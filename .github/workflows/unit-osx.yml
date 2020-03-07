@@ -1,0 +1,21 @@
+name: Build & Test for OSX
+on: [push]
+jobs:
+  run:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        architecture: [x64, x86]
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 8
+          java-package: jdk
+          architecture: ${{ matrix.architecture }}
+      - run: |
+          xcode-select --install
+          brew install llvm
+          mvn clean package
+          mvn clean test

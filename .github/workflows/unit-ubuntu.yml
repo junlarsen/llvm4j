@@ -1,12 +1,11 @@
-name: Test compile and execute tests
+name: Build & Test for Ubuntu
 on: [push]
 jobs:
   run:
     name: Run Tests
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        operating-system: [ubuntu-latest]
         architecture: [x64, x86]
     steps:
       - uses: actions/checkout@v1
