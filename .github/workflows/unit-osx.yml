@@ -15,7 +15,7 @@ jobs:
           java-package: jdk
           architecture: ${{ matrix.architecture }}
       - run: |
-          sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
           brew install --with-toolchain llvm
           mvn clean package
           mvn clean test
