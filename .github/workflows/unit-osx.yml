@@ -15,7 +15,6 @@ jobs:
           java-package: jdk
           architecture: ${{ matrix.architecture }}
       - run: |
-          xcode-select --install
-          brew install llvm
+          brew install --with-toolchain llvm
           mvn clean package
           mvn clean test
