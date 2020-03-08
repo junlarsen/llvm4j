@@ -1,12 +1,11 @@
-name: Test compile and execute tests
+name: Build & Test for OSX
 on: [push]
 jobs:
   run:
     name: Run Tests
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        operating-system: [ubuntu-latest]
         architecture: [x64, x86]
     steps:
       - uses: actions/checkout@v1
@@ -16,6 +15,8 @@ jobs:
           java-package: jdk
           architecture: ${{ matrix.architecture }}
       - run: |
-          sudo apt install llvm build-essential clang
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+          eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
+          brew install llvm
           mvn clean package
           mvn clean test
