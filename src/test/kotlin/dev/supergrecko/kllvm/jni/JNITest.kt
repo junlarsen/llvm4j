@@ -1,4 +1,4 @@
-package dev.supergrecko.ktools.llvm.basic
+package dev.supergrecko.kllvm.jni
 
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM

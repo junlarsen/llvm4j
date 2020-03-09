@@ -1,4 +1,4 @@
-package dev.supergrecko.ktools.llvm.core
+package dev.supergrecko.kllvm.core
 
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
