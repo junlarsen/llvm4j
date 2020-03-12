@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core
 
+import dev.supergrecko.kllvm.core.type.IntegerType
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.Pointer
@@ -14,11 +15,11 @@ import org.bytedeco.llvm.global.LLVM
  *
  * Note: prefer calling [Context.create] over using the constructor.
  *
- * @throws AssertionError given underlying context is null for methods which call [Context.assertIsNotNull]
- *
  * - [llvm::LLVMContext](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html)
+ *
+ * @throws IllegalArgumentException If any argument assertions fail. Most noticeably functions which involve a context ref.
  */
-public class Context(private val context: LLVMContextRef) : AutoCloseable {
+public class Context internal constructor(private val llvmCtx: LLVMContextRef) : AutoCloseable {
     /**
      * A LLVM Context has a diagnostic handler. The receiving pointer will be passed to the handler.
      *
@@ -36,7 +37,8 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * - [LLVMContextSetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gacbfc704565962bf71eaaa549a9be570f)
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler, diagnosticContext: Pointer) {
-        LLVM.LLVMContextSetDiagnosticHandler(context, handler, diagnosticContext)
+        require(!llvmCtx.isNull)
+        LLVM.LLVMContextSetDiagnosticHandler(llvmCtx, handler, diagnosticContext)
     }
 
     /**
@@ -56,7 +58,8 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * - [LLVMContextGetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga4ecfc4310276f36557ee231e22d1b823)
      */
     public fun getDiagnosticHandler(): LLVMDiagnosticHandler {
-        return LLVM.LLVMContextGetDiagnosticHandler(context)
+        require(!llvmCtx.isNull)
+        return LLVM.LLVMContextGetDiagnosticHandler(llvmCtx)
     }
 
     /**
@@ -68,11 +71,12 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * - [LLVMContextSetYieldCallback](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gabdcc4e421199e9e7bb5e0cd449468731)
      */
     public fun setYieldCallback(callback: LLVMYieldCallback, opaqueHandle: Pointer) {
-        LLVM.LLVMContextSetYieldCallback(context, callback, opaqueHandle)
+        require(!llvmCtx.isNull)
+        LLVM.LLVMContextSetYieldCallback(llvmCtx, callback, opaqueHandle)
     }
 
     /**
-     * Retrieve whether the given context is set to discard all value names.
+     * Retrieve whether the given context will be set to discard all value names.
      *
      * The underlying JNI function returns [Int] to be C compatible, so we will just turn
      * it into a kotlin [Boolean].
@@ -80,7 +84,9 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * - [LLVMContextShouldDiscardValueNames](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga537bd9783e94fa79d3980c4782cf5d76)
      */
     public fun shouldDiscardValueNames(): Boolean {
-        val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(context)
+        require(!llvmCtx.isNull)
+
+        val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(llvmCtx)
 
         // Conversion from C++ bool to kotlin Boolean
         return willDiscard.toBoolean()
@@ -98,63 +104,35 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * - [LLVMContextSetDiscardValueNames](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga0a07c702a2d8d2dedfe0a4813a0e0fd1)
      */
     public fun setDiscardValueNames(discard: Boolean) {
+        require(!llvmCtx.isNull)
+
         // Conversion from kotlin Boolean to C++ bool
         val intValue = discard.toInt()
 
-        LLVM.LLVMContextSetDiscardValueNames(context, intValue)
+        LLVM.LLVMContextSetDiscardValueNames(llvmCtx, intValue)
     }
-
-    /**
-     * Obtain an i128 type from a context with specified bit width.
-     *
-     * - [LLVMInt128TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga5f3cfd960e39ae448213d45db5da229a)
-     */
-    public fun i128Type(): LLVMTypeRef = LLVM.LLVMInt128TypeInContext(context)
-
-    /**
-     * Obtain an i16 type from a context with specified bit width.
-     *
-     * - [LLVMInt64TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga23a21172a069470b344a61672b299968)
-     */
-    public fun i64Type(): LLVMTypeRef = LLVM.LLVMInt64TypeInContext(context)
-
-    /**
-     * Obtain an i32 type from a context with specified bit width.
-     *
-     * - [LLVMInt32TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga5e69a2cc779db154a0b805ed6ad3c724)
-     */
-    public fun i32Type(): LLVMTypeRef = LLVM.LLVMInt32TypeInContext(context)
-
-    /**
-     * Obtain an i16 type from a context with specified bit width.
-     *
-     * - [LLVMInt16TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga23a21172a069470b344a61672b299968)
-     */
-    public fun i16Type(): LLVMTypeRef = LLVM.LLVMInt16TypeInContext(context)
-
-    /**
-     * Obtain an i32 type from a context with specified bit width.
-     *
-     * - [LLVMInt32TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga7afaa9a2cb5dd3c5c06d65298ed195d4)
-     */
-    public fun i8Type(): LLVMTypeRef = LLVM.LLVMInt8TypeInContext(context)
-
-    /**
-     * Obtain an i1 type from a context with specified bit width.
-     *
-     * - [LLVMInt1TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga390b4c486c780eed40002b07933d13df)
-     */
-    public fun i1Type(): LLVMTypeRef = LLVM.LLVMInt1TypeInContext(context)
 
     /**
      * Obtain an integer type from a context with specified bit width.
-     *
-     * - [LLVMIntIntTypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga2e5db8cbc30daa156083f2c42989138d)
      */
-    public fun intType(size: Int): LLVMTypeRef {
-        require(size > 0)
-        return LLVM.LLVMIntTypeInContext(context, size)
-    }
+    public fun i128Type(): LLVMTypeRef = IntegerType.i128Type(llvmCtx)
+    public fun i64Type(): LLVMTypeRef = IntegerType.i64Type(llvmCtx)
+    public fun i32Type(): LLVMTypeRef = IntegerType.i32Type(llvmCtx)
+    public fun i16Type(): LLVMTypeRef = IntegerType.i16Type(llvmCtx)
+    public fun i8Type(): LLVMTypeRef = IntegerType.i8Type(llvmCtx)
+    public fun i1Type(): LLVMTypeRef = IntegerType.i1Type(llvmCtx)
+    public fun iType(size: Int): LLVMTypeRef = IntegerType.iType(size, llvmCtx)
+
+    /**
+     * Dispose the current context reference.
+     *
+     * Any calls referencing this context will most likely fail
+     * as the inner LLVM Context will be set to a null pointer after
+     * this is called.
+     *
+     * Equal to [Context.disposeContext]
+     */
+    public fun dispose() = close()
 
     /**
      * Implementation for AutoCloseable for Context
@@ -189,8 +167,8 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
          * - [LLVMContextDispose](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga9cf8b0fb4a546d4cdb6f64b8055f5f57)
          */
         public fun disposeContext(context: Context) {
-            require(!context.context.isNull)
-            LLVM.LLVMContextDispose(context.context)
+            require(!context.llvmCtx.isNull)
+            LLVM.LLVMContextDispose(context.llvmCtx)
         }
     }
 }
