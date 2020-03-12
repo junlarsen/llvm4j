@@ -1,7 +1,8 @@
 package dev.supergrecko.kllvm.core
 
+import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
-import java.lang.IllegalArgumentException
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class ContextTest {
@@ -23,6 +24,28 @@ class ContextTest {
 
         assertFailsWith<IllegalArgumentException> {
             Context.disposeContext(ctx)
+        }
+    }
+
+    @Test
+    fun `modifying discard value names actually works`() {
+        val ctx = Context.create()
+        val values = listOf(true, false)
+
+        values.forEach {
+            ctx.setDiscardValueNames(it)
+            assertEquals(it, ctx.shouldDiscardValueNames())
+        }
+    }
+
+    @Test
+    fun `get integer types from llvm`() {
+        val ctx = Context.create()
+        val sizes = listOf(1, 8, 16, 32, 64, 128, /* LLVMGetIntType */ 256, 1024)
+
+        sizes.forEach {
+            val type = ctx.iType(it)
+            assertEquals(it, LLVM.LLVMGetIntTypeWidth(type))
         }
     }
 }

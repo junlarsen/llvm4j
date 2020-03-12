@@ -81,6 +81,8 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
     /**
      * Register a yield callback with the given context.
      *
+     * TODO: Find out how to actually call this thing from Kotlin/Java
+     *
      * @param callback Callback to register. C++ Type: void (*)(LLVMContext *Context, void *OpaqueHandle)
      * @param opaqueHandle Pointer type: void*
      *
