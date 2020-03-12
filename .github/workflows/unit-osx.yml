@@ -14,9 +14,14 @@ jobs:
           java-version: 8
           java-package: jdk
           architecture: ${{ matrix.architecture }}
-      - run: |
+      - name: Install LLVM
+        run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
           eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
           brew install llvm
+      - name: Package Fatjar
+        run: |
           mvn clean package
+      - name: Run tests
+        run: |
           mvn clean test

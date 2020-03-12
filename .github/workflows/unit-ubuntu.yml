@@ -14,7 +14,12 @@ jobs:
           java-version: 8
           java-package: jdk
           architecture: ${{ matrix.architecture }}
-      - run: |
+      - name: Install LLVM
+        run: |
           sudo apt install llvm build-essential clang
+      - name: Package Fatjar
+        run: |
           mvn clean package
+      - name: Run tests
+        run: |
           mvn clean test
