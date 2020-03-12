@@ -47,7 +47,7 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler, diagnosticContext: Pointer) {
-        require(isAlive)
+        require(isAlive) { "This module has already been disposed." }
 
         LLVM.LLVMContextSetDiagnosticHandler(llvmCtx, handler, diagnosticContext)
     }
@@ -73,7 +73,7 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun getDiagnosticHandler(): LLVMDiagnosticHandler {
-        require(isAlive)
+        require(isAlive) { "This module has already been disposed." }
 
         return LLVM.LLVMContextGetDiagnosticHandler(llvmCtx)
     }
@@ -91,7 +91,7 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setYieldCallback(callback: LLVMYieldCallback, opaqueHandle: Pointer) {
-        require(isAlive)
+        require(isAlive) { "This module has already been disposed." }
 
         LLVM.LLVMContextSetYieldCallback(llvmCtx, callback, opaqueHandle)
     }
@@ -107,7 +107,7 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun shouldDiscardValueNames(): Boolean {
-        require(isAlive)
+        require(isAlive) { "This module has already been disposed." }
 
         val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(llvmCtx)
 
@@ -129,7 +129,7 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setDiscardValueNames(discard: Boolean) {
-        require(isAlive)
+        require(isAlive) { "This module has already been disposed." }
 
         // Conversion from kotlin Boolean to C++ bool
         val intValue = discard.toInt()
@@ -140,22 +140,18 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
     /**
      * Obtain an integer type from a context with specified bit width.
      *
+     * These are the integer types described in the Language manual
+     *
+     * - https://llvm.org/docs/LangRef.html#integer-type
+     *
      * @throws IllegalArgumentException If internal instance has been dropped.
-     * @throws IllegalArgumentException If wanted size is less than 0
+     * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
      */
     public fun iType(size: Int): LLVMTypeRef {
-        require(isAlive)
-        require(size > 0)
+        require(isAlive) { "This module has already been disposed." }
+        require(size in 1..8388606) { "LLVM only supports integers of 2^23-1 bits size" }
 
-        return when (size) {
-            128 -> IntegerType.i128Type(llvmCtx)
-            64 -> IntegerType.i64Type(llvmCtx)
-            32 -> IntegerType.i32Type(llvmCtx)
-            16 -> IntegerType.i16Type(llvmCtx)
-            8 -> IntegerType.i8Type(llvmCtx)
-            1 -> IntegerType.i1Type(llvmCtx)
-            else -> IntegerType.iType(size, llvmCtx)
-        }
+        return IntegerType.iType(size, llvmCtx)
     }
 
     /**
@@ -165,7 +161,7 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * as the inner LLVM Context will be set to a null pointer after
      * this is called.
      *
-     * Equal to [Context.disposeContext]
+     * Equal to [Context.disposeContext] and [Context.close]
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
@@ -174,7 +170,10 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
     /**
      * Implementation for AutoCloseable for Context
      *
-     * In short: disposes the underlying context
+     * If the JVM ever does decide to auto-close this then
+     * the module will be dropped to prevent memory leaks.
+     *
+     * Equal to [Context.dispose] and [Context.disposeContext]
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
@@ -205,7 +204,7 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
          * @throws IllegalArgumentException If internal instance has been dropped.
          */
         public fun disposeContext(context: Context) {
-            require(context.isAlive)
+            require(context.isAlive) { "This module has already been disposed." }
             context.isAlive = false
             LLVM.LLVMContextDispose(context.llvmCtx)
         }

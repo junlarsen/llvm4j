@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core
 
+import dev.supergrecko.kllvm.utils.runAll
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -30,9 +31,8 @@ class ContextTest {
     @Test
     fun `modifying discard value names actually works`() {
         val ctx = Context.create()
-        val values = listOf(true, false)
 
-        values.forEach {
+        runAll(true, false) {
             ctx.setDiscardValueNames(it)
             assertEquals(it, ctx.shouldDiscardValueNames())
         }
@@ -41,9 +41,8 @@ class ContextTest {
     @Test
     fun `get integer types from llvm`() {
         val ctx = Context.create()
-        val sizes = listOf(1, 8, 16, 32, 64, 128, /* LLVMGetIntType */ 256, 1024)
 
-        sizes.forEach {
+        runAll(1, 6, 16, 32, 64, 8237, 64362) {
             val type = ctx.iType(it)
             assertEquals(it, LLVM.LLVMGetIntTypeWidth(type))
         }

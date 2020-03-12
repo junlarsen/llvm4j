@@ -88,8 +88,16 @@ object IntegerType {
     public fun iType(size: Int): LLVMTypeRef = iType(size, LLVM.LLVMGetGlobalContext())
     public fun iType(size: Int, context: LLVMContextRef): LLVMTypeRef {
         require(!context.isNull)
-        require(size > 0)
+        require(size in 1..8388606) { "LLVM only supports integers of 2^23-1 bits size" }
 
-        return LLVM.LLVMIntTypeInContext(context, size)
+        return when (size) {
+            128 -> i128Type(context)
+            64 -> i64Type(context)
+            32 -> i32Type(context)
+            16 -> i16Type(context)
+            8 -> i8Type(context)
+            1 -> i1Type(context)
+            else -> LLVM.LLVMIntTypeInContext(context, size)
+        }
     }
 }
