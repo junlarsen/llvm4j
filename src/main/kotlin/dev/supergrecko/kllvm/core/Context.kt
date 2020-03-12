@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core
 
+import dev.supergrecko.kllvm.core.type.IntegerType
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.Pointer
@@ -14,11 +15,19 @@ import org.bytedeco.llvm.global.LLVM
  *
  * Note: prefer calling [Context.create] over using the constructor.
  *
- * @throws AssertionError given underlying context is null for methods which call [Context.assertIsNotNull]
- *
  * - [llvm::LLVMContext](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html)
+ *
+ * @throws IllegalArgumentException If any argument assertions fail. Most noticeably functions which involve a context ref.
  */
-public class Context(private val context: LLVMContextRef) : AutoCloseable {
+public class Context internal constructor(private val llvmCtx: LLVMContextRef) : AutoCloseable {
+    /**
+     * Control whether the instance has been dropped or not.
+     *
+     * Attempting to do anything with a dead module will fail.
+     */
+    public var isAlive: Boolean = true
+        internal set
+
     /**
      * A LLVM Context has a diagnostic handler. The receiving pointer will be passed to the handler.
      *
@@ -34,9 +43,13 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * @param diagnosticContext The diagnostic context. Pointer type: DiagnosticContext*
      *
      * - [LLVMContextSetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gacbfc704565962bf71eaaa549a9be570f)
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler, diagnosticContext: Pointer) {
-        LLVM.LLVMContextSetDiagnosticHandler(context, handler, diagnosticContext)
+        require(isAlive) { "This module has already been disposed." }
+
+        LLVM.LLVMContextSetDiagnosticHandler(llvmCtx, handler, diagnosticContext)
     }
 
     /**
@@ -45,6 +58,8 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * This sets the context to be a nullptr.
      *
      * @param handler The diagnostic handler to use
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler) {
         setDiagnosticHandler(handler, Pointer())
@@ -54,33 +69,47 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * Get the diagnostic handler for this context.
      *
      * - [LLVMContextGetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga4ecfc4310276f36557ee231e22d1b823)
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun getDiagnosticHandler(): LLVMDiagnosticHandler {
-        return LLVM.LLVMContextGetDiagnosticHandler(context)
+        require(isAlive) { "This module has already been disposed." }
+
+        return LLVM.LLVMContextGetDiagnosticHandler(llvmCtx)
     }
 
     /**
      * Register a yield callback with the given context.
      *
+     * TODO: Find out how to actually call this thing from Kotlin/Java
+     *
      * @param callback Callback to register. C++ Type: void (*)(LLVMContext *Context, void *OpaqueHandle)
      * @param opaqueHandle Pointer type: void*
      *
      * - [LLVMContextSetYieldCallback](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gabdcc4e421199e9e7bb5e0cd449468731)
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setYieldCallback(callback: LLVMYieldCallback, opaqueHandle: Pointer) {
-        LLVM.LLVMContextSetYieldCallback(context, callback, opaqueHandle)
+        require(isAlive) { "This module has already been disposed." }
+
+        LLVM.LLVMContextSetYieldCallback(llvmCtx, callback, opaqueHandle)
     }
 
     /**
-     * Retrieve whether the given context is set to discard all value names.
+     * Retrieve whether the given context will be set to discard all value names.
      *
      * The underlying JNI function returns [Int] to be C compatible, so we will just turn
      * it into a kotlin [Boolean].
      *
      * - [LLVMContextShouldDiscardValueNames](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga537bd9783e94fa79d3980c4782cf5d76)
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun shouldDiscardValueNames(): Boolean {
-        val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(context)
+        require(isAlive) { "This module has already been disposed." }
+
+        val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(llvmCtx)
 
         // Conversion from C++ bool to kotlin Boolean
         return willDiscard.toBoolean()
@@ -96,70 +125,57 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * it into a kotlin [Boolean].
      *
      * - [LLVMContextSetDiscardValueNames](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga0a07c702a2d8d2dedfe0a4813a0e0fd1)
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setDiscardValueNames(discard: Boolean) {
+        require(isAlive) { "This module has already been disposed." }
+
         // Conversion from kotlin Boolean to C++ bool
         val intValue = discard.toInt()
 
-        LLVM.LLVMContextSetDiscardValueNames(context, intValue)
+        LLVM.LLVMContextSetDiscardValueNames(llvmCtx, intValue)
     }
-
-    /**
-     * Obtain an i128 type from a context with specified bit width.
-     *
-     * - [LLVMInt128TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga5f3cfd960e39ae448213d45db5da229a)
-     */
-    public fun i128Type(): LLVMTypeRef = LLVM.LLVMInt128TypeInContext(context)
-
-    /**
-     * Obtain an i16 type from a context with specified bit width.
-     *
-     * - [LLVMInt64TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga23a21172a069470b344a61672b299968)
-     */
-    public fun i64Type(): LLVMTypeRef = LLVM.LLVMInt64TypeInContext(context)
-
-    /**
-     * Obtain an i32 type from a context with specified bit width.
-     *
-     * - [LLVMInt32TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga5e69a2cc779db154a0b805ed6ad3c724)
-     */
-    public fun i32Type(): LLVMTypeRef = LLVM.LLVMInt32TypeInContext(context)
-
-    /**
-     * Obtain an i16 type from a context with specified bit width.
-     *
-     * - [LLVMInt16TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga23a21172a069470b344a61672b299968)
-     */
-    public fun i16Type(): LLVMTypeRef = LLVM.LLVMInt16TypeInContext(context)
-
-    /**
-     * Obtain an i32 type from a context with specified bit width.
-     *
-     * - [LLVMInt32TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga7afaa9a2cb5dd3c5c06d65298ed195d4)
-     */
-    public fun i8Type(): LLVMTypeRef = LLVM.LLVMInt8TypeInContext(context)
-
-    /**
-     * Obtain an i1 type from a context with specified bit width.
-     *
-     * - [LLVMInt1TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga390b4c486c780eed40002b07933d13df)
-     */
-    public fun i1Type(): LLVMTypeRef = LLVM.LLVMInt1TypeInContext(context)
 
     /**
      * Obtain an integer type from a context with specified bit width.
      *
-     * - [LLVMIntIntTypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga2e5db8cbc30daa156083f2c42989138d)
+     * These are the integer types described in the Language manual
+     *
+     * - https://llvm.org/docs/LangRef.html#integer-type
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
+     * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
      */
-    public fun intType(size: Int): LLVMTypeRef {
-        require(size > 0)
-        return LLVM.LLVMIntTypeInContext(context, size)
+    public fun iType(size: Int): LLVMTypeRef {
+        require(isAlive) { "This module has already been disposed." }
+        require(size in 1..8388606) { "LLVM only supports integers of 2^23-1 bits size" }
+
+        return IntegerType.iType(size, llvmCtx)
     }
+
+    /**
+     * Dispose the current context reference.
+     *
+     * Any calls referencing this context will most likely fail
+     * as the inner LLVM Context will be set to a null pointer after
+     * this is called.
+     *
+     * Equal to [Context.disposeContext] and [Context.close]
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
+     */
+    public fun dispose() = close()
 
     /**
      * Implementation for AutoCloseable for Context
      *
-     * In short: disposes the underlying context
+     * If the JVM ever does decide to auto-close this then
+     * the module will be dropped to prevent memory leaks.
+     *
+     * Equal to [Context.dispose] and [Context.disposeContext]
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     override fun close() {
         disposeContext(this)
@@ -183,14 +199,14 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
          * Note that after using this, the [context] should not be used again as
          * its LLVM reference has been disposed.
          *
-         * This method does not care if the underlying context has already been
-         * dropped or not.
-         *
          * - [LLVMContextDispose](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga9cf8b0fb4a546d4cdb6f64b8055f5f57)
+         *
+         * @throws IllegalArgumentException If internal instance has been dropped.
          */
         public fun disposeContext(context: Context) {
-            require(!context.context.isNull)
-            LLVM.LLVMContextDispose(context.context)
+            require(context.isAlive) { "This module has already been disposed." }
+            context.isAlive = false
+            LLVM.LLVMContextDispose(context.llvmCtx)
         }
     }
 }
