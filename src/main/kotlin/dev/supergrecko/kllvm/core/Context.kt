@@ -21,6 +21,14 @@ import org.bytedeco.llvm.global.LLVM
  */
 public class Context internal constructor(private val llvmCtx: LLVMContextRef) : AutoCloseable {
     /**
+     * Control whether the instance has been dropped or not.
+     *
+     * Attempting to do anything with a dead module will fail.
+     */
+    public var isAlive: Boolean = true
+        internal set
+
+    /**
      * A LLVM Context has a diagnostic handler. The receiving pointer will be passed to the handler.
      *
      * The C++ code for the DiagnosticHandler looks a little like this.
@@ -35,9 +43,12 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * @param diagnosticContext The diagnostic context. Pointer type: DiagnosticContext*
      *
      * - [LLVMContextSetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gacbfc704565962bf71eaaa549a9be570f)
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler, diagnosticContext: Pointer) {
-        require(!llvmCtx.isNull)
+        require(isAlive)
+
         LLVM.LLVMContextSetDiagnosticHandler(llvmCtx, handler, diagnosticContext)
     }
 
@@ -47,6 +58,8 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * This sets the context to be a nullptr.
      *
      * @param handler The diagnostic handler to use
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler) {
         setDiagnosticHandler(handler, Pointer())
@@ -56,9 +69,12 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * Get the diagnostic handler for this context.
      *
      * - [LLVMContextGetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga4ecfc4310276f36557ee231e22d1b823)
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun getDiagnosticHandler(): LLVMDiagnosticHandler {
-        require(!llvmCtx.isNull)
+        require(isAlive)
+
         return LLVM.LLVMContextGetDiagnosticHandler(llvmCtx)
     }
 
@@ -69,9 +85,12 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * @param opaqueHandle Pointer type: void*
      *
      * - [LLVMContextSetYieldCallback](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gabdcc4e421199e9e7bb5e0cd449468731)
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setYieldCallback(callback: LLVMYieldCallback, opaqueHandle: Pointer) {
-        require(!llvmCtx.isNull)
+        require(isAlive)
+
         LLVM.LLVMContextSetYieldCallback(llvmCtx, callback, opaqueHandle)
     }
 
@@ -82,9 +101,11 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * it into a kotlin [Boolean].
      *
      * - [LLVMContextShouldDiscardValueNames](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga537bd9783e94fa79d3980c4782cf5d76)
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun shouldDiscardValueNames(): Boolean {
-        require(!llvmCtx.isNull)
+        require(isAlive)
 
         val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(llvmCtx)
 
@@ -102,9 +123,11 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * it into a kotlin [Boolean].
      *
      * - [LLVMContextSetDiscardValueNames](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga0a07c702a2d8d2dedfe0a4813a0e0fd1)
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setDiscardValueNames(discard: Boolean) {
-        require(!llvmCtx.isNull)
+        require(isAlive)
 
         // Conversion from kotlin Boolean to C++ bool
         val intValue = discard.toInt()
@@ -114,14 +137,24 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
 
     /**
      * Obtain an integer type from a context with specified bit width.
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
+     * @throws IllegalArgumentException If wanted size is less than 0
      */
-    public fun i128Type(): LLVMTypeRef = IntegerType.i128Type(llvmCtx)
-    public fun i64Type(): LLVMTypeRef = IntegerType.i64Type(llvmCtx)
-    public fun i32Type(): LLVMTypeRef = IntegerType.i32Type(llvmCtx)
-    public fun i16Type(): LLVMTypeRef = IntegerType.i16Type(llvmCtx)
-    public fun i8Type(): LLVMTypeRef = IntegerType.i8Type(llvmCtx)
-    public fun i1Type(): LLVMTypeRef = IntegerType.i1Type(llvmCtx)
-    public fun iType(size: Int): LLVMTypeRef = IntegerType.iType(size, llvmCtx)
+    public fun iType(size: Int): LLVMTypeRef {
+        require(isAlive)
+        require(size > 0)
+
+        return when (size) {
+            128 -> IntegerType.i128Type(llvmCtx)
+            64 -> IntegerType.i64Type(llvmCtx)
+            32 -> IntegerType.i32Type(llvmCtx)
+            16 -> IntegerType.i16Type(llvmCtx)
+            8 -> IntegerType.i8Type(llvmCtx)
+            1 -> IntegerType.i1Type(llvmCtx)
+            else -> IntegerType.iType(size, llvmCtx)
+        }
+    }
 
     /**
      * Dispose the current context reference.
@@ -131,6 +164,8 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * this is called.
      *
      * Equal to [Context.disposeContext]
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun dispose() = close()
 
@@ -138,6 +173,8 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * Implementation for AutoCloseable for Context
      *
      * In short: disposes the underlying context
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     override fun close() {
         disposeContext(this)
@@ -161,13 +198,13 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
          * Note that after using this, the [context] should not be used again as
          * its LLVM reference has been disposed.
          *
-         * This method does not care if the underlying context has already been
-         * dropped or not.
-         *
          * - [LLVMContextDispose](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga9cf8b0fb4a546d4cdb6f64b8055f5f57)
+         *
+         * @throws IllegalArgumentException If internal instance has been dropped.
          */
         public fun disposeContext(context: Context) {
-            require(!context.llvmCtx.isNull)
+            require(context.isAlive)
+            context.isAlive = false
             LLVM.LLVMContextDispose(context.llvmCtx)
         }
     }
