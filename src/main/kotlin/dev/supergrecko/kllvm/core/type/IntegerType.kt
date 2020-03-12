@@ -41,7 +41,7 @@ object IntegerType {
     public fun i16Type(context: LLVMContextRef): LLVMTypeRef {
         require(!context.isNull)
 
-        return LLVM.LLVMInt32TypeInContext(context)
+        return LLVM.LLVMInt16TypeInContext(context)
     }
 
     /**
