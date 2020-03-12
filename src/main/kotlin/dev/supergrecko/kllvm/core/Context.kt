@@ -1,8 +1,11 @@
 package dev.supergrecko.kllvm.core
 
+import dev.supergrecko.kllvm.utils.toBoolean
+import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
+import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMYieldCallback
 import org.bytedeco.llvm.global.LLVM
 
@@ -16,14 +19,6 @@ import org.bytedeco.llvm.global.LLVM
  * - [llvm::LLVMContext](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html)
  */
 public class Context(private val context: LLVMContextRef) : AutoCloseable {
-
-    /**
-     * Make sure the context is alive upon creation as it would not make sense to create a context from a nullptr
-     */
-    init {
-        assertIsNotNull()
-    }
-
     /**
      * A LLVM Context has a diagnostic handler. The receiving pointer will be passed to the handler.
      *
@@ -38,7 +33,6 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * @param handler The diagnostic handler to use
      * @param diagnosticContext The diagnostic context. Pointer type: DiagnosticContext*
      *
-     * - [llvm::LLVMContext::setDiagnosticHandler](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html#af00a4d3e0ec33c889e807f9e507493ee)
      * - [LLVMContextSetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gacbfc704565962bf71eaaa549a9be570f)
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler, diagnosticContext: Pointer) {
@@ -59,7 +53,6 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
     /**
      * Get the diagnostic handler for this context.
      *
-     * - [llvm::LLVMContext::getDiagnosticHandler](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html#a4c4156ebce5aa9a4cfebfe8f31cfc743)
      * - [LLVMContextGetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga4ecfc4310276f36557ee231e22d1b823)
      */
     public fun getDiagnosticHandler(): LLVMDiagnosticHandler {
@@ -73,7 +66,6 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * @param opaqueHandle Pointer type: void*
      *
      * - [LLVMContextSetYieldCallback](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gabdcc4e421199e9e7bb5e0cd449468731)
-     * - [llvm::LLVMContext::setYieldCallback](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html#a26b9a4decea0c52a7225bc63c8166f90)
      */
     public fun setYieldCallback(callback: LLVMYieldCallback, opaqueHandle: Pointer) {
         LLVM.LLVMContextSetYieldCallback(context, callback, opaqueHandle)
@@ -85,13 +77,13 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * The underlying JNI function returns [Int] to be C compatible, so we will just turn
      * it into a kotlin [Boolean].
      *
-     * - [llvm::LLVMContext::shouldDiscardValueNames](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html#a865b245ad9c5dc10922481c736ed4a4a)
      * - [LLVMContextShouldDiscardValueNames](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga537bd9783e94fa79d3980c4782cf5d76)
      */
     public fun shouldDiscardValueNames(): Boolean {
         val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(context)
 
-        return willDiscard == 1
+        // Conversion from C++ bool to kotlin Boolean
+        return willDiscard.toBoolean()
     }
 
     /**
@@ -103,17 +95,69 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
      * The underlying JNI function accepts [Int] to be C compatible, so we will just turn
      * it into a kotlin [Boolean].
      *
-     * - [llvm::LLVMContext::setDiscardValueNames](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html#a865b245ad9c5dc10922481c736ed4a4a)
      * - [LLVMContextSetDiscardValueNames](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga0a07c702a2d8d2dedfe0a4813a0e0fd1)
      */
     public fun setDiscardValueNames(discard: Boolean) {
-        val intValue = if (discard) 1 else 0
+        // Conversion from kotlin Boolean to C++ bool
+        val intValue = discard.toInt()
 
         LLVM.LLVMContextSetDiscardValueNames(context, intValue)
     }
 
     /**
-     * Implementation for AutoClosable for Context
+     * Obtain an i128 type from a context with specified bit width.
+     *
+     * - [LLVMInt128TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga5f3cfd960e39ae448213d45db5da229a)
+     */
+    public fun i128Type(): LLVMTypeRef = LLVM.LLVMInt128TypeInContext(context)
+
+    /**
+     * Obtain an i16 type from a context with specified bit width.
+     *
+     * - [LLVMInt64TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga23a21172a069470b344a61672b299968)
+     */
+    public fun i64Type(): LLVMTypeRef = LLVM.LLVMInt64TypeInContext(context)
+
+    /**
+     * Obtain an i32 type from a context with specified bit width.
+     *
+     * - [LLVMInt32TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga5e69a2cc779db154a0b805ed6ad3c724)
+     */
+    public fun i32Type(): LLVMTypeRef = LLVM.LLVMInt32TypeInContext(context)
+
+    /**
+     * Obtain an i16 type from a context with specified bit width.
+     *
+     * - [LLVMInt16TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga23a21172a069470b344a61672b299968)
+     */
+    public fun i16Type(): LLVMTypeRef = LLVM.LLVMInt16TypeInContext(context)
+
+    /**
+     * Obtain an i32 type from a context with specified bit width.
+     *
+     * - [LLVMInt32TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga7afaa9a2cb5dd3c5c06d65298ed195d4)
+     */
+    public fun i8Type(): LLVMTypeRef = LLVM.LLVMInt8TypeInContext(context)
+
+    /**
+     * Obtain an i1 type from a context with specified bit width.
+     *
+     * - [LLVMInt1TypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga390b4c486c780eed40002b07933d13df)
+     */
+    public fun i1Type(): LLVMTypeRef = LLVM.LLVMInt1TypeInContext(context)
+
+    /**
+     * Obtain an integer type from a context with specified bit width.
+     *
+     * - [LLVMIntIntTypeInContext](https://llvm.org/doxygen/group__LLVMCCoreTypeInt.html#ga2e5db8cbc30daa156083f2c42989138d)
+     */
+    public fun intType(size: Int): LLVMTypeRef {
+        require(size > 0)
+        return LLVM.LLVMIntTypeInContext(context, size)
+    }
+
+    /**
+     * Implementation for AutoCloseable for Context
      *
      * In short: disposes the underlying context
      */
@@ -121,19 +165,10 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
         disposeContext(this)
     }
 
-    /**
-     * Method to assert that the underlying reference has not
-     * been dropped yet.
-     */
-    private fun assertIsNotNull() {
-        assert(!context.isNull)
-    }
-
     companion object {
         /**
          * Create a new LLVM context
          *
-         * - [llvm::LLVMContext::LLVMContext](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html#a4eb1cb06b47255ef63fa4212866849e1)
          * - [LLVMContextCreate](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gaac4f39a2d0b9735e64ac7681ab543b4c)
          */
         public fun create(): Context {
@@ -151,10 +186,10 @@ public class Context(private val context: LLVMContextRef) : AutoCloseable {
          * This method does not care if the underlying context has already been
          * dropped or not.
          *
-         * - [llvm::LLVMContext::~LLVMContext](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html#a4c4127987cdf74291dd97e24b20bfae4)
          * - [LLVMContextDispose](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga9cf8b0fb4a546d4cdb6f64b8055f5f57)
          */
         public fun disposeContext(context: Context) {
+            require(!context.context.isNull)
             LLVM.LLVMContextDispose(context.context)
         }
     }
