@@ -17,9 +17,6 @@ jobs:
       - name: Install LLVM
         run: |
           sudo apt install llvm build-essential clang
-      - name: Package Fatjar
-        run: |
-          gradle clean build
       - name: Run tests
         run: |
           gradle clean test

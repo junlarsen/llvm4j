@@ -19,9 +19,6 @@ jobs:
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
           eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
           brew install llvm
-      - name: Package Fatjar
-        run: |
-          gradle clean shadowJar
       - name: Run tests
         run: |
           gradle clean test
