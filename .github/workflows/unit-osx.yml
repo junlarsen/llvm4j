@@ -3,7 +3,7 @@ on: [push]
 jobs:
   run:
     name: Run Tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     strategy:
       matrix:
         architecture: [x64, x86]
@@ -16,9 +16,7 @@ jobs:
           architecture: ${{ matrix.architecture }}
       - name: Install LLVM
         run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-          eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-          brew install llvm
+          gradle build --refresh-dependencies
       - name: Run tests
         run: |
           gradle clean test

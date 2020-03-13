@@ -16,7 +16,7 @@ jobs:
           architecture: ${{ matrix.architecture }}
       - name: Install LLVM
         run: |
-          sudo apt install llvm build-essential clang
+          gradle build --refresh-dependencies
       - name: Run tests
         run: |
           gradle clean test
