@@ -1,0 +1,7 @@
+out
+build
+target
+.idea
+.gradle
+*.iml
+__backup__
