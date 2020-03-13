@@ -7,16 +7,19 @@ jobs:
       matrix:
         architecture: [x64, x86]
         operating-system: [macos-latest, windows-latest, ubuntu-latest, ubuntu-16.04]
-        java-version: [8, 11]
+        # Bytedeco LLVM versions
+        llvm-version: [8.0.0-1.5.1, 9.0.0-1.5.2]
     runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-java@v1
         with:
-          java-version: ${{ matrix.java-version }}
+          java-version: 8
           java-package: jdk
           architecture: ${{ matrix.architecture }}
       - name: Install LLVM
+        env:
+          LLVM_VERSION: ${{ matrix.llvm-version }}
         run: |
           gradle build --refresh-dependencies
       - name: Run tests
