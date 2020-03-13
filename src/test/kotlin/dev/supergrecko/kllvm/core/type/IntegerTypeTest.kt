@@ -12,8 +12,8 @@ class IntegerTypeTest {
         val ctx = Context.create()
 
         runAll(1, 8, 16, 32, 64, 128) {
-            val contextType = ctx.iType(it)
-            val globalType = IntegerType.iType(it)
+            val contextType = ctx.intType(it)
+            val globalType = IntegerTypes.type(it)
 
             assertEquals(LLVM.LLVMGetIntTypeWidth(contextType), LLVM.LLVMGetIntTypeWidth(globalType))
         }

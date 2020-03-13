@@ -43,7 +43,7 @@ class ContextTest {
         val ctx = Context.create()
 
         runAll(1, 6, 16, 32, 64, 8237, 64362) {
-            val type = ctx.iType(it)
+            val type = ctx.intType(it)
             assertEquals(it, LLVM.LLVMGetIntTypeWidth(type))
         }
     }
