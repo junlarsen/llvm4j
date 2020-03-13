@@ -5,8 +5,9 @@ import dev.supergrecko.kllvm.utils.runAll
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
-class IntegerTypeTest {
+class IntegerTypesTest {
     @Test
     fun `global module values equate to module values`() {
         val ctx = Context.create()
@@ -16,6 +17,17 @@ class IntegerTypeTest {
             val globalType = IntegerTypes.type(it)
 
             assertEquals(LLVM.LLVMGetIntTypeWidth(contextType), LLVM.LLVMGetIntTypeWidth(globalType))
+        }
+    }
+
+    @Test
+    fun `it actually grabs types instead of null pointers`() {
+        val ctx = Context.create()
+
+        runAll(*IntegerTypes.TypeKinds.values()) {
+            val type = IntegerTypes.type(ctx.llvmCtx, it, 100)
+
+            assertTrue { !type.isNull }
         }
     }
 }

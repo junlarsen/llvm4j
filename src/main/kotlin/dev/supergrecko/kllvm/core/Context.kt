@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core
 
+import dev.supergrecko.kllvm.core.type.FloatingPointTypes
 import dev.supergrecko.kllvm.core.type.IntegerTypes
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
@@ -19,7 +20,7 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @throws IllegalArgumentException If any argument assertions fail. Most noticeably functions which involve a context ref.
  */
-public class Context internal constructor(private val llvmCtx: LLVMContextRef) : AutoCloseable {
+public class Context internal constructor(internal val llvmCtx: LLVMContextRef) : AutoCloseable {
     /**
      * Control whether the instance has been dropped or not.
      *
@@ -142,7 +143,7 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
     }
 
     /**
-     * Obtain an integer type from a context with specified bit width.
+     * Obtain an integer type from the context with specified bit width.
      *
      * These are the integer types described in the Language manual. The size passed in must satisfy the constraints
      * required in [IntegerTypes.type].
@@ -159,6 +160,21 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
         require(isAlive) { "This module has already been disposed."}
 
         return IntegerTypes.type(llvmCtx, size)
+    }
+
+    /**
+     * Obtain a floating-point number type from the context
+     *
+     * These are the floating-point numbers described in the language manual.
+     *
+     * - https://llvm.org/docs/LangRef.html#floating-point-types
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped
+     */
+    public fun floatType(kind: FloatingPointTypes.TypeKinds): LLVMTypeRef {
+        require(isAlive) { "This module has already been disposed."}
+
+        return FloatingPointTypes.type(llvmCtx, kind)
     }
 
     /**
