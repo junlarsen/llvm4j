@@ -21,7 +21,7 @@ jobs:
           brew install llvm
       - name: Package Fatjar
         run: |
-          mvn clean package
+          gradle clean shadowJar
       - name: Run tests
         run: |
-          mvn clean test
+          gradle clean test
