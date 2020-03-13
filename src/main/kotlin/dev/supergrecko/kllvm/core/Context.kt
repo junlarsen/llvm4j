@@ -187,6 +187,7 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
          *
          * - [LLVMContextCreate](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gaac4f39a2d0b9735e64ac7681ab543b4c)
          */
+        @JvmStatic
         public fun create(): Context {
             val llvmContext = LLVM.LLVMContextCreate()
 
@@ -203,6 +204,7 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
          *
          * @throws IllegalArgumentException If internal instance has been dropped.
          */
+        @JvmStatic
         public fun disposeContext(context: Context) {
             require(context.isAlive) { "This module has already been disposed." }
             context.isAlive = false
