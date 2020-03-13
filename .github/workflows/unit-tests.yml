@@ -1,24 +1,24 @@
-name: Build & Test for OSX
+name: Build & Test for Ubuntu + Windows + OSX
 on: [push]
 jobs:
   run:
     name: Run Tests
-    runs-on: ubuntu-latest
     strategy:
       matrix:
         architecture: [x64, x86]
+        operating-system: [macos-latest, windows-latest, ubuntu-latest, ubuntu-16.04]
+        java-version: [8, 11]
+    runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: ${{ matrix.java-version }}
           java-package: jdk
           architecture: ${{ matrix.architecture }}
       - name: Install LLVM
         run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
-          eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-          brew install llvm
+          gradle build --refresh-dependencies
       - name: Run tests
         run: |
           gradle clean test
