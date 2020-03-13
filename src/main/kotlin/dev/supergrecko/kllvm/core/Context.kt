@@ -1,6 +1,7 @@
 package dev.supergrecko.kllvm.core
 
-import dev.supergrecko.kllvm.core.type.IntegerType
+import dev.supergrecko.kllvm.core.type.FloatingPointTypes
+import dev.supergrecko.kllvm.core.type.IntegerTypes
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.Pointer
@@ -19,7 +20,7 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @throws IllegalArgumentException If any argument assertions fail. Most noticeably functions which involve a context ref.
  */
-public class Context internal constructor(private val llvmCtx: LLVMContextRef) : AutoCloseable {
+public class Context internal constructor(internal val llvmCtx: LLVMContextRef) : AutoCloseable {
     /**
      * Control whether the instance has been dropped or not.
      *
@@ -60,6 +61,8 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * @param handler The diagnostic handler to use
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
+     *
+     * TODO: Find out how to actually call this thing from Kotlin/Java
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler) {
         setDiagnosticHandler(handler, Pointer())
@@ -71,6 +74,8 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
      * - [LLVMContextGetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga4ecfc4310276f36557ee231e22d1b823)
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
+     *
+     * TODO: Find out how to actually call this thing from Kotlin/Java
      */
     public fun getDiagnosticHandler(): LLVMDiagnosticHandler {
         require(isAlive) { "This module has already been disposed." }
@@ -81,14 +86,14 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
     /**
      * Register a yield callback with the given context.
      *
-     * TODO: Find out how to actually call this thing from Kotlin/Java
-     *
      * @param callback Callback to register. C++ Type: void (*)(LLVMContext *Context, void *OpaqueHandle)
      * @param opaqueHandle Pointer type: void*
      *
      * - [LLVMContextSetYieldCallback](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gabdcc4e421199e9e7bb5e0cd449468731)
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
+     *
+     * TODO: Find out how to actually call this thing from Kotlin/Java
      */
     public fun setYieldCallback(callback: LLVMYieldCallback, opaqueHandle: Pointer) {
         require(isAlive) { "This module has already been disposed." }
@@ -138,20 +143,38 @@ public class Context internal constructor(private val llvmCtx: LLVMContextRef) :
     }
 
     /**
-     * Obtain an integer type from a context with specified bit width.
+     * Obtain an integer type from the context with specified bit width.
      *
-     * These are the integer types described in the Language manual
+     * These are the integer types described in the Language manual. The size passed in must satisfy the constraints
+     * required in [IntegerTypes.type].
+     *
+     * There are special cases for all built-in LLVM Integer types (1, 8, 16, 32, 64, 128) which will be used if the
+     * passed [size] is equal to any of these, otherwise [LLVM.LLVMIntTypeInContext] will be used.
      *
      * - https://llvm.org/docs/LangRef.html#integer-type
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
      */
-    public fun iType(size: Int): LLVMTypeRef {
-        require(isAlive) { "This module has already been disposed." }
-        require(size in 1..8388606) { "LLVM only supports integers of 2^23-1 bits size" }
+    public fun intType(size: Int): LLVMTypeRef {
+        require(isAlive) { "This module has already been disposed."}
 
-        return IntegerType.iType(size, llvmCtx)
+        return IntegerTypes.type(llvmCtx, size)
+    }
+
+    /**
+     * Obtain a floating-point number type from the context
+     *
+     * These are the floating-point numbers described in the language manual.
+     *
+     * - https://llvm.org/docs/LangRef.html#floating-point-types
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped
+     */
+    public fun floatType(kind: FloatingPointTypes.TypeKinds): LLVMTypeRef {
+        require(isAlive) { "This module has already been disposed."}
+
+        return FloatingPointTypes.type(llvmCtx, kind)
     }
 
     /**
