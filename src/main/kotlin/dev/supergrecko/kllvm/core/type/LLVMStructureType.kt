@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core.type
 
+import dev.supergrecko.kllvm.utils.getAll
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.PointerPointer
@@ -54,13 +55,6 @@ public class LLVMStructureType internal constructor(
         val dest = PointerPointer<LLVMTypeRef>()
         LLVM.LLVMGetStructElementTypes(llvmType, dest)
 
-        val res = mutableListOf<LLVMType>()
-
-        for (i in 0..dest.capacity()) {
-            // Pointer<LLVMTypeRef>
-            res += LLVMType(dest.get(i) as LLVMTypeRef)
-        }
-
-        return res
+        return dest.getAll().map { LLVMType(it) }
     }
 }
