@@ -1,5 +1,7 @@
 package dev.supergrecko.kllvm.core.type
 
+import dev.supergrecko.kllvm.contracts.ScalarTypeFactory
+import dev.supergrecko.kllvm.contracts.Validatable
 import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
@@ -12,7 +14,7 @@ public class LLVMIntegerType internal constructor(llvmType: LLVMTypeRef) : LLVMT
         return LLVM.LLVMGetIntTypeWidth(llvmType)
     }
 
-    companion object : TypeFactory<LLVMIntegerType, IntegerTypeKinds> {
+    public companion object : ScalarTypeFactory<LLVMIntegerType, IntegerTypeKinds> {
         /**
          * Create a type in the global context from a type kind
          *
