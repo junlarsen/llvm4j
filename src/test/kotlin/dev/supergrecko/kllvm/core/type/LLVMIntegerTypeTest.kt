@@ -13,8 +13,8 @@ class LLVMIntegerTypeTest {
         val ctx = LLVMContext.create()
 
         runAll(1, 8, 16, 32, 64, 128) {
-            val contextType = ctx.integerType(it)
-            val globalType = LLVMIntegerType.type(it)
+            val contextType = ctx.integerType(LLVMType.IntegerTypeKinds.LLVM_INT_TYPE, it)
+            val globalType = LLVMType.makeInteger(LLVMType.IntegerTypeKinds.LLVM_INT_TYPE, it)
 
             assertEquals(contextType.typeWidth(), globalType.typeWidth())
         }
@@ -25,7 +25,7 @@ class LLVMIntegerTypeTest {
         val ctx = LLVMContext.create()
 
         runAll(*LLVMType.IntegerTypeKinds.values()) {
-            val type = LLVMIntegerType.type(ctx.llvmCtx, it, 100)
+            val type = LLVMType.makeInteger(it, 1024, ctx.llvmCtx)
 
             assertTrue { !type.llvmType.isNull }
         }
