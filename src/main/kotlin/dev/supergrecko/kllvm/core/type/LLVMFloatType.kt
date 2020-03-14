@@ -1,11 +1,12 @@
 package dev.supergrecko.kllvm.core.type
 
+import dev.supergrecko.kllvm.contracts.ScalarTypeFactory
 import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class LLVMFloatType internal constructor(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
-    companion object : TypeFactory<LLVMFloatType, FloatTypeKinds> {
+    public companion object : ScalarTypeFactory<LLVMFloatType, FloatTypeKinds> {
         /**
          * Create a float in the global context
          *

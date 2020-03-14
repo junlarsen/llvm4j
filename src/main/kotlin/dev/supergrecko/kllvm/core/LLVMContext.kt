@@ -1,5 +1,7 @@
 package dev.supergrecko.kllvm.core
 
+import dev.supergrecko.kllvm.contracts.Disposable
+import dev.supergrecko.kllvm.contracts.Validatable
 import dev.supergrecko.kllvm.core.type.LLVMFloatType
 import dev.supergrecko.kllvm.core.type.LLVMIntegerType
 import dev.supergrecko.kllvm.core.type.LLVMType
@@ -18,14 +20,8 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @throws IllegalArgumentException If any argument assertions fail. Most noticeably functions which involve a context ref.
  */
-public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextRef) : AutoCloseable {
-    /**
-     * Control whether the instance has been dropped or not.
-     *
-     * Attempting to do anything with a dead module will fail.
-     */
-    public var isAlive: Boolean = true
-        internal set
+public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextRef) : AutoCloseable, Validatable, Disposable {
+    public override var valid: Boolean = true
 
     /**
      * A LLVM Context has a diagnostic handler. The receiving pointer will be passed to the handler.
@@ -48,7 +44,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler, diagnosticContext: Pointer) {
-        require(isAlive) { "This module has already been disposed." }
+        require(valid) { "This module has already been disposed." }
 
         LLVM.LLVMContextSetDiagnosticHandler(llvmCtx, handler, diagnosticContext)
     }
@@ -78,7 +74,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
     public fun getDiagnosticHandler(): LLVMDiagnosticHandler {
-        require(isAlive) { "This module has already been disposed." }
+        require(valid) { "This module has already been disposed." }
 
         return LLVM.LLVMContextGetDiagnosticHandler(llvmCtx)
     }
@@ -96,7 +92,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
     public fun setYieldCallback(callback: LLVMYieldCallback, opaqueHandle: Pointer) {
-        require(isAlive) { "This module has already been disposed." }
+        require(valid) { "This module has already been disposed." }
 
         LLVM.LLVMContextSetYieldCallback(llvmCtx, callback, opaqueHandle)
     }
@@ -112,7 +108,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun shouldDiscardValueNames(): Boolean {
-        require(isAlive) { "This module has already been disposed." }
+        require(valid) { "This module has already been disposed." }
 
         val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(llvmCtx)
 
@@ -134,7 +130,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setDiscardValueNames(discard: Boolean) {
-        require(isAlive) { "This module has already been disposed." }
+        require(valid) { "This module has already been disposed." }
 
         // Conversion from kotlin Boolean to C++ bool
         val intValue = discard.toInt()
@@ -157,7 +153,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
      */
     public fun integerType(size: Int): LLVMIntegerType {
-        require(isAlive) { "This module has already been disposed."}
+        require(valid) { "This module has already been disposed."}
 
         return LLVMIntegerType.type(llvmCtx, size)
     }
@@ -172,7 +168,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * @throws IllegalArgumentException If internal instance has been dropped
      */
     public fun floatType(kind: LLVMType.FloatTypeKinds): LLVMFloatType {
-        require(isAlive) { "This module has already been disposed."}
+        require(valid) { "This module has already been disposed."}
 
         return LLVMFloatType.type(llvmCtx, kind)
     }
@@ -188,7 +184,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
-    public fun dispose() = close()
+    public override fun dispose() = close()
 
     /**
      * Implementation for AutoCloseable for Context
@@ -204,7 +200,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
         disposeContext(this)
     }
 
-    companion object {
+    public companion object {
         /**
          * Create a new LLVM context
          *
@@ -229,8 +225,8 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
          */
         @JvmStatic
         public fun disposeContext(context: LLVMContext) {
-            require(context.isAlive) { "This module has already been disposed." }
-            context.isAlive = false
+            require(context.valid) { "This module has already been disposed." }
+            context.valid = false
             LLVM.LLVMContextDispose(context.llvmCtx)
         }
     }

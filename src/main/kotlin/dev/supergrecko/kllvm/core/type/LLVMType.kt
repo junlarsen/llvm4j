@@ -1,6 +1,7 @@
 package dev.supergrecko.kllvm.core.type
 
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
+import org.bytedeco.llvm.global.LLVM
 
 /**
  * Higher level wrapper around LLVM Core's type module
@@ -8,6 +9,13 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
  * -[Documentation](https://llvm.org/doxygen/group__LLVMCCoreType.html)
  */
 public open class LLVMType internal constructor(internal val llvmType: LLVMTypeRef) {
+    /**
+     * Create a type of this exact type in the form of a Pointer
+     */
+    public fun asPointer(addressSpace: Int = 0): LLVMTypeRef {
+        return LLVM.LLVMPointerType(llvmType, addressSpace)
+    }
+
     /**
      * Enumerable to describe different LLVM floating-point number types
      *
