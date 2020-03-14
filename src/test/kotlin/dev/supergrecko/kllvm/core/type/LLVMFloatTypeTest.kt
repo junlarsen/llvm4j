@@ -1,19 +1,19 @@
 package dev.supergrecko.kllvm.core.type
 
-import dev.supergrecko.kllvm.core.Context
+import dev.supergrecko.kllvm.core.LLVMContext
 import dev.supergrecko.kllvm.utils.runAll
 import org.junit.jupiter.api.Test
 import kotlin.test.assertTrue
 
-class FloatingPointTypesTest {
+class LLVMFloatTypeTest {
     @Test
     fun `it actually grabs types instead of null pointers`() {
-        val ctx = Context.create()
+        val ctx = LLVMContext.create()
 
-        runAll(*FloatingPointTypes.TypeKinds.values()) {
+        runAll(*LLVMType.FloatTypeKinds.values()) {
             val type = ctx.floatType(it)
 
-            assertTrue { !type.isNull }
+            assertTrue { !type.llvmType.isNull }
         }
     }
 }
