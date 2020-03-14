@@ -1,26 +1,24 @@
 package dev.supergrecko.kllvm.core
 
-import dev.supergrecko.kllvm.core.type.FloatingPointTypes
-import dev.supergrecko.kllvm.core.type.IntegerTypes
+import dev.supergrecko.kllvm.core.type.LLVMFloatType
+import dev.supergrecko.kllvm.core.type.LLVMIntegerType
+import dev.supergrecko.kllvm.core.type.LLVMType
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
-import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMYieldCallback
 import org.bytedeco.llvm.global.LLVM
 
 /**
  * Higher level wrapper around llvm::LLVMContext
  *
- * Note: prefer calling [Context.create] over using the constructor.
- *
  * - [llvm::LLVMContext](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html)
  *
  * @throws IllegalArgumentException If any argument assertions fail. Most noticeably functions which involve a context ref.
  */
-public class Context internal constructor(internal val llvmCtx: LLVMContextRef) : AutoCloseable {
+public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextRef) : AutoCloseable {
     /**
      * Control whether the instance has been dropped or not.
      *
@@ -46,6 +44,8 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
      * - [LLVMContextSetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gacbfc704565962bf71eaaa549a9be570f)
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
+     *
+     * TODO: Find out how to actually call this thing from Kotlin/Java
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler, diagnosticContext: Pointer) {
         require(isAlive) { "This module has already been disposed." }
@@ -146,7 +146,7 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
      * Obtain an integer type from the context with specified bit width.
      *
      * These are the integer types described in the Language manual. The size passed in must satisfy the constraints
-     * required in [IntegerTypes.type].
+     * required in [LLVMIntegerType.type].
      *
      * There are special cases for all built-in LLVM Integer types (1, 8, 16, 32, 64, 128) which will be used if the
      * passed [size] is equal to any of these, otherwise [LLVM.LLVMIntTypeInContext] will be used.
@@ -156,10 +156,10 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
      * @throws IllegalArgumentException If internal instance has been dropped.
      * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
      */
-    public fun intType(size: Int): LLVMTypeRef {
+    public fun integerType(size: Int): LLVMIntegerType {
         require(isAlive) { "This module has already been disposed."}
 
-        return IntegerTypes.type(llvmCtx, size)
+        return LLVMIntegerType.type(llvmCtx, size)
     }
 
     /**
@@ -171,10 +171,10 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
      *
      * @throws IllegalArgumentException If internal instance has been dropped
      */
-    public fun floatType(kind: FloatingPointTypes.TypeKinds): LLVMTypeRef {
+    public fun floatType(kind: LLVMType.FloatTypeKinds): LLVMFloatType {
         require(isAlive) { "This module has already been disposed."}
 
-        return FloatingPointTypes.type(llvmCtx, kind)
+        return LLVMFloatType.type(llvmCtx, kind)
     }
 
     /**
@@ -184,7 +184,7 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
      * as the inner LLVM Context will be set to a null pointer after
      * this is called.
      *
-     * Equal to [Context.disposeContext] and [Context.close]
+     * Equal to [LLVMContext.disposeContext] and [LLVMContext.close]
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
@@ -196,7 +196,7 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
      * If the JVM ever does decide to auto-close this then
      * the module will be dropped to prevent memory leaks.
      *
-     * Equal to [Context.dispose] and [Context.disposeContext]
+     * Equal to [LLVMContext.dispose] and [LLVMContext.disposeContext]
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
@@ -211,10 +211,10 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
          * - [LLVMContextCreate](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gaac4f39a2d0b9735e64ac7681ab543b4c)
          */
         @JvmStatic
-        public fun create(): Context {
+        public fun create(): LLVMContext {
             val llvmContext = LLVM.LLVMContextCreate()
 
-            return Context(llvmContext)
+            return LLVMContext(llvmContext)
         }
 
         /**
@@ -228,7 +228,7 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
          * @throws IllegalArgumentException If internal instance has been dropped.
          */
         @JvmStatic
-        public fun disposeContext(context: Context) {
+        public fun disposeContext(context: LLVMContext) {
             require(context.isAlive) { "This module has already been disposed." }
             context.isAlive = false
             LLVM.LLVMContextDispose(context.llvmCtx)
