@@ -12,8 +12,8 @@ class LLVMFunctionTypeTest {
 
         val fn = LLVMFunctionType.type(ret, listOf(), false)
 
-        assertEquals(LLVM.LLVMCountParamTypes(fn.llvmType), 0)
-        assertEquals(LLVM.LLVMGetReturnType(fn.llvmType), ret.llvmType)
+        assertEquals(fn.getParameterCount(), 0)
+        assertEquals(fn.getReturnType().llvmType, ret.llvmType)
     }
 
     @Test
@@ -23,6 +23,26 @@ class LLVMFunctionTypeTest {
 
         val fn = LLVMFunctionType.type(ret, listOf(arg), true)
 
-        assertEquals(LLVM.LLVMIsFunctionVarArg(fn.llvmType).toBoolean(), true)
+        assertEquals(fn.isVariadic(), true)
+    }
+
+    @Test
+    fun `test variadic wrapper works`() {
+        val ret = LLVMIntegerType.type(64)
+        val arg = LLVMFloatType.type(LLVMType.FloatTypeKinds.LLVM_FLOAT_TYPE)
+
+        val fn = LLVMFunctionType.type(ret, listOf(arg), true)
+
+        assertEquals(LLVM.LLVMIsFunctionVarArg(fn.llvmType).toBoolean(), fn.isVariadic())
+    }
+
+    @Test
+    fun `test parameter count wrapper works`() {
+        val ret = LLVMIntegerType.type(64)
+        val arg = LLVMFloatType.type(LLVMType.FloatTypeKinds.LLVM_FLOAT_TYPE)
+
+        val fn = LLVMFunctionType.type(ret, listOf(arg), true)
+
+        assertEquals(LLVM.LLVMCountParamTypes(fn.llvmType), fn.getParameterCount())
     }
 }
