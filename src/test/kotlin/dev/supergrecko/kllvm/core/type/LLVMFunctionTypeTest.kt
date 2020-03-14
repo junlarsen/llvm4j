@@ -4,6 +4,7 @@ import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class LLVMFunctionTypeTest {
     @Test
@@ -12,7 +13,7 @@ class LLVMFunctionTypeTest {
         val fn = LLVMType.makeFunction(ret, listOf(), false)
 
         assertEquals(fn.getParameterCount(), 0)
-        assertEquals(fn.getReturnType().llvmType, ret.llvmType)
+        assertTrue { fn.getReturnType().llvmType == ret.llvmType }
     }
 
     @Test

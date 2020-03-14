@@ -81,12 +81,26 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
         public fun makeFunction(returnType: LLVMType, paramTypes: List<LLVMType>, isVariadic: Boolean): LLVMFunctionType {
             val types = paramTypes.map { it.llvmType }
             val array = ArrayList(types).toTypedArray()
-
             val ptr = PointerPointer(*array)
 
-            val type = LLVM.LLVMFunctionType(returnType.llvmType, ptr, paramTypes.size, isVariadic.toInt())
+            val type = LLVM.LLVMFunctionType(returnType.llvmType, ptr, array.size, isVariadic.toInt())
 
-            return LLVMFunctionType(type, returnType, paramTypes)
+            return LLVMFunctionType(type)
+        }
+
+        @JvmStatic
+        public fun makeStruct(elementTypes: List<LLVMType>, packed: Boolean, name: String? = null, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMStructureType {
+            val types = elementTypes.map { it.llvmType }
+            val array = ArrayList(types).toTypedArray()
+            val ptr = PointerPointer(*array)
+
+            val type = if (name == null) {
+                LLVM.LLVMStructTypeInContext(context, ptr, array.size, packed.toInt())
+            } else {
+                LLVM.LLVMStructCreateNamed(context, name)
+            }
+
+            return LLVMStructureType(type)
         }
     }
 }
