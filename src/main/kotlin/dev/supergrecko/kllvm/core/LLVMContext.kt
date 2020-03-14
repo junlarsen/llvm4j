@@ -152,10 +152,10 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * @throws IllegalArgumentException If internal instance has been dropped.
      * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
      */
-    public fun integerType(size: Int): LLVMIntegerType {
+    public fun integerType(kind: LLVMType.IntegerTypeKinds, size: Int = 0): LLVMIntegerType {
         require(valid) { "This module has already been disposed."}
 
-        return LLVMIntegerType.type(llvmCtx, size)
+        return LLVMType.makeInteger(kind, size, llvmCtx)
     }
 
     /**
@@ -170,7 +170,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
     public fun floatType(kind: LLVMType.FloatTypeKinds): LLVMFloatType {
         require(valid) { "This module has already been disposed."}
 
-        return LLVMFloatType.type(llvmCtx, kind)
+        return LLVMType.makeFloat(kind, llvmCtx)
     }
 
     /**

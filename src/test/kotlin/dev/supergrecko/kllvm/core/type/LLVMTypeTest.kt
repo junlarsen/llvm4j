@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 class LLVMTypeTest {
     @Test
     fun `test creation of pointer type`() {
-        val type = LLVMIntegerType.type(64)
+        val type = LLVMType.makeInteger(LLVMType.IntegerTypeKinds.LLVM_I64_TYPE)
 
         val ptr = type.asPointer()
 

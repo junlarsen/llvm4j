@@ -1,7 +1,6 @@
 package dev.supergrecko.kllvm.core
 
 import dev.supergrecko.kllvm.utils.runAll
-import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -35,16 +34,6 @@ class LLVMContextTest {
         runAll(true, false) {
             ctx.setDiscardValueNames(it)
             assertEquals(it, ctx.shouldDiscardValueNames())
-        }
-    }
-
-    @Test
-    fun `get integer types from llvm`() {
-        val ctx = LLVMContext.create()
-
-        runAll(1, 6, 16, 32, 64, 8237, 64362) {
-            val type = ctx.integerType(it)
-            assertEquals(it, type.typeWidth())
         }
     }
 }
