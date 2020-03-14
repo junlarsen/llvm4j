@@ -10,7 +10,7 @@ class LLVMFloatTypeTest {
     fun `it actually grabs types instead of null pointers`() {
         val ctx = LLVMContext.create()
 
-        runAll(*LLVMType.FloatTypeKinds.values()) {
+        runAll(*LLVMTypeKind.Float.values()) {
             val type = ctx.floatType(it)
 
             assertTrue { !type.llvmType.isNull }

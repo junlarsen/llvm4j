@@ -19,46 +19,6 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
         return LLVM.LLVMPointerType(llvmType, addressSpace)
     }
 
-    /**
-     * Enumerable to describe different LLVM floating-point number types
-     *
-     * @property LLVM_HALF_TYPE LLVM 16-bit float
-     * @property LLVM_FLOAT_TYPE LLVM 32-bit float
-     * @property LLVM_DOUBLE_TYPE LLVM 64-bit float
-     * @property LLVM_X86FP80_TYPE LLVM 80-bit float (x87) https://en.wikipedia.org/wiki/X87
-     * @property LLVM_FP128_TYPE LLVM 128-bit float https://en.wikipedia.org/wiki/Quadruple-precision_floating-point_format#IEEE_754_quadruple-precision_binary_floating-point_format:_binary128
-     * @property LLVM_PPCFP128_TYPE LLVM 128-bit float (2x 64-bit)
-     */
-    public enum class FloatTypeKinds {
-        LLVM_HALF_TYPE,
-        LLVM_FLOAT_TYPE,
-        LLVM_DOUBLE_TYPE,
-        LLVM_X86FP80_TYPE,
-        LLVM_FP128_TYPE,
-        LLVM_PPCFP128_TYPE
-    }
-
-    /**
-     * Enumerable to describe different LLVM integer types
-     *
-     * @property LLVM_I1_TYPE LLVM 1-bit integer
-     * @property LLVM_I8_TYPE LLVM 8-bit integer
-     * @property LLVM_I16_TYPE LLVM 16-bit integer
-     * @property LLVM_I32_TYPE LLVM 32-bit integer
-     * @property LLVM_I64_TYPE LLVM 64-bit integer
-     * @property LLVM_I128_TYPE LLVM 128-bit integer
-     * @property LLVM_INT_TYPE Arbitrarily large LLVM integer
-     */
-    public enum class IntegerTypeKinds {
-        LLVM_I1_TYPE,
-        LLVM_I8_TYPE,
-        LLVM_I16_TYPE,
-        LLVM_I32_TYPE,
-        LLVM_I64_TYPE,
-        LLVM_I128_TYPE,
-        LLVM_INT_TYPE
-    }
-
     companion object {
         /**
          * Create a type in a context and a known size.
@@ -70,15 +30,15 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
          * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
          */
         @JvmStatic
-        public fun makeInteger(kind: IntegerTypeKinds, size: Int = 0, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMIntegerType {
+        public fun makeInteger(kind: LLVMTypeKind.Integer, size: Int = 0, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMIntegerType {
             val type = when (kind) {
-                IntegerTypeKinds.LLVM_I1_TYPE -> LLVM.LLVMInt1TypeInContext(context)
-                IntegerTypeKinds.LLVM_I8_TYPE -> LLVM.LLVMInt8TypeInContext(context)
-                IntegerTypeKinds.LLVM_I16_TYPE -> LLVM.LLVMInt16TypeInContext(context)
-                IntegerTypeKinds.LLVM_I32_TYPE -> LLVM.LLVMInt32TypeInContext(context)
-                IntegerTypeKinds.LLVM_I64_TYPE -> LLVM.LLVMInt64TypeInContext(context)
-                IntegerTypeKinds.LLVM_I128_TYPE -> LLVM.LLVMInt128TypeInContext(context)
-                IntegerTypeKinds.LLVM_INT_TYPE -> {
+                LLVMTypeKind.Integer.LLVM_I1_TYPE -> LLVM.LLVMInt1TypeInContext(context)
+                LLVMTypeKind.Integer.LLVM_I8_TYPE -> LLVM.LLVMInt8TypeInContext(context)
+                LLVMTypeKind.Integer.LLVM_I16_TYPE -> LLVM.LLVMInt16TypeInContext(context)
+                LLVMTypeKind.Integer.LLVM_I32_TYPE -> LLVM.LLVMInt32TypeInContext(context)
+                LLVMTypeKind.Integer.LLVM_I64_TYPE -> LLVM.LLVMInt64TypeInContext(context)
+                LLVMTypeKind.Integer.LLVM_I128_TYPE -> LLVM.LLVMInt128TypeInContext(context)
+                LLVMTypeKind.Integer.LLVM_INT_TYPE -> {
                     require(size in 1..8388606) { "LLVM only supports integers of 2^23-1 bits size" }
 
                     LLVM.LLVMIntTypeInContext(context, size)
@@ -95,14 +55,14 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
          * @param context The context to use, default to global
          */
         @JvmStatic
-        public fun makeFloat(kind: FloatTypeKinds, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMFloatType {
+        public fun makeFloat(kind: LLVMTypeKind.Float, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMFloatType {
             val type = when (kind) {
-                FloatTypeKinds.LLVM_HALF_TYPE -> LLVM.LLVMHalfTypeInContext(context)
-                FloatTypeKinds.LLVM_FLOAT_TYPE -> LLVM.LLVMFloatTypeInContext(context)
-                FloatTypeKinds.LLVM_DOUBLE_TYPE -> LLVM.LLVMDoubleTypeInContext(context)
-                FloatTypeKinds.LLVM_X86FP80_TYPE -> LLVM.LLVMX86FP80TypeInContext(context)
-                FloatTypeKinds.LLVM_FP128_TYPE -> LLVM.LLVMFP128TypeInContext(context)
-                FloatTypeKinds.LLVM_PPCFP128_TYPE -> LLVM.LLVMPPCFP128TypeInContext(context)
+                LLVMTypeKind.Float.LLVM_HALF_TYPE -> LLVM.LLVMHalfTypeInContext(context)
+                LLVMTypeKind.Float.LLVM_FLOAT_TYPE -> LLVM.LLVMFloatTypeInContext(context)
+                LLVMTypeKind.Float.LLVM_DOUBLE_TYPE -> LLVM.LLVMDoubleTypeInContext(context)
+                LLVMTypeKind.Float.LLVM_X86FP80_TYPE -> LLVM.LLVMX86FP80TypeInContext(context)
+                LLVMTypeKind.Float.LLVM_FP128_TYPE -> LLVM.LLVMFP128TypeInContext(context)
+                LLVMTypeKind.Float.LLVM_PPCFP128_TYPE -> LLVM.LLVMPPCFP128TypeInContext(context)
             }
 
             return LLVMFloatType(type)

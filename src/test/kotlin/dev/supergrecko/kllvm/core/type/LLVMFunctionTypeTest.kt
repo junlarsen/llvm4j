@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 class LLVMFunctionTypeTest {
     @Test
     fun `creation of zero arg type works`() {
-        val ret = LLVMType.makeInteger(LLVMType.IntegerTypeKinds.LLVM_I64_TYPE)
+        val ret = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I64_TYPE)
         val fn = LLVMType.makeFunction(ret, listOf(), false)
 
         assertEquals(fn.getParameterCount(), 0)
@@ -17,8 +17,8 @@ class LLVMFunctionTypeTest {
 
     @Test
     fun `variadic arguments work`() {
-        val ret = LLVMType.makeInteger(LLVMType.IntegerTypeKinds.LLVM_I64_TYPE)
-        val arg = LLVMType.makeFloat(LLVMType.FloatTypeKinds.LLVM_FLOAT_TYPE)
+        val ret = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I64_TYPE)
+        val arg = LLVMType.makeFloat(LLVMTypeKind.Float.LLVM_FLOAT_TYPE)
         val fn = LLVMType.makeFunction(ret, listOf(arg), true)
 
         assertEquals(fn.isVariadic(), true)
@@ -26,8 +26,8 @@ class LLVMFunctionTypeTest {
 
     @Test
     fun `test variadic wrapper works`() {
-        val ret = LLVMType.makeInteger(LLVMType.IntegerTypeKinds.LLVM_I64_TYPE)
-        val arg = LLVMType.makeFloat(LLVMType.FloatTypeKinds.LLVM_FLOAT_TYPE)
+        val ret = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I64_TYPE)
+        val arg = LLVMType.makeFloat(LLVMTypeKind.Float.LLVM_FLOAT_TYPE)
         val fn = LLVMType.makeFunction(ret, listOf(arg), true)
 
         assertEquals(LLVM.LLVMIsFunctionVarArg(fn.llvmType).toBoolean(), fn.isVariadic())
@@ -35,8 +35,8 @@ class LLVMFunctionTypeTest {
 
     @Test
     fun `test parameter count wrapper works`() {
-        val ret = LLVMType.makeInteger(LLVMType.IntegerTypeKinds.LLVM_I64_TYPE)
-        val arg = LLVMType.makeFloat(LLVMType.FloatTypeKinds.LLVM_FLOAT_TYPE)
+        val ret = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I64_TYPE)
+        val arg = LLVMType.makeFloat(LLVMTypeKind.Float.LLVM_FLOAT_TYPE)
         val fn = LLVMType.makeFunction(ret, listOf(arg), true)
 
         assertEquals(LLVM.LLVMCountParamTypes(fn.llvmType), fn.getParameterCount())
