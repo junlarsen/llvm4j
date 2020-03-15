@@ -21,8 +21,8 @@ public class LLVMStructureType internal constructor(
         return LLVM.LLVMCountStructElementTypes(llvmType)
     }
 
-    public fun getType(index: Int): LLVMType? {
-        // TODO: Make this access safe as we can calculate the capacity of the array
+    public fun getType(index: Int): LLVMType {
+        require(index <= getElementTypeCount()) { "Requested index $index is out of bounds for this struct" }
         val res = LLVM.LLVMStructGetTypeAtIndex(llvmType, index)
 
         return LLVMType(res)
@@ -41,9 +41,10 @@ public class LLVMStructureType internal constructor(
     }
 
     public fun getName(): String? {
+        // TODO: Resolve IllegalStateException for this
         val name = LLVM.LLVMGetStructName(llvmType)
 
-        return if (name.isNull) {
+        return if (name.bool) {
             null
         } else {
             name.string
