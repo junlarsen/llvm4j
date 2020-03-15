@@ -55,17 +55,22 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
          * @param context The context to use, default to global
          */
         @JvmStatic
-        public fun makeFloat(kind: LLVMTypeKind.Float, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMFloatType {
+        public fun make(kind: LLVMTypeKind, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMType {
             val type = when (kind) {
-                LLVMTypeKind.Float.LLVM_HALF_TYPE -> LLVM.LLVMHalfTypeInContext(context)
-                LLVMTypeKind.Float.LLVM_FLOAT_TYPE -> LLVM.LLVMFloatTypeInContext(context)
-                LLVMTypeKind.Float.LLVM_DOUBLE_TYPE -> LLVM.LLVMDoubleTypeInContext(context)
-                LLVMTypeKind.Float.LLVM_X86FP80_TYPE -> LLVM.LLVMX86FP80TypeInContext(context)
-                LLVMTypeKind.Float.LLVM_FP128_TYPE -> LLVM.LLVMFP128TypeInContext(context)
-                LLVMTypeKind.Float.LLVM_PPCFP128_TYPE -> LLVM.LLVMPPCFP128TypeInContext(context)
+                LLVMTypeKind.LLVM_HALF_TYPE -> LLVM.LLVMHalfTypeInContext(context)
+                LLVMTypeKind.LLVM_FLOAT_TYPE -> LLVM.LLVMFloatTypeInContext(context)
+                LLVMTypeKind.LLVM_DOUBLE_TYPE -> LLVM.LLVMDoubleTypeInContext(context)
+                LLVMTypeKind.LLVM_X86FP80_TYPE -> LLVM.LLVMX86FP80TypeInContext(context)
+                LLVMTypeKind.LLVM_FP128_TYPE -> LLVM.LLVMFP128TypeInContext(context)
+                LLVMTypeKind.LLVM_PPCFP128_TYPE -> LLVM.LLVMPPCFP128TypeInContext(context)
+                LLVMTypeKind.LLVM_LABEL_TYPE -> LLVM.LLVMLabelTypeInContext(context)
+                LLVMTypeKind.LLVM_METADATA_TYPE -> LLVM.LLVMMetadataTypeInContext(context)
+                LLVMTypeKind.LLVM_X86MMX_TYPE -> LLVM.LLVMX86MMXTypeInContext(context)
+                LLVMTypeKind.LLVM_TOKEN_TYPE -> LLVM.LLVMTokenTypeInContext(context)
+                LLVMTypeKind.LLVM_VOID_TYPE -> LLVM.LLVMVoidTypeInContext(context)
             }
 
-            return LLVMFloatType(type)
+            return LLVMType(type)
         }
 
         /**
