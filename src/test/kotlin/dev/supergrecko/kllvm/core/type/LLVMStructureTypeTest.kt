@@ -24,7 +24,6 @@ class LLVMStructureTypeTest {
 
     @Test
     fun `test opaque struct`() {
-        val ctx = LLVMContext.create()
         val struct = LLVMType.makeStruct(listOf(), false, "test_struct")
 
         assertEquals(true, struct.isOpaque())
