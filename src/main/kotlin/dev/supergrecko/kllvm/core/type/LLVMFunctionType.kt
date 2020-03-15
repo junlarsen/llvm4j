@@ -1,6 +1,7 @@
 package dev.supergrecko.kllvm.core.type
 
 import dev.supergrecko.kllvm.utils.toBoolean
+import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -8,34 +9,34 @@ import org.bytedeco.llvm.global.LLVM
  * Wrapper around LLVM Function Types
  *
  * @property llvmType Internal [LLVMTypeRef] reference
- * @property returnType [LLVMType] for function return type
- * @property paramTypes [LLVMType] list for function parameters
- *
- * TODO: Determine whether passing [returnType] and [paramTypes] is okay (does LLVM use this elsewhere?)
  */
 public class LLVMFunctionType internal constructor(
-        llvmType: LLVMTypeRef,
-        internal val returnType: LLVMType,
-        internal val paramTypes: List<LLVMType>
+        llvmType: LLVMTypeRef
 ) : LLVMType(llvmType) {
-    /**
-     * Is this function type variadic?
-     *
-     * TODO: Determine whether passing this from [LLVMFunctionType.type] is more optimal
-     */
     public fun isVariadic(): Boolean {
         return LLVM.LLVMIsFunctionVarArg(llvmType).toBoolean()
     }
 
-    /**
-     * Get how many parameters this function type expects
-     *
-     * TODO: Determine whether passing this from [LLVMFunctionType.type] is more optimal
-     */
     public fun getParameterCount(): Int {
         return LLVM.LLVMCountParamTypes(llvmType)
     }
 
-    public fun getReturnType(): LLVMType = returnType
-    public fun getParameters(): List<LLVMType> = paramTypes
+    public fun getReturnType(): LLVMType {
+        val type = LLVM.LLVMGetReturnType(llvmType)
+
+        return LLVMType(type)
+    }
+
+    public fun getParameters(): List<LLVMType> {
+        val dest = PointerPointer<LLVMTypeRef>(getParameterCount().toLong())
+        LLVM.LLVMGetParamTypes(llvmType, dest)
+
+        val res = mutableListOf<LLVMTypeRef>()
+
+        for (i in 0..dest.capacity()) {
+            res += LLVMTypeRef(dest.get(i))
+        }
+
+        return res.map { LLVMType(it) }
+    }
 }
