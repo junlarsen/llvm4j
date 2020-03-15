@@ -42,4 +42,19 @@ class LLVMFunctionTypeTest {
 
         assertEquals(LLVM.LLVMCountParamTypes(fn.llvmType), fn.getParameterCount())
     }
+
+    @Test
+    fun `test parameter list matches`() {
+        val ret = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I64_TYPE)
+        val args = listOf(LLVMType.makeFloat(LLVMTypeKind.Float.LLVM_FLOAT_TYPE))
+        val fn = LLVMType.makeFunction(ret, args, true)
+
+        val params = fn.getParameters()
+
+        for (i in args.indices) {
+            val x = params[i].llvmType
+            val y = params[i].llvmType
+            assertEquals(x, y)
+        }
+    }
 }
