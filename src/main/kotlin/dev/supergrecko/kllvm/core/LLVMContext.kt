@@ -165,10 +165,10 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      *
      * @throws IllegalArgumentException If internal instance has been dropped
      */
-    public fun floatType(kind: LLVMTypeKind.Float): LLVMFloatType {
+    public fun type(kind: LLVMTypeKind): LLVMType {
         require(valid) { "This module has already been disposed."}
 
-        return LLVMType.makeFloat(kind, llvmCtx)
+        return LLVMType.make(kind, llvmCtx)
     }
 
     /**

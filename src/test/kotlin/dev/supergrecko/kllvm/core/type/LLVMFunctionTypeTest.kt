@@ -19,7 +19,7 @@ class LLVMFunctionTypeTest {
     @Test
     fun `variadic arguments work`() {
         val ret = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I64_TYPE)
-        val arg = LLVMType.makeFloat(LLVMTypeKind.Float.LLVM_FLOAT_TYPE)
+        val arg = LLVMType.make(LLVMTypeKind.LLVM_FLOAT_TYPE)
         val fn = LLVMType.makeFunction(ret, listOf(arg), true)
 
         assertEquals(fn.isVariadic(), true)
@@ -28,7 +28,7 @@ class LLVMFunctionTypeTest {
     @Test
     fun `test variadic wrapper works`() {
         val ret = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I64_TYPE)
-        val arg = LLVMType.makeFloat(LLVMTypeKind.Float.LLVM_FLOAT_TYPE)
+        val arg = LLVMType.make(LLVMTypeKind.LLVM_FLOAT_TYPE)
         val fn = LLVMType.makeFunction(ret, listOf(arg), true)
 
         assertEquals(LLVM.LLVMIsFunctionVarArg(fn.llvmType).toBoolean(), fn.isVariadic())
@@ -37,7 +37,7 @@ class LLVMFunctionTypeTest {
     @Test
     fun `test parameter count wrapper works`() {
         val ret = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I64_TYPE)
-        val arg = LLVMType.makeFloat(LLVMTypeKind.Float.LLVM_FLOAT_TYPE)
+        val arg = LLVMType.make(LLVMTypeKind.LLVM_FLOAT_TYPE)
         val fn = LLVMType.makeFunction(ret, listOf(arg), true)
 
         assertEquals(LLVM.LLVMCountParamTypes(fn.llvmType), fn.getParameterCount())
@@ -46,7 +46,7 @@ class LLVMFunctionTypeTest {
     @Test
     fun `test parameter list matches`() {
         val ret = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I64_TYPE)
-        val args = listOf(LLVMType.makeFloat(LLVMTypeKind.Float.LLVM_FLOAT_TYPE))
+        val args = listOf(LLVMType.make(LLVMTypeKind.LLVM_FLOAT_TYPE))
         val fn = LLVMType.makeFunction(ret, args, true)
 
         val params = fn.getParameters()
