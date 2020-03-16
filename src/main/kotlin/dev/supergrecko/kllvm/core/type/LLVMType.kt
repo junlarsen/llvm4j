@@ -12,12 +12,16 @@ import org.bytedeco.llvm.global.LLVM
  * -[Documentation](https://llvm.org/doxygen/group__LLVMCCoreType.html)
  */
 public open class LLVMType internal constructor(internal val llvmType: LLVMTypeRef) {
-    /**
-     * Create a type of this exact type in the form of a Pointer
-     */
-    public fun asPointer(addressSpace: Int = 0): LLVMTypeRef {
-        return LLVM.LLVMPointerType(llvmType, addressSpace)
+    public fun asPointer(addressSpace: Int = 0): LLVMPointerType {
+        require(addressSpace >= 0) { "Cannot use negative address space" }
+        val ptr = LLVM.LLVMPointerType(llvmType, addressSpace)
+
+        return LLVMPointerType(ptr)
     }
+
+    public fun asInteger(): LLVMIntegerType = LLVMIntegerType(llvmType)
+    public fun asFunction(): LLVMFunctionType = LLVMFunctionType(llvmType)
+    public fun asStruct(): LLVMStructureType = LLVMStructureType(llvmType)
 
     companion object {
         /**
@@ -93,6 +97,13 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
             return LLVMFunctionType(type)
         }
 
+        /**
+         * Create a structure type
+         *
+         * This method creates different kinds of structure types depending on whether [name] is passed or not.
+         * If name is passed, an opaque struct is created, otherwise a regular struct is created inside the given
+         * context or the global context.
+         */
         @JvmStatic
         public fun makeStruct(elementTypes: List<LLVMType>, packed: Boolean, name: String? = null, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMStructureType {
             val types = elementTypes.map { it.llvmType }
