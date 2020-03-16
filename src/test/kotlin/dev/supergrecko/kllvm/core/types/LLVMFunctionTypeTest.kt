@@ -12,7 +12,7 @@ class LLVMFunctionTypeTest {
     @Test
     fun `creation of zero arg type works`() {
         val ret = LLVMType.makeInteger(64)
-        val fn = LLVMType.makeFunction(ret, listOf(), false)
+        val fn = LLVMType.createFunction(ret, listOf(), false)
 
         assertEquals(fn.getParameterCount(), 0)
         assertTrue { fn.getReturnType().llvmType == ret.llvmType }
@@ -21,8 +21,8 @@ class LLVMFunctionTypeTest {
     @Test
     fun `variadic arguments work`() {
         val ret = LLVMType.makeInteger(64)
-        val arg = LLVMType.make(LLVMTypeKind.Float)
-        val fn = LLVMType.makeFunction(ret, listOf(arg), true)
+        val arg = LLVMType.create(LLVMTypeKind.Float)
+        val fn = LLVMType.createFunction(ret, listOf(arg), true)
 
         assertEquals(fn.isVariadic(), true)
     }
@@ -30,8 +30,8 @@ class LLVMFunctionTypeTest {
     @Test
     fun `test variadic wrapper works`() {
         val ret = LLVMType.makeInteger(64)
-        val arg = LLVMType.make(LLVMTypeKind.Float)
-        val fn = LLVMType.makeFunction(ret, listOf(arg), true)
+        val arg = LLVMType.create(LLVMTypeKind.Float)
+        val fn = LLVMType.createFunction(ret, listOf(arg), true)
 
         assertEquals(LLVM.LLVMIsFunctionVarArg(fn.llvmType).toBoolean(), fn.isVariadic())
     }
@@ -39,8 +39,8 @@ class LLVMFunctionTypeTest {
     @Test
     fun `test parameter count wrapper works`() {
         val ret = LLVMType.makeInteger(64)
-        val arg = LLVMType.make(LLVMTypeKind.Float)
-        val fn = LLVMType.makeFunction(ret, listOf(arg), true)
+        val arg = LLVMType.create(LLVMTypeKind.Float)
+        val fn = LLVMType.createFunction(ret, listOf(arg), true)
 
         assertEquals(LLVM.LLVMCountParamTypes(fn.llvmType), fn.getParameterCount())
     }
@@ -48,8 +48,8 @@ class LLVMFunctionTypeTest {
     @Test
     fun `test parameter list matches`() {
         val ret = LLVMType.makeInteger(64)
-        val args = listOf(LLVMType.make(LLVMTypeKind.Float))
-        val fn = LLVMType.makeFunction(ret, args, true)
+        val args = listOf(LLVMType.create(LLVMTypeKind.Float))
+        val fn = LLVMType.createFunction(ret, args, true)
 
         val params = fn.getParameterTypes()
 

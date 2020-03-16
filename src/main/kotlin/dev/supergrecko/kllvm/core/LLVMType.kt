@@ -105,7 +105,7 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
          * @param context The context to use, default to global
          */
         @JvmStatic
-        public fun make(kind: LLVMTypeKind, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMType {
+        public fun create(kind: LLVMTypeKind, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMType {
             val type = when (kind) {
                 LLVMTypeKind.Half -> LLVM.LLVMHalfTypeInContext(context)
                 LLVMTypeKind.Float -> LLVM.LLVMFloatTypeInContext(context)
@@ -139,7 +139,7 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
          * @param isVariadic Is the function variadic?
          */
         @JvmStatic
-        public fun makeFunction(returnType: LLVMType, paramTypes: List<LLVMType>, isVariadic: Boolean): LLVMFunctionType {
+        public fun createFunction(returnType: LLVMType, paramTypes: List<LLVMType>, isVariadic: Boolean): LLVMFunctionType {
             val types = paramTypes.map { it.llvmType }
             val array = ArrayList(types).toTypedArray()
             val ptr = PointerPointer(*array)
@@ -157,7 +157,7 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
          * context or the global context.
          */
         @JvmStatic
-        public fun makeStruct(elementTypes: List<LLVMType>, packed: Boolean, name: String? = null, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMStructureType {
+        public fun createStruct(elementTypes: List<LLVMType>, packed: Boolean, name: String? = null, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMStructureType {
             val types = elementTypes.map { it.llvmType }
             val array = ArrayList(types).toTypedArray()
             val ptr = PointerPointer(*array)
@@ -172,14 +172,14 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
         }
 
         @JvmStatic
-        public fun makeVector(elementType: LLVMType, size: Int): LLVMVectorType {
+        public fun createVector(elementType: LLVMType, size: Int): LLVMVectorType {
             val type = LLVM.LLVMVectorType(elementType.llvmType, size)
 
             return LLVMVectorType(type)
         }
 
         @JvmStatic
-        public fun makeArray(elementType: LLVMType, size: Int): LLVMArrayType {
+        public fun createArray(elementType: LLVMType, size: Int): LLVMArrayType {
             val type = LLVM.LLVMArrayType(elementType.llvmType, size)
 
             return LLVMArrayType(type)
