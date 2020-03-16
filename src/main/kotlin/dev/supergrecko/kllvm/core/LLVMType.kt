@@ -1,11 +1,13 @@
 package dev.supergrecko.kllvm.core
 
+import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
 import dev.supergrecko.kllvm.core.types.*
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
+import java.lang.IllegalArgumentException
 
 /**
  * Higher level wrapper around LLVM Core's types module
@@ -78,15 +80,15 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
          * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
          */
         @JvmStatic
-        public fun makeInteger(kind: LLVMTypeKind.Integer, size: Int = 0, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMIntegerType {
-            val type = when (kind) {
-                LLVMTypeKind.Integer.LLVM_I1_TYPE -> LLVM.LLVMInt1TypeInContext(context)
-                LLVMTypeKind.Integer.LLVM_I8_TYPE -> LLVM.LLVMInt8TypeInContext(context)
-                LLVMTypeKind.Integer.LLVM_I16_TYPE -> LLVM.LLVMInt16TypeInContext(context)
-                LLVMTypeKind.Integer.LLVM_I32_TYPE -> LLVM.LLVMInt32TypeInContext(context)
-                LLVMTypeKind.Integer.LLVM_I64_TYPE -> LLVM.LLVMInt64TypeInContext(context)
-                LLVMTypeKind.Integer.LLVM_I128_TYPE -> LLVM.LLVMInt128TypeInContext(context)
-                LLVMTypeKind.Integer.LLVM_INT_TYPE -> {
+        public fun makeInteger(size: Int = 0, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMIntegerType {
+            val type = when (size) {
+                1 -> LLVM.LLVMInt1TypeInContext(context)
+                8 -> LLVM.LLVMInt8TypeInContext(context)
+                16 -> LLVM.LLVMInt16TypeInContext(context)
+                32 -> LLVM.LLVMInt32TypeInContext(context)
+                64 -> LLVM.LLVMInt64TypeInContext(context)
+                128 -> LLVM.LLVMInt128TypeInContext(context)
+                else -> {
                     require(size in 1..8388606) { "LLVM only supports integers of 2^23-1 bits size" }
 
                     LLVM.LLVMIntTypeInContext(context, size)
@@ -105,17 +107,23 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
         @JvmStatic
         public fun make(kind: LLVMTypeKind, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMType {
             val type = when (kind) {
-                LLVMTypeKind.LLVM_HALF_TYPE -> LLVM.LLVMHalfTypeInContext(context)
-                LLVMTypeKind.LLVM_FLOAT_TYPE -> LLVM.LLVMFloatTypeInContext(context)
-                LLVMTypeKind.LLVM_DOUBLE_TYPE -> LLVM.LLVMDoubleTypeInContext(context)
-                LLVMTypeKind.LLVM_X86FP80_TYPE -> LLVM.LLVMX86FP80TypeInContext(context)
-                LLVMTypeKind.LLVM_FP128_TYPE -> LLVM.LLVMFP128TypeInContext(context)
-                LLVMTypeKind.LLVM_PPCFP128_TYPE -> LLVM.LLVMPPCFP128TypeInContext(context)
-                LLVMTypeKind.LLVM_LABEL_TYPE -> LLVM.LLVMLabelTypeInContext(context)
-                LLVMTypeKind.LLVM_METADATA_TYPE -> LLVM.LLVMMetadataTypeInContext(context)
-                LLVMTypeKind.LLVM_X86MMX_TYPE -> LLVM.LLVMX86MMXTypeInContext(context)
-                LLVMTypeKind.LLVM_TOKEN_TYPE -> LLVM.LLVMTokenTypeInContext(context)
-                LLVMTypeKind.LLVM_VOID_TYPE -> LLVM.LLVMVoidTypeInContext(context)
+                LLVMTypeKind.Half -> LLVM.LLVMHalfTypeInContext(context)
+                LLVMTypeKind.Float -> LLVM.LLVMFloatTypeInContext(context)
+                LLVMTypeKind.Double -> LLVM.LLVMDoubleTypeInContext(context)
+                LLVMTypeKind.X86_FP80 -> LLVM.LLVMX86FP80TypeInContext(context)
+                LLVMTypeKind.FP128 -> LLVM.LLVMFP128TypeInContext(context)
+                LLVMTypeKind.PPC_FP128 -> LLVM.LLVMPPCFP128TypeInContext(context)
+                LLVMTypeKind.Label -> LLVM.LLVMLabelTypeInContext(context)
+                LLVMTypeKind.Metadata -> LLVM.LLVMMetadataTypeInContext(context)
+                LLVMTypeKind.X86_MMX -> LLVM.LLVMX86MMXTypeInContext(context)
+                LLVMTypeKind.Token -> LLVM.LLVMTokenTypeInContext(context)
+                LLVMTypeKind.Void -> LLVM.LLVMVoidTypeInContext(context)
+                LLVMTypeKind.Integer -> throw IllegalArgumentException("Use .makeInteger")
+                LLVMTypeKind.Function -> throw IllegalArgumentException("Use .makeFunction")
+                LLVMTypeKind.Struct -> throw IllegalArgumentException("Use .makeStruct")
+                LLVMTypeKind.Array -> throw IllegalArgumentException("Use .makeArray")
+                LLVMTypeKind.Pointer -> throw IllegalArgumentException("Use .asPointer")
+                LLVMTypeKind.Vector -> throw IllegalArgumentException("Use .makeVector")
             }
 
             return LLVMType(type)

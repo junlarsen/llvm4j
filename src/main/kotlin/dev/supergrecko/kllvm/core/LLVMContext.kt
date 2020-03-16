@@ -2,6 +2,7 @@ package dev.supergrecko.kllvm.core
 
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
+import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
 import dev.supergrecko.kllvm.core.types.*
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
@@ -150,10 +151,10 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * @throws IllegalArgumentException If internal instance has been dropped.
      * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
      */
-    public fun integerType(kind: LLVMTypeKind.Integer, size: Int = 0): LLVMIntegerType {
+    public fun integerType(size: Int = 0): LLVMIntegerType {
         require(valid) { "This module has already been disposed."}
 
-        return LLVMType.makeInteger(kind, size, llvmCtx)
+        return LLVMType.makeInteger(size, llvmCtx)
     }
 
     /**
