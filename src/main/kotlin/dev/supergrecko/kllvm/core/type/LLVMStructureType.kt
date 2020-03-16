@@ -1,14 +1,13 @@
 package dev.supergrecko.kllvm.core.type
 
+import dev.supergrecko.kllvm.utils.iterateIntoType
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class LLVMStructureType internal constructor(
-        llvmType: LLVMTypeRef
-) : LLVMType(llvmType) {
+public class LLVMStructureType internal constructor(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
     public fun setBody(elementTypes: List<LLVMType>, packed: Boolean) {
         val types = elementTypes.map { it.llvmType }
         val array = ArrayList(types).toTypedArray()
@@ -55,12 +54,6 @@ public class LLVMStructureType internal constructor(
         val dest = PointerPointer<LLVMTypeRef>(getElementTypeCount().toLong())
         LLVM.LLVMGetStructElementTypes(llvmType, dest)
 
-        val res = mutableListOf<LLVMTypeRef>()
-
-        for (i in 0..dest.capacity()) {
-            res += LLVMTypeRef(dest.get(i))
-        }
-
-        return res.map { LLVMType(it) }
+        return dest.iterateIntoType { LLVMType(it) }
     }
 }

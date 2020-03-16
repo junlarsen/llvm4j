@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core.type
 
+import dev.supergrecko.kllvm.utils.iterateIntoType
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
@@ -10,9 +11,7 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @property llvmType Internal [LLVMTypeRef] reference
  */
-public class LLVMFunctionType internal constructor(
-        llvmType: LLVMTypeRef
-) : LLVMType(llvmType) {
+public class LLVMFunctionType internal constructor(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
     public fun isVariadic(): Boolean {
         return LLVM.LLVMIsFunctionVarArg(llvmType).toBoolean()
     }
@@ -31,12 +30,6 @@ public class LLVMFunctionType internal constructor(
         val dest = PointerPointer<LLVMTypeRef>(getParameterCount().toLong())
         LLVM.LLVMGetParamTypes(llvmType, dest)
 
-        val res = mutableListOf<LLVMTypeRef>()
-
-        for (i in 0..dest.capacity()) {
-            res += LLVMTypeRef(dest.get(i))
-        }
-
-        return res.map { LLVMType(it) }
+        return dest.iterateIntoType { LLVMType(it) }
     }
 }
