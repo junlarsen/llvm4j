@@ -7,9 +7,7 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class LLVMStructureType internal constructor(
-        llvmType: LLVMTypeRef
-) : LLVMType(llvmType) {
+public class LLVMStructureType internal constructor(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
     public fun setBody(elementTypes: List<LLVMType>, packed: Boolean) {
         val types = elementTypes.map { it.llvmType }
         val array = ArrayList(types).toTypedArray()

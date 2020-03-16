@@ -11,9 +11,7 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @property llvmType Internal [LLVMTypeRef] reference
  */
-public class LLVMFunctionType internal constructor(
-        llvmType: LLVMTypeRef
-) : LLVMType(llvmType) {
+public class LLVMFunctionType internal constructor(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
     public fun isVariadic(): Boolean {
         return LLVM.LLVMIsFunctionVarArg(llvmType).toBoolean()
     }
