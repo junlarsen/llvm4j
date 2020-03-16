@@ -1,5 +1,6 @@
-package dev.supergrecko.kllvm.core.type
+package dev.supergrecko.kllvm.core.types
 
+import dev.supergrecko.kllvm.core.LLVMType
 import dev.supergrecko.kllvm.utils.runAll
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
@@ -35,7 +36,7 @@ class LLVMTypeTest {
     @Test
     fun `casting won't fail when the underlying type is different`() {
         // This behavior is documented at LLVMType. There is no way
-        // to guarantee that the underlying type is valid or invalid
+        // to guarantee that the underlying types is valid or invalid
         val type = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I32_TYPE)
         val ptr = type.intoPointer()
         val underlying = ptr.getElementType()

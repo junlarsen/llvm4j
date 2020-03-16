@@ -2,7 +2,7 @@ package dev.supergrecko.kllvm.core
 
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
-import dev.supergrecko.kllvm.core.type.*
+import dev.supergrecko.kllvm.core.types.*
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.Pointer
@@ -33,7 +33,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * }
      *
      * @param handler The diagnostic handler to use
-     * @param diagnosticContext The diagnostic context. Pointer type: DiagnosticContext*
+     * @param diagnosticContext The diagnostic context. Pointer types: DiagnosticContext*
      *
      * - [LLVMContextSetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gacbfc704565962bf71eaaa549a9be570f)
      *
@@ -81,7 +81,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * Register a yield callback with the given context.
      *
      * @param callback Callback to register. C++ Type: void (*)(LLVMContext *Context, void *OpaqueHandle)
-     * @param opaqueHandle Pointer type: void*
+     * @param opaqueHandle Pointer types: void*
      *
      * - [LLVMContextSetYieldCallback](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gabdcc4e421199e9e7bb5e0cd449468731)
      *
@@ -137,15 +137,15 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
     }
 
     /**
-     * Obtain an integer type from the context with specified bit width.
+     * Obtain an integer types from the context with specified bit width.
      *
      * These are the integer types described in the Language manual. The size passed in must satisfy the constraints
-     * required in [LLVMIntegerType.type].
+     * required in [LLVMIntegerType.types].
      *
      * There are special cases for all built-in LLVM Integer types (1, 8, 16, 32, 64, 128) which will be used if the
      * passed [size] is equal to any of these, otherwise [LLVM.LLVMIntTypeInContext] will be used.
      *
-     * - https://llvm.org/docs/LangRef.html#integer-type
+     * - https://llvm.org/docs/LangRef.html#integer-types
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
@@ -157,7 +157,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
     }
 
     /**
-     * Obtain a floating-point number type from the context
+     * Obtain a floating-point number types from the context
      *
      * These are the floating-point numbers described in the language manual.
      *

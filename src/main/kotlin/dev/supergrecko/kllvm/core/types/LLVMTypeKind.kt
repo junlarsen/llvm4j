@@ -1,9 +1,9 @@
-package dev.supergrecko.kllvm.core.type
+package dev.supergrecko.kllvm.core.types
 
 /**
  * Enum listing all LLVM Type Kinds.
  *
- * @property LLVM_X86MMX_TYPE he x86_mmx type represents a value held in an MMX register on an x86 machine
+ * @property LLVM_X86MMX_TYPE he x86_mmx types represents a value held in an MMX register on an x86 machine
  * @property LLVM_HALF_TYPE LLVM 16-bit float
  * @property LLVM_FLOAT_TYPE LLVM 32-bit float
  * @property LLVM_DOUBLE_TYPE LLVM 64-bit float
