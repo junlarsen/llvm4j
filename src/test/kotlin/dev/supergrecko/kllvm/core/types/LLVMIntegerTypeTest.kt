@@ -1,6 +1,7 @@
-package dev.supergrecko.kllvm.core.type
+package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.core.LLVMContext
+import dev.supergrecko.kllvm.core.LLVMType
 import dev.supergrecko.kllvm.utils.runAll
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

@@ -1,5 +1,6 @@
-package dev.supergrecko.kllvm.core.type
+package dev.supergrecko.kllvm.core.types
 
+import dev.supergrecko.kllvm.core.LLVMType
 import dev.supergrecko.kllvm.utils.iterateIntoType
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt

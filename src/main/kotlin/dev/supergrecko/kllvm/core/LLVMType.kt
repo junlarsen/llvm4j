@@ -1,5 +1,6 @@
-package dev.supergrecko.kllvm.core.type
+package dev.supergrecko.kllvm.core
 
+import dev.supergrecko.kllvm.core.types.*
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
@@ -7,13 +8,13 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 /**
- * Higher level wrapper around LLVM Core's type module
+ * Higher level wrapper around LLVM Core's types module
  *
  * -[Documentation](https://llvm.org/doxygen/group__LLVMCCoreType.html)
  */
 public open class LLVMType internal constructor(internal val llvmType: LLVMTypeRef) {
     /**
-     * Feed this type into a [LLVMPointerType]
+     * Feed this types into a [LLVMPointerType]
      */
     public fun intoPointer(addressSpace: Int = 0): LLVMPointerType {
         require(addressSpace >= 0) { "Cannot use negative address space as it would cause integer underflow" }
@@ -23,14 +24,14 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
     }
 
     /**
-     * Feed this type into a [LLVMArrayType]
+     * Feed this types into a [LLVMArrayType]
      */
     public fun intoArray(): LLVMArrayType {
         return LLVMArrayType(llvmType)
     }
 
     /**
-     * Feed this type into a [LLVMVectorType]
+     * Feed this types into a [LLVMVectorType]
      */
     public fun intoVector(): LLVMVectorType {
         return LLVMVectorType(llvmType)
@@ -68,7 +69,7 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
 
     companion object {
         /**
-         * Create a type in a context and a known size.
+         * Create a types in a context and a known size.
          *
          * @param kind Integer kind to create
          * @param size Context size for [LLVMType.IntegerTypeKinds.LLVM_INT_TYPE]
@@ -96,9 +97,9 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
         }
 
         /**
-         * Create a float type in the given context
+         * Create a float types in the given context
          *
-         * @param kind Float type to create
+         * @param kind Float types to create
          * @param context The context to use, default to global
          */
         @JvmStatic
@@ -121,11 +122,11 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
         }
 
         /**
-         * Create a function type
+         * Create a function types
          *
          * Argument count is automatically calculated from [paramTypes].
          *
-         * @param returnType Expected return type
+         * @param returnType Expected return types
          * @param paramTypes List of parameter types
          * @param isVariadic Is the function variadic?
          */
@@ -141,7 +142,7 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
         }
 
         /**
-         * Create a structure type
+         * Create a structure types
          *
          * This method creates different kinds of structure types depending on whether [name] is passed or not.
          * If name is passed, an opaque struct is created, otherwise a regular struct is created inside the given

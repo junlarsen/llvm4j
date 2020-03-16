@@ -1,5 +1,6 @@
-package dev.supergrecko.kllvm.core.type
+package dev.supergrecko.kllvm.core.types
 
+import dev.supergrecko.kllvm.core.LLVMType
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
