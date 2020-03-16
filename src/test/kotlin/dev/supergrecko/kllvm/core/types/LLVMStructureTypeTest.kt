@@ -1,13 +1,14 @@
 package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.core.LLVMType
+import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class LLVMStructureTypeTest {
     @Test
     fun `test element spec matches`() {
-        val elements = listOf(LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I32_TYPE))
+        val elements = listOf(LLVMType.makeInteger(32))
         val struct = LLVMType.makeStruct(elements, false)
 
         assertEquals(false, struct.isPacked())
@@ -28,7 +29,7 @@ class LLVMStructureTypeTest {
 
         assertEquals(true, struct.isOpaque())
 
-        val elements = listOf(LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I32_TYPE))
+        val elements = listOf(LLVMType.makeInteger(32))
         struct.setBody(elements, false)
 
         val (first) = struct.getElementTypes()
