@@ -10,10 +10,8 @@ public class LLVMArrayType internal constructor(llvmType: LLVMTypeRef) : LLVMTyp
         return LLVM.LLVMGetArrayLength(llvmType)
     }
 
-    /**
-     * TODO: Learn how to test this
-     */
     public fun getSubtypes(): List<LLVMType> {
+        // TODO: Learn how to test this
         val dest = PointerPointer<LLVMTypeRef>(getLength().toLong())
         LLVM.LLVMGetSubtypes(llvmType, dest)
 

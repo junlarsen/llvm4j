@@ -7,7 +7,7 @@ class LLVMPointerTypeTest {
     @Test
     fun `underlying type matches`() {
         val type = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I32_TYPE)
-        val ptr = type.asPointer()
+        val ptr = type.intoPointer()
 
         assertEquals(type.llvmType, ptr.getElementType().llvmType)
     }
@@ -15,7 +15,7 @@ class LLVMPointerTypeTest {
     @Test
     fun `address space matches`() {
         val type = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I32_TYPE)
-        val ptr = type.asPointer(100)
+        val ptr = type.intoPointer(100)
 
         assertEquals(100, ptr.getAddressSpace())
     }

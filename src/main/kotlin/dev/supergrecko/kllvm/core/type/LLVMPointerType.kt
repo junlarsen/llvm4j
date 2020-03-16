@@ -14,10 +14,8 @@ public class LLVMPointerType internal constructor(llvmType: LLVMTypeRef) : LLVMT
         return LLVM.LLVMGetNumContainedTypes(llvmType)
     }
 
-    /**
-     * TODO: Learn how to test this
-     */
     public fun getSubtypes(): List<LLVMType> {
+        // TODO: Learn how to test this
         val dest = PointerPointer<LLVMTypeRef>(getContainedTypes().toLong())
         LLVM.LLVMGetSubtypes(llvmType, dest)
 

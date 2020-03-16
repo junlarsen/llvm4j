@@ -5,7 +5,7 @@ import org.bytedeco.llvm.global.LLVM
 
 public class LLVMIntegerType internal constructor(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
     /**
-     * Get the amount of bits this type can hold
+     * Returns the amount of bits this integer type can hold
      */
     public fun typeWidth(): Int {
         return LLVM.LLVMGetIntTypeWidth(llvmType)

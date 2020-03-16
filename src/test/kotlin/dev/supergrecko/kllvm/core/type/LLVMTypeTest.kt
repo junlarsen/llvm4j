@@ -10,7 +10,7 @@ class LLVMTypeTest {
     fun `test creation of pointer type`() {
         val type = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I64_TYPE)
 
-        val ptr = type.asPointer()
+        val ptr = type.intoPointer()
 
         assertEquals(LLVM.LLVMGetTypeKind(ptr.llvmType), LLVM.LLVMPointerTypeKind)
     }
@@ -26,7 +26,7 @@ class LLVMTypeTest {
     @Test
     fun `casting into other type works when expected to`() {
         val type = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I32_TYPE)
-        val ptr = type.asPointer()
+        val ptr = type.intoPointer()
         val underlying = ptr.getElementType()
 
         assertEquals(type.llvmType, underlying.asInteger().llvmType)
@@ -37,7 +37,7 @@ class LLVMTypeTest {
         // This behavior is documented at LLVMType. There is no way
         // to guarantee that the underlying type is valid or invalid
         val type = LLVMType.makeInteger(LLVMTypeKind.Integer.LLVM_I32_TYPE)
-        val ptr = type.asPointer()
+        val ptr = type.intoPointer()
         val underlying = ptr.getElementType()
 
         assertEquals(type.llvmType, underlying.asFunction().llvmType)

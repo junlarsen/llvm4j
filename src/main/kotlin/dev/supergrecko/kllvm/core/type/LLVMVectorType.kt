@@ -10,10 +10,8 @@ public class LLVMVectorType internal constructor(llvmType: LLVMTypeRef) : LLVMTy
         return LLVM.LLVMGetVectorSize(llvmType)
     }
 
-    /**
-     * TODO: Learn how to test this
-     */
     public fun getSubtypes(): List<LLVMType> {
+        // TODO: Learn how to test this
         val dest = PointerPointer<LLVMTypeRef>(getSize().toLong())
         LLVM.LLVMGetSubtypes(llvmType, dest)
 
