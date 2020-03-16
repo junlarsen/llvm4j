@@ -49,7 +49,7 @@ class LLVMFunctionTypeTest {
         val args = listOf(LLVMType.make(LLVMTypeKind.LLVM_FLOAT_TYPE))
         val fn = LLVMType.makeFunction(ret, args, true)
 
-        val params = fn.getParameters()
+        val params = fn.getParameterTypes()
 
         for (i in args.indices) {
             val x = params[i].llvmType

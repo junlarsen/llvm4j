@@ -12,17 +12,58 @@ import org.bytedeco.llvm.global.LLVM
  * -[Documentation](https://llvm.org/doxygen/group__LLVMCCoreType.html)
  */
 public open class LLVMType internal constructor(internal val llvmType: LLVMTypeRef) {
-    public fun asPointer(addressSpace: Int = 0): LLVMPointerType {
+    /**
+     * Feed this type into a [LLVMPointerType]
+     */
+    public fun intoPointer(addressSpace: Int = 0): LLVMPointerType {
         require(addressSpace >= 0) { "Cannot use negative address space as it would cause integer underflow" }
         val ptr = LLVM.LLVMPointerType(llvmType, addressSpace)
 
         return LLVMPointerType(ptr)
     }
 
+    /**
+     * Feed this type into a [LLVMArrayType]
+     */
+    public fun intoArray(): LLVMArrayType {
+        return LLVMArrayType(llvmType)
+    }
+
+    /**
+     * Feed this type into a [LLVMVectorType]
+     */
+    public fun intoVector(): LLVMVectorType {
+        return LLVMVectorType(llvmType)
+    }
+
+    /**
+     * Cast to [LLVMPointerType]
+     */
+    public fun asPointer(): LLVMPointerType = LLVMPointerType(llvmType)
+
+    /**
+     * Cast to [LLVMIntegerType]
+     */
     public fun asInteger(): LLVMIntegerType = LLVMIntegerType(llvmType)
+
+    /**
+     * Cast to [LLVMFunctionType]
+     */
     public fun asFunction(): LLVMFunctionType = LLVMFunctionType(llvmType)
+
+    /**
+     * Cast to [LLVMStructureType]
+     */
     public fun asStruct(): LLVMStructureType = LLVMStructureType(llvmType)
+
+    /**
+     * Cast to [LLVMArrayType]
+     */
     public fun asArray(): LLVMArrayType = LLVMArrayType(llvmType)
+
+    /**
+     * Cast to [LLVMVectorType]
+     */
     public fun asVector(): LLVMVectorType = LLVMVectorType(llvmType)
 
     companion object {

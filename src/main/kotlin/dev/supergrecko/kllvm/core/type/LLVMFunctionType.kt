@@ -6,11 +6,6 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-/**
- * Wrapper around LLVM Function Types
- *
- * @property llvmType Internal [LLVMTypeRef] reference
- */
 public class LLVMFunctionType internal constructor(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
     public fun isVariadic(): Boolean {
         return LLVM.LLVMIsFunctionVarArg(llvmType).toBoolean()
@@ -26,7 +21,7 @@ public class LLVMFunctionType internal constructor(llvmType: LLVMTypeRef) : LLVM
         return LLVMType(type)
     }
 
-    public fun getParameters(): List<LLVMType> {
+    public fun getParameterTypes(): List<LLVMType> {
         val dest = PointerPointer<LLVMTypeRef>(getParameterCount().toLong())
         LLVM.LLVMGetParamTypes(llvmType, dest)
 
