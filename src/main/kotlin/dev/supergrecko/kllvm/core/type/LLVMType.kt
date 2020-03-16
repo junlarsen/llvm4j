@@ -13,7 +13,7 @@ import org.bytedeco.llvm.global.LLVM
  */
 public open class LLVMType internal constructor(internal val llvmType: LLVMTypeRef) {
     public fun asPointer(addressSpace: Int = 0): LLVMPointerType {
-        require(addressSpace >= 0) { "Cannot use negative address space" }
+        require(addressSpace >= 0) { "Cannot use negative address space as it would cause integer underflow" }
         val ptr = LLVM.LLVMPointerType(llvmType, addressSpace)
 
         return LLVMPointerType(ptr)
@@ -22,6 +22,8 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
     public fun asInteger(): LLVMIntegerType = LLVMIntegerType(llvmType)
     public fun asFunction(): LLVMFunctionType = LLVMFunctionType(llvmType)
     public fun asStruct(): LLVMStructureType = LLVMStructureType(llvmType)
+    public fun asArray(): LLVMArrayType = LLVMArrayType(llvmType)
+    public fun asVector(): LLVMVectorType = LLVMVectorType(llvmType)
 
     companion object {
         /**
@@ -117,6 +119,20 @@ public open class LLVMType internal constructor(internal val llvmType: LLVMTypeR
             }
 
             return LLVMStructureType(type)
+        }
+
+        @JvmStatic
+        public fun makeVector(elementType: LLVMType, size: Int): LLVMVectorType {
+            val type = LLVM.LLVMVectorType(elementType.llvmType, size)
+
+            return LLVMVectorType(type)
+        }
+
+        @JvmStatic
+        public fun makeArray(elementType: LLVMType, size: Int): LLVMArrayType {
+            val type = LLVM.LLVMArrayType(elementType.llvmType, size)
+
+            return LLVMArrayType(type)
         }
     }
 }
