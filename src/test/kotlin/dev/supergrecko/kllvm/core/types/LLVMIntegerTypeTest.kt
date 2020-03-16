@@ -2,7 +2,6 @@ package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.core.LLVMContext
 import dev.supergrecko.kllvm.core.LLVMType
-import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
 import dev.supergrecko.kllvm.utils.runAll
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -14,7 +13,7 @@ class LLVMIntegerTypeTest {
         val ctx = LLVMContext.create()
 
         runAll(1, 8, 16, 32, 64, 128) {
-            val contextType = ctx.integerType(it)
+            val contextType = ctx.createIntegerType(it)
             val globalType = LLVMType.makeInteger(it)
 
             assertEquals(contextType.typeWidth(), globalType.typeWidth())
@@ -26,7 +25,7 @@ class LLVMIntegerTypeTest {
         val ctx = LLVMContext.create()
 
         runAll(1, 8, 16, 32, 64, 128) {
-            val type = ctx.integerType(it)
+            val type = ctx.createIntegerType(it)
 
             assertTrue { !type.llvmType.isNull }
         }
