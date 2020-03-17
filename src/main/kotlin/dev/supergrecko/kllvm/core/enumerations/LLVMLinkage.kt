@@ -4,20 +4,20 @@ import dev.supergrecko.kllvm.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
 public enum class LLVMLinkage(public override val value: Int) : OrderedEnum<Int> {
-    AvailableExternallyLinkage(LLVM.LLVMAvailableExternallyLinkage),
-    LinkOnceAnyLinkage(LLVM.LLVMLinkOnceAnyLinkage),
-    LinkOnceODRLinkage(LLVM.LLVMLinkOnceODRLinkage),
-    LinkOnceODRAutoHideLinkage(LLVM.LLVMLinkOnceODRAutoHideLinkage),
-    WeakAnyLinkage(LLVM.LLVMWeakAnyLinkage),
-    WeakODRLinkage(LLVM.LLVMWeakODRLinkage),
-    AppendingLinkage(LLVM.LLVMAppendingLinkage),
-    InternalLinkage(LLVM.LLVMInternalLinkage),
-    PrivateLinkage(LLVM.LLVMPrivateLinkage),
-    DLLImportLinkage(LLVM.LLVMDLLImportLinkage),
-    DLLExportLinkage(LLVM.LLVMDLLExportLinkage),
-    ExternalWeakLinkage(LLVM.LLVMExternalWeakLinkage),
-    GhostLinkage(LLVM.LLVMGhostLinkage),
-    CommonLinkage(LLVM.LLVMCommonLinkage),
-    LinkerPrivateLinkage(LLVM.LLVMLinkerPrivateLinkage),
-    LinkerPrivateWeakLinkage(LLVM.LLVMLinkerPrivateWeakLinkage)
+    AvailableExternally(LLVM.LLVMAvailableExternallyLinkage),
+    LinkOnceAny(LLVM.LLVMLinkOnceAnyLinkage),
+    LinkOnceODR(LLVM.LLVMLinkOnceODRLinkage),
+    LinkOnceODRAutoHide(LLVM.LLVMLinkOnceODRAutoHideLinkage),
+    WeakAny(LLVM.LLVMWeakAnyLinkage),
+    WeakODR(LLVM.LLVMWeakODRLinkage),
+    Appending(LLVM.LLVMAppendingLinkage),
+    Internal(LLVM.LLVMInternalLinkage),
+    Private(LLVM.LLVMPrivateLinkage),
+    DLLImport(LLVM.LLVMDLLImportLinkage),
+    DLLExport(LLVM.LLVMDLLExportLinkage),
+    ExternalWeak(LLVM.LLVMExternalWeakLinkage),
+    Ghost(LLVM.LLVMGhostLinkage),
+    Common(LLVM.LLVMCommonLinkage),
+    LinkerPrivate(LLVM.LLVMLinkerPrivateLinkage),
+    LinkerPrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage)
 }
