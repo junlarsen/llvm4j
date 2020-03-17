@@ -226,7 +226,8 @@ public open class LLVMType internal constructor(
         val dest = PointerPointer<LLVMTypeRef>(getParameterCount().toLong())
         LLVM.LLVMGetParamTypes(llvmType, dest)
 
-        return dest.iterateIntoType { LLVMType(it, getTypeKind(it)) }
+        return dest
+                .iterateIntoType { LLVMType(it, getTypeKind(it)) }
     }
 
     /**

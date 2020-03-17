@@ -7,18 +7,18 @@ import kotlin.test.assertEquals
 class LLVMStructureTypeTest {
     @Test
     fun `test element spec matches`() {
-        val elements = listOf(LLVMType.makeInteger(32))
+        val elements = listOf(LLVMType.createInteger(32))
         val struct = LLVMType.createStruct(elements, false)
 
-        assertEquals(false, struct.isPacked())
-        assertEquals(1, struct.getElementTypeCount())
-        assertEquals(true, struct.isLiteral())
-        assertEquals(false, struct.isOpaque())
+        assertEquals(false, struct.isPackedStruct())
+        assertEquals(1, struct.getElementSize())
+        assertEquals(true, struct.isLiteralStruct())
+        assertEquals(false, struct.isOpaqueStruct())
 
-        val (first) = struct.getElementTypes()
+        val (first) = struct.getStructElementTypes()
         assertEquals(elements.first().llvmType, first.llvmType)
 
-        val type = struct.getType(0)
+        val type = struct.getElementTypeAt(0)
         assertEquals(type.llvmType, elements.first().llvmType)
     }
 
@@ -26,13 +26,13 @@ class LLVMStructureTypeTest {
     fun `test opaque struct`() {
         val struct = LLVMType.createStruct(listOf(), false, "test_struct")
 
-        assertEquals(true, struct.isOpaque())
+        assertEquals(true, struct.isOpaqueStruct())
 
-        val elements = listOf(LLVMType.makeInteger(32))
-        struct.setBody(elements, false)
+        val elements = listOf(LLVMType.createInteger(32))
+        struct.setStructBody(elements, false)
 
-        val (first) = struct.getElementTypes()
+        val (first) = struct.getStructElementTypes()
         assertEquals(elements.first().llvmType, first.llvmType)
-        assertEquals(false, struct.isOpaque())
+        assertEquals(false, struct.isOpaqueStruct())
     }
 }

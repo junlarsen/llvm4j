@@ -7,7 +7,7 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 internal fun <P : Pointer, R> PointerPointer<P>.iterateIntoType(applyAfter: (elem: LLVMTypeRef) -> R): List<R> {
     val res = mutableListOf<LLVMTypeRef>()
 
-    for (i in 0..capacity()) {
+    for (i in 0 until capacity()) {
         res += LLVMTypeRef(get(i))
     }
 

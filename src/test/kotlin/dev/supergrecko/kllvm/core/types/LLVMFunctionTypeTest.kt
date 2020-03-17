@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 class LLVMFunctionTypeTest {
     @Test
     fun `creation of zero arg type works`() {
-        val ret = LLVMType.makeInteger(64)
+        val ret = LLVMType.createInteger(64)
         val fn = LLVMType.createFunction(ret, listOf(), false)
 
         assertEquals(fn.getParameterCount(), 0)
@@ -20,7 +20,7 @@ class LLVMFunctionTypeTest {
 
     @Test
     fun `variadic arguments work`() {
-        val ret = LLVMType.makeInteger(64)
+        val ret = LLVMType.createInteger(64)
         val arg = LLVMType.create(LLVMTypeKind.Float)
         val fn = LLVMType.createFunction(ret, listOf(arg), true)
 
@@ -29,7 +29,7 @@ class LLVMFunctionTypeTest {
 
     @Test
     fun `test variadic wrapper works`() {
-        val ret = LLVMType.makeInteger(64)
+        val ret = LLVMType.createInteger(64)
         val arg = LLVMType.create(LLVMTypeKind.Float)
         val fn = LLVMType.createFunction(ret, listOf(arg), true)
 
@@ -38,7 +38,7 @@ class LLVMFunctionTypeTest {
 
     @Test
     fun `test parameter count wrapper works`() {
-        val ret = LLVMType.makeInteger(64)
+        val ret = LLVMType.createInteger(64)
         val arg = LLVMType.create(LLVMTypeKind.Float)
         val fn = LLVMType.createFunction(ret, listOf(arg), true)
 
@@ -47,7 +47,7 @@ class LLVMFunctionTypeTest {
 
     @Test
     fun `test parameter list matches`() {
-        val ret = LLVMType.makeInteger(64)
+        val ret = LLVMType.createInteger(64)
         val args = listOf(LLVMType.create(LLVMTypeKind.Float))
         val fn = LLVMType.createFunction(ret, args, true)
 

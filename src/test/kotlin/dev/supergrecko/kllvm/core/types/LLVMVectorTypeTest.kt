@@ -7,10 +7,10 @@ import kotlin.test.assertEquals
 class LLVMVectorTypeTest {
     @Test
     fun `underlying type matches`() {
-        val type = LLVMType.makeInteger(32)
+        val type = LLVMType.createInteger(32)
         val vec = LLVMType.createVector(type, 10)
 
-        assertEquals(10, vec.getSize())
+        assertEquals(10, vec.getElementSize())
         assertEquals(type.llvmType, vec.getElementType().llvmType)
     }
 }
