@@ -15,7 +15,13 @@ public class Message(private val buffer: ByteBuffer) : Disposable, AutoCloseable
     public fun getString(): String {
         require(valid)
 
-        return buffer.toString()
+        val res = StringBuilder()
+
+        for (i in 0 until buffer.capacity()) {
+            res.append(buffer.get(i).toChar())
+        }
+
+        return res.toString()
     }
 
     override fun dispose() {

@@ -30,7 +30,9 @@ public open class LLVMType internal constructor(
     public fun createConstAllOnes(): LLVMValue {
         requires(LLVMTypeKind.Integer)
 
-        TODO()
+        val value = LLVM.LLVMConstAllOnes(llvmType)
+
+        return LLVMValue(value, LLVMValue.getValueKind(value))
     }
 
     /**
@@ -40,7 +42,10 @@ public open class LLVMType internal constructor(
      */
     public fun createZeroValue(): LLVMValue {
         except(LLVMTypeKind.Function, LLVMTypeKind.Label)
-        require(getTypeKind() != LLVMTypeKind.Struct && !isOpaqueStruct())
+
+        if (getTypeKind() == LLVMTypeKind.Struct) {
+            require(!isOpaqueStruct())
+        }
 
         val value = LLVM.LLVMConstNull(llvmType)
 
