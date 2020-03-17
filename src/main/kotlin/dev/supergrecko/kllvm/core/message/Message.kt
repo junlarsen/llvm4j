@@ -3,8 +3,9 @@ package dev.supergrecko.kllvm.core.message
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
 import org.bytedeco.llvm.global.LLVM
+import java.nio.ByteBuffer
 
-public class Message(private val buffer: ByteArray) : Disposable, AutoCloseable {
+public class Message(private val buffer: ByteBuffer) : Disposable, AutoCloseable {
     public override var valid: Boolean = true
 
     public override fun close() {
@@ -22,7 +23,7 @@ public class Message(private val buffer: ByteArray) : Disposable, AutoCloseable 
     }
 
     public companion object {
-        public fun create(buffer: ByteArray): Message {
+        public fun create(buffer: ByteBuffer): Message {
             return Message(buffer)
         }
 

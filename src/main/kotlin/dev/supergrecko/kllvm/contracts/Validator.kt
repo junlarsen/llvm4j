@@ -34,7 +34,13 @@ public open class Validator<T>(public open var kind: T) {
 
     public fun requires(vararg allowed: T) {
         if (kind !in allowed) {
-            throw IllegalArgumentException("Passed kind '$kind' is not any of $allowed")
+            throw IllegalArgumentException("Passed kind '$kind' is not allowed here")
+        }
+    }
+
+    public fun except(vararg banned: T) {
+        if (kind in banned) {
+            throw IllegalArgumentException("Passed kind '$kind' is not allowed here")
         }
     }
 }
