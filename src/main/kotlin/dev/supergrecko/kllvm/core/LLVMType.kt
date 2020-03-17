@@ -255,7 +255,7 @@ public open class LLVMType internal constructor(
     /**
      * Wrap this type inside a vector
      */
-    public fun intoVector(size: Int): LLVMType = createVector(this, size)
+    public fun toVector(size: Int): LLVMType = createVector(this, size)
 
     public fun getTypeKind(): LLVMTypeKind {
         return getTypeKind(llvmType)
@@ -365,6 +365,7 @@ public open class LLVMType internal constructor(
 
         @JvmStatic
         public fun createVector(elementType: LLVMType, size: Int): LLVMType {
+            require(size >= 0)
             val type = LLVM.LLVMVectorType(elementType.llvmType, size)
 
             return LLVMType(type, LLVMTypeKind.Vector)
@@ -372,6 +373,7 @@ public open class LLVMType internal constructor(
 
         @JvmStatic
         public fun createArray(elementType: LLVMType, size: Int): LLVMType {
+            require(size >= 0)
             val type = LLVM.LLVMArrayType(elementType.llvmType, size)
 
             return LLVMType(type, LLVMTypeKind.Array)
@@ -391,6 +393,7 @@ public open class LLVMType internal constructor(
 
             return LLVMTypeKind.values()
                     .firstOrNull { it.value == kind }
+                    // Theoretically unreachable, but kept if wrong LLVM version is used
                     ?: throw IllegalArgumentException("Type $type has invalid type kind")
         }
     }

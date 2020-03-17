@@ -2,18 +2,35 @@ package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.core.LLVMType
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
-import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
+import java.lang.IllegalArgumentException
 import kotlin.test.*
 
 class LLVMTypeTest {
     @Test
     fun `test creation of pointer type`() {
         val type = LLVMType.createInteger(64)
-
         val ptr = type.toPointer()
 
-        assertEquals(LLVM.LLVMGetTypeKind(ptr.llvmType), LLVM.LLVMPointerTypeKind)
+        assertEquals(LLVMTypeKind.Pointer, ptr.getTypeKind())
+    }
+
+    @Test
+    fun `test creation of array type`() {
+        val type = LLVMType.createInteger(64)
+        val arr = type.toArray(10)
+
+        assertEquals(LLVMTypeKind.Array, arr.getTypeKind())
+        assertEquals(10, arr.getElementSize())
+    }
+
+    @Test
+    fun `test creation of vector type`() {
+        val type = LLVMType.createInteger(32)
+        val vec = type.toVector(1000)
+
+        assertEquals(LLVMTypeKind.Array, type.getTypeKind())
+        assertEquals(1000, type.getElementSize())
     }
 
     @Test
@@ -41,5 +58,28 @@ class LLVMTypeTest {
         val type = LLVMType.create(LLVMTypeKind.Float)
 
         assertEquals(LLVMTypeKind.Float, type.getTypeKind())
+    }
+
+    @Test
+    fun `calling function with different type fails`() {
+        val type = LLVMType.create(LLVMTypeKind.Float)
+
+        assertFailsWith<IllegalArgumentException> {
+            type.getElementSize()
+        }
+    }
+
+    @Test
+    fun `negative size is illegal`() {
+        assertFailsWith<IllegalArgumentException> {
+            LLVMType.createInteger(-1)
+        }
+    }
+
+    @Test
+    fun `too huge size is illegal`() {
+        assertFailsWith<IllegalArgumentException> {
+            LLVMType.createInteger(1000123012)
+        }
     }
 }
