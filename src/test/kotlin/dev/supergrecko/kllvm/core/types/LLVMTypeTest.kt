@@ -29,8 +29,8 @@ class LLVMTypeTest {
         val type = LLVMType.createInteger(32)
         val vec = type.toVector(1000)
 
-        assertEquals(LLVMTypeKind.Array, type.getTypeKind())
-        assertEquals(1000, type.getElementSize())
+        assertEquals(LLVMTypeKind.Vector, vec.getTypeKind())
+        assertEquals(1000, vec.getElementSize())
     }
 
     @Test
