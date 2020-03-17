@@ -1,7 +1,9 @@
 package dev.supergrecko.kllvm.core.types
 
+import dev.supergrecko.kllvm.core.LLVMContext
 import dev.supergrecko.kllvm.core.LLVMType
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
+import dev.supergrecko.kllvm.core.enumerations.LLVMValueKind
 import org.junit.jupiter.api.Test
 import java.lang.IllegalArgumentException
 import kotlin.test.*
@@ -81,5 +83,42 @@ class LLVMTypeTest {
         assertFailsWith<IllegalArgumentException> {
             LLVMType.createInteger(1000123012)
         }
+    }
+
+    @Test
+    fun `is sized works for integer`() {
+        val type = LLVMType.createInteger(192)
+
+        assertEquals(true, type.isSized())
+    }
+
+    @Test
+    fun `is sized works for struct`() {
+        val arg = LLVMType.create(LLVMTypeKind.Float)
+        val type = LLVMType.createStruct(listOf(arg), false)
+
+        assertEquals(true, type.isSized())
+    }
+
+    @Test
+    fun `retrieving context works`() {
+        val ctx = LLVMContext.create()
+        val type = ctx.createIntegerType(32)
+
+        val typeCtx = type.getContext()
+
+        assertEquals(ctx.llvmCtx, typeCtx.llvmCtx)
+    }
+
+    @Test
+    fun `getting a name representation works`() {
+        val type = LLVMType.createInteger(32)
+
+        val msg = type.getString()
+
+        // LLVM does apparently not retain bit size for integer types here
+        assertEquals("i", msg.getString())
+
+        msg.dispose()
     }
 }

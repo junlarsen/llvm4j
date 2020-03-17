@@ -3,6 +3,7 @@ package dev.supergrecko.kllvm.core
 import dev.supergrecko.kllvm.contracts.Validator
 import dev.supergrecko.kllvm.contracts.Unreachable
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
+import dev.supergrecko.kllvm.core.message.Message
 import dev.supergrecko.kllvm.utils.iterateIntoType
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
@@ -21,8 +22,103 @@ public open class LLVMType internal constructor(
         internal val llvmType: LLVMTypeRef,
         kind: LLVMTypeKind
 ) : Validator<LLVMTypeKind>(kind) {
+    //region Core::Values::Constants
+
     /**
-     * Case [LLVMTypeKind.Struct]
+     * Accepts [LLVMTypeKind.Integer]
+     */
+    public fun createConstAllOnes(): LLVMValue {
+        requires(LLVMTypeKind.Integer)
+
+        val value = LLVM.LLVMConstAllOnes(llvmType)
+
+        return LLVMValue(value, LLVMValue.getValueKind(value))
+    }
+
+    /**
+     * Create a zero value of a type
+     *
+     * This operation is not valid for functions, labels or opaque structures.
+     */
+    public fun createZeroValue(): LLVMValue {
+        except(LLVMTypeKind.Function, LLVMTypeKind.Label)
+
+        if (getTypeKind() == LLVMTypeKind.Struct) {
+            require(!isOpaqueStruct())
+        }
+
+        val value = LLVM.LLVMConstNull(llvmType)
+
+        return LLVMValue(value, LLVMValue.getValueKind(value))
+    }
+
+    /**
+     * Obtain a constant that is a const ptr pointing to NULL for the specified type
+     */
+    public fun createConstPointerNull(): LLVMValue {
+        val ptr = LLVM.LLVMConstPointerNull(llvmType)
+
+        return LLVMValue(ptr, LLVMValue.getValueKind(ptr))
+    }
+
+    /**
+     * Obtain an "undefined" object of the specified type
+     */
+    public fun createUndefined(): LLVMValue {
+        val value = LLVM.LLVMGetUndef(llvmType)
+
+        return LLVMValue(value, LLVMValue.getValueKind(value))
+    }
+
+    //endregion Core::Values::Constants
+    //region Core::Types
+
+    /**
+     * Get the type kind for this type
+     */
+    public fun getTypeKind(): LLVMTypeKind {
+        return getTypeKind(llvmType)
+    }
+
+    /**
+     * Determine whether this type has a known size or not
+     */
+    public fun isSized(): Boolean {
+        return LLVM.LLVMTypeIsSized(llvmType).toBoolean()
+    }
+
+    /**
+     * Dump the type to stderr. Not supported by LLVM 9.x.x
+     */
+    public fun dumpType(): Unit = TODO("LLVM 9.x.x does not support this method.")
+
+    /**
+     * Get the context this type resides in
+     */
+    public fun getContext(): LLVMContext {
+        except(LLVMTypeKind.Function, LLVMTypeKind.Array, LLVMTypeKind.Pointer, LLVMTypeKind.Vector)
+
+        val ctx = LLVM.LLVMGetTypeContext(llvmType)
+
+        return LLVMContext(ctx)
+    }
+
+    /**
+     * Moves the string representation into a Message
+     *
+     * This message must be disposed via [Message.dispose] otherwise memory will be leaked.
+     */
+    public fun getString(): Message {
+        val ptr = LLVM.LLVMPrintTypeToString(llvmType)
+
+        return Message(ptr.asBuffer())
+    }
+
+    //endregion Core::Types
+    //region Core::Types::StructureTypes
+
+    /**
+     * Accepts [LLVMTypeKind.Struct]
      */
     public fun isPackedStruct(): Boolean {
         requires(LLVMTypeKind.Struct)
@@ -31,7 +127,7 @@ public open class LLVMType internal constructor(
     }
 
     /**
-     * Case [LLVMTypeKind.Struct]
+     * Accepts [LLVMTypeKind.Struct]
      */
     public fun isOpaqueStruct(): Boolean {
         requires(LLVMTypeKind.Struct)
@@ -40,7 +136,7 @@ public open class LLVMType internal constructor(
     }
 
     /**
-     * Case [LLVMTypeKind.Struct]
+     * Accepts [LLVMTypeKind.Struct]
      */
     public fun isLiteralStruct(): Boolean {
         requires(LLVMTypeKind.Struct)
@@ -49,10 +145,13 @@ public open class LLVMType internal constructor(
     }
 
     /**
-     * Case [LLVMTypeKind.Struct]
+     * Set the struct body for an opaque struct
+     * 
+     * Accepts [LLVMTypeKind.Struct]
      */
     public fun setStructBody(elementTypes: List<LLVMType>, packed: Boolean) {
         requires(LLVMTypeKind.Struct)
+        require(isOpaqueStruct())
 
         val types = elementTypes.map { it.llvmType }
         val array = ArrayList(types).toTypedArray()
@@ -64,7 +163,7 @@ public open class LLVMType internal constructor(
     /**
      * Get the element type from the struct at index [index]
      *
-     * Case [LLVMTypeKind.Struct]
+     * Accepts [LLVMTypeKind.Struct]
      */
     public fun getElementTypeAt(index: Int): LLVMType {
         requires(LLVMTypeKind.Struct)
@@ -78,7 +177,7 @@ public open class LLVMType internal constructor(
     /**
      * Get the struct name if it has a name
      *
-     * Case [LLVMTypeKind.Struct]
+     * Accepts [LLVMTypeKind.Struct]
      */
     public fun getStructName(): String? {
         requires(LLVMTypeKind.Struct)
@@ -96,7 +195,7 @@ public open class LLVMType internal constructor(
     /**
      * Get the types of the elements in this struct
      *
-     * Case [LLVMTypeKind.Struct]
+     * Accepts [LLVMTypeKind.Struct]
      */
     public fun getStructElementTypes(): List<LLVMType> {
         requires(LLVMTypeKind.Struct)
@@ -107,10 +206,13 @@ public open class LLVMType internal constructor(
         return dest.iterateIntoType { LLVMType(it, getTypeKind(it)) }
     }
 
+    //endregion Core::Types::StructureTypes
+    //region Core::Types::SequentialTypes
+
     /**
      * Get the declared address space for this pointer
      *
-     * Case [LLVMTypeKind.Pointer]
+     * Accepts [LLVMTypeKind.Pointer]
      */
     public fun getAddressSpace(): Int {
         requires(LLVMTypeKind.Pointer)
@@ -121,7 +223,7 @@ public open class LLVMType internal constructor(
     /**
      * Get the amount of bits this integer type can hold
      *
-     * Case [LLVMTypeKind.Integer]
+     * Accepts [LLVMTypeKind.Integer]
      */
     public fun getTypeWidth(): Int {
         requires(LLVMTypeKind.Integer)
@@ -132,10 +234,10 @@ public open class LLVMType internal constructor(
     /**
      * Get the amount of elements for this type
      *
-     * Case [LLVMTypeKind.Array]: Allocated array size
-     * Case [LLVMTypeKind.Vector]: Vector size
-     * Case [LLVMTypeKind.Pointer]: Number of derived types
-     * Case [LLVMTypeKind.Struct]: Number of elements in struct body
+     * Accepts [LLVMTypeKind.Array]: Allocated array size
+     * Accepts [LLVMTypeKind.Vector]: Vector size
+     * Accepts [LLVMTypeKind.Pointer]: Number of derived types
+     * Accepts [LLVMTypeKind.Struct]: Number of elements in struct body
      */
     public fun getElementSize(): Int {
         requires(LLVMTypeKind.Array, LLVMTypeKind.Vector, LLVMTypeKind.Pointer, LLVMTypeKind.Struct)
@@ -152,9 +254,9 @@ public open class LLVMType internal constructor(
     /**
      * Get the subtype of this type
      *
-     * Case [LLVMTypeKind.Array]
-     * Case [LLVMTypeKind.Pointer]
-     * Case [LLVMTypeKind.Vector]
+     * Accepts [LLVMTypeKind.Array]
+     * Accepts [LLVMTypeKind.Pointer]
+     * Accepts [LLVMTypeKind.Vector]
      *
      * TODO: Learn how to test this
      */
@@ -170,9 +272,9 @@ public open class LLVMType internal constructor(
     /**
      * Get the underlying element's type
      *
-     * Case [LLVMTypeKind.Array]
-     * Case [LLVMTypeKind.Pointer]
-     * Case [LLVMTypeKind.Vector]
+     * Accepts [LLVMTypeKind.Array]
+     * Accepts [LLVMTypeKind.Pointer]
+     * Accepts [LLVMTypeKind.Vector]
      */
     public fun getElementType(): LLVMType {
         requires(LLVMTypeKind.Array, LLVMTypeKind.Pointer, LLVMTypeKind.Vector)
@@ -182,10 +284,13 @@ public open class LLVMType internal constructor(
         return LLVMType(type, getTypeKind(type))
     }
 
+    //endregion Core::Types::SequentialTypes
+    //region Core::Types::FunctionTypes
+
     /**
      * Determine whether this function accepts variadic arguments
      *
-     * Case [LLVMTypeKind.Function]
+     * Accepts [LLVMTypeKind.Function]
      */
     public fun isVariadic(): Boolean {
         requires(LLVMTypeKind.Function)
@@ -194,7 +299,7 @@ public open class LLVMType internal constructor(
     }
 
     /**
-     * Case [LLVMTypeKind.Function]
+     * Accepts [LLVMTypeKind.Function]
      */
     public fun getParameterCount(): Int {
         requires(LLVMTypeKind.Function)
@@ -205,7 +310,7 @@ public open class LLVMType internal constructor(
     /**
      * Get the return type of the function
      *
-     * Case [LLVMTypeKind.Function]
+     * Accepts [LLVMTypeKind.Function]
      */
     public fun getReturnType(): LLVMType {
         requires(LLVMTypeKind.Function)
@@ -218,7 +323,7 @@ public open class LLVMType internal constructor(
     /**
      * Get the types of this function's parameters
      *
-     * Case [LLVMTypeKind.Function]
+     * Accepts [LLVMTypeKind.Function]
      */
     public fun getParameterTypes(): List<LLVMType> {
         requires(LLVMTypeKind.Function)
@@ -229,6 +334,8 @@ public open class LLVMType internal constructor(
         return dest
                 .iterateIntoType { LLVMType(it, getTypeKind(it)) }
     }
+
+    //endregion Core::Types::FunctionTypes
 
     /**
      * "Cast" into another LLVMType
@@ -257,16 +364,11 @@ public open class LLVMType internal constructor(
      */
     public fun toVector(size: Int): LLVMType = createVector(this, size)
 
-    public fun getTypeKind(): LLVMTypeKind {
-        return getTypeKind(llvmType)
-    }
-
     companion object {
         /**
          * Create a types in a context and a known size.
          *
-         * @param kind Integer kind to create
-         * @param size Context size for [LLVMType.IntegerTypeKinds.LLVM_INT_TYPE]
+         * @param size Wanted integer bit size
          * @param context The context to use, default to global
          *
          * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
