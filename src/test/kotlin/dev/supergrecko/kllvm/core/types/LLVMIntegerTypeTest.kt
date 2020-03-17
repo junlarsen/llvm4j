@@ -14,9 +14,9 @@ class LLVMIntegerTypeTest {
 
         runAll(1, 8, 16, 32, 64, 128) {
             val contextType = ctx.createIntegerType(it)
-            val globalType = LLVMType.makeInteger(it)
+            val globalType = LLVMType.createInteger(it)
 
-            assertEquals(contextType.typeWidth(), globalType.typeWidth())
+            assertEquals(contextType.getTypeWidth(), globalType.getTypeWidth())
         }
     }
 

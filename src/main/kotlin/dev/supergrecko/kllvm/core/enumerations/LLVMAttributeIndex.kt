@@ -4,6 +4,6 @@ import dev.supergrecko.kllvm.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
 public enum class LLVMAttributeIndex(public override val value: Long) : OrderedEnum<Long> {
-    ReturnIndex(LLVM.LLVMAttributeReturnIndex),
-    FunctionIndex(LLVM.LLVMAttributeFunctionIndex)
+    Return(LLVM.LLVMAttributeReturnIndex),
+    Function(LLVM.LLVMAttributeFunctionIndex)
 }
