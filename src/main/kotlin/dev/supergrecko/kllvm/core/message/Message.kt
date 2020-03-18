@@ -1,7 +1,6 @@
 package dev.supergrecko.kllvm.core.message
 
 import dev.supergrecko.kllvm.contracts.Disposable
-import dev.supergrecko.kllvm.contracts.Validatable
 import org.bytedeco.llvm.global.LLVM
 import java.nio.ByteBuffer
 
