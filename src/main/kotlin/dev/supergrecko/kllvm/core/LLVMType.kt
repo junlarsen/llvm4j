@@ -3,6 +3,7 @@ package dev.supergrecko.kllvm.core
 import dev.supergrecko.kllvm.contracts.Unreachable
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
 import dev.supergrecko.kllvm.core.message.Message
+import dev.supergrecko.kllvm.factories.TypeFactory
 import dev.supergrecko.kllvm.utils.*
 import dev.supergrecko.kllvm.utils.iterateIntoType
 import dev.supergrecko.kllvm.utils.toBoolean
@@ -20,7 +21,7 @@ import java.lang.IllegalArgumentException
  */
 public open class LLVMType internal constructor(
         internal val llvmType: LLVMTypeRef,
-        public var kind: LLVMTypeKind
+        public var kind: LLVMTypeKind = getTypeKind(llvmType)
 ) {
     //region Core::Types
 
@@ -303,143 +304,19 @@ public open class LLVMType internal constructor(
     /**
      * Wrap this type inside a pointer
      */
-    public fun toPointer(addressSpace: Int = 0): LLVMType = createPointer(this, addressSpace)
+    public fun toPointer(addressSpace: Int = 0): LLVMType = TypeFactory.pointer(this, addressSpace)
 
     /**
      * Wrap this type inside an array
      */
-    public fun toArray(size: Int): LLVMType = createArray(this, size)
+    public fun toArray(size: Int): LLVMType = TypeFactory.array(this, size)
 
     /**
      * Wrap this type inside a vector
      */
-    public fun toVector(size: Int): LLVMType = createVector(this, size)
+    public fun toVector(size: Int): LLVMType = TypeFactory.vector(this, size)
 
     companion object {
-        /**
-         * Create a types in a context and a known size.
-         *
-         * @param size Wanted integer bit size
-         * @param context The context to use, default to global
-         *
-         * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
-         */
-        @JvmStatic
-        public fun createInteger(size: Int = 0, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMType {
-            val type = when (size) {
-                1 -> LLVM.LLVMInt1TypeInContext(context)
-                8 -> LLVM.LLVMInt8TypeInContext(context)
-                16 -> LLVM.LLVMInt16TypeInContext(context)
-                32 -> LLVM.LLVMInt32TypeInContext(context)
-                64 -> LLVM.LLVMInt64TypeInContext(context)
-                128 -> LLVM.LLVMInt128TypeInContext(context)
-                else -> {
-                    require(size in 1..8388606) { "LLVM only supports integers of 2^23-1 bits size" }
-
-                    LLVM.LLVMIntTypeInContext(context, size)
-                }
-            }
-
-            return LLVMType(type, LLVMTypeKind.Integer)
-        }
-
-        /**
-         * Create a float types in the given context
-         *
-         * @param typeKind Float types to create
-         * @param context The context to use, default to global
-         */
-        @JvmStatic
-        public fun create(typeKind: LLVMTypeKind, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMType {
-            val type = when (typeKind) {
-                LLVMTypeKind.Half -> LLVM.LLVMHalfTypeInContext(context)
-                LLVMTypeKind.Float -> LLVM.LLVMFloatTypeInContext(context)
-                LLVMTypeKind.Double -> LLVM.LLVMDoubleTypeInContext(context)
-                LLVMTypeKind.X86_FP80 -> LLVM.LLVMX86FP80TypeInContext(context)
-                LLVMTypeKind.FP128 -> LLVM.LLVMFP128TypeInContext(context)
-                LLVMTypeKind.PPC_FP128 -> LLVM.LLVMPPCFP128TypeInContext(context)
-                LLVMTypeKind.Label -> LLVM.LLVMLabelTypeInContext(context)
-                LLVMTypeKind.Metadata -> LLVM.LLVMMetadataTypeInContext(context)
-                LLVMTypeKind.X86_MMX -> LLVM.LLVMX86MMXTypeInContext(context)
-                LLVMTypeKind.Token -> LLVM.LLVMTokenTypeInContext(context)
-                LLVMTypeKind.Void -> LLVM.LLVMVoidTypeInContext(context)
-                LLVMTypeKind.Integer -> throw IllegalArgumentException("Use .makeInteger")
-                LLVMTypeKind.Function -> throw IllegalArgumentException("Use .makeFunction")
-                LLVMTypeKind.Struct -> throw IllegalArgumentException("Use .makeStruct")
-                LLVMTypeKind.Array -> throw IllegalArgumentException("Use .makeArray")
-                LLVMTypeKind.Pointer -> throw IllegalArgumentException("Use .asPointer")
-                LLVMTypeKind.Vector -> throw IllegalArgumentException("Use .makeVector")
-            }
-
-            return LLVMType(type, typeKind)
-        }
-
-        /**
-         * Create a function types
-         *
-         * Argument count is automatically calculated from [paramTypes].
-         *
-         * @param returnType Expected return types
-         * @param paramTypes List of parameter types
-         * @param isVariadic Is the function variadic?
-         */
-        @JvmStatic
-        public fun createFunction(returnType: LLVMType, paramTypes: List<LLVMType>, isVariadic: Boolean): LLVMType {
-            val types = paramTypes.map { it.llvmType }
-            val array = ArrayList(types).toTypedArray()
-            val ptr = PointerPointer(*array)
-
-            val type = LLVM.LLVMFunctionType(returnType.llvmType, ptr, array.size, isVariadic.toInt())
-
-            return LLVMType(type, LLVMTypeKind.Function)
-        }
-
-        /**
-         * Create a structure types
-         *
-         * This method creates different kinds of structure types depending on whether [name] is passed or not.
-         * If name is passed, an opaque struct is created, otherwise a regular struct is created inside the given
-         * context or the global context.
-         */
-        @JvmStatic
-        public fun createStruct(elementTypes: List<LLVMType>, packed: Boolean, name: String? = null, context: LLVMContextRef = LLVM.LLVMGetGlobalContext()): LLVMType {
-            val types = elementTypes.map { it.llvmType }
-            val array = ArrayList(types).toTypedArray()
-            val ptr = PointerPointer(*array)
-
-            val type = if (name == null) {
-                LLVM.LLVMStructTypeInContext(context, ptr, array.size, packed.toInt())
-            } else {
-                LLVM.LLVMStructCreateNamed(context, name)
-            }
-
-            return LLVMType(type, LLVMTypeKind.Struct)
-        }
-
-        @JvmStatic
-        public fun createVector(elementType: LLVMType, size: Int): LLVMType {
-            require(size >= 0)
-            val type = LLVM.LLVMVectorType(elementType.llvmType, size)
-
-            return LLVMType(type, LLVMTypeKind.Vector)
-        }
-
-        @JvmStatic
-        public fun createArray(elementType: LLVMType, size: Int): LLVMType {
-            require(size >= 0)
-            val type = LLVM.LLVMArrayType(elementType.llvmType, size)
-
-            return LLVMType(type, LLVMTypeKind.Array)
-        }
-
-        @JvmStatic
-        public fun createPointer(elementType: LLVMType, addressSpace: Int): LLVMType {
-            require(addressSpace >= 0) { "Cannot use negative address space as it would cause integer underflow" }
-            val ptr = LLVM.LLVMPointerType(elementType.llvmType, addressSpace)
-
-            return LLVMType(ptr, LLVMTypeKind.Pointer)
-        }
-
         @JvmStatic
         public fun getTypeKind(type: LLVMTypeRef): LLVMTypeKind {
             val kind = LLVM.LLVMGetTypeKind(type)

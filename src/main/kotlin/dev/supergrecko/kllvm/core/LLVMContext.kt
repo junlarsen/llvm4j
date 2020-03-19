@@ -137,48 +137,6 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
     }
 
     /**
-     * Obtain an integer types from the context with specified bit width.
-     *
-     * These are the integer types described in the Language manual. The size passed in must satisfy the constraints
-     * required in [LLVMIntegerType.types].
-     *
-     * There are special cases for all built-in LLVM Integer types (1, 8, 16, 32, 64, 128) which will be used if the
-     * passed [size] is equal to any of these, otherwise [LLVM.LLVMIntTypeInContext] will be used.
-     *
-     * - https://llvm.org/docs/LangRef.html#integer-types
-     *
-     * @throws IllegalArgumentException If internal instance has been dropped.
-     * @throws IllegalArgumentException If wanted size is less than 0 or larger than 2^23-1
-     */
-    public fun createIntegerType(size: Int = 0): LLVMType {
-        require(valid) { "This module has already been disposed."}
-
-        return LLVMType.createInteger(size, llvmCtx)
-    }
-
-    /**
-     * Create a structure type in this context
-     */
-    public fun createStructType(elementTypes: List<LLVMType>, packed: Boolean): LLVMType {
-        return LLVMType.createStruct(elementTypes, packed, null, llvmCtx)
-    }
-
-    /**
-     * Obtain a floating-point number types from the context
-     *
-     * These are the floating-point numbers described in the language manual.
-     *
-     * - https://llvm.org/docs/LangRef.html#floating-point-types
-     *
-     * @throws IllegalArgumentException If internal instance has been dropped
-     */
-    public fun createType(kind: LLVMTypeKind): LLVMType {
-        require(valid) { "This module has already been disposed."}
-
-        return LLVMType.create(kind, llvmCtx)
-    }
-
-    /**
      * Dispose the current context reference.
      *
      * Any calls referencing this context will most likely fail
@@ -216,6 +174,13 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
             val llvmContext = LLVM.LLVMContextCreate()
 
             return LLVMContext(llvmContext)
+        }
+
+        @JvmStatic
+        public fun global(): LLVMContext {
+            val ctx = LLVM.LLVMGetGlobalContext()
+
+            return LLVMContext(ctx)
         }
 
         /**
