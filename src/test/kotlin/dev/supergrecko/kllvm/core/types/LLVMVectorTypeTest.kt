@@ -25,5 +25,11 @@ class LLVMVectorTypeTest {
         assertFailsWith<IllegalArgumentException> {
             type.toVector(-100)
         }
+
+        assertFailsWith<IllegalArgumentException> {
+            TypeFactory.vector(-100) {
+                this.type = type
+            }
+        }
     }
 }

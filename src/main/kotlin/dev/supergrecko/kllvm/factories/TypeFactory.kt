@@ -4,6 +4,8 @@ import dev.supergrecko.kllvm.contracts.Factory
 import dev.supergrecko.kllvm.core.LLVMContext
 import dev.supergrecko.kllvm.core.LLVMType
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
+import dev.supergrecko.kllvm.core.typebuilders.StructBuilder
+import dev.supergrecko.kllvm.core.typebuilders.VectorBuilder
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.global.LLVM
@@ -54,6 +56,10 @@ public object TypeFactory : Factory<LLVMType> {
         return LLVMType(vec, LLVMTypeKind.Vector)
     }
 
+    public fun vector(size: Int, apply: VectorBuilder.() -> Unit): LLVMType {
+        return VectorBuilder(size).apply(apply).build()
+    }
+
     /**
      * Create a structure type
      *
@@ -68,6 +74,10 @@ public object TypeFactory : Factory<LLVMType> {
         val struct = LLVM.LLVMStructTypeInContext(ctx.llvmCtx, PointerPointer(*arr), arr.size, packed.toInt())
 
         return LLVMType(struct, LLVMTypeKind.Struct)
+    }
+
+    public fun struct(apply: StructBuilder.() -> Unit): LLVMType {
+        return StructBuilder().apply(apply).build()
     }
 
     /**
