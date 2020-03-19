@@ -6,6 +6,7 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
+import kotlin.system.exitProcess
 import kotlin.test.assertEquals
 
 class JNIFactorialTest {
@@ -51,7 +52,7 @@ class JNIFactorialTest {
         if (LLVM.LLVMCreateJITCompilerForModule(engine, mod, 2, error) != 0) {
             System.err.println(error.string)
             LLVM.LLVMDisposeMessage(error)
-            System.exit(-1)
+            exitProcess(-1)
         }
         val pass = LLVM.LLVMCreatePassManager()
         LLVM.LLVMAddConstantPropagationPass(pass)

@@ -1,6 +1,5 @@
 package dev.supergrecko.kllvm.core.types
 
-import dev.supergrecko.kllvm.core.LLVMType
 import dev.supergrecko.kllvm.factories.TypeFactory
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

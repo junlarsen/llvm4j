@@ -5,14 +5,9 @@ import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
 import dev.supergrecko.kllvm.core.message.Message
 import dev.supergrecko.kllvm.factories.TypeFactory
 import dev.supergrecko.kllvm.utils.*
-import dev.supergrecko.kllvm.utils.iterateIntoType
-import dev.supergrecko.kllvm.utils.toBoolean
-import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.PointerPointer
-import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
-import java.lang.IllegalArgumentException
 
 /**
  * Higher level wrapper around LLVM Core's types module

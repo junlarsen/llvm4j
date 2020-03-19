@@ -1,6 +1,5 @@
 package dev.supergrecko.kllvm.core.types
 
-import dev.supergrecko.kllvm.core.LLVMType
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
 import dev.supergrecko.kllvm.factories.TypeFactory
 import dev.supergrecko.kllvm.utils.toBoolean
