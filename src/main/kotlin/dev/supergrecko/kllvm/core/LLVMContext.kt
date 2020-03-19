@@ -2,7 +2,6 @@ package dev.supergrecko.kllvm.core
 
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
-import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.Pointer
@@ -176,6 +175,9 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
             return LLVMContext(llvmContext)
         }
 
+        /**
+         * Obtain the global LLVM context
+         */
         @JvmStatic
         public fun global(): LLVMContext {
             val ctx = LLVM.LLVMGetGlobalContext()

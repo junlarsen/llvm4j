@@ -83,7 +83,7 @@ public class LLVMValue internal constructor(
         public fun createUndefined(type: LLVMType): LLVMValue {
             val value = LLVM.LLVMGetUndef(type.llvmType)
 
-            return LLVMValue(value, LLVMValue.getValueKind(value))
+            return LLVMValue(value, getValueKind(value))
         }
 
         //endregion Core::Values::Constants
