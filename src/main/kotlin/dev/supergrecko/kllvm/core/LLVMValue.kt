@@ -17,6 +17,25 @@ public class LLVMValue internal constructor(
     }
 
     //endregion Core::Types
+    //region Core::Values::Constants::ScalarConstants
+
+    public fun getIntZeroExtValue(): Long { TODO() }
+    public fun getIntSignExtValue(): Long { TODO() }
+    public fun getRealValue(): Double { TODO() }
+
+    //endregion Core::Values::Constants::ScalarConstants
+    //region Core::Values::Constants::CompositeConstants
+
+    public fun isConstantString(): Boolean { TODO() }
+    public fun getAsString(): Boolean { TODO() }
+    public fun getElementAsConstant(index: Boolean): LLVMValue { TODO() }
+
+    //endregion Core::Values::Constants::CompositeConstants
+    //region Core::Values::Constants::ConstantExpressions
+
+
+
+    //endregion Core::Values::Constants::ConstantExpressions
 
     /**
      * Obtain the type of a value
