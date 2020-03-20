@@ -21,7 +21,7 @@ public class LLVMValue internal constructor(
 
     public fun getIntZeroExtValue(): Long { TODO() }
     public fun getIntSignExtValue(): Long { TODO() }
-    public fun getRealValue(): Double { TODO() }
+    public fun getRealDoubleValue(): Double { TODO() }
 
     //endregion Core::Values::Constants::ScalarConstants
     //region Core::Values::Constants::CompositeConstants
@@ -40,7 +40,7 @@ public class LLVMValue internal constructor(
     /**
      * Obtain the type of a value
      *
-     * TODO: Find region
+     * TODO: Find region this belongs to
      */
     public fun typeOf(): LLVMType {
         val type = LLVM.LLVMTypeOf(llvmValue)
@@ -50,25 +50,22 @@ public class LLVMValue internal constructor(
 
     /**
      * Obtain the value kind for this value
+     *
+     * TODO: Find region for this
      */
     public fun getValueKind(): LLVMValueKind {
         return getValueKind(llvmValue)
     }
 
-    public fun isKind(kind: LLVMValueKind): Boolean {
+    public fun isValueKind(kind: LLVMValueKind): Boolean {
         return kind == this.kind
     }
 
-    public fun inKinds(vararg kinds: LLVMValueKind): Boolean {
+    public fun isInValueKinds(vararg kinds: LLVMValueKind): Boolean {
         return kind in kinds
     }
 
     public companion object {
-        @JvmStatic
-        public fun getValueKind(value: LLVMValue): LLVMValueKind {
-            return getValueKind(value.llvmValue)
-        }
-
         /**
          * Obtain the value kind for this value
          */

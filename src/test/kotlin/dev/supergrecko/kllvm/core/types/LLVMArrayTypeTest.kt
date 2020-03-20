@@ -11,8 +11,8 @@ class LLVMArrayTypeTest {
         val type = TypeFactory.integer(32)
         val arr = TypeFactory.array(type, 10)
 
-        assertEquals(10, arr.getElementSize())
-        assertEquals(type.llvmType, arr.getElementType().llvmType)
+        assertEquals(10, arr.getSequentialElementSize())
+        assertEquals(type.llvmType, arr.getSequentialElementType().llvmType)
     }
 
     @Test
@@ -20,7 +20,7 @@ class LLVMArrayTypeTest {
         val type = TypeFactory.integer(32)
 
         assertFailsWith<IllegalArgumentException> {
-            type.toArray(-100)
+            type.toArrayType(-100)
         }
     }
 }

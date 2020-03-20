@@ -12,8 +12,8 @@ class LLVMVectorTypeTest {
         val type = TypeFactory.integer(32)
         val vec = TypeFactory.vector(type, 10)
 
-        assertEquals(10, vec.getElementSize())
-        assertEquals(type.llvmType, vec.getElementType().llvmType)
+        assertEquals(10, vec.getSequentialElementSize())
+        assertEquals(type.llvmType, vec.getSequentialElementType().llvmType)
     }
 
     @Test
@@ -21,7 +21,7 @@ class LLVMVectorTypeTest {
         val type = TypeFactory.float(LLVMTypeKind.Float)
 
         assertFailsWith<IllegalArgumentException> {
-            type.toVector(-100)
+            type.toVectorType(-100)
         }
 
         assertFailsWith<IllegalArgumentException> {
