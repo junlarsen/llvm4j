@@ -12,7 +12,7 @@ import dev.supergrecko.kllvm.factories.TypeFactory
  * This is a DSL for building [LLVMTypeKind.Struct] types. This builder does not build opaque types.
  */
 public class StructBuilder : Builder<LLVMType> {
-    public var context = LLVMContext.global()
+    public var context = LLVMContext.getGlobalContext()
     public var packed = false
     internal val types: MutableList<LLVMType> = mutableListOf()
 

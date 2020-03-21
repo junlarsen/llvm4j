@@ -16,7 +16,7 @@ class LLVMIntegerTypeTest {
             val contextType = TypeFactory.integer(it, ctx)
             val globalType = TypeFactory.integer(it)
 
-            assertEquals(contextType.getTypeWidth(), globalType.getTypeWidth())
+            assertEquals(contextType.getIntegerTypeWidth(), globalType.getIntegerTypeWidth())
         }
     }
 

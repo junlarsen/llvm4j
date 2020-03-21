@@ -179,7 +179,7 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
          * Obtain the global LLVM context
          */
         @JvmStatic
-        public fun global(): LLVMContext {
+        public fun getGlobalContext(): LLVMContext {
             val ctx = LLVM.LLVMGetGlobalContext()
 
             return LLVMContext(ctx)

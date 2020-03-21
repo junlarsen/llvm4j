@@ -11,7 +11,7 @@ class LLVMTypeTest {
     @Test
     fun `test creation of pointer type`() {
         val type = TypeFactory.integer(64)
-        val ptr = type.toPointer()
+        val ptr = type.toPointerType()
 
         assertEquals(LLVMTypeKind.Pointer, ptr.getTypeKind())
     }
@@ -19,26 +19,26 @@ class LLVMTypeTest {
     @Test
     fun `test creation of array type`() {
         val type = TypeFactory.integer(64)
-        val arr = type.toArray(10)
+        val arr = type.toArrayType(10)
 
         assertEquals(LLVMTypeKind.Array, arr.getTypeKind())
-        assertEquals(10, arr.getElementSize())
+        assertEquals(10, arr.getSequentialElementSize())
     }
 
     @Test
     fun `test creation of vector type`() {
         val type = TypeFactory.integer(32)
-        val vec = type.toVector(1000)
+        val vec = type.toVectorType(1000)
 
         assertEquals(LLVMTypeKind.Vector, vec.getTypeKind())
-        assertEquals(1000, vec.getElementSize())
+        assertEquals(1000, vec.getSequentialElementSize())
     }
 
     @Test
     fun `casting into other type works when expected to`() {
         val type = TypeFactory.integer(32)
-        val ptr = type.toPointer()
-        val underlying = ptr.getElementType()
+        val ptr = type.toPointerType()
+        val underlying = ptr.getSequentialElementType()
 
         assertEquals(type.llvmType, underlying.cast(LLVMTypeKind.Integer).llvmType)
     }
@@ -48,8 +48,8 @@ class LLVMTypeTest {
         // This behavior is documented at LLVMType. There is no way
         // to guarantee that the underlying types is valid or invalid
         val type = TypeFactory.integer(32)
-        val ptr = type.toPointer()
-        val underlying = ptr.getElementType()
+        val ptr = type.toPointerType()
+        val underlying = ptr.getSequentialElementType()
 
         assertEquals(type.llvmType, underlying.cast(LLVMTypeKind.Function).llvmType)
     }
@@ -66,7 +66,7 @@ class LLVMTypeTest {
         val type = TypeFactory.float(LLVMTypeKind.Float)
 
         assertFailsWith<IllegalArgumentException> {
-            type.getElementSize()
+            type.getSequentialElementSize()
         }
     }
 
@@ -113,7 +113,7 @@ class LLVMTypeTest {
     fun `getting a name representation works`() {
         val type = TypeFactory.integer(32)
 
-        val msg = type.getString()
+        val msg = type.getStringRepresentation()
 
         // LLVM does apparently not retain bit size for integer types here
         assertEquals("i", msg.getString())
