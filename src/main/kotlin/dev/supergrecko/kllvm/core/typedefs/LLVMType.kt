@@ -1,4 +1,4 @@
-package dev.supergrecko.kllvm.core
+package dev.supergrecko.kllvm.core.typedefs
 
 import dev.supergrecko.kllvm.annotation.ExpectsType
 import dev.supergrecko.kllvm.contracts.Unreachable

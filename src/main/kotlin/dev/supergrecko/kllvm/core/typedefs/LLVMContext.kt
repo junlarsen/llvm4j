@@ -1,4 +1,4 @@
-package dev.supergrecko.kllvm.core
+package dev.supergrecko.kllvm.core.typedefs
 
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
@@ -138,15 +138,22 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
     /**
      * Dispose the current context reference.
      *
-     * Any calls referencing this context will most likely fail
+     * Note that after using this, the [context] should not be used again as
+     * its LLVM reference has been disposed.
+     *
+     * Any calls referencing this context after it has been dropped will most likely fail
      * as the inner LLVM Context will be set to a null pointer after
      * this is called.
      *
-     * Equal to [LLVMContext.disposeContext] and [LLVMContext.close]
-     *
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
-    public override fun dispose() = close()
+    public override fun dispose() {
+        require(valid) { "This module has already been disposed." }
+
+        valid = false
+
+        LLVM.LLVMContextDispose(llvmCtx)
+    }
 
     /**
      * Implementation for AutoCloseable for Context
@@ -154,13 +161,9 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
      * If the JVM ever does decide to auto-close this then
      * the module will be dropped to prevent memory leaks.
      *
-     * Equal to [LLVMContext.dispose] and [LLVMContext.disposeContext]
-     *
      * @throws IllegalArgumentException If internal instance has been dropped.
      */
-    override fun close() {
-        disposeContext(this)
-    }
+    public override fun close() = dispose()
 
     public companion object {
         /**
@@ -183,23 +186,6 @@ public class LLVMContext internal constructor(internal val llvmCtx: LLVMContextR
             val ctx = LLVM.LLVMGetGlobalContext()
 
             return LLVMContext(ctx)
-        }
-
-        /**
-         * Dispose the underlying LLVM context.
-         *
-         * Note that after using this, the [context] should not be used again as
-         * its LLVM reference has been disposed.
-         *
-         * - [LLVMContextDispose](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga9cf8b0fb4a546d4cdb6f64b8055f5f57)
-         *
-         * @throws IllegalArgumentException If internal instance has been dropped.
-         */
-        @JvmStatic
-        public fun disposeContext(context: LLVMContext) {
-            require(context.valid) { "This module has already been disposed." }
-            context.valid = false
-            LLVM.LLVMContextDispose(context.llvmCtx)
         }
     }
 }

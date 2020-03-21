@@ -1,4 +1,4 @@
-package dev.supergrecko.kllvm.core
+package dev.supergrecko.kllvm.core.typedefs
 
 import dev.supergrecko.kllvm.core.enumerations.LLVMValueKind
 import dev.supergrecko.kllvm.utils.toBoolean
@@ -11,30 +11,24 @@ public class LLVMValue internal constructor(
         public var kind: LLVMValueKind = getValueKind(llvmValue)
 ) {
     //region Core::Types
-
     public fun isNull(): Boolean {
         return LLVM.LLVMIsNull(llvmValue).toBoolean()
     }
-
     //endregion Core::Types
-    //region Core::Values::Constants::ScalarConstants
 
+    //region Core::Values::Constants::ScalarConstants
     public fun getIntZeroExtValue(): Long { TODO() }
     public fun getIntSignExtValue(): Long { TODO() }
     public fun getRealDoubleValue(): Double { TODO() }
-
     //endregion Core::Values::Constants::ScalarConstants
-    //region Core::Values::Constants::CompositeConstants
 
+    //region Core::Values::Constants::CompositeConstants
     public fun isConstantString(): Boolean { TODO() }
     public fun getAsString(): Boolean { TODO() }
     public fun getElementAsConstant(index: Boolean): LLVMValue { TODO() }
-
     //endregion Core::Values::Constants::CompositeConstants
+
     //region Core::Values::Constants::ConstantExpressions
-
-
-
     //endregion Core::Values::Constants::ConstantExpressions
 
     /**

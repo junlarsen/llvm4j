@@ -1,6 +1,5 @@
 package dev.supergrecko.kllvm.core.values
 
-import dev.supergrecko.kllvm.core.LLVMValue
 import dev.supergrecko.kllvm.core.enumerations.LLVMValueKind
 import dev.supergrecko.kllvm.factories.ConstantFactory
 import dev.supergrecko.kllvm.factories.TypeFactory

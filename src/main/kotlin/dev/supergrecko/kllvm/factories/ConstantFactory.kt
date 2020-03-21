@@ -3,9 +3,9 @@ package dev.supergrecko.kllvm.factories
 import dev.supergrecko.kllvm.annotation.ExpectsType
 import dev.supergrecko.kllvm.annotation.RejectsType
 import dev.supergrecko.kllvm.contracts.Factory
-import dev.supergrecko.kllvm.core.LLVMContext
-import dev.supergrecko.kllvm.core.LLVMType
-import dev.supergrecko.kllvm.core.LLVMValue
+import dev.supergrecko.kllvm.core.typedefs.LLVMContext
+import dev.supergrecko.kllvm.core.typedefs.LLVMType
+import dev.supergrecko.kllvm.core.typedefs.LLVMValue
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
 import dev.supergrecko.kllvm.utils.Radix
 import org.bytedeco.llvm.LLVM.LLVMValueRef
