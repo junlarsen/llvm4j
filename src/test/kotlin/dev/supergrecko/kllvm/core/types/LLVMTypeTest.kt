@@ -1,6 +1,6 @@
 package dev.supergrecko.kllvm.core.types
 
-import dev.supergrecko.kllvm.core.LLVMContext
+import dev.supergrecko.kllvm.core.typedefs.LLVMContext
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
 import dev.supergrecko.kllvm.factories.TypeFactory
 import org.junit.jupiter.api.Test

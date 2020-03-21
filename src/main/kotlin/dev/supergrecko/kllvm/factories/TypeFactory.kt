@@ -1,8 +1,8 @@
 package dev.supergrecko.kllvm.factories
 
 import dev.supergrecko.kllvm.contracts.Factory
-import dev.supergrecko.kllvm.core.LLVMContext
-import dev.supergrecko.kllvm.core.LLVMType
+import dev.supergrecko.kllvm.core.typedefs.LLVMContext
+import dev.supergrecko.kllvm.core.typedefs.LLVMType
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
 import dev.supergrecko.kllvm.core.typebuilders.StructBuilder
 import dev.supergrecko.kllvm.core.typebuilders.VectorBuilder

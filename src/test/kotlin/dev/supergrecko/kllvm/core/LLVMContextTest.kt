@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core
 
+import dev.supergrecko.kllvm.core.typedefs.LLVMContext
 import dev.supergrecko.kllvm.utils.runAll
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -23,7 +24,7 @@ class LLVMContextTest {
         ctx.dispose()
 
         assertFailsWith<IllegalArgumentException> {
-            LLVMContext.disposeContext(ctx)
+            ctx.dispose()
         }
     }
 
