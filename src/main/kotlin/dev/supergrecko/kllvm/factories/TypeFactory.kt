@@ -1,9 +1,9 @@
 package dev.supergrecko.kllvm.factories
 
 import dev.supergrecko.kllvm.contracts.Factory
-import dev.supergrecko.kllvm.core.typedefs.LLVMContext
-import dev.supergrecko.kllvm.core.typedefs.LLVMType
-import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
+import dev.supergrecko.kllvm.core.typedefs.Context
+import dev.supergrecko.kllvm.core.typedefs.Type
+import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.types.*
 import dev.supergrecko.kllvm.dsl.ArrayBuilder
 import dev.supergrecko.kllvm.dsl.StructBuilder
@@ -14,22 +14,22 @@ import org.bytedeco.llvm.global.LLVM
 import java.lang.IllegalArgumentException
 
 /**
- * A factory for producing [LLVMType] instances
+ * A factory for producing [Type] instances
  *
  * This type factory provides a nice interface for creating LLVMTypeRef's
  */
-public object TypeFactory : Factory<LLVMType> {
+public object TypeFactory : Factory<Type> {
     /**
      * Create a pointer type
      *
      * Creates a pointer type of type [ty]. An address space may be provided, but defaults to 0.
      */
-    public fun pointer(ty: LLVMType, address: Int = 0): LLVMPointerType {
+    public fun pointer(ty: Type, address: Int = 0): PointerType {
         require(address >= 0) { "Cannot use negative address" }
 
         val ptr = LLVM.LLVMPointerType(ty.llvmType, address)
 
-        return LLVMPointerType(ptr)
+        return PointerType(ptr)
     }
 
     /**
@@ -37,15 +37,15 @@ public object TypeFactory : Factory<LLVMType> {
      *
      * Constructs an array of type [ty] with size [size].
      */
-    public fun array(ty: LLVMType, size: Int): LLVMArrayType {
+    public fun array(ty: Type, size: Int): ArrayType {
         require(size >= 0) { "Cannot make array of negative size" }
 
         val arr = LLVM.LLVMArrayType(ty.llvmType, size)
 
-        return LLVMArrayType(arr)
+        return ArrayType(arr)
     }
 
-    public fun array(size: Int, apply: ArrayBuilder.() -> Unit): LLVMArrayType {
+    public fun array(size: Int, apply: ArrayBuilder.() -> Unit): ArrayType {
         return ArrayBuilder(size).apply(apply).build()
     }
 
@@ -54,15 +54,15 @@ public object TypeFactory : Factory<LLVMType> {
      *
      * Constructs a vector type of type [ty] with size [size].
      */
-    public fun vector(ty: LLVMType, size: Int): LLVMVectorType {
+    public fun vector(ty: Type, size: Int): VectorType {
         require(size >= 0) { "Cannot make vector of negative size" }
 
         val vec = LLVM.LLVMVectorType(ty.llvmType, size)
 
-        return LLVMVectorType(vec)
+        return VectorType(vec)
     }
 
-    public fun vector(size: Int, apply: VectorBuilder.() -> Unit): LLVMVectorType {
+    public fun vector(size: Int, apply: VectorBuilder.() -> Unit): VectorType {
         return VectorBuilder(size).apply(apply).build()
     }
 
@@ -74,15 +74,15 @@ public object TypeFactory : Factory<LLVMType> {
      *
      * The struct body will be the types provided in [tys].
      */
-    public fun struct(tys: List<LLVMType>, packed: Boolean, ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMStructType {
+    public fun struct(tys: List<Type>, packed: Boolean, ctx: Context = Context.getGlobalContext()): StructType {
         val arr = ArrayList(tys.map { it.llvmType }).toTypedArray()
 
         val struct = LLVM.LLVMStructTypeInContext(ctx.llvmCtx, PointerPointer(*arr), arr.size, packed.toInt())
 
-        return LLVMStructType(struct)
+        return StructType(struct)
     }
 
-    public fun struct(apply: StructBuilder.() -> Unit): LLVMStructType {
+    public fun struct(apply: StructBuilder.() -> Unit): StructType {
         return StructBuilder().apply(apply).build()
     }
 
@@ -90,12 +90,12 @@ public object TypeFactory : Factory<LLVMType> {
      * Create an opaque struct type
      *
      * This will create an opaque struct (a struct without a body, like C forward declaration) with the given [name].
-     * You will be able to use [LLVMType.setStructBody] to assign a body to the opaque struct.
+     * You will be able to use [Type.setStructBody] to assign a body to the opaque struct.
      */
-    public fun opaque(name: String, ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMStructType {
+    public fun opaque(name: String, ctx: Context = Context.getGlobalContext()): StructType {
         val struct = LLVM.LLVMStructCreateNamed(ctx.llvmCtx, name)
 
-        return LLVMStructType(struct)
+        return StructType(struct)
     }
 
     /**
@@ -105,12 +105,12 @@ public object TypeFactory : Factory<LLVMType> {
      * parameters of the types provided in [tys]. You can mark a function type as variadic by setting the [variadic] arg
      * to true.
      */
-    public fun function(returns: LLVMType, tys: List<LLVMType>, variadic: Boolean): LLVMFunctionType {
+    public fun function(returns: Type, tys: List<Type>, variadic: Boolean): FunctionType {
         val arr = ArrayList(tys.map { it.llvmType }).toTypedArray()
 
         val fn = LLVM.LLVMFunctionType(returns.llvmType, PointerPointer(*arr), arr.size, variadic.toInt())
 
-        return LLVMFunctionType(fn)
+        return FunctionType(fn)
     }
 
     /**
@@ -119,7 +119,7 @@ public object TypeFactory : Factory<LLVMType> {
      * This will create an integer type of the size [size]. If the size matches any of LLVM's preset integer sizes then
      * that size will be returned. Otherwise an arbitrary size int type will be returned ([LLVM.LLVMIntTypeInContext]).
      */
-    public fun integer(size: Int, ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMIntType {
+    public fun integer(size: Int, ctx: Context = Context.getGlobalContext()): IntType {
         val type = when (size) {
             1 -> LLVM.LLVMInt1TypeInContext(ctx.llvmCtx)
             8 -> LLVM.LLVMInt8TypeInContext(ctx.llvmCtx)
@@ -134,7 +134,7 @@ public object TypeFactory : Factory<LLVMType> {
             }
         }
 
-        return LLVMIntType(type)
+        return IntType(type)
     }
 
     /**
@@ -142,48 +142,48 @@ public object TypeFactory : Factory<LLVMType> {
      *
      * This function will create a fp type of the provided [kind].
      */
-    public fun float(kind: LLVMTypeKind, ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMFloatType {
+    public fun float(kind: TypeKind, ctx: Context = Context.getGlobalContext()): FloatType {
         val type = when (kind) {
-            LLVMTypeKind.Half -> LLVM.LLVMHalfTypeInContext(ctx.llvmCtx)
-            LLVMTypeKind.Float -> LLVM.LLVMFloatTypeInContext(ctx.llvmCtx)
-            LLVMTypeKind.Double -> LLVM.LLVMDoubleTypeInContext(ctx.llvmCtx)
-            LLVMTypeKind.X86_FP80 -> LLVM.LLVMX86FP80TypeInContext(ctx.llvmCtx)
-            LLVMTypeKind.FP128 -> LLVM.LLVMFP128TypeInContext(ctx.llvmCtx)
-            LLVMTypeKind.PPC_FP128 -> LLVM.LLVMPPCFP128TypeInContext(ctx.llvmCtx)
+            TypeKind.Half -> LLVM.LLVMHalfTypeInContext(ctx.llvmCtx)
+            TypeKind.Float -> LLVM.LLVMFloatTypeInContext(ctx.llvmCtx)
+            TypeKind.Double -> LLVM.LLVMDoubleTypeInContext(ctx.llvmCtx)
+            TypeKind.X86_FP80 -> LLVM.LLVMX86FP80TypeInContext(ctx.llvmCtx)
+            TypeKind.FP128 -> LLVM.LLVMFP128TypeInContext(ctx.llvmCtx)
+            TypeKind.PPC_FP128 -> LLVM.LLVMPPCFP128TypeInContext(ctx.llvmCtx)
             else -> {
                 throw IllegalArgumentException("Type kind '$kind' is not a floating point type")
             }
         }
 
-        return LLVMFloatType(type)
+        return FloatType(type)
     }
 
-    public fun token(ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMType {
+    public fun token(ctx: Context = Context.getGlobalContext()): Type {
         val ty = LLVM.LLVMTokenTypeInContext(ctx.llvmCtx)
 
-        return LLVMType(ty)
+        return Type(ty)
     }
 
-    public fun void(ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMVoidType {
+    public fun void(ctx: Context = Context.getGlobalContext()): VoidType {
         val ty = LLVM.LLVMVoidTypeInContext(ctx.llvmCtx)
 
-        return LLVMVoidType(ty)
+        return VoidType(ty)
     }
 
-    public fun label(ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMType {
+    public fun label(ctx: Context = Context.getGlobalContext()): Type {
         val ty = LLVM.LLVMLabelTypeInContext(ctx.llvmCtx)
 
-        return LLVMType(ty)
+        return Type(ty)
     }
 
-    public fun metadata(ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMType {
+    public fun metadata(ctx: Context = Context.getGlobalContext()): Type {
         val ty = LLVM.LLVMMetadataTypeInContext(ctx.llvmCtx)
 
-        return LLVMType(ty)
+        return Type(ty)
     }
-    public fun x86mmx(ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMType {
+    public fun x86mmx(ctx: Context = Context.getGlobalContext()): Type {
         val ty = LLVM.LLVMX86MMXTypeInContext(ctx.llvmCtx)
 
-        return LLVMType(ty)
+        return Type(ty)
     }
 }
