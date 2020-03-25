@@ -4,7 +4,7 @@ import dev.supergrecko.kllvm.contracts.Builder
 import dev.supergrecko.kllvm.core.typedefs.LLVMContext
 import dev.supergrecko.kllvm.core.typedefs.LLVMType
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
-import dev.supergrecko.kllvm.core.types.StructType
+import dev.supergrecko.kllvm.core.types.LLVMStructType
 import dev.supergrecko.kllvm.factories.TypeFactory
 
 /**
@@ -12,7 +12,7 @@ import dev.supergrecko.kllvm.factories.TypeFactory
  *
  * This is a DSL for building [LLVMTypeKind.Struct] types. This builder does not build opaque types.
  */
-public class StructBuilder : Builder<StructType> {
+public class StructBuilder : Builder<LLVMStructType> {
     public var context = LLVMContext.getGlobalContext()
     public var packed = false
     internal val types: MutableList<LLVMType> = mutableListOf()
@@ -21,7 +21,7 @@ public class StructBuilder : Builder<StructType> {
         types.add(type)
     }
 
-    public override fun build(): StructType {
+    public override fun build(): LLVMStructType {
         return TypeFactory.struct(types, packed, context)
     }
 }

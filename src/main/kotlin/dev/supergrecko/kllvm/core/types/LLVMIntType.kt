@@ -4,7 +4,7 @@ import dev.supergrecko.kllvm.core.typedefs.LLVMType
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class IntType(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
+public class LLVMIntType(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
     public fun getTypeWidth(): Int {
         return LLVM.LLVMGetIntTypeWidth(llvmType)
     }

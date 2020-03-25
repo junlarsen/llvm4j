@@ -6,9 +6,9 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ArrayType(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
+public class LLVMVectorType(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
     public fun getElementCount(): Int {
-        return LLVM.LLVMGetArrayLength(llvmType)
+        return LLVM.LLVMGetVectorSize(llvmType)
     }
 
     public fun getSubtypes(): List<LLVMType> {
