@@ -3,10 +3,17 @@ package dev.supergrecko.kllvm.core.types
 import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
+import dev.supergrecko.kllvm.core.values.FloatValue
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class FloatType(llvmType: LLVMTypeRef) : Type(llvmType) {
+    //region Core::Values::Constants::ScalarConstants
+    public fun getConstantFloat(value: Double): FloatValue {
+        return FloatValue(LLVM.LLVMConstReal(llvmType, value))
+    }
+    //endregion Core::Values::Constants::ScalarConstants
+
     public companion object {
         /**
          * Create a floating point type
