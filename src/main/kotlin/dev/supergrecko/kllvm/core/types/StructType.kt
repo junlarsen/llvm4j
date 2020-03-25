@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core.types
 
+import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
 import dev.supergrecko.kllvm.utils.iterateIntoType
 import dev.supergrecko.kllvm.utils.toBoolean
@@ -57,5 +58,37 @@ public class StructType(llvmType: LLVMTypeRef) : Type(llvmType) {
 
     public fun getElementCount(): Int {
         return LLVM.LLVMCountStructElementTypes(llvmType)
+    }
+
+    public companion object {
+        /**
+         * Create a structure type
+         *
+         * This method creates a structure type inside the given [ctx]. Do not that this method cannot produce opaque struct
+         * types, use [opaque] for that.
+         *
+         * The struct body will be the types provided in [tys].
+         */
+        @JvmStatic
+        public fun new(types: List<Type>, packed: Boolean, ctx: Context = Context.getGlobalContext()): StructType {
+            val arr = ArrayList(types.map { it.llvmType }).toTypedArray()
+
+            val struct = LLVM.LLVMStructTypeInContext(ctx.llvmCtx, PointerPointer(*arr), arr.size, packed.toInt())
+
+            return StructType(struct)
+        }
+
+        /**
+         * Create an opaque struct type
+         *
+         * This will create an opaque struct (a struct without a body, like C forward declaration) with the given [name].
+         * You will be able to use [setBody] to assign a body to the opaque struct.
+         */
+        @JvmStatic
+        public fun opaque(name: String, ctx: Context = Context.getGlobalContext()): StructType {
+            val struct = LLVM.LLVMStructCreateNamed(ctx.llvmCtx, name)
+
+            return StructType(struct)
+        }
     }
 }

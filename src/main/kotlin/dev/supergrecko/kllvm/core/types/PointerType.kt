@@ -27,4 +27,20 @@ public class PointerType(llvmType: LLVMTypeRef) : Type(llvmType) {
 
         return Type(type)
     }
+
+    public companion object {
+        /**
+         * Create a pointer type
+         *
+         * Creates a pointer type of type [ty]. An address space may be provided, but defaults to 0.
+         */
+        @JvmStatic
+        public fun new(ty: Type, address: Int = 0): PointerType {
+            require(address >= 0) { "Cannot use negative address" }
+
+            val ptr = LLVM.LLVMPointerType(ty.llvmType, address)
+
+            return PointerType(ptr)
+        }
+    }
 }
