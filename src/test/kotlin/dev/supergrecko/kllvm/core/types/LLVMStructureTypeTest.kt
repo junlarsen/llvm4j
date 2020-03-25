@@ -10,15 +10,15 @@ class LLVMStructureTypeTest {
         val elements = listOf(TypeFactory.integer(32))
         val struct = TypeFactory.struct(elements, false)
 
-        assertEquals(false, struct.isStructPacked())
-        assertEquals(1, struct.getSequentialElementSize())
-        assertEquals(true, struct.isStructLiteral())
-        assertEquals(false, struct.isStructOpaque())
+        assertEquals(false, struct.isPacked())
+        assertEquals(1, struct.getElementCount())
+        assertEquals(true, struct.isLiteral())
+        assertEquals(false, struct.isOpaque())
 
-        val (first) = struct.getStructElementTypes()
+        val (first) = struct.getElementTypes()
         assertEquals(elements.first().llvmType, first.llvmType)
 
-        val type = struct.getStructElementTypeAt(0)
+        val type = struct.getElementTypeAt(0)
         assertEquals(type.llvmType, elements.first().llvmType)
     }
 
@@ -26,13 +26,13 @@ class LLVMStructureTypeTest {
     fun `test opaque struct`() {
         val struct = TypeFactory.opaque("test_struct")
 
-        assertEquals(true, struct.isStructOpaque())
+        assertEquals(true, struct.isOpaque())
 
         val elements = listOf(TypeFactory.integer(32))
-        struct.setStructBody(elements, false)
+        struct.setBody(elements, false)
 
-        val (first) = struct.getStructElementTypes()
+        val (first) = struct.getElementTypes()
         assertEquals(elements.first().llvmType, first.llvmType)
-        assertEquals(false, struct.isStructOpaque())
+        assertEquals(false, struct.isOpaque())
     }
 }

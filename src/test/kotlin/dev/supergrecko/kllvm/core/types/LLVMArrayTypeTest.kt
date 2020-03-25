@@ -11,8 +11,8 @@ class LLVMArrayTypeTest {
         val type = TypeFactory.integer(32)
         val arr = TypeFactory.array(type, 10)
 
-        assertEquals(10, arr.getSequentialElementSize())
-        assertEquals(type.llvmType, arr.getSequentialElementType().llvmType)
+        assertEquals(10, arr.getElementCount())
+        assertEquals(type.llvmType, arr.getElementType().llvmType)
     }
 
     @Test
