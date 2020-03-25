@@ -23,6 +23,13 @@ class LLVMStructureTypeTest {
     }
 
     @Test
+    fun `name matches`() {
+        val struct = TypeFactory.opaque("StructureName")
+
+        assertEquals("StructureName", struct.getName())
+    }
+
+    @Test
     fun `test opaque struct`() {
         val struct = TypeFactory.opaque("test_struct")
 

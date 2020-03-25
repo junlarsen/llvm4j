@@ -12,7 +12,6 @@ public class LLVMArrayType(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
     }
 
     public fun getSubtypes(): List<LLVMType> {
-        // TODO: Learn how to test this
         val dest = PointerPointer<LLVMTypeRef>(getElementCount().toLong())
         LLVM.LLVMGetSubtypes(llvmType, dest)
 

@@ -17,6 +17,15 @@ class LLVMVectorTypeTest {
     }
 
     @Test
+    fun `subtypes match`() {
+        val type = TypeFactory.integer(32)
+        val vec = TypeFactory.vector(type, 10)
+
+        assertEquals(10, vec.getSubtypes().size)
+        assertEquals(type.llvmType, vec.getSubtypes().first().llvmType)
+    }
+
+    @Test
     fun `negative size is illegal`() {
         val type = TypeFactory.float(LLVMTypeKind.Float)
 

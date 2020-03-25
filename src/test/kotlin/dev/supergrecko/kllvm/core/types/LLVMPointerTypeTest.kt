@@ -14,6 +14,21 @@ class LLVMPointerTypeTest {
     }
 
     @Test
+    fun `subtype matches`() {
+        val type = TypeFactory.integer(32)
+        val ptr = type.toPointerType()
+
+        assertEquals(type.getTypeKind(), ptr.getSubtypes().first().getTypeKind())
+    }
+
+    @Test
+    fun `count matches`() {
+        val type = TypeFactory.integer(32).toPointerType()
+
+        assertEquals(1, type.getElementCount())
+    }
+
+    @Test
     fun `address space matches`() {
         val type = TypeFactory.integer(32)
         val ptr = type.toPointerType(100)

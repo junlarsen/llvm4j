@@ -164,10 +164,10 @@ public object TypeFactory : Factory<LLVMType> {
         return LLVMType(ty)
     }
 
-    public fun void(ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMType {
+    public fun void(ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMVoidType {
         val ty = LLVM.LLVMVoidTypeInContext(ctx.llvmCtx)
 
-        return LLVMType(ty)
+        return LLVMVoidType(ty)
     }
 
     public fun label(ctx: LLVMContext = LLVMContext.getGlobalContext()): LLVMType {
