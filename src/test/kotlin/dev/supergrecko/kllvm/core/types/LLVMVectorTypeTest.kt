@@ -12,8 +12,8 @@ class LLVMVectorTypeTest {
         val type = TypeFactory.integer(32)
         val vec = TypeFactory.vector(type, 10)
 
-        assertEquals(10, vec.getSequentialElementSize())
-        assertEquals(type.llvmType, vec.getSequentialElementType().llvmType)
+        assertEquals(10, vec.getElementCount())
+        assertEquals(type.llvmType, vec.getElementType().llvmType)
     }
 
     @Test

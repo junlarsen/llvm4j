@@ -14,8 +14,8 @@ class LLVMFunctionTypeTest {
         val ret = TypeFactory.integer(64)
         val fn = TypeFactory.function(ret, listOf(), true)
 
-        assertEquals(fn.getFunctionParameterCount(), 0)
-        assertTrue { fn.getFunctionReturnType().llvmType == ret.llvmType }
+        assertEquals(fn.getParameterCount(), 0)
+        assertTrue { fn.getReturnType().llvmType == ret.llvmType }
     }
 
     @Test
@@ -24,7 +24,7 @@ class LLVMFunctionTypeTest {
         val args = listOf(TypeFactory.float(LLVMTypeKind.Float))
         val fn = TypeFactory.function(ret, args, true)
 
-        assertEquals(fn.isFunctionVariadic(), true)
+        assertEquals(fn.isVariadic(), true)
     }
 
     @Test
@@ -33,7 +33,7 @@ class LLVMFunctionTypeTest {
         val args = listOf(TypeFactory.float(LLVMTypeKind.Float))
         val fn = TypeFactory.function(ret, args, true)
 
-        assertEquals(LLVM.LLVMIsFunctionVarArg(fn.llvmType).toBoolean(), fn.isFunctionVariadic())
+        assertEquals(LLVM.LLVMIsFunctionVarArg(fn.llvmType).toBoolean(), fn.isVariadic())
     }
 
     @Test
@@ -42,7 +42,7 @@ class LLVMFunctionTypeTest {
         val args = listOf(TypeFactory.float(LLVMTypeKind.Float))
         val fn = TypeFactory.function(ret, args, true)
 
-        assertEquals(LLVM.LLVMCountParamTypes(fn.llvmType), fn.getFunctionParameterCount())
+        assertEquals(LLVM.LLVMCountParamTypes(fn.llvmType), fn.getParameterCount())
     }
 
     @Test
@@ -51,7 +51,7 @@ class LLVMFunctionTypeTest {
         val args = listOf(TypeFactory.float(LLVMTypeKind.Float))
         val fn = TypeFactory.function(ret, args, true)
 
-        val params = fn.getFunctionParameterTypes()
+        val params = fn.getParameterTypes()
 
         for (i in args.indices) {
             val x = params[i].llvmType

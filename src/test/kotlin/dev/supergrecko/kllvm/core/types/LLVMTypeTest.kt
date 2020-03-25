@@ -22,7 +22,7 @@ class LLVMTypeTest {
         val arr = type.toArrayType(10)
 
         assertEquals(LLVMTypeKind.Array, arr.getTypeKind())
-        assertEquals(10, arr.getSequentialElementSize())
+        assertEquals(10, arr.getElementCount())
     }
 
     @Test
@@ -31,16 +31,16 @@ class LLVMTypeTest {
         val vec = type.toVectorType(1000)
 
         assertEquals(LLVMTypeKind.Vector, vec.getTypeKind())
-        assertEquals(1000, vec.getSequentialElementSize())
+        assertEquals(1000, vec.getElementCount())
     }
 
     @Test
     fun `casting into other type works when expected to`() {
         val type = TypeFactory.integer(32)
         val ptr = type.toPointerType()
-        val underlying = ptr.getSequentialElementType()
+        val underlying = ptr.getElementType()
 
-        assertEquals(type.llvmType, underlying.cast(LLVMTypeKind.Integer).llvmType)
+        assertEquals(type.llvmType, underlying.cast<IntType>().llvmType)
     }
 
     @Test
@@ -49,9 +49,9 @@ class LLVMTypeTest {
         // to guarantee that the underlying types is valid or invalid
         val type = TypeFactory.integer(32)
         val ptr = type.toPointerType()
-        val underlying = ptr.getSequentialElementType()
+        val underlying = ptr.getElementType()
 
-        assertEquals(type.llvmType, underlying.cast(LLVMTypeKind.Function).llvmType)
+        assertEquals(type.llvmType, underlying.cast<FunctionType>().llvmType)
     }
 
     @Test
@@ -59,15 +59,6 @@ class LLVMTypeTest {
         val type = TypeFactory.float(LLVMTypeKind.Float)
 
         assertEquals(LLVMTypeKind.Float, type.getTypeKind())
-    }
-
-    @Test
-    fun `calling function with different type fails`() {
-        val type = TypeFactory.float(LLVMTypeKind.Float)
-
-        assertFailsWith<IllegalArgumentException> {
-            type.getSequentialElementSize()
-        }
     }
 
     @Test

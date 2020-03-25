@@ -10,7 +10,7 @@ class LLVMPointerTypeTest {
         val type = TypeFactory.integer(32)
         val ptr = type.toPointerType()
 
-        assertEquals(type.llvmType, ptr.getSequentialElementType().llvmType)
+        assertEquals(type.llvmType, ptr.getElementType().llvmType)
     }
 
     @Test
@@ -18,6 +18,6 @@ class LLVMPointerTypeTest {
         val type = TypeFactory.integer(32)
         val ptr = type.toPointerType(100)
 
-        assertEquals(100, ptr.getPointerAddressSpace())
+        assertEquals(100, ptr.getAddressSpace())
     }
 }
