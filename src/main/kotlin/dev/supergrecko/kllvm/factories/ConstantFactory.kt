@@ -1,7 +1,5 @@
 package dev.supergrecko.kllvm.factories
 
-import dev.supergrecko.kllvm.annotation.ExpectsType
-import dev.supergrecko.kllvm.annotation.RejectsType
 import dev.supergrecko.kllvm.contracts.Factory
 import dev.supergrecko.kllvm.core.typedefs.LLVMContext
 import dev.supergrecko.kllvm.core.typedefs.LLVMType
