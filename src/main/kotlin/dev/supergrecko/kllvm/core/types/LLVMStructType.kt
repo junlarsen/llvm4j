@@ -8,7 +8,7 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class StructType(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
+public class LLVMStructType(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
     public fun isPacked(): Boolean {
         return LLVM.LLVMIsPackedStruct(llvmType).toBoolean()
     }
@@ -40,15 +40,12 @@ public class StructType(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
         return LLVMType(type)
     }
 
-    public fun getName(): String? {
-        // TODO: Resolve IllegalStateException
+    public fun getName(): String {
+        require(!isLiteral()) { "Literal structs are never named" }
+
         val name = LLVM.LLVMGetStructName(llvmType)
 
-        return if (name.bool) {
-            null
-        } else {
-            name.string
-        }
+        return name.string
     }
 
     public fun getElementTypes(): List<LLVMType> {

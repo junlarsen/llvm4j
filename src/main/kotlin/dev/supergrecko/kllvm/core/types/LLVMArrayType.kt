@@ -6,13 +6,12 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class VectorType(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
+public class LLVMArrayType(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
     public fun getElementCount(): Int {
-        return LLVM.LLVMGetVectorSize(llvmType)
+        return LLVM.LLVMGetArrayLength(llvmType)
     }
 
     public fun getSubtypes(): List<LLVMType> {
-        // TODO: Learn how to test this
         val dest = PointerPointer<LLVMTypeRef>(getElementCount().toLong())
         LLVM.LLVMGetSubtypes(llvmType, dest)
 

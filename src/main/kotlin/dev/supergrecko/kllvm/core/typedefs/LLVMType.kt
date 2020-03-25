@@ -40,11 +40,11 @@ public open class LLVMType internal constructor(
     //endregion Core::Types
 
     // TODO: refactor with factories
-    public fun toPointerType(addressSpace: Int = 0): PointerType = TypeFactory.pointer(this, addressSpace)
+    public fun toPointerType(addressSpace: Int = 0): LLVMPointerType = TypeFactory.pointer(this, addressSpace)
 
-    public fun toArrayType(size: Int): ArrayType = TypeFactory.array(this, size)
+    public fun toArrayType(size: Int): LLVMArrayType = TypeFactory.array(this, size)
 
-    public fun toVectorType(size: Int): VectorType = TypeFactory.vector(this, size)
+    public fun toVectorType(size: Int): LLVMVectorType = TypeFactory.vector(this, size)
 
     public inline fun <reified T : LLVMType> cast(): T {
         val ctor: Constructor<T> = T::class.java.getDeclaredConstructor(LLVMTypeRef::class.java)
@@ -55,14 +55,14 @@ public open class LLVMType internal constructor(
 
     public fun getUnderlyingReference(): LLVMTypeRef = llvmType
 
-    public fun asArrayType(): ArrayType = ArrayType(llvmType)
-    public fun asFloatType(): FloatType = FloatType(llvmType)
-    public fun asFunctionType(): FunctionType = FunctionType(llvmType)
-    public fun asIntType(): IntType = IntType(llvmType)
-    public fun asPointerType(): PointerType = PointerType(llvmType)
-    public fun asStructType(): StructType = StructType(llvmType)
-    public fun asVectorType(): VectorType = VectorType(llvmType)
-    public fun asVoidType(): VoidType = VoidType(llvmType)
+    public fun asArrayType(): LLVMArrayType = LLVMArrayType(llvmType)
+    public fun asFloatType(): LLVMFloatType = LLVMFloatType(llvmType)
+    public fun asFunctionType(): LLVMFunctionType = LLVMFunctionType(llvmType)
+    public fun asIntType(): LLVMIntType = LLVMIntType(llvmType)
+    public fun asPointerType(): LLVMPointerType = LLVMPointerType(llvmType)
+    public fun asStructType(): LLVMStructType = LLVMStructType(llvmType)
+    public fun asVectorType(): LLVMVectorType = LLVMVectorType(llvmType)
+    public fun asVoidType(): LLVMVoidType = LLVMVoidType(llvmType)
 
     companion object {
         @JvmStatic
