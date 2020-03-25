@@ -2,13 +2,34 @@ package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
+import dev.supergrecko.kllvm.core.typedefs.Value
+import dev.supergrecko.kllvm.core.values.IntValue
+import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class IntType(llvmType: LLVMTypeRef) : Type(llvmType) {
+    //region Core::Types::Int
     public fun getTypeWidth(): Int {
         return LLVM.LLVMGetIntTypeWidth(llvmType)
     }
+    //endregion Core::Types::Int
+
+    //region Core::Values::Constants
+    public fun getConstantAllOnes(): IntValue {
+        return IntValue(LLVM.LLVMConstAllOnes(llvmType))
+    }
+    //endregion Core::Values::Constants
+
+    //region Core::Values::Constants::ScalarConstants
+    public fun getConstantInt(value: Long, signExtend: Boolean): IntValue {
+        return IntValue(LLVM.LLVMConstInt(llvmType, value, signExtend.toInt()))
+    }
+
+    public fun getConstantIntAP(words: List<Long>): IntValue {
+        return IntValue(LLVM.LLVMConstIntOfArbitraryPrecision(llvmType, words.size, words.toLongArray()))
+    }
+    //endregion Core::Values::Constants::ScalarConstants
 
     public companion object {
         /**

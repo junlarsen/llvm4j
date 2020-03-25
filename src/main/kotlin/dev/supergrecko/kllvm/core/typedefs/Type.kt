@@ -38,6 +38,25 @@ public open class Type internal constructor(
     }
     //endregion Core::Types
 
+    //region Core::Values::Constants
+    public fun getConstantNull(): Value {
+        // Opaque structures cannot have a null type
+        if (this is StructType) {
+            require(!isOpaque())
+        }
+
+        return Value(LLVM.LLVMConstNull(llvmType))
+    }
+
+    public fun getConstUndef(): Value {
+        return Value(LLVM.LLVMGetUndef(llvmType))
+    }
+
+    public fun getConstNullPointer(): Value {
+        return Value(LLVM.LLVMConstPointerNull(llvmType))
+    }
+    //endregion Core::Values::Constants
+
     // TODO: refactor with factories
     public fun toPointerType(addressSpace: Int = 0): PointerType = PointerType.new(this, addressSpace)
 
@@ -45,6 +64,7 @@ public open class Type internal constructor(
 
     public fun toVectorType(size: Int): VectorType = VectorType.new(this, size)
 
+    //region Typecasting
     public inline fun <reified T : Type> cast(): T {
         val ctor: Constructor<T> = T::class.java.getDeclaredConstructor(LLVMTypeRef::class.java)
 
@@ -63,6 +83,7 @@ public open class Type internal constructor(
     public fun asStructType(): StructType = StructType(llvmType)
     public fun asVectorType(): VectorType = VectorType(llvmType)
     public fun asVoidType(): VoidType = VoidType(llvmType)
+    //endregion Typecasting
 
     companion object {
         @JvmStatic
