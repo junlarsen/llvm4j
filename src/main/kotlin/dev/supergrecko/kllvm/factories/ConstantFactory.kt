@@ -5,6 +5,7 @@ import dev.supergrecko.kllvm.core.typedefs.LLVMContext
 import dev.supergrecko.kllvm.core.typedefs.LLVMType
 import dev.supergrecko.kllvm.core.typedefs.LLVMValue
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
+import dev.supergrecko.kllvm.core.types.StructType
 import dev.supergrecko.kllvm.utils.Radix
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -13,10 +14,8 @@ public object ConstantFactory : Factory<LLVMValue> {
     //region Core::Values::Constants
 
     public fun constNull(type: LLVMType): LLVMValue {
-        require(!type.isInTypeKinds(LLVMTypeKind.Function, LLVMTypeKind.Label))
-
-        if (type.isTypeKind(LLVMTypeKind.Struct)) {
-            require(!type.isStructOpaque())
+        if (type is StructType) {
+            require(!type.isOpaque())
         }
 
         val value = LLVM.LLVMConstNull(type.llvmType)
@@ -25,8 +24,6 @@ public object ConstantFactory : Factory<LLVMValue> {
     }
 
     public fun constAllOnes(type: LLVMType): LLVMValue {
-        require(type.isTypeKind(LLVMTypeKind.Integer))
-
         val value = LLVM.LLVMConstAllOnes(type.llvmType)
 
         return LLVMValue(value)

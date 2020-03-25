@@ -19,7 +19,7 @@ public open class LLVMValue internal constructor(
     public fun getType(): LLVMType {
         val type = LLVM.LLVMTypeOf(llvmValue)
 
-        return LLVMType(type, LLVMType.getTypeKind(type))
+        return LLVMType(type)
     }
 
     public fun isUndef(): Boolean {

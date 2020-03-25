@@ -7,10 +7,13 @@ import dev.supergrecko.kllvm.factories.TypeFactory
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
+import java.lang.reflect.Constructor
 
 public open class LLVMType internal constructor(
         internal val llvmType: LLVMTypeRef
 ) {
+    internal constructor() : this(LLVMTypeRef())
+
     //region Core::Types
     public fun getTypeKind(): LLVMTypeKind {
         return getTypeKind(llvmType)
@@ -39,11 +42,20 @@ public open class LLVMType internal constructor(
     //endregion Core::Types
 
     // TODO: refactor with factories
-    public fun toPointerType(addressSpace: Int = 0): LLVMType = TypeFactory.pointer(this, addressSpace)
+    public fun toPointerType(addressSpace: Int = 0): PointerType = TypeFactory.pointer(this, addressSpace)
 
-    public fun toArrayType(size: Int): LLVMType = TypeFactory.array(this, size)
+    public fun toArrayType(size: Int): ArrayType = TypeFactory.array(this, size)
 
-    public fun toVectorType(size: Int): LLVMType = TypeFactory.vector(this, size)
+    public fun toVectorType(size: Int): VectorType = TypeFactory.vector(this, size)
+
+    public inline fun <reified T : LLVMType> cast(): T {
+        val ctor: Constructor<T> = T::class.java.getDeclaredConstructor(LLVMTypeRef::class.java)
+
+        return ctor.newInstance(getUnderlyingReference())
+                ?: throw TypeCastException("Failed to cast LLVMType to T")
+    }
+
+    public fun getUnderlyingReference(): LLVMTypeRef = llvmType
 
     public fun asArrayType(): ArrayType = ArrayType(llvmType)
     public fun asFloatType(): FloatType = FloatType(llvmType)
