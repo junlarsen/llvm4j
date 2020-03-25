@@ -7,8 +7,7 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public open class LLVMValue internal constructor(
-        internal val llvmValue: LLVMValueRef,
-        public var kind: LLVMValueKind = getValueKind(llvmValue)
+        internal val llvmValue: LLVMValueRef
 ) {
     //region Core::Values::Constants
     public fun isNull(): Boolean {
