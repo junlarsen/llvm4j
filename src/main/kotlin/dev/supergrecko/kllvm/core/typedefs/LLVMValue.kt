@@ -3,8 +3,10 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.core.enumerations.LLVMValueKind
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.javacpp.SizeTPointer
+import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
+import java.lang.reflect.Constructor
 
 public open class LLVMValue internal constructor(
         internal val llvmValue: LLVMValueRef
@@ -60,6 +62,15 @@ public open class LLVMValue internal constructor(
     public fun isAMDNode() {}
     public fun isAMDString() {}
     //endregion Core::Values::Constants::GeneralAPIs
+
+    public inline fun <reified T : LLVMValue> cast(): T {
+        val ctor: Constructor<T> = T::class.java.getDeclaredConstructor(LLVMValueRef::class.java)
+
+        return ctor.newInstance(getUnderlyingReference())
+                ?: throw TypeCastException("Failed to cast LLVMType to T")
+    }
+
+    public fun getUnderlyingReference(): LLVMValueRef = llvmValue
 
     public companion object {
         /**

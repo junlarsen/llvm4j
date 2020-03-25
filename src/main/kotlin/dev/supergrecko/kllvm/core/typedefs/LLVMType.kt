@@ -12,8 +12,6 @@ import java.lang.reflect.Constructor
 public open class LLVMType internal constructor(
         internal val llvmType: LLVMTypeRef
 ) {
-    internal constructor() : this(LLVMTypeRef())
-
     //region Core::Types
     public fun getTypeKind(): LLVMTypeKind {
         return getTypeKind(llvmType)

@@ -8,8 +8,6 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class FunctionType(llvmType: LLVMTypeRef) : LLVMType(llvmType) {
-    internal constructor(): this(LLVMTypeRef())
-
     public fun isVariadic(): Boolean {
         return LLVM.LLVMIsFunctionVarArg(llvmType).toBoolean()
     }
