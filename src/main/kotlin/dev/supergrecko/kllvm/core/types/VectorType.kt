@@ -23,4 +23,18 @@ public class VectorType(llvmType: LLVMTypeRef) : Type(llvmType) {
 
         return Type(type)
     }
+
+    public companion object {
+        /**
+         * Create a vector type
+         *
+         * Constructs a vector type of type [ty] with size [size].
+         */
+        @JvmStatic
+        public fun new(type: Type, size: Int): VectorType {
+            require(size >= 0) { "Cannot make vector of negative size" }
+
+            return VectorType(LLVM.LLVMVectorType(type.llvmType, size))
+        }
+    }
 }

@@ -2,7 +2,6 @@ package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.enumerations.TypeKind
-import dev.supergrecko.kllvm.factories.TypeFactory
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -10,7 +9,7 @@ import kotlin.test.assertFailsWith
 class TypeTest {
     @Test
     fun `test creation of pointer type`() {
-        val type = TypeFactory.integer(64)
+        val type = IntType.new(64)
         val ptr = type.toPointerType()
 
         assertEquals(TypeKind.Pointer, ptr.getTypeKind())
@@ -18,7 +17,7 @@ class TypeTest {
 
     @Test
     fun `test creation of array type`() {
-        val type = TypeFactory.integer(64)
+        val type = IntType.new(64)
         val arr = type.toArrayType(10)
 
         assertEquals(TypeKind.Array, arr.getTypeKind())
@@ -27,7 +26,7 @@ class TypeTest {
 
     @Test
     fun `test creation of vector type`() {
-        val type = TypeFactory.integer(32)
+        val type = IntType.new(32)
         val vec = type.toVectorType(1000)
 
         assertEquals(TypeKind.Vector, vec.getTypeKind())
@@ -36,7 +35,7 @@ class TypeTest {
 
     @Test
     fun `casting into other type works when expected to`() {
-        val type = TypeFactory.integer(32)
+        val type = IntType.new(32)
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
 
@@ -45,9 +44,8 @@ class TypeTest {
 
     @Test
     fun `casting won't fail when the underlying type is different`() {
-        // This behavior is documented at LLVMType. There is no way
-        // to guarantee that the underlying types is valid or invalid
-        val type = TypeFactory.integer(32)
+        // it is impossible to guarantee that the underlying types is valid or invalid
+        val type = IntType.new(32)
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
 
@@ -56,7 +54,7 @@ class TypeTest {
 
     @Test
     fun `getting a type works properly`() {
-        val type = TypeFactory.float(TypeKind.Float)
+        val type = FloatType.new(TypeKind.Float)
 
         assertEquals(TypeKind.Float, type.getTypeKind())
     }
@@ -64,28 +62,28 @@ class TypeTest {
     @Test
     fun `negative size is illegal`() {
         assertFailsWith<IllegalArgumentException> {
-            TypeFactory.integer(-1)
+            IntType.new(-1)
         }
     }
 
     @Test
     fun `too huge size is illegal`() {
         assertFailsWith<IllegalArgumentException> {
-            TypeFactory.integer(1238234672)
+            IntType.new(1238234672)
         }
     }
 
     @Test
     fun `is sized works for integer`() {
-        val type = TypeFactory.integer(192)
+        val type = IntType.new(192)
 
         assertEquals(true, type.isSized())
     }
 
     @Test
     fun `is sized works for struct`() {
-        val arg = TypeFactory.float(TypeKind.Float)
-        val type = TypeFactory.struct(listOf(arg), false)
+        val arg = FloatType.new(TypeKind.Float)
+        val type = StructType.new(listOf(arg), false)
 
         assertEquals(true, type.isSized())
     }
@@ -93,7 +91,7 @@ class TypeTest {
     @Test
     fun `retrieving context works`() {
         val ctx = Context.create()
-        val type = TypeFactory.integer(32, ctx)
+        val type = IntType.new(32, ctx)
 
         val typeCtx = type.getContext()
 
@@ -102,7 +100,7 @@ class TypeTest {
 
     @Test
     fun `getting a name representation works`() {
-        val type = TypeFactory.integer(32)
+        val type = IntType.new(32)
 
         val msg = type.getStringRepresentation()
 

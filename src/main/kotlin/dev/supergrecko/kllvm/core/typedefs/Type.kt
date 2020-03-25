@@ -3,7 +3,6 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.message.Message
 import dev.supergrecko.kllvm.core.types.*
-import dev.supergrecko.kllvm.factories.TypeFactory
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
@@ -40,11 +39,11 @@ public open class Type internal constructor(
     //endregion Core::Types
 
     // TODO: refactor with factories
-    public fun toPointerType(addressSpace: Int = 0): PointerType = TypeFactory.pointer(this, addressSpace)
+    public fun toPointerType(addressSpace: Int = 0): PointerType = PointerType.new(this, addressSpace)
 
-    public fun toArrayType(size: Int): ArrayType = TypeFactory.array(this, size)
+    public fun toArrayType(size: Int): ArrayType = ArrayType.new(this, size)
 
-    public fun toVectorType(size: Int): VectorType = TypeFactory.vector(this, size)
+    public fun toVectorType(size: Int): VectorType = VectorType.new(this, size)
 
     public inline fun <reified T : Type> cast(): T {
         val ctor: Constructor<T> = T::class.java.getDeclaredConstructor(LLVMTypeRef::class.java)

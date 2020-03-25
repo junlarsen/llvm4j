@@ -1,14 +1,13 @@
 package dev.supergrecko.kllvm.core.types
 
-import dev.supergrecko.kllvm.factories.TypeFactory
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class StructureTypeTest {
     @Test
     fun `test element spec matches`() {
-        val elements = listOf(TypeFactory.integer(32))
-        val struct = TypeFactory.struct(elements, false)
+        val elements = listOf(IntType.new(32))
+        val struct = StructType.new(elements, false)
 
         assertEquals(false, struct.isPacked())
         assertEquals(1, struct.getElementCount())
@@ -24,18 +23,18 @@ class StructureTypeTest {
 
     @Test
     fun `name matches`() {
-        val struct = TypeFactory.opaque("StructureName")
+        val struct = StructType.opaque("StructureName")
 
         assertEquals("StructureName", struct.getName())
     }
 
     @Test
     fun `test opaque struct`() {
-        val struct = TypeFactory.opaque("test_struct")
+        val struct = StructType.opaque("test_struct")
 
         assertEquals(true, struct.isOpaque())
 
-        val elements = listOf(TypeFactory.integer(32))
+        val elements = listOf(IntType.new(32))
         struct.setBody(elements, false)
 
         val (first) = struct.getElementTypes()
