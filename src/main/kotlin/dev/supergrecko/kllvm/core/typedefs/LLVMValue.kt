@@ -2,62 +2,65 @@ package dev.supergrecko.kllvm.core.typedefs
 
 import dev.supergrecko.kllvm.core.enumerations.LLVMValueKind
 import dev.supergrecko.kllvm.utils.toBoolean
+import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
-import java.lang.IllegalArgumentException
 
-public class LLVMValue internal constructor(
+public open class LLVMValue internal constructor(
         internal val llvmValue: LLVMValueRef,
         public var kind: LLVMValueKind = getValueKind(llvmValue)
 ) {
-    //region Core::Types
+    //region Core::Values::Constants
     public fun isNull(): Boolean {
         return LLVM.LLVMIsNull(llvmValue).toBoolean()
     }
-    //endregion Core::Types
+    //endregion Core::Values::Constants
 
-    //region Core::Values::Constants::ScalarConstants
-    public fun getIntZeroExtValue(): Long { TODO() }
-    public fun getIntSignExtValue(): Long { TODO() }
-    public fun getRealDoubleValue(): Double { TODO() }
-    //endregion Core::Values::Constants::ScalarConstants
-
-    //region Core::Values::Constants::CompositeConstants
-    public fun isConstantString(): Boolean { TODO() }
-    public fun getAsString(): Boolean { TODO() }
-    public fun getElementAsConstant(index: Boolean): LLVMValue { TODO() }
-    //endregion Core::Values::Constants::CompositeConstants
-
-    //region Core::Values::Constants::ConstantExpressions
-    //endregion Core::Values::Constants::ConstantExpressions
-
-    /**
-     * Obtain the type of a value
-     *
-     * TODO: Find region this belongs to
-     */
-    public fun typeOf(): LLVMType {
+    //region Core::Values::Constants::GeneralAPIs
+    public fun getType(): LLVMType {
         val type = LLVM.LLVMTypeOf(llvmValue)
 
         return LLVMType(type, LLVMType.getTypeKind(type))
     }
 
-    /**
-     * Obtain the value kind for this value
-     *
-     * TODO: Find region for this
-     */
-    public fun getValueKind(): LLVMValueKind {
-        return getValueKind(llvmValue)
+    public fun isUndef(): Boolean {
+        return LLVM.LLVMIsUndef(llvmValue).toBoolean()
     }
 
-    public fun isValueKind(kind: LLVMValueKind): Boolean {
-        return kind == this.kind
+    public fun isConstant(): Boolean {
+        return LLVM.LLVMIsConstant(llvmValue).toBoolean()
     }
 
-    public fun isInValueKinds(vararg kinds: LLVMValueKind): Boolean {
-        return kind in kinds
+    public fun setValueName(name: String) {
+        LLVM.LLVMSetValueName2(llvmValue, name, name.length.toLong())
     }
+
+    public fun getValueName(): String {
+        val ptr = LLVM.LLVMGetValueName2(llvmValue, SizeTPointer())
+
+        return ptr.string
+    }
+
+    public fun getValueKind(): LLVMValueKind = getValueKind(llvmValue)
+
+    public fun dump() {
+        LLVM.LLVMDumpValue(llvmValue)
+    }
+
+    public fun dumpToString(): String {
+        val ptr = LLVM.LLVMPrintValueToString(llvmValue)
+
+        return ptr.string
+    }
+
+    public fun replaceAllUsesWith(value: LLVMValue) {
+        LLVM.LLVMReplaceAllUsesWith(llvmValue, value.llvmValue)
+    }
+
+    // TODO: Implement these two
+    public fun isAMDNode() {}
+    public fun isAMDString() {}
+    //endregion Core::Values::Constants::GeneralAPIs
 
     public companion object {
         /**
@@ -69,7 +72,7 @@ public class LLVMValue internal constructor(
 
             return LLVMValueKind.values()
                     .firstOrNull { it.value == kind }
-                    // Theoretically unreachable, but kept if wrong LLVM version is used
+            // Theoretically unreachable, but kept if wrong LLVM version is used
                     ?: throw IllegalArgumentException("Value $value has invalid value kind")
         }
     }
