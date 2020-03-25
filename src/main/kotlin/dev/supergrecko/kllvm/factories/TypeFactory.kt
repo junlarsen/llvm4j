@@ -4,8 +4,9 @@ import dev.supergrecko.kllvm.contracts.Factory
 import dev.supergrecko.kllvm.core.typedefs.LLVMContext
 import dev.supergrecko.kllvm.core.typedefs.LLVMType
 import dev.supergrecko.kllvm.core.enumerations.LLVMTypeKind
-import dev.supergrecko.kllvm.core.typebuilders.StructBuilder
-import dev.supergrecko.kllvm.core.typebuilders.VectorBuilder
+import dev.supergrecko.kllvm.dsl.ArrayBuilder
+import dev.supergrecko.kllvm.dsl.StructBuilder
+import dev.supergrecko.kllvm.dsl.VectorBuilder
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.global.LLVM
@@ -41,6 +42,10 @@ public object TypeFactory : Factory<LLVMType> {
         val arr = LLVM.LLVMArrayType(ty.llvmType, size)
 
         return LLVMType(arr, LLVMTypeKind.Array)
+    }
+
+    public fun array(size: Int, apply: ArrayBuilder.() -> Unit): LLVMType {
+        return ArrayBuilder(size).apply(apply).build()
     }
 
     /**

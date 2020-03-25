@@ -1,4 +1,4 @@
-package dev.supergrecko.kllvm.core.typebuilders
+package dev.supergrecko.kllvm.dsl
 
 import dev.supergrecko.kllvm.contracts.Builder
 import dev.supergrecko.kllvm.core.typedefs.LLVMType
