@@ -4,7 +4,6 @@ import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
 import dev.supergrecko.kllvm.core.types.FunctionType
 import dev.supergrecko.kllvm.core.values.FunctionValue
-import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
