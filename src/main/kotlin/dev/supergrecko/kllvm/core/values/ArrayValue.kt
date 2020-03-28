@@ -15,8 +15,7 @@ public class ArrayValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
     public fun getAsString(): String {
         require(isConstantString())
 
-        // TODO: Determine whether this is actually good enough to pull the string
-        val ptr = LLVM.LLVMGetAsString(llvmValue, SizeTPointer())
+        val ptr = LLVM.LLVMGetAsString(llvmValue, SizeTPointer(0))
 
         return ptr.string
     }
