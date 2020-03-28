@@ -25,6 +25,10 @@ public class Module internal constructor(internal val llvmModule: LLVMModuleRef)
      */
     val ref get() = llvmModule
 
+    fun dump() {
+        LLVM.LLVMDumpModule(llvmModule)
+    }
+
     companion object {
         @JvmStatic
         fun create(sourceFileName: String, context: Context? = null): Module {
