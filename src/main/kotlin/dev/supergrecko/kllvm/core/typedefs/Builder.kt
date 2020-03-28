@@ -21,4 +21,11 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
     fun positionAtEnd(basicBlock: BasicBlock) {
         LLVM.LLVMPositionBuilderAtEnd(llvmBuilder, basicBlock.llvmBlock)
     }
+
+    companion object {
+        @JvmStatic
+        fun create(ctx: Context): Builder {
+            return Builder(LLVM.LLVMCreateBuilderInContext(ctx.llvmCtx))
+        }
+    }
 }
