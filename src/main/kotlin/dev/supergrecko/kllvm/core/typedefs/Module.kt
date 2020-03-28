@@ -17,4 +17,15 @@ public class Module internal constructor(internal val llvmModule: LLVMModuleRef)
     }
 
     override fun close() = dispose()
+
+    companion object {
+        @JvmStatic
+        fun create(sourceFileName: String, context: Context? = null): Module {
+            return Module(if (context == null) {
+                LLVM.LLVMModuleCreateWithName(sourceFileName)
+            } else {
+                LLVM.LLVMModuleCreateWithNameInContext(sourceFileName, context.llvmCtx)
+            })
+        }
+    }
 }
