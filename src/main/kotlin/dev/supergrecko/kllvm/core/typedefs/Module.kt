@@ -4,13 +4,55 @@ import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
 import dev.supergrecko.kllvm.core.types.FunctionType
 import dev.supergrecko.kllvm.core.values.FunctionValue
+import org.bytedeco.javacpp.Pointer
+import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
 public class Module internal constructor(internal val llvmModule: LLVMModuleRef) : AutoCloseable, Validatable, Disposable {
     public override var valid: Boolean = true
 
-    override fun dispose() {
+    //region Core::Modules
+    public fun dump() {
+        // TODO: test
+        LLVM.LLVMDumpModule(llvmModule)
+    }
+
+    public fun addFunction(name: String, type: FunctionType): FunctionValue {
+        // TODO: test
+        val value = LLVM.LLVMAddFunction(llvmModule, name, type.getUnderlyingReference())
+
+        return FunctionValue(value)
+    }
+
+    public fun clone(): Module {
+        val mod = LLVM.LLVMCloneModule(llvmModule)
+
+        return Module(mod)
+    }
+
+    public fun getModuleIdentifier(): String {
+        val ptr = LLVM.LLVMGetModuleIdentifier(llvmModule, SizeTPointer(0))
+
+        return ptr.string
+    }
+
+    public fun setModuleIdentifier(identifier: String) {
+        LLVM.LLVMSetModuleIdentifier(llvmModule, identifier, identifier.length.toLong())
+    }
+
+    public fun getSourceFileName(): String {
+        val ptr = LLVM.LLVMGetSourceFileName(llvmModule, SizeTPointer(0))
+
+        return ptr.string
+    }
+
+    public fun setSourceFileName(sourceName: String) {
+        LLVM.LLVMSetSourceFileName(llvmModule, sourceName, sourceName.length.toLong())
+    }
+    //endregion Core::Modules
+
+    public override fun dispose() {
         require(valid) { "This module has already been disposed." }
 
         valid = false
@@ -18,27 +60,16 @@ public class Module internal constructor(internal val llvmModule: LLVMModuleRef)
         LLVM.LLVMDisposeModule(llvmModule)
     }
 
-    override fun close() = dispose()
+    public override fun close() = dispose()
 
-    fun getUnderlyingReference() = llvmModule
+    public fun getUnderlyingReference() = llvmModule
 
-    fun dump() {
-        LLVM.LLVMDumpModule(llvmModule)
-    }
-
-    fun addFunction(name: String, type: FunctionType): FunctionValue {
-        return FunctionValue(
-                LLVM.LLVMAddFunction(llvmModule, name, type.getUnderlyingReference()))
-    }
-
-    companion object {
+    public companion object {
+        //region Core::Modules
         @JvmStatic
-        fun create(sourceFileName: String, context: Context? = null): Module {
-            return Module(if (context == null) {
-                LLVM.LLVMModuleCreateWithName(sourceFileName)
-            } else {
-                LLVM.LLVMModuleCreateWithNameInContext(sourceFileName, context.llvmCtx)
-            })
+        public fun create(sourceFileName: String, context: Context = Context.getGlobalContext()): Module {
+            return Module(LLVM.LLVMModuleCreateWithNameInContext(sourceFileName, context.llvmCtx))
         }
+        //endregion Core::Modules
     }
 }

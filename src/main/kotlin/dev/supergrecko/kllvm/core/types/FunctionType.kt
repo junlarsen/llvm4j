@@ -27,8 +27,7 @@ public class FunctionType(llvmType: LLVMTypeRef) : Type(llvmType) {
         val dest = PointerPointer<LLVMTypeRef>(getParameterCount().toLong())
         LLVM.LLVMGetParamTypes(llvmType, dest)
 
-        return dest
-                .iterateIntoType { Type(it) }
+        return dest.iterateIntoType { Type(it) }
     }
 
     public companion object {

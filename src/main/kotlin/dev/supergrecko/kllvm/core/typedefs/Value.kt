@@ -36,7 +36,7 @@ public open class Value internal constructor(
     }
 
     public fun getValueName(): String {
-        val ptr = LLVM.LLVMGetValueName2(llvmValue, SizeTPointer())
+        val ptr = LLVM.LLVMGetValueName2(llvmValue, SizeTPointer(0))
 
         return ptr.string
     }
