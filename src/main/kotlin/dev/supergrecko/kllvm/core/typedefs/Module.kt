@@ -2,6 +2,7 @@ package dev.supergrecko.kllvm.core.typedefs
 
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
+import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -23,10 +24,20 @@ public class Module internal constructor(internal val llvmModule: LLVMModuleRef)
      * but till then, we need this to interface with the underlying
      * generated bindings
      */
-    val ref get() = llvmModule
+    fun getUnderlyingReference() = llvmModule
 
     fun dump() {
         LLVM.LLVMDumpModule(llvmModule)
+    }
+
+    fun addFunction(name: String, retType: Type, paramTypes: Type, paramCount: Int, isVarArg: Boolean) {
+        LLVM.LLVMAddFunction(llvmModule, name,
+            LLVM.LLVMFunctionType(
+                    retType.getUnderlyingReference(),
+                    paramTypes.getUnderlyingReference(),
+                    paramCount,
+                    if (isVarArg) 0 else 1
+            ))
     }
 
     companion object {
