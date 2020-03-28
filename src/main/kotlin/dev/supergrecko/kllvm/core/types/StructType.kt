@@ -2,6 +2,8 @@ package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
+import dev.supergrecko.kllvm.core.typedefs.Value
+import dev.supergrecko.kllvm.core.values.StructValue
 import dev.supergrecko.kllvm.utils.iterateIntoType
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
@@ -10,6 +12,7 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class StructType(llvmType: LLVMTypeRef) : Type(llvmType) {
+    //region Core::Types::StructureTypes
     public fun isPacked(): Boolean {
         return LLVM.LLVMIsPackedStruct(llvmType).toBoolean()
     }
@@ -59,6 +62,31 @@ public class StructType(llvmType: LLVMTypeRef) : Type(llvmType) {
     public fun getElementCount(): Int {
         return LLVM.LLVMCountStructElementTypes(llvmType)
     }
+    //endregion Core::Types::StructureTypes
+
+    //region Core::Values::Constants::CompositeConstants
+    /**
+     * Create an anonymous ConstantStruct with the specified [values]
+     */
+    public fun getConstStruct(values: List<Value>, packed: Boolean, context: Context = Context.getGlobalContext()): StructValue {
+        val ptr = ArrayList(values.map { it.llvmValue }).toTypedArray()
+
+        val struct = LLVM.LLVMConstStructInContext(context.llvmCtx, PointerPointer(*ptr), ptr.size, packed.toInt())
+
+        return StructValue(struct)
+    }
+
+    /**
+     * Create a non-anonymous ConstantStruct from values.
+     */
+    public fun getConstNamedStruct(type: StructType, values: List<Value>): StructValue {
+        val ptr = ArrayList(values.map { it.llvmValue }).toTypedArray()
+
+        val struct = LLVM.LLVMConstNamedStruct(type.llvmType, PointerPointer(*ptr), ptr.size)
+
+        return StructValue(struct)
+    }
+    //endregion Core::Values::Constants::CompositeConstants
 
     public companion object {
         /**

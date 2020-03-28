@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core.values
 
+import dev.supergrecko.kllvm.annotations.Shared
 import dev.supergrecko.kllvm.core.typedefs.Value
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.javacpp.SizeTPointer
@@ -18,6 +19,18 @@ public class ArrayValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
         val ptr = LLVM.LLVMGetAsString(llvmValue, SizeTPointer(0))
 
         return ptr.string
+    }
+
+    /**
+     * Get an element at specified [index] as a constant
+     *
+     * This method is shared with [ArrayValue] and [VectorValue]
+     */
+    @Shared
+    public fun getElementAsConstant(index: Int): Value {
+        val value = LLVM.LLVMGetElementAsConstant(llvmValue, index)
+
+        return Value(value)
     }
     //endregion Core::Values::Constants::CompositeConstants
 }
