@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core.types
 
+import dev.supergrecko.kllvm.annotations.Shared
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
 import dev.supergrecko.kllvm.core.values.ArrayValue
@@ -11,10 +12,21 @@ import org.bytedeco.llvm.global.LLVM
 
 public class ArrayType(llvmType: LLVMTypeRef) : Type(llvmType) {
     //region Core::Types::SequentialTypes
+    /**
+     * Returns the amount of elements contained in this type
+     *
+     * This is shared with [ArrayType], [VectorType], [PointerType]
+     */
     public fun getElementCount(): Int {
         return LLVM.LLVMGetArrayLength(llvmType)
     }
 
+    /**
+     * Returns type's subtypes
+     *
+     * This is shared with [ArrayType], [VectorType], [PointerType]
+     */
+    @Shared
     public fun getSubtypes(): List<Type> {
         val dest = PointerPointer<LLVMTypeRef>(getElementCount().toLong())
         LLVM.LLVMGetSubtypes(llvmType, dest)
@@ -22,6 +34,12 @@ public class ArrayType(llvmType: LLVMTypeRef) : Type(llvmType) {
         return dest.iterateIntoType { Type(it) }
     }
 
+    /**
+     * Obtain the type of elements within a sequential type
+     *
+     * This is shared with [ArrayType], [VectorType], [PointerType]
+     */
+    @Shared
     public fun getElementType(): Type {
         val type = LLVM.LLVMGetElementType(llvmType)
 
@@ -41,7 +59,7 @@ public class ArrayType(llvmType: LLVMTypeRef) : Type(llvmType) {
         /**
          * Create an array type
          *
-         * Constructs an array of type [ty] with size [size].
+         * Constructs an array of type [type] with size [size].
          */
         @JvmStatic
         public fun new(type: Type, size: Int): ArrayType {

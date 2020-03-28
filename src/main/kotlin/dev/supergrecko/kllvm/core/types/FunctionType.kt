@@ -9,6 +9,7 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class FunctionType(llvmType: LLVMTypeRef) : Type(llvmType) {
+    //region Core::Types::FunctionTypes
     public fun isVariadic(): Boolean {
         return LLVM.LLVMIsFunctionVarArg(llvmType).toBoolean()
     }
@@ -29,6 +30,7 @@ public class FunctionType(llvmType: LLVMTypeRef) : Type(llvmType) {
 
         return dest.iterateIntoType { Type(it) }
     }
+    //endregion Core::Types::FunctionTypes
 
     public companion object {
         /**
