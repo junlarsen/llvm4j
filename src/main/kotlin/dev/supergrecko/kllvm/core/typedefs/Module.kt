@@ -18,6 +18,13 @@ public class Module internal constructor(internal val llvmModule: LLVMModuleRef)
 
     override fun close() = dispose()
 
+    /**
+     * This should not be required once all bindings are completed
+     * but till then, we need this to interface with the underlying
+     * generated bindings
+     */
+    val ref get() = llvmModule
+
     companion object {
         @JvmStatic
         fun create(sourceFileName: String, context: Context? = null): Module {
