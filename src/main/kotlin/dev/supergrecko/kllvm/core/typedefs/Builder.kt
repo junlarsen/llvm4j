@@ -22,6 +22,14 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
         LLVM.LLVMPositionBuilderAtEnd(llvmBuilder, basicBlock.llvmBlock)
     }
 
+    fun getUnderlyingRef(): LLVMBuilderRef {
+        return llvmBuilder
+    }
+
+    fun buildRetVoid(): Value {
+        return Value(LLVM.LLVMBuildRetVoid(llvmBuilder))
+    }
+
     companion object {
         @JvmStatic
         fun create(ctx: Context): Builder {
