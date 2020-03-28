@@ -3,6 +3,7 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
 import dev.supergrecko.kllvm.core.types.FunctionType
+import dev.supergrecko.kllvm.core.values.FunctionValue
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
@@ -31,8 +32,9 @@ public class Module internal constructor(internal val llvmModule: LLVMModuleRef)
         LLVM.LLVMDumpModule(llvmModule)
     }
 
-    fun addFunction(name: String, type: FunctionType) {
-        LLVM.LLVMAddFunction(llvmModule, name, type.getUnderlyingReference())
+    fun addFunction(name: String, type: FunctionType): FunctionValue {
+        return FunctionValue(
+                LLVM.LLVMAddFunction(llvmModule, name, type.getUnderlyingReference()))
     }
 
     companion object {
