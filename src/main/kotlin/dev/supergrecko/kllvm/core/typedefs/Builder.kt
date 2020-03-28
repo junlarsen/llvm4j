@@ -17,4 +17,8 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
     }
 
     override fun close() = dispose()
+
+    fun positionAtEnd(basicBlock: BasicBlock) {
+        LLVM.LLVMPositionBuilderAtEnd(llvmBuilder, basicBlock.llvmBlock)
+    }
 }
