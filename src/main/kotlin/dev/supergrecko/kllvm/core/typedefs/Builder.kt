@@ -69,7 +69,7 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
     companion object {
         //region InstructionBuilders
         @JvmStatic
-        fun create(ctx: Context? = Context.getGlobalContext()): Builder {
+        fun create(ctx: Context = Context.getGlobalContext()): Builder {
             return Builder(LLVM.LLVMCreateBuilderInContext(ctx?.llvmCtx))
         }
 
