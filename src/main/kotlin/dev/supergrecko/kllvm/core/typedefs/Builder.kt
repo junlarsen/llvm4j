@@ -9,11 +9,11 @@ import org.bytedeco.llvm.global.LLVM
 public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderRef) : AutoCloseable, Validatable, Disposable {
     public override var valid: Boolean = true
 
-    //region Core::Builders
     public fun getUnderlyingRef(): LLVMBuilderRef {
         return llvmBuilder
     }
 
+    //region InstructionBuilders
     public fun buildRetVoid(): Value {
         return Value(LLVM.LLVMBuildRetVoid(llvmBuilder))
     }
@@ -54,7 +54,7 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
         LLVM.LLVMInsertIntoBuilderWithName(getUnderlyingRef(), instruction.getUnderlyingReference(), name)
     }
 
-    //endregion Core::Builders
+    //endregion InstructionBuilders
 
     override fun dispose() {
         require(valid) { "This builder has already been disposed." }
@@ -67,12 +67,12 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
     override fun close() = dispose()
 
     companion object {
-        //region Core::Builders
+        //region InstructionBuilders
         @JvmStatic
-        fun create(ctx: Context? = null): Builder {
+        fun create(ctx: Context? = Context.getGlobalContext()): Builder {
             return Builder(LLVM.LLVMCreateBuilderInContext(ctx?.llvmCtx))
         }
 
-        //endregion Core::Builders
+        //endregion InstructionBuilders
     }
 }
