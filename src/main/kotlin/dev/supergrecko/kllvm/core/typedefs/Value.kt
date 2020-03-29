@@ -1,7 +1,10 @@
 package dev.supergrecko.kllvm.core.typedefs
 
+import dev.supergrecko.kllvm.contracts.Unreachable
+import dev.supergrecko.kllvm.core.enumerations.ThreadLocalMode
 import dev.supergrecko.kllvm.core.enumerations.ValueKind
 import dev.supergrecko.kllvm.utils.toBoolean
+import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -10,6 +13,34 @@ import java.lang.reflect.Constructor
 public open class Value internal constructor(
         internal val llvmValue: LLVMValueRef
 ) {
+    //region Core::Values::Constants::GlobalVariables
+    public var externallyInitialized: Boolean
+        get() = LLVM.LLVMIsExternallyInitialized(llvmValue).toBoolean()
+        set(value) = LLVM.LLVMSetExternallyInitialized(llvmValue, value.toInt())
+
+    public var initializer: Value
+        get() = Value(LLVM.LLVMGetInitializer(llvmValue))
+        set(value) = LLVM.LLVMSetInitializer(llvmValue, value.llvmValue)
+
+    public var globalConstant: Boolean
+        get() = LLVM.LLVMIsGlobalConstant(llvmValue).toBoolean()
+        set(value) = LLVM.LLVMSetGlobalConstant(llvmValue, value.toInt())
+
+    public var threadLocalMode: ThreadLocalMode
+        get() {
+            val mode = LLVM.LLVMGetThreadLocalMode(llvmValue)
+
+            return ThreadLocalMode.values()
+                    .firstOrNull { it.value == mode }
+                    ?: throw Unreachable()
+        }
+        set(value) = LLVM.LLVMSetThreadLocalMode(llvmValue, value.value)
+
+    public var threadLocal: Boolean
+        get() = LLVM.LLVMIsThreadLocal(llvmValue).toBoolean()
+        set(value) = LLVM.LLVMSetThreadLocal(llvmValue, value.toInt())
+    //endregion Core::Values::Constants::GlobalVariables
+
     //region Core::Values::Constants
     public fun isNull(): Boolean {
         return LLVM.LLVMIsNull(llvmValue).toBoolean()
