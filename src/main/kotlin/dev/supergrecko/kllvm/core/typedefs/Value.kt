@@ -41,13 +41,15 @@ public open class Value internal constructor(
         set(value) = LLVM.LLVMSetThreadLocal(llvmValue, value.toInt())
     //endregion Core::Values::Constants::GlobalVariables
 
-    //region Core::Values::Constants
-    public fun isNull(): Boolean {
-        return LLVM.LLVMIsNull(llvmValue).toBoolean()
-    }
-    //endregion Core::Values::Constants
-
     //region Core::Values::Constants::GeneralAPIs
+    public var valueName: String
+        get() {
+            val ptr = LLVM.LLVMGetValueName2(llvmValue, SizeTPointer(0))
+
+            return ptr.string
+        }
+        set(value) = LLVM.LLVMSetValueName2(llvmValue, value, value.length.toLong())
+
     public fun getType(): Type {
         val type = LLVM.LLVMTypeOf(llvmValue)
 
@@ -60,16 +62,6 @@ public open class Value internal constructor(
 
     public fun isConstant(): Boolean {
         return LLVM.LLVMIsConstant(llvmValue).toBoolean()
-    }
-
-    public fun setValueName(name: String) {
-        LLVM.LLVMSetValueName2(llvmValue, name, name.length.toLong())
-    }
-
-    public fun getValueName(): String {
-        val ptr = LLVM.LLVMGetValueName2(llvmValue, SizeTPointer(0))
-
-        return ptr.string
     }
 
     public fun getValueKind(): ValueKind = getValueKind(llvmValue)
@@ -92,6 +84,12 @@ public open class Value internal constructor(
     public fun isAMDNode() {}
     public fun isAMDString() {}
     //endregion Core::Values::Constants::GeneralAPIs
+
+    //region Core::Values::Constants
+    public fun isNull(): Boolean {
+        return LLVM.LLVMIsNull(llvmValue).toBoolean()
+    }
+    //endregion Core::Values::Constants
 
     public inline fun <reified T : Value> cast(): T {
         val ctor: Constructor<T> = T::class.java.getDeclaredConstructor(LLVMValueRef::class.java)
