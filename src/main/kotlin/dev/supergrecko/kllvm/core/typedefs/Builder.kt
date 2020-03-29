@@ -2,11 +2,59 @@ package dev.supergrecko.kllvm.core.typedefs
 
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
+import dev.supergrecko.kllvm.core.values.InstructionValue
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.global.LLVM
 
 public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderRef) : AutoCloseable, Validatable, Disposable {
     public override var valid: Boolean = true
+
+    public fun getUnderlyingRef(): LLVMBuilderRef {
+        return llvmBuilder
+    }
+
+    //region InstructionBuilders
+    public fun buildRetVoid(): Value {
+        return Value(LLVM.LLVMBuildRetVoid(llvmBuilder))
+    }
+
+    /**
+     * LLVMPositionBuilder
+     */
+    public fun positionBefore(instruction: InstructionValue): Unit {
+        // TODO: Test
+        LLVM.LLVMPositionBuilderBefore(getUnderlyingRef(), instruction.llvmValue)
+    }
+
+    /**
+     * LLVMPositionBuilderAtEnd
+     */
+    public fun positionAtEnd(basicBlock: BasicBlock): Unit {
+        LLVM.LLVMPositionBuilderAtEnd(getUnderlyingRef(), basicBlock.llvmBlock)
+    }
+
+    /**
+     * LLVMGetInsertBlock
+     */
+    public fun getInsertBlock(): BasicBlock? {
+        val ref = LLVM.LLVMGetInsertBlock(getUnderlyingRef()) ?: return null
+        return BasicBlock(ref)
+    }
+
+    /**
+     * LLVMClearInsertionPosition
+     */
+    public fun clearInsertPosition(): Unit = LLVM.LLVMClearInsertionPosition(getUnderlyingRef())
+
+    /**
+     * LLVMInsertIntoBuilderWithName
+     */
+    public fun insert(instruction: InstructionValue, name: String?): Unit {
+        // TODO: Test
+        LLVM.LLVMInsertIntoBuilderWithName(getUnderlyingRef(), instruction.getUnderlyingReference(), name)
+    }
+
+    //endregion InstructionBuilders
 
     override fun dispose() {
         require(valid) { "This builder has already been disposed." }
@@ -18,22 +66,13 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
 
     override fun close() = dispose()
 
-    fun positionAtEnd(basicBlock: BasicBlock) {
-        LLVM.LLVMPositionBuilderAtEnd(llvmBuilder, basicBlock.llvmBlock)
-    }
-
-    fun getUnderlyingRef(): LLVMBuilderRef {
-        return llvmBuilder
-    }
-
-    fun buildRetVoid(): Value {
-        return Value(LLVM.LLVMBuildRetVoid(llvmBuilder))
-    }
-
     companion object {
+        //region InstructionBuilders
         @JvmStatic
-        fun create(ctx: Context): Builder {
+        fun create(ctx: Context = Context.getGlobalContext()): Builder {
             return Builder(LLVM.LLVMCreateBuilderInContext(ctx.llvmCtx))
         }
+
+        //endregion InstructionBuilders
     }
 }
