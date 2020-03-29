@@ -48,11 +48,11 @@ public open class Type internal constructor(
         return Value(LLVM.LLVMConstNull(llvmType))
     }
 
-    public fun getConstUndef(): Value {
+    public fun getConstantUndef(): Value {
         return Value(LLVM.LLVMGetUndef(llvmType))
     }
 
-    public fun getConstNullPointer(): Value {
+    public fun getConstantNullPointer(): Value {
         return Value(LLVM.LLVMConstPointerNull(llvmType))
     }
     //endregion Core::Values::Constants
