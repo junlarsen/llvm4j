@@ -21,29 +21,38 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
     /**
      * LLVMPositionBuilder
      */
-    public fun positionBefore(instruction: InstructionValue): Unit = TODO()
+    public fun positionBefore(instruction: InstructionValue): Unit {
+        // TODO: Test
+        LLVM.LLVMPositionBuilderBefore(getUnderlyingRef(), instruction.llvmValue)
+    }
 
     /**
      * LLVMPositionBuilderAtEnd
      */
     public fun positionAtEnd(basicBlock: BasicBlock): Unit {
-        LLVM.LLVMPositionBuilderAtEnd(llvmBuilder, basicBlock.llvmBlock)
+        LLVM.LLVMPositionBuilderAtEnd(getUnderlyingRef(), basicBlock.llvmBlock)
     }
 
     /**
      * LLVMGetInsertBlock
      */
-    public fun getInsertBlock(): BasicBlock? = TODO()
+    public fun getInsertBlock(): BasicBlock? {
+        val ref = LLVM.LLVMGetInsertBlock(getUnderlyingRef()) ?: return null
+        return BasicBlock(ref)
+    }
 
     /**
      * LLVMClearInsertionPosition
      */
-    public fun clearInsertPosition(): Unit = LLVM.LLVMClearInsertionPosition(llvmBuilder)
+    public fun clearInsertPosition(): Unit = LLVM.LLVMClearInsertionPosition(getUnderlyingRef())
 
     /**
      * LLVMInsertIntoBuilderWithName
      */
-    public fun insert(instruction: InstructionValue, name: String?): Void = TODO()
+    public fun insert(instruction: InstructionValue, name: String?): Unit {
+        // TODO: Test
+        LLVM.LLVMInsertIntoBuilderWithName(getUnderlyingRef(), instruction.getUnderlyingReference(), name)
+    }
 
     //endregion Core::Builders
 
@@ -60,7 +69,7 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
     companion object {
         //region Core::Builders
         @JvmStatic
-        fun create(ctx: Context?): Builder {
+        fun create(ctx: Context? = null): Builder {
             return Builder(LLVM.LLVMCreateBuilderInContext(ctx?.llvmCtx))
         }
 
