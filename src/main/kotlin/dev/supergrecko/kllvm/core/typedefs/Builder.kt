@@ -63,10 +63,7 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
     public fun buildCall(
         function: Value,
         args: List<Value>,
-        resultName: String = "" // even though null default would arguably
-        // make more sense here, null string causes
-        // it to segfault and blank string causes correct
-        // behaviour.
+        resultName: String? = null
     ) : InstructionValue /* TODO: Replace with CallInstruction when type is created  */ {
         val argsPtr: PointerPointer<LLVMValueRef> =
             PointerPointer(*(args.map { it.getUnderlyingReference() }.toTypedArray()))
@@ -75,9 +72,20 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
             function.getUnderlyingReference(),
             argsPtr,
             args.size,
-            resultName
+            // This call segfaults when null string is supplied
+            // the correct behaviour of calling without binding
+            // the result to a name is invoked by passing a blank
+            // string
+            resultName ?: ""
         )
         return InstructionValue(ref)
+    }
+
+    public fun buildRet(value: Value): InstructionValue {
+        return InstructionValue(
+            LLVM.LLVMBuildRet(
+                getUnderlyingRef(),
+                value.getUnderlyingReference()))
     }
     //endregion InstructionBuilders
 
@@ -101,3 +109,4 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
         //endregion InstructionBuilders
     }
 }
+
