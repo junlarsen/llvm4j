@@ -3,6 +3,11 @@ package dev.supergrecko.kllvm.core.enumerations
 import dev.supergrecko.kllvm.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Support type matching LLVMTypeKind
+ *
+ * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
+ */
 public enum class TypeKind(public override val value: Int) : OrderedEnum<Int> {
     Void(LLVM.LLVMVoidTypeKind),
     Half(LLVM.LLVMHalfTypeKind),
