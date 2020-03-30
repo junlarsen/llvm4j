@@ -13,12 +13,41 @@ import org.bytedeco.llvm.global.LLVM
 /**
  * Higher level wrapper around llvm::LLVMContext
  *
- * - [llvm::LLVMContext](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html)
+ * - [Documentation](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html)
  *
  * @throws IllegalArgumentException If any argument assertions fail. Most noticeably functions which involve a context ref.
  */
 public class Context internal constructor(internal val llvmCtx: LLVMContextRef) : AutoCloseable, Validatable, Disposable {
     public override var valid: Boolean = true
+
+    //region Core::Context
+    /**
+     * Property determining whether the given context discards all value names.
+     *
+     * If true, only the names of GlobalValue objects will be available in the IR.
+     * This can be used to save memory and runtime, especially in release mode.
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
+     *
+     * @see [LLVM.LLVMContextSetDiscardValueNames]
+     */
+    public var discardValueNames: Boolean
+        get() {
+            require(valid) { "This module has already been disposed." }
+
+            val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(llvmCtx)
+
+            // Conversion from C++ bool to kotlin Boolean
+            return willDiscard.toBoolean()
+        }
+        set(value) {
+            require(valid) { "This module has already been disposed." }
+
+            // Conversion from kotlin Boolean to C++ bool
+            val intValue = value.toInt()
+
+            LLVM.LLVMContextSetDiscardValueNames(llvmCtx, intValue)
+        }
 
     /**
      * A LLVM Context has a diagnostic handler. The receiving pointer will be passed to the handler.
@@ -34,9 +63,9 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
      * @param handler The diagnostic handler to use
      * @param diagnosticContext The diagnostic context. Pointer types: DiagnosticContext*
      *
-     * - [LLVMContextSetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gacbfc704565962bf71eaaa549a9be570f)
-     *
      * @throws IllegalArgumentException If internal instance has been dropped.
+     *
+     * @see [LLVM.LLVMContextSetDiagnosticHandler]
      *
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
@@ -55,6 +84,8 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
+     * @see [LLVM.LLVMContextSetDiagnosticHandler]
+     *
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler) {
@@ -64,9 +95,9 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
     /**
      * Get the diagnostic handler for this context.
      *
-     * - [LLVMContextGetDiagnosticHandler](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga4ecfc4310276f36557ee231e22d1b823)
-     *
      * @throws IllegalArgumentException If internal instance has been dropped.
+     *
+     * @see [LLVM.LLVMContextGetDiagnosticContext]
      *
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
@@ -82,9 +113,9 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
      * @param callback Callback to register. C++ Type: void (*)(LLVMContext *Context, void *OpaqueHandle)
      * @param opaqueHandle Pointer types: void*
      *
-     * - [LLVMContextSetYieldCallback](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gabdcc4e421199e9e7bb5e0cd449468731)
-     *
      * @throws IllegalArgumentException If internal instance has been dropped.
+     *
+     * @see [LLVM.LLVMContextSetYieldCallback]
      *
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
@@ -93,52 +124,12 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
 
         LLVM.LLVMContextSetYieldCallback(llvmCtx, callback, opaqueHandle)
     }
-
-    /**
-     * Retrieve whether the given context will be set to discard all value names.
-     *
-     * The underlying JNI function returns [Int] to be C compatible, so we will just turn
-     * it into a kotlin [Boolean].
-     *
-     * - [LLVMContextShouldDiscardValueNames](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga537bd9783e94fa79d3980c4782cf5d76)
-     *
-     * @throws IllegalArgumentException If internal instance has been dropped.
-     */
-    public fun shouldDiscardValueNames(): Boolean {
-        require(valid) { "This module has already been disposed." }
-
-        val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(llvmCtx)
-
-        // Conversion from C++ bool to kotlin Boolean
-        return willDiscard.toBoolean()
-    }
-
-    /**
-     * Set whether the given context discards all value names.
-     *
-     * If true, only the names of GlobalValue objects will be available in the IR.
-     * This can be used to save memory and runtime, especially in release mode.
-     *
-     * The underlying JNI function accepts [Int] to be C compatible, so we will just turn
-     * it into a kotlin [Boolean].
-     *
-     * - [LLVMContextSetDiscardValueNames](https://llvm.org/doxygen/group__LLVMCCoreContext.html#ga0a07c702a2d8d2dedfe0a4813a0e0fd1)
-     *
-     * @throws IllegalArgumentException If internal instance has been dropped.
-     */
-    public fun setDiscardValueNames(discard: Boolean) {
-        require(valid) { "This module has already been disposed." }
-
-        // Conversion from kotlin Boolean to C++ bool
-        val intValue = discard.toInt()
-
-        LLVM.LLVMContextSetDiscardValueNames(llvmCtx, intValue)
-    }
+    //endregion Core::Context
 
     /**
      * Dispose the current context reference.
      *
-     * Note that after using this, the [context] should not be used again as
+     * Note that after using this, the [Context] should not be used again as
      * its LLVM reference has been disposed.
      *
      * Any calls referencing this context after it has been dropped will most likely fail
@@ -168,8 +159,6 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
     public companion object {
         /**
          * Create a new LLVM context
-         *
-         * - [LLVMContextCreate](https://llvm.org/doxygen/group__LLVMCCoreContext.html#gaac4f39a2d0b9735e64ac7681ab543b4c)
          */
         @JvmStatic
         public fun create(): Context {

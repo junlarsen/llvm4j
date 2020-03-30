@@ -24,7 +24,7 @@ public class ArrayValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
     /**
      * Get an element at specified [index] as a constant
      *
-     * This method is shared with [ArrayValue] and [VectorValue]
+     * This is shared with [ArrayValue], [VectorValue], [StructValue]
      */
     @Shared
     public fun getElementAsConstant(index: Int): Value {

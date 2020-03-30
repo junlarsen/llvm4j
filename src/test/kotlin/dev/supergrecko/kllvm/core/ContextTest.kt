@@ -33,8 +33,8 @@ class ContextTest {
         val ctx = Context.create()
 
         runAll(true, false) {
-            ctx.setDiscardValueNames(it)
-            assertEquals(it, ctx.shouldDiscardValueNames())
+            ctx.discardValueNames = it
+            assertEquals(it, ctx.discardValueNames)
         }
     }
 }
