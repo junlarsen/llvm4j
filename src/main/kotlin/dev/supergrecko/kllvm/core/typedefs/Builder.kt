@@ -13,6 +13,10 @@ public class Builder internal constructor(builder: LLVMBuilderRef) :
     internal var ref: LLVMBuilderRef = builder
     public override var valid: Boolean = true
 
+    public constructor(context: Context = Context.getGlobalContext()) {
+        ref = LLVM.LLVMCreateBuilderInContext(context.ref)
+    }
+
     public fun getUnderlyingRef(): LLVMBuilderRef {
         return ref
     }
@@ -106,15 +110,5 @@ public class Builder internal constructor(builder: LLVMBuilderRef) :
     }
 
     override fun close() = dispose()
-
-    companion object {
-        //region InstructionBuilders
-        @JvmStatic
-        fun create(ctx: Context = Context.getGlobalContext()): Builder {
-            return Builder(LLVM.LLVMCreateBuilderInContext(ctx.ref))
-        }
-
-        //endregion InstructionBuilders
-    }
 }
 

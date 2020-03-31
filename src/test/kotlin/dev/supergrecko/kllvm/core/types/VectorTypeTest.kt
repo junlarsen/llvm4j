@@ -12,7 +12,7 @@ class VectorTypeTest {
         val vec = VectorType.new(type, 10)
 
         assertEquals(10, vec.getElementCount())
-        assertEquals(type.llvmType, vec.getElementType().llvmType)
+        assertEquals(type.ref, vec.getElementType().ref)
     }
 
     @Test
@@ -21,7 +21,7 @@ class VectorTypeTest {
         val vec = VectorType.new(type, 10)
 
         assertEquals(10, vec.getSubtypes().size)
-        assertEquals(type.llvmType, vec.getSubtypes().first().llvmType)
+        assertEquals(type.ref, vec.getSubtypes().first().ref)
     }
 
     @Test

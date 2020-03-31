@@ -10,6 +10,19 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class VectorType(llvmType: LLVMTypeRef) : Type(llvmType) {
+    public constructor(type: Type) : this(type.ref)
+
+    /**
+     * Create a vector type
+     *
+     * Constructs a vector type of type [ty] with size [size].
+     */
+    public constructor(type: Type, size: Int) {
+        require(size >= 0) { "Cannot make vector of negative size" }
+
+        ref = LLVM.LLVMVectorType(type.ref, size)
+    }
+
     //region Core::Types::SequentialTypes
     /**
      * Returns the amount of elements contained in this type
@@ -18,7 +31,7 @@ public class VectorType(llvmType: LLVMTypeRef) : Type(llvmType) {
      */
     @Shared
     public fun getElementCount(): Int {
-        return LLVM.LLVMGetVectorSize(llvmType)
+        return LLVM.LLVMGetVectorSize(ref)
     }
 
     /**
@@ -29,7 +42,7 @@ public class VectorType(llvmType: LLVMTypeRef) : Type(llvmType) {
     @Shared
     public fun getSubtypes(): List<Type> {
         val dest = PointerPointer<LLVMTypeRef>(getElementCount().toLong())
-        LLVM.LLVMGetSubtypes(llvmType, dest)
+        LLVM.LLVMGetSubtypes(ref, dest)
 
         return dest.iterateIntoType { Type(it) }
     }
@@ -41,7 +54,7 @@ public class VectorType(llvmType: LLVMTypeRef) : Type(llvmType) {
      */
     @Shared
     public fun getElementType(): Type {
-        val type = LLVM.LLVMGetElementType(llvmType)
+        val type = LLVM.LLVMGetElementType(ref)
 
         return Type(type)
     }
@@ -56,18 +69,4 @@ public class VectorType(llvmType: LLVMTypeRef) : Type(llvmType) {
         return VectorValue(vec)
     }
     //endregion Core::Values::Constants::CompositeConstants
-
-    public companion object {
-        /**
-         * Create a vector type
-         *
-         * Constructs a vector type of type [ty] with size [size].
-         */
-        @JvmStatic
-        public fun new(type: Type, size: Int): VectorType {
-            require(size >= 0) { "Cannot make vector of negative size" }
-
-            return VectorType(LLVM.LLVMVectorType(type.llvmType, size))
-        }
-    }
 }

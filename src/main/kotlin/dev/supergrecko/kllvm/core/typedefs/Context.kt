@@ -22,6 +22,13 @@ public class Context internal constructor(ctx: LLVMContextRef) : AutoCloseable,
     internal var ref: LLVMContextRef = ctx
     public override var valid: Boolean = true
 
+    /**
+     * Create a new LLVM context
+     */
+    public constructor() {
+        ref = LLVM.LLVMContextCreate()
+    }
+
     //region Core::Context
     /**
      * Property determining whether the given context discards all value names.
@@ -165,16 +172,6 @@ public class Context internal constructor(ctx: LLVMContextRef) : AutoCloseable,
     public override fun close() = dispose()
 
     public companion object {
-        /**
-         * Create a new LLVM context
-         */
-        @JvmStatic
-        public fun create(): Context {
-            val llvmContext = LLVM.LLVMContextCreate()
-
-            return Context(llvmContext)
-        }
-
         /**
          * Obtain the global LLVM context
          */

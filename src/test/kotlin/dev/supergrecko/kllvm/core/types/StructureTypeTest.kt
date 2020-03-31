@@ -15,10 +15,10 @@ class StructureTypeTest {
         assertEquals(false, struct.isOpaque())
 
         val (first) = struct.getElementTypes()
-        assertEquals(elements.first().llvmType, first.llvmType)
+        assertEquals(elements.first().ref, first.ref)
 
         val type = struct.getElementTypeAt(0)
-        assertEquals(type.llvmType, elements.first().llvmType)
+        assertEquals(type.ref, elements.first().ref)
     }
 
     @Test
@@ -38,7 +38,7 @@ class StructureTypeTest {
         struct.setBody(elements, false)
 
         val (first) = struct.getElementTypes()
-        assertEquals(elements.first().llvmType, first.llvmType)
+        assertEquals(elements.first().ref, first.ref)
         assertEquals(false, struct.isOpaque())
     }
 }

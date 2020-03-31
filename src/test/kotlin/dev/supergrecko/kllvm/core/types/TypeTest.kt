@@ -39,7 +39,7 @@ class TypeTest {
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
 
-        assertEquals(type.llvmType, underlying.cast<IntType>().llvmType)
+        assertEquals(type.ref, underlying.cast<IntType>().llvmType)
     }
 
     @Test
@@ -49,7 +49,7 @@ class TypeTest {
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
 
-        assertEquals(type.llvmType, underlying.cast<FunctionType>().llvmType)
+        assertEquals(type.ref, underlying.cast<FunctionType>().llvmType)
     }
 
     @Test

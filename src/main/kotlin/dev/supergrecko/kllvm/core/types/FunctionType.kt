@@ -9,44 +9,41 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class FunctionType(llvmType: LLVMTypeRef) : Type(llvmType) {
+    public constructor(type: Type) : this(type.ref)
+
+    /**
+     * Create a function type
+     *
+     * This will construct a function type which returns the type provided in [returns] which expects to receive
+     * parameters of the types provided in [tys]. You can mark a function type as variadic by setting the [variadic] arg
+     * to true.
+     */
+    public constructor(returns: Type, types: List<Type>, variadic: Boolean) {
+        val arr = ArrayList(types.map { it.ref }).toTypedArray()
+
+        ref = LLVM.LLVMFunctionType(returns.ref, PointerPointer(*arr), arr.size, variadic.toInt())
+    }
+
     //region Core::Types::FunctionTypes
     public fun isVariadic(): Boolean {
-        return LLVM.LLVMIsFunctionVarArg(llvmType).toBoolean()
+        return LLVM.LLVMIsFunctionVarArg(ref).toBoolean()
     }
 
     public fun getParameterCount(): Int {
-        return LLVM.LLVMCountParamTypes(llvmType)
+        return LLVM.LLVMCountParamTypes(ref)
     }
 
     public fun getReturnType(): Type {
-        val type = LLVM.LLVMGetReturnType(llvmType)
+        val type = LLVM.LLVMGetReturnType(ref)
 
         return Type(type)
     }
 
     public fun getParameterTypes(): List<Type> {
         val dest = PointerPointer<LLVMTypeRef>(getParameterCount().toLong())
-        LLVM.LLVMGetParamTypes(llvmType, dest)
+        LLVM.LLVMGetParamTypes(ref, dest)
 
         return dest.iterateIntoType { Type(it) }
     }
     //endregion Core::Types::FunctionTypes
-
-    public companion object {
-        /**
-         * Create a function type
-         *
-         * This will construct a function type which returns the type provided in [returns] which expects to receive
-         * parameters of the types provided in [tys]. You can mark a function type as variadic by setting the [variadic] arg
-         * to true.
-         */
-        @JvmStatic
-        public fun new(returns: Type, types: List<Type>, variadic: Boolean): FunctionType {
-            val arr = ArrayList(types.map { it.llvmType }).toTypedArray()
-
-            val fn = LLVM.LLVMFunctionType(returns.llvmType, PointerPointer(*arr), arr.size, variadic.toInt())
-
-            return FunctionType(fn)
-        }
-    }
 }

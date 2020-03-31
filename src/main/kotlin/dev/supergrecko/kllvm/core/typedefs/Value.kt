@@ -14,6 +14,9 @@ public open class Value internal constructor(
     value: LLVMValueRef
 ) {
     internal var ref: LLVMValueRef = value
+
+    public constructor(value: Value) : this(value.ref)
+
     //region Core::Values::Constants::GlobalVariables
     /**
      * @see [LLVM.LLVMIsExternallyInitialized]
@@ -140,16 +143,6 @@ public open class Value internal constructor(
         return LLVM.LLVMIsNull(ref).toBoolean()
     }
     //endregion Core::Values::Constants
-
-    //region Typecasting
-    public inline fun <reified T : Value> cast(): T {
-        val ctor: Constructor<T> =
-            T::class.java.getDeclaredConstructor(LLVMValueRef::class.java)
-
-        return ctor.newInstance(getUnderlyingReference())
-            ?: throw TypeCastException("Failed to cast LLVMType to T")
-    }
-    //endregion Typecasting
 
     public fun getUnderlyingReference(): LLVMValueRef = ref
 

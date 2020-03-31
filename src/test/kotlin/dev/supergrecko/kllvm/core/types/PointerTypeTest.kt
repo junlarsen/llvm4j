@@ -9,7 +9,7 @@ class PointerTypeTest {
         val type = IntType.new(32)
         val ptr = type.toPointerType()
 
-        assertEquals(type.llvmType, ptr.getElementType().llvmType)
+        assertEquals(type.ref, ptr.getElementType().ref)
     }
 
     @Test

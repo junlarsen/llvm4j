@@ -6,12 +6,9 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class LabelType(llvmType: LLVMTypeRef) : Type(llvmType) {
-    public companion object {
-        @JvmStatic
-        public fun new(ctx: Context = Context.getGlobalContext()): LabelType {
-            val ty = LLVM.LLVMLabelTypeInContext(ctx.ref)
+    public constructor(type: Type) : this(type.ref)
 
-            return LabelType(ty)
-        }
+    public constructor(context: Context = Context.getGlobalContext()) {
+        ref = LLVM.LLVMLabelTypeInContext(context.ref)
     }
 }

@@ -11,7 +11,7 @@ class ArrayTypeTest {
         val arr = ArrayType.new(type, 10)
 
         assertEquals(10, arr.getElementCount())
-        assertEquals(type.llvmType, arr.getElementType().llvmType)
+        assertEquals(type.ref, arr.getElementType().ref)
     }
 
     @Test
@@ -22,7 +22,7 @@ class ArrayTypeTest {
         val children = arr.getSubtypes()
 
         assertEquals(10, children.size)
-        assertEquals(type.llvmType, children.first().llvmType)
+        assertEquals(type.ref, children.first().ref)
     }
 
     @Test

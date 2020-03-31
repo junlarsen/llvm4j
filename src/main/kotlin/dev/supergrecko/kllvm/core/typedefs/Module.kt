@@ -13,6 +13,10 @@ public class Module internal constructor(module: LLVMModuleRef) : AutoCloseable,
     internal var ref: LLVMModuleRef = module
     public override var valid: Boolean = true
 
+    public constructor(sourceFileName: String, context: Context = Context.getGlobalContext()) {
+        ref = LLVM.LLVMModuleCreateWithNameInContext(sourceFileName, context.ref)
+    }
+
     //region Core::Modules
     public fun dump() {
         // TODO: test
@@ -77,21 +81,4 @@ public class Module internal constructor(module: LLVMModuleRef) : AutoCloseable,
     public override fun close() = dispose()
 
     public fun getUnderlyingReference() = ref
-
-    public companion object {
-        //region Core::Modules
-        @JvmStatic
-        public fun create(
-            sourceFileName: String,
-            context: Context = Context.getGlobalContext()
-        ): Module {
-            return Module(
-                LLVM.LLVMModuleCreateWithNameInContext(
-                    sourceFileName,
-                    context.ref
-                )
-            )
-        }
-        //endregion Core::Modules
-    }
 }

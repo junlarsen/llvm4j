@@ -6,12 +6,9 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class MetadataType(llvmType: LLVMTypeRef) : Type(llvmType) {
-    public companion object {
-        @JvmStatic
-        public fun new(ctx: Context = Context.getGlobalContext()): MetadataType {
-            val ty = LLVM.LLVMMetadataTypeInContext(ctx.ref)
+    public constructor(type: Type) : this(type.ref)
 
-            return MetadataType(ty)
-        }
+    public constructor(context: Context = Context.getGlobalContext()) {
+        ref = LLVM.LLVMMetadataTypeInContext(context.ref)
     }
 }

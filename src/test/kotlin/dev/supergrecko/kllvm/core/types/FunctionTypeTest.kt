@@ -14,7 +14,7 @@ class FunctionTypeTest {
         val fn = FunctionType.new(ret, listOf(), true)
 
         assertEquals(fn.getParameterCount(), 0)
-        assertTrue { fn.getReturnType().llvmType == ret.llvmType }
+        assertTrue { fn.getReturnType().ref == ret.ref }
     }
 
     @Test
@@ -32,7 +32,7 @@ class FunctionTypeTest {
         val args = listOf(FloatType.new(TypeKind.Float))
         val fn = FunctionType.new(ret, args, true)
 
-        assertEquals(LLVM.LLVMIsFunctionVarArg(fn.llvmType).toBoolean(), fn.isVariadic())
+        assertEquals(LLVM.LLVMIsFunctionVarArg(fn.ref).toBoolean(), fn.isVariadic())
     }
 
     @Test
@@ -41,7 +41,7 @@ class FunctionTypeTest {
         val args = listOf(FloatType.new(TypeKind.Float))
         val fn = FunctionType.new(ret, args, true)
 
-        assertEquals(LLVM.LLVMCountParamTypes(fn.llvmType), fn.getParameterCount())
+        assertEquals(LLVM.LLVMCountParamTypes(fn.ref), fn.getParameterCount())
     }
 
     @Test
@@ -53,8 +53,8 @@ class FunctionTypeTest {
         val params = fn.getParameterTypes()
 
         for (i in args.indices) {
-            val x = params[i].llvmType
-            val y = params[i].llvmType
+            val x = params[i].ref
+            val y = params[i].ref
             assertEquals(x, y)
         }
     }

@@ -6,30 +6,32 @@ import dev.supergrecko.kllvm.core.types.*
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
-import java.lang.reflect.Constructor
 
-public open class Type internal constructor(ref: LLVMTypeRef) {
-    internal var llvmType: LLVMTypeRef = ref
+public open class Type internal constructor(ty: LLVMTypeRef) {
+    internal var ref: LLVMTypeRef = ty
+
+    public constructor(type: Type) : this(type.ref)
+
     //region Core::Types
     /**
      * @see [LLVM.LLVMGetTypeKind]
      */
     public fun getTypeKind(): TypeKind {
-        return getTypeKind(llvmType)
+        return getTypeKind(ref)
     }
 
     /**
      * @see [LLVM.LLVMTypeIsSized]
      */
     public fun isSized(): Boolean {
-        return LLVM.LLVMTypeIsSized(llvmType).toBoolean()
+        return LLVM.LLVMTypeIsSized(ref).toBoolean()
     }
 
     /**
      * @see [LLVM.LLVMGetTypeContext]
      */
     public fun getContext(): Context {
-        val ctx = LLVM.LLVMGetTypeContext(llvmType)
+        val ctx = LLVM.LLVMGetTypeContext(ref)
 
         return Context(ctx)
     }
@@ -42,7 +44,7 @@ public open class Type internal constructor(ref: LLVMTypeRef) {
      * @see [LLVM.LLVMPrintTypeToString]
      */
     public fun getStringRepresentation(): Message {
-        val ptr = LLVM.LLVMPrintTypeToString(llvmType)
+        val ptr = LLVM.LLVMPrintTypeToString(ref)
 
         return Message(ptr.asBuffer())
     }
@@ -58,21 +60,21 @@ public open class Type internal constructor(ref: LLVMTypeRef) {
             require(!isOpaque())
         }
 
-        return Value(LLVM.LLVMConstNull(llvmType))
+        return Value(LLVM.LLVMConstNull(ref))
     }
 
     /**
      * @see [LLVM.LLVMGetUndef]
      */
     public fun getConstantUndef(): Value {
-        return Value(LLVM.LLVMGetUndef(llvmType))
+        return Value(LLVM.LLVMGetUndef(ref))
     }
 
     /**
      * @see [LLVM.LLVMConstPointerNull]
      */
     public fun getConstantNullPointer(): Value {
-        return Value(LLVM.LLVMConstPointerNull(llvmType))
+        return Value(LLVM.LLVMConstPointerNull(ref))
     }
     //endregion Core::Values::Constants
 
@@ -83,27 +85,9 @@ public open class Type internal constructor(ref: LLVMTypeRef) {
     public fun toArrayType(size: Int): ArrayType = ArrayType.new(this, size)
 
     public fun toVectorType(size: Int): VectorType = VectorType.new(this, size)
-
-    public inline fun <reified T : Type> cast(): T {
-        val ctor: Constructor<T> =
-            T::class.java.getDeclaredConstructor(LLVMTypeRef::class.java)
-
-        return ctor.newInstance(getUnderlyingReference())
-        // Should theoretically be unreachable
-            ?: throw TypeCastException("Failed to cast LLVMType to T")
-    }
-
-    public fun asArrayType(): ArrayType = ArrayType(llvmType)
-    public fun asFloatType(): FloatType = FloatType(llvmType)
-    public fun asFunctionType(): FunctionType = FunctionType(llvmType)
-    public fun asIntType(): IntType = IntType(llvmType)
-    public fun asPointerType(): PointerType = PointerType(llvmType)
-    public fun asStructType(): StructType = StructType(llvmType)
-    public fun asVectorType(): VectorType = VectorType(llvmType)
-    public fun asVoidType(): VoidType = VoidType(llvmType)
     //endregion Typecasting
 
-    public fun getUnderlyingReference(): LLVMTypeRef = llvmType
+    public fun getUnderlyingReference(): LLVMTypeRef = ref
 
     companion object {
         @JvmStatic

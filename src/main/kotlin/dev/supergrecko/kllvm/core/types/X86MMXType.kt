@@ -6,12 +6,9 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class X86MMXType(llvmType: LLVMTypeRef) : Type(llvmType) {
-    public companion object {
-        @JvmStatic
-        public fun new(ctx: Context = Context.getGlobalContext()): X86MMXType {
-            val ty = LLVM.LLVMX86MMXTypeInContext(ctx.ref)
+    public constructor(type: Type) : this(type.ref)
 
-            return X86MMXType(ty)
-        }
+    public constructor(context: Context = Context.getGlobalContext()) {
+        ref = LLVM.LLVMX86MMXTypeInContext(context.ref)
     }
 }
