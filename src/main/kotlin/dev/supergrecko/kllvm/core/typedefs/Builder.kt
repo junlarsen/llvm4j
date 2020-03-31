@@ -59,12 +59,13 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
      * Create a function call passing in [args] and binding the result into
      * variable [resultName]. Result discarded if no resultName supplied.
      * @see LLVM.LLVMBuildCall
+     * TODO: Replace with CallInstruction when type is created
      */
     public fun buildCall(
         function: Value,
         args: List<Value>,
         resultName: String? = null
-    ) : InstructionValue /* TODO: Replace with CallInstruction when type is created  */ {
+    ) : InstructionValue {
         val argsPtr: PointerPointer<LLVMValueRef> =
             PointerPointer(*(args.map { it.getUnderlyingReference() }.toTypedArray()))
         val ref = LLVM.LLVMBuildCall(
