@@ -1,8 +1,12 @@
 package dev.supergrecko.kllvm.core.modules
 
 import dev.supergrecko.kllvm.core.typedefs.Module
+import dev.supergrecko.kllvm.core.types.FunctionType
+import dev.supergrecko.kllvm.core.types.VoidType
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class ModuleTest {
     @Test
@@ -32,5 +36,18 @@ class ModuleTest {
         mod.setSourceFileName("test2.ll")
 
         assertEquals("test2.ll", mod.getSourceFileName())
+    }
+
+    @Test
+    fun `test getFunction returns null when no function added`() {
+        val module = Module.create("test.ll")
+        assertNull(module.getFunction("test"))
+    }
+
+    @Test
+    fun `test getFunction returns function object when function added`() {
+        val module = Module.create("test.ll")
+        module.addFunction("test", FunctionType.new(VoidType.new(), listOf(), false))
+        assertNotNull(module.getFunction("test"))
     }
 }

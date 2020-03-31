@@ -3,7 +3,9 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
 import dev.supergrecko.kllvm.core.values.InstructionValue
+import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
+import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderRef) : AutoCloseable, Validatable, Disposable {
@@ -53,7 +55,39 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
         // TODO: Test
         LLVM.LLVMInsertIntoBuilderWithName(getUnderlyingRef(), instruction.getUnderlyingReference(), name)
     }
+    /**
+     * Create a function call passing in [args] and binding the result into
+     * variable [resultName]. Result discarded if no resultName supplied.
+     * @see LLVM.LLVMBuildCall
+     * TODO: Replace with CallInstruction when type is created
+     */
+    public fun buildCall(
+        function: Value,
+        args: List<Value>,
+        resultName: String? = null
+    ) : InstructionValue {
+        val argsPtr: PointerPointer<LLVMValueRef> =
+            PointerPointer(*(args.map { it.getUnderlyingReference() }.toTypedArray()))
+        val ref = LLVM.LLVMBuildCall(
+            getUnderlyingRef(),
+            function.getUnderlyingReference(),
+            argsPtr,
+            args.size,
+            // This call segfaults when null string is supplied
+            // the correct behaviour of calling without binding
+            // the result to a name is invoked by passing a blank
+            // string
+            resultName ?: ""
+        )
+        return InstructionValue(ref)
+    }
 
+    public fun buildRet(value: Value): InstructionValue {
+        return InstructionValue(
+            LLVM.LLVMBuildRet(
+                getUnderlyingRef(),
+                value.getUnderlyingReference()))
+    }
     //endregion InstructionBuilders
 
     override fun dispose() {
@@ -76,3 +110,4 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
         //endregion InstructionBuilders
     }
 }
+

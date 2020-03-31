@@ -50,6 +50,14 @@ public class Module internal constructor(internal val llvmModule: LLVMModuleRef)
     public fun setSourceFileName(sourceName: String) {
         LLVM.LLVMSetSourceFileName(llvmModule, sourceName, sourceName.length.toLong())
     }
+
+    public fun getFunction(name: String): Value? {
+        val ref = LLVM.LLVMGetNamedFunction(getUnderlyingReference(), name)
+        if (ref == null) {
+            return null
+        }
+        return FunctionValue(ref)
+    }
     //endregion Core::Modules
 
     public override fun dispose() {
