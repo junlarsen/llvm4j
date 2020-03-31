@@ -1,12 +1,19 @@
 package dev.supergrecko.kllvm.core.values
 
 import dev.supergrecko.kllvm.core.typedefs.Value
+import dev.supergrecko.kllvm.core.types.FloatType
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class FloatValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
+    public constructor(value: Value) : this(value.ref)
+
+    public constructor(type: FloatType, value: Double) {
+        ref = LLVM.LLVMConstReal(type.ref, value)
+    }
+
     //region Core::Values::Constants::ScalarConstants
     /**
      * Obtains the double value for a floating point const value

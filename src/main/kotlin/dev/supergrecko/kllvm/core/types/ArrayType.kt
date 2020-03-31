@@ -59,12 +59,4 @@ public class ArrayType(llvmType: LLVMTypeRef) : Type(llvmType) {
         return Type(type)
     }
     //endregion Core::Types::SequentialTypes
-
-    //region Core::Values::Constants::CompositeConstants
-    public fun getConstString(content: String, nullTerminate: Boolean, context: Context = Context.getGlobalContext()): ArrayValue {
-        val str = LLVM.LLVMConstStringInContext(context.ref, content, content.length, nullTerminate.toInt())
-
-        return ArrayValue(str)
-    }
-    //endregion Core::Values::Constants::CompositeConstants
 }

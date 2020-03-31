@@ -6,6 +6,8 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class FunctionValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
+    public constructor(value: Value) : this(value.ref)
+
     fun appendBasicBlock(name: String): BasicBlock {
         return BasicBlock(LLVM.LLVMAppendBasicBlock(getUnderlyingReference(), name))
     }

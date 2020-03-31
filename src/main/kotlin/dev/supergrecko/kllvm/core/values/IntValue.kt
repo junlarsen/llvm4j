@@ -1,6 +1,5 @@
 package dev.supergrecko.kllvm.core.values
 
-import dev.supergrecko.kllvm.core.typedefs.Type
 import dev.supergrecko.kllvm.core.typedefs.Value
 import dev.supergrecko.kllvm.core.types.IntType
 import dev.supergrecko.kllvm.utils.toInt
@@ -8,28 +7,19 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class IntValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
+    public constructor(value: Value) : this(value.ref)
 
-    //region Core::Values::Constants::ScalarConstants
-    public fun getIntZeroExtended(): Long {
-        return LLVM.LLVMConstIntGetZExtValue(ref)
+    /**
+     * @see [LLVM.LLVMConstInt]
+     */
+    public constructor(type: IntType, value: Long, signExtend: Boolean) {
+        ref = LLVM.LLVMConstInt(type.ref, value, signExtend.toInt())
     }
 
-    public fun getIntSignExtended(): Long {
-        return LLVM.LLVMConstIntGetSExtValue(ref)
-    }
-    //endregion Core::Values::Constants::ScalarConstants
-
-    companion object {
-        //region Core::Values::Constants::ScalarConstants
-        public fun new(type: Type, value: Long, signExtend: Boolean): IntValue {
-            return IntValue(
-                LLVM.LLVMConstInt(
-                    type.getUnderlyingReference(),
-                    value,
-                    signExtend.toInt()
-                )
-            )
-        }
-        //endregion Core::Values::Constants::ScalarConstants
+    /**
+     * @see [LLVM.LLVMConstIntOfArbitraryPrecision]
+     */
+    public constructor(type: IntType, words: List<Long>) {
+        ref = LLVM.LLVMConstIntOfArbitraryPrecision(type.ref, words.size, words.toLongArray())
     }
 }

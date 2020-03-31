@@ -43,14 +43,4 @@ public class IntType(llvmType: LLVMTypeRef) : Type(llvmType) {
         return IntValue(LLVM.LLVMConstAllOnes(ref))
     }
     //endregion Core::Values::Constants
-
-    //region Core::Values::Constants::ScalarConstants
-    public fun getConstantInt(value: Long, signExtend: Boolean): IntValue {
-        return IntValue(LLVM.LLVMConstInt(ref, value, signExtend.toInt()))
-    }
-
-    public fun getConstantIntAP(words: List<Long>): IntValue {
-        return IntValue(LLVM.LLVMConstIntOfArbitraryPrecision(ref, words.size, words.toLongArray()))
-    }
-    //endregion Core::Values::Constants::ScalarConstants
 }

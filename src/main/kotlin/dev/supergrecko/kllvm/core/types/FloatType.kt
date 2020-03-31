@@ -27,10 +27,4 @@ public class FloatType(llvmType: LLVMTypeRef) : Type(llvmType) {
             else -> throw Unreachable()
         }
     }
-
-    //region Core::Values::Constants::ScalarConstants
-    public fun getConstantFloat(value: Double): FloatValue {
-        return FloatValue(LLVM.LLVMConstReal(ref, value))
-    }
-    //endregion Core::Values::Constants::ScalarConstants
 }

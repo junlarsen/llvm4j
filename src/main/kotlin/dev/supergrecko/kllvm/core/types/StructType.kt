@@ -89,28 +89,4 @@ public class StructType(llvmType: LLVMTypeRef) : Type(llvmType) {
         return LLVM.LLVMCountStructElementTypes(ref)
     }
     //endregion Core::Types::StructureTypes
-
-    //region Core::Values::Constants::CompositeConstants
-    /**
-     * Create an anonymous ConstantStruct with the specified [values]
-     */
-    public fun getConstStruct(values: List<Value>, packed: Boolean, context: Context = Context.getGlobalContext()): StructValue {
-        val ptr = ArrayList(values.map { it.ref }).toTypedArray()
-
-        val struct = LLVM.LLVMConstStructInContext(context.ref, PointerPointer(*ptr), ptr.size, packed.toInt())
-
-        return StructValue(struct)
-    }
-
-    /**
-     * Create a non-anonymous ConstantStruct from values.
-     */
-    public fun getConstNamedStruct(type: StructType, values: List<Value>): StructValue {
-        val ptr = ArrayList(values.map { it.ref }).toTypedArray()
-
-        val struct = LLVM.LLVMConstNamedStruct(type.ref, PointerPointer(*ptr), ptr.size)
-
-        return StructValue(struct)
-    }
-    //endregion Core::Values::Constants::CompositeConstants
 }
