@@ -56,8 +56,8 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
         LLVM.LLVMInsertIntoBuilderWithName(getUnderlyingRef(), instruction.getUnderlyingReference(), name)
     }
     /**
-     * Create a function call passing in |args| and binding the result into
-     * variable |resultName|. Result discarded if no resultName supplied.
+     * Create a function call passing in [args] and binding the result into
+     * variable [resultName]. Result discarded if no resultName supplied.
      * @see LLVM.LLVMBuildCall
      */
     public fun buildCall(
