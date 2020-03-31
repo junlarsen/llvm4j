@@ -5,7 +5,9 @@ import dev.supergrecko.kllvm.contracts.Validatable
 import org.bytedeco.llvm.LLVM.LLVMModuleProviderRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ModuleProvider internal constructor(internal val llvmModuleProvider: LLVMModuleProviderRef) : AutoCloseable, Validatable, Disposable {
+public class ModuleProvider internal constructor(provider: LLVMModuleProviderRef) :
+    AutoCloseable, Validatable, Disposable {
+    internal var ref: LLVMModuleProviderRef = provider
     public override var valid: Boolean = true
 
     override fun dispose() {
@@ -13,7 +15,7 @@ public class ModuleProvider internal constructor(internal val llvmModuleProvider
 
         valid = false
 
-        LLVM.LLVMDisposeModuleProvider(llvmModuleProvider)
+        LLVM.LLVMDisposeModuleProvider(ref)
     }
 
     override fun close() = dispose()

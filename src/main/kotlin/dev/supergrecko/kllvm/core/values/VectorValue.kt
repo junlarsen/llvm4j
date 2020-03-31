@@ -13,7 +13,7 @@ public class VectorValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
      */
     @Shared
     public fun getElementAsConstant(index: Int): Value {
-        val value = LLVM.LLVMGetElementAsConstant(llvmValue, index)
+        val value = LLVM.LLVMGetElementAsConstant(ref, index)
 
         return Value(value)
     }

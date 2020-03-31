@@ -2,7 +2,6 @@ package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
-import dev.supergrecko.kllvm.core.typedefs.Value
 import dev.supergrecko.kllvm.core.values.IntValue
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
@@ -41,16 +40,16 @@ public class IntType(llvmType: LLVMTypeRef) : Type(llvmType) {
         @JvmStatic
         public fun new(size: Int, ctx: Context = Context.getGlobalContext()): IntType {
             val type = when (size) {
-                1 -> LLVM.LLVMInt1TypeInContext(ctx.llvmCtx)
-                8 -> LLVM.LLVMInt8TypeInContext(ctx.llvmCtx)
-                16 -> LLVM.LLVMInt16TypeInContext(ctx.llvmCtx)
-                32 -> LLVM.LLVMInt32TypeInContext(ctx.llvmCtx)
-                64 -> LLVM.LLVMInt64TypeInContext(ctx.llvmCtx)
-                128 -> LLVM.LLVMInt128TypeInContext(ctx.llvmCtx)
+                1 -> LLVM.LLVMInt1TypeInContext(ctx.ref)
+                8 -> LLVM.LLVMInt8TypeInContext(ctx.ref)
+                16 -> LLVM.LLVMInt16TypeInContext(ctx.ref)
+                32 -> LLVM.LLVMInt32TypeInContext(ctx.ref)
+                64 -> LLVM.LLVMInt64TypeInContext(ctx.ref)
+                128 -> LLVM.LLVMInt128TypeInContext(ctx.ref)
                 else -> {
                     require(size in 1..8388606) { "LLVM only supports integers of 2^23-1 bits size" }
 
-                    LLVM.LLVMIntTypeInContext(ctx.llvmCtx, size)
+                    LLVM.LLVMIntTypeInContext(ctx.ref, size)
                 }
             }
 

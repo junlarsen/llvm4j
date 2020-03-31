@@ -49,7 +49,7 @@ public class ArrayType(llvmType: LLVMTypeRef) : Type(llvmType) {
 
     //region Core::Values::Constants::CompositeConstants
     public fun getConstString(content: String, nullTerminate: Boolean, context: Context = Context.getGlobalContext()): ArrayValue {
-        val str = LLVM.LLVMConstStringInContext(context.llvmCtx, content, content.length, nullTerminate.toInt())
+        val str = LLVM.LLVMConstStringInContext(context.ref, content, content.length, nullTerminate.toInt())
 
         return ArrayValue(str)
     }

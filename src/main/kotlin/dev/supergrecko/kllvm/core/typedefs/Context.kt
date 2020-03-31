@@ -17,7 +17,9 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @throws IllegalArgumentException If any argument assertions fail. Most noticeably functions which involve a context ref.
  */
-public class Context internal constructor(internal val llvmCtx: LLVMContextRef) : AutoCloseable, Validatable, Disposable {
+public class Context internal constructor(ctx: LLVMContextRef) : AutoCloseable,
+    Validatable, Disposable {
+    internal var ref: LLVMContextRef = ctx
     public override var valid: Boolean = true
 
     //region Core::Context
@@ -35,7 +37,7 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
         get() {
             require(valid) { "This module has already been disposed." }
 
-            val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(llvmCtx)
+            val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(ref)
 
             // Conversion from C++ bool to kotlin Boolean
             return willDiscard.toBoolean()
@@ -46,7 +48,7 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
             // Conversion from kotlin Boolean to C++ bool
             val intValue = value.toInt()
 
-            LLVM.LLVMContextSetDiscardValueNames(llvmCtx, intValue)
+            LLVM.LLVMContextSetDiscardValueNames(ref, intValue)
         }
 
     /**
@@ -69,10 +71,13 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
      *
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
-    public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler, diagnosticContext: Pointer) {
+    public fun setDiagnosticHandler(
+        handler: LLVMDiagnosticHandler,
+        diagnosticContext: Pointer
+    ) {
         require(valid) { "This module has already been disposed." }
 
-        LLVM.LLVMContextSetDiagnosticHandler(llvmCtx, handler, diagnosticContext)
+        LLVM.LLVMContextSetDiagnosticHandler(ref, handler, diagnosticContext)
     }
 
     /**
@@ -104,7 +109,7 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
     public fun getDiagnosticHandler(): LLVMDiagnosticHandler {
         require(valid) { "This module has already been disposed." }
 
-        return LLVM.LLVMContextGetDiagnosticHandler(llvmCtx)
+        return LLVM.LLVMContextGetDiagnosticHandler(ref)
     }
 
     /**
@@ -119,10 +124,13 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
      *
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
-    public fun setYieldCallback(callback: LLVMYieldCallback, opaqueHandle: Pointer) {
+    public fun setYieldCallback(
+        callback: LLVMYieldCallback,
+        opaqueHandle: Pointer
+    ) {
         require(valid) { "This module has already been disposed." }
 
-        LLVM.LLVMContextSetYieldCallback(llvmCtx, callback, opaqueHandle)
+        LLVM.LLVMContextSetYieldCallback(ref, callback, opaqueHandle)
     }
     //endregion Core::Context
 
@@ -143,7 +151,7 @@ public class Context internal constructor(internal val llvmCtx: LLVMContextRef) 
 
         valid = false
 
-        LLVM.LLVMContextDispose(llvmCtx)
+        LLVM.LLVMContextDispose(ref)
     }
 
     /**

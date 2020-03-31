@@ -8,16 +8,18 @@ import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderRef) : AutoCloseable, Validatable, Disposable {
+public class Builder internal constructor(builder: LLVMBuilderRef) :
+    AutoCloseable, Validatable, Disposable {
+    internal var ref: LLVMBuilderRef = builder
     public override var valid: Boolean = true
 
     public fun getUnderlyingRef(): LLVMBuilderRef {
-        return llvmBuilder
+        return ref
     }
 
     //region InstructionBuilders
     public fun buildRetVoid(): Value {
-        return Value(LLVM.LLVMBuildRetVoid(llvmBuilder))
+        return Value(LLVM.LLVMBuildRetVoid(ref))
     }
 
     /**
@@ -25,14 +27,14 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
      */
     public fun positionBefore(instruction: InstructionValue): Unit {
         // TODO: Test
-        LLVM.LLVMPositionBuilderBefore(getUnderlyingRef(), instruction.llvmValue)
+        LLVM.LLVMPositionBuilderBefore(getUnderlyingRef(), instruction.ref)
     }
 
     /**
      * LLVMPositionBuilderAtEnd
      */
     public fun positionAtEnd(basicBlock: BasicBlock): Unit {
-        LLVM.LLVMPositionBuilderAtEnd(getUnderlyingRef(), basicBlock.llvmBlock)
+        LLVM.LLVMPositionBuilderAtEnd(getUnderlyingRef(), basicBlock.ref)
     }
 
     /**
@@ -46,14 +48,19 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
     /**
      * LLVMClearInsertionPosition
      */
-    public fun clearInsertPosition(): Unit = LLVM.LLVMClearInsertionPosition(getUnderlyingRef())
+    public fun clearInsertPosition(): Unit =
+        LLVM.LLVMClearInsertionPosition(getUnderlyingRef())
 
     /**
      * LLVMInsertIntoBuilderWithName
      */
     public fun insert(instruction: InstructionValue, name: String?): Unit {
         // TODO: Test
-        LLVM.LLVMInsertIntoBuilderWithName(getUnderlyingRef(), instruction.getUnderlyingReference(), name)
+        LLVM.LLVMInsertIntoBuilderWithName(
+            getUnderlyingRef(),
+            instruction.getUnderlyingReference(),
+            name
+        )
     }
     /**
      * Create a function call passing in [args] and binding the result into
@@ -95,7 +102,7 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
 
         valid = false
 
-        LLVM.LLVMDisposeBuilder(llvmBuilder)
+        LLVM.LLVMDisposeBuilder(ref)
     }
 
     override fun close() = dispose()
@@ -104,7 +111,7 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
         //region InstructionBuilders
         @JvmStatic
         fun create(ctx: Context = Context.getGlobalContext()): Builder {
-            return Builder(LLVM.LLVMCreateBuilderInContext(ctx.llvmCtx))
+            return Builder(LLVM.LLVMCreateBuilderInContext(ctx.ref))
         }
 
         //endregion InstructionBuilders

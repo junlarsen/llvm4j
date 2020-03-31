@@ -49,7 +49,7 @@ public class VectorType(llvmType: LLVMTypeRef) : Type(llvmType) {
 
     //region Core::Values::Constants::CompositeConstants
     public fun getConstantVector(values: List<Value>): VectorValue {
-        val ptr = ArrayList(values.map { it.llvmValue }).toTypedArray()
+        val ptr = ArrayList(values.map { it.ref }).toTypedArray()
 
         val vec = LLVM.LLVMConstVector(PointerPointer(*ptr), ptr.size)
 

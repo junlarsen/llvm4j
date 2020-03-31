@@ -69,9 +69,9 @@ public class StructType(llvmType: LLVMTypeRef) : Type(llvmType) {
      * Create an anonymous ConstantStruct with the specified [values]
      */
     public fun getConstStruct(values: List<Value>, packed: Boolean, context: Context = Context.getGlobalContext()): StructValue {
-        val ptr = ArrayList(values.map { it.llvmValue }).toTypedArray()
+        val ptr = ArrayList(values.map { it.ref }).toTypedArray()
 
-        val struct = LLVM.LLVMConstStructInContext(context.llvmCtx, PointerPointer(*ptr), ptr.size, packed.toInt())
+        val struct = LLVM.LLVMConstStructInContext(context.ref, PointerPointer(*ptr), ptr.size, packed.toInt())
 
         return StructValue(struct)
     }
@@ -80,7 +80,7 @@ public class StructType(llvmType: LLVMTypeRef) : Type(llvmType) {
      * Create a non-anonymous ConstantStruct from values.
      */
     public fun getConstNamedStruct(type: StructType, values: List<Value>): StructValue {
-        val ptr = ArrayList(values.map { it.llvmValue }).toTypedArray()
+        val ptr = ArrayList(values.map { it.ref }).toTypedArray()
 
         val struct = LLVM.LLVMConstNamedStruct(type.llvmType, PointerPointer(*ptr), ptr.size)
 
@@ -101,7 +101,7 @@ public class StructType(llvmType: LLVMTypeRef) : Type(llvmType) {
         public fun new(types: List<Type>, packed: Boolean, ctx: Context = Context.getGlobalContext()): StructType {
             val arr = ArrayList(types.map { it.llvmType }).toTypedArray()
 
-            val struct = LLVM.LLVMStructTypeInContext(ctx.llvmCtx, PointerPointer(*arr), arr.size, packed.toInt())
+            val struct = LLVM.LLVMStructTypeInContext(ctx.ref, PointerPointer(*arr), arr.size, packed.toInt())
 
             return StructType(struct)
         }
@@ -114,7 +114,7 @@ public class StructType(llvmType: LLVMTypeRef) : Type(llvmType) {
          */
         @JvmStatic
         public fun opaque(name: String, ctx: Context = Context.getGlobalContext()): StructType {
-            val struct = LLVM.LLVMStructCreateNamed(ctx.llvmCtx, name)
+            val struct = LLVM.LLVMStructCreateNamed(ctx.ref, name)
 
             return StructType(struct)
         }

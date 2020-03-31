@@ -8,9 +8,8 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 import java.lang.reflect.Constructor
 
-public open class Type internal constructor(
-        internal val llvmType: LLVMTypeRef
-) {
+public open class Type internal constructor(ref: LLVMTypeRef) {
+    internal var llvmType: LLVMTypeRef = ref
     //region Core::Types
     /**
      * @see [LLVM.LLVMGetTypeKind]
@@ -78,18 +77,20 @@ public open class Type internal constructor(
     //endregion Core::Values::Constants
 
     //region Typecasting
-    public fun toPointerType(addressSpace: Int = 0): PointerType = PointerType.new(this, addressSpace)
+    public fun toPointerType(addressSpace: Int = 0): PointerType =
+        PointerType.new(this, addressSpace)
 
     public fun toArrayType(size: Int): ArrayType = ArrayType.new(this, size)
 
     public fun toVectorType(size: Int): VectorType = VectorType.new(this, size)
 
     public inline fun <reified T : Type> cast(): T {
-        val ctor: Constructor<T> = T::class.java.getDeclaredConstructor(LLVMTypeRef::class.java)
+        val ctor: Constructor<T> =
+            T::class.java.getDeclaredConstructor(LLVMTypeRef::class.java)
 
         return ctor.newInstance(getUnderlyingReference())
-                // Should theoretically be unreachable
-                ?: throw TypeCastException("Failed to cast LLVMType to T")
+        // Should theoretically be unreachable
+            ?: throw TypeCastException("Failed to cast LLVMType to T")
     }
 
     public fun asArrayType(): ArrayType = ArrayType(llvmType)
@@ -115,9 +116,9 @@ public open class Type internal constructor(
             val kind = LLVM.LLVMGetTypeKind(type)
 
             return TypeKind.values()
-                    .firstOrNull { it.value == kind }
+                .firstOrNull { it.value == kind }
             // Theoretically unreachable, but kept if wrong LLVM version is used
-                    ?: throw IllegalArgumentException("Type $type has invalid type kind")
+                ?: throw IllegalArgumentException("Type $type has invalid type kind")
         }
     }
 }
