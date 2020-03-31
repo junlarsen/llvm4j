@@ -9,7 +9,7 @@ public class MetadataType(llvmType: LLVMTypeRef) : Type(llvmType) {
     public companion object {
         @JvmStatic
         public fun new(ctx: Context = Context.getGlobalContext()): MetadataType {
-            val ty = LLVM.LLVMMetadataTypeInContext(ctx.llvmCtx)
+            val ty = LLVM.LLVMMetadataTypeInContext(ctx.ref)
 
             return MetadataType(ty)
         }

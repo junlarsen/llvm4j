@@ -9,7 +9,7 @@ public class VoidType(llvmType: LLVMTypeRef) : Type(llvmType) {
     public companion object {
         @JvmStatic
         public fun new(ctx: Context = Context.getGlobalContext()): VoidType {
-            return VoidType(LLVM.LLVMVoidTypeInContext(ctx.llvmCtx))
+            return VoidType(LLVM.LLVMVoidTypeInContext(ctx.ref))
         }
     }
 }

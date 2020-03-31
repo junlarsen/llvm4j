@@ -4,51 +4,57 @@ import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
 import dev.supergrecko.kllvm.core.types.FunctionType
 import dev.supergrecko.kllvm.core.values.FunctionValue
-import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Module internal constructor(internal val llvmModule: LLVMModuleRef) : AutoCloseable, Validatable, Disposable {
+public class Module internal constructor(module: LLVMModuleRef) : AutoCloseable,
+    Validatable, Disposable {
+    internal var ref: LLVMModuleRef = module
     public override var valid: Boolean = true
 
     //region Core::Modules
     public fun dump() {
         // TODO: test
-        LLVM.LLVMDumpModule(llvmModule)
+        LLVM.LLVMDumpModule(ref)
     }
 
     public fun addFunction(name: String, type: FunctionType): FunctionValue {
         // TODO: test
-        val value = LLVM.LLVMAddFunction(llvmModule, name, type.getUnderlyingReference())
+        val value =
+            LLVM.LLVMAddFunction(ref, name, type.getUnderlyingReference())
 
         return FunctionValue(value)
     }
 
     public fun clone(): Module {
-        val mod = LLVM.LLVMCloneModule(llvmModule)
+        val mod = LLVM.LLVMCloneModule(ref)
 
         return Module(mod)
     }
 
     public fun getModuleIdentifier(): String {
-        val ptr = LLVM.LLVMGetModuleIdentifier(llvmModule, SizeTPointer(0))
+        val ptr = LLVM.LLVMGetModuleIdentifier(ref, SizeTPointer(0))
 
         return ptr.string
     }
 
     public fun setModuleIdentifier(identifier: String) {
-        LLVM.LLVMSetModuleIdentifier(llvmModule, identifier, identifier.length.toLong())
+        LLVM.LLVMSetModuleIdentifier(
+            ref,
+            identifier,
+            identifier.length.toLong()
+        )
     }
 
     public fun getSourceFileName(): String {
-        val ptr = LLVM.LLVMGetSourceFileName(llvmModule, SizeTPointer(0))
+        val ptr = LLVM.LLVMGetSourceFileName(ref, SizeTPointer(0))
 
         return ptr.string
     }
 
     public fun setSourceFileName(sourceName: String) {
-        LLVM.LLVMSetSourceFileName(llvmModule, sourceName, sourceName.length.toLong())
+        LLVM.LLVMSetSourceFileName(ref, sourceName, sourceName.length.toLong())
     }
     //endregion Core::Modules
 
@@ -57,18 +63,26 @@ public class Module internal constructor(internal val llvmModule: LLVMModuleRef)
 
         valid = false
 
-        LLVM.LLVMDisposeModule(llvmModule)
+        LLVM.LLVMDisposeModule(ref)
     }
 
     public override fun close() = dispose()
 
-    public fun getUnderlyingReference() = llvmModule
+    public fun getUnderlyingReference() = ref
 
     public companion object {
         //region Core::Modules
         @JvmStatic
-        public fun create(sourceFileName: String, context: Context = Context.getGlobalContext()): Module {
-            return Module(LLVM.LLVMModuleCreateWithNameInContext(sourceFileName, context.llvmCtx))
+        public fun create(
+            sourceFileName: String,
+            context: Context = Context.getGlobalContext()
+        ): Module {
+            return Module(
+                LLVM.LLVMModuleCreateWithNameInContext(
+                    sourceFileName,
+                    context.ref
+                )
+            )
         }
         //endregion Core::Modules
     }

@@ -9,7 +9,7 @@ public class TokenType(llvmType: LLVMTypeRef) : Type(llvmType) {
     public companion object {
         @JvmStatic
         public fun new(ctx: Context = Context.getGlobalContext()): TokenType {
-            val ty = LLVM.LLVMTokenTypeInContext(ctx.llvmCtx)
+            val ty = LLVM.LLVMTokenTypeInContext(ctx.ref)
 
             return TokenType(ty)
         }

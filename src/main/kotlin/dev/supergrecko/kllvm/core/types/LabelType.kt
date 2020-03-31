@@ -9,7 +9,7 @@ public class LabelType(llvmType: LLVMTypeRef) : Type(llvmType) {
     public companion object {
         @JvmStatic
         public fun new(ctx: Context = Context.getGlobalContext()): LabelType {
-            val ty = LLVM.LLVMLabelTypeInContext(ctx.llvmCtx)
+            val ty = LLVM.LLVMLabelTypeInContext(ctx.ref)
 
             return LabelType(ty)
         }

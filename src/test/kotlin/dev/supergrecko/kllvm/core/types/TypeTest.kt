@@ -95,7 +95,7 @@ class TypeTest {
 
         val typeCtx = type.getContext()
 
-        assertEquals(ctx.llvmCtx, typeCtx.llvmCtx)
+        assertEquals(ctx.ref, typeCtx.ref)
     }
 
     @Test

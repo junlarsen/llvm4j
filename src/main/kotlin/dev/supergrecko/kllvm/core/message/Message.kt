@@ -10,8 +10,11 @@ import java.nio.ByteBuffer
  * A [Message] is a wrapper around Java's ByteBuffer and Bytedeco's BytePointers. It contains a char buffer which will
  * be decoded into a Kotlin [String]. Because these are obtained from C++ they need to be de-allocated which is why
  * they provide the [dispose] method. Failing to call this method will leak memory.
+ *
+ * TODO: Test whether this works with ByteBuffers which are not coming from LLVM
  */
-public class Message(private val buffer: ByteBuffer) : Disposable, AutoCloseable {
+public class Message(private val buffer: ByteBuffer) : Disposable,
+    AutoCloseable {
     public override var valid: Boolean = true
 
     /**
@@ -41,15 +44,4 @@ public class Message(private val buffer: ByteBuffer) : Disposable, AutoCloseable
     }
 
     public override fun close() = dispose()
-
-    public companion object {
-        /**
-         * Create a new Message from a [buffer]
-         *
-         * TODO: Test whether this works with ByteBuffers which are not coming from LLVM
-         */
-        public fun create(buffer: ByteBuffer): Message {
-            return Message(buffer)
-        }
-    }
 }

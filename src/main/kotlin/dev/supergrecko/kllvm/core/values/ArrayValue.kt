@@ -10,13 +10,13 @@ import org.bytedeco.llvm.global.LLVM
 public class ArrayValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
     //region Core::Values::Constants::CompositeConstants
     public fun isConstantString(): Boolean {
-        return LLVM.LLVMIsConstantString(llvmValue).toBoolean()
+        return LLVM.LLVMIsConstantString(ref).toBoolean()
     }
 
     public fun getAsString(): String {
         require(isConstantString())
 
-        val ptr = LLVM.LLVMGetAsString(llvmValue, SizeTPointer(0))
+        val ptr = LLVM.LLVMGetAsString(ref, SizeTPointer(0))
 
         return ptr.string
     }
@@ -28,7 +28,7 @@ public class ArrayValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
      */
     @Shared
     public fun getElementAsConstant(index: Int): Value {
-        val value = LLVM.LLVMGetElementAsConstant(llvmValue, index)
+        val value = LLVM.LLVMGetElementAsConstant(ref, index)
 
         return Value(value)
     }

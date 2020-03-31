@@ -5,7 +5,9 @@ import dev.supergrecko.kllvm.contracts.Validatable
 import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.global.LLVM
 
-public class MemoryBuffer internal constructor(internal val llvmBuffer: LLVMMemoryBufferRef) : AutoCloseable, Validatable, Disposable {
+public class MemoryBuffer internal constructor(buffer: LLVMMemoryBufferRef) :
+    AutoCloseable, Validatable, Disposable {
+    internal var ref: LLVMMemoryBufferRef = buffer
     public override var valid: Boolean = true
 
     override fun dispose() {
@@ -13,7 +15,7 @@ public class MemoryBuffer internal constructor(internal val llvmBuffer: LLVMMemo
 
         valid = false
 
-        LLVM.LLVMDisposeMemoryBuffer(llvmBuffer)
+        LLVM.LLVMDisposeMemoryBuffer(ref)
     }
 
     override fun close() = dispose()

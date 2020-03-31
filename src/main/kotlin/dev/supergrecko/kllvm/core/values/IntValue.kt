@@ -7,11 +7,11 @@ import org.bytedeco.llvm.global.LLVM
 public class IntValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
     //region Core::Values::Constants::ScalarConstants
     public fun getIntZeroExtended(): Long {
-        return LLVM.LLVMConstIntGetZExtValue(llvmValue)
+        return LLVM.LLVMConstIntGetZExtValue(ref)
     }
 
     public fun getIntSignExtended(): Long {
-        return LLVM.LLVMConstIntGetSExtValue(llvmValue)
+        return LLVM.LLVMConstIntGetSExtValue(ref)
     }
     //endregion Core::Values::Constants::ScalarConstants
 }

@@ -3,8 +3,6 @@ package dev.supergrecko.kllvm.core.values
 import dev.supergrecko.kllvm.core.typedefs.Value
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.javacpp.IntPointer
-import org.bytedeco.javacpp.Pointer
-import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -17,7 +15,7 @@ public class FloatValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
      */
     public fun getDouble(): Pair<Double, Boolean> {
         val ptr = IntPointer()
-        val double = LLVM.LLVMConstRealGetDouble(llvmValue, ptr)
+        val double = LLVM.LLVMConstRealGetDouble(ref, ptr)
 
         return (double) to (ptr.get().toBoolean())
     }

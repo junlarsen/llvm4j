@@ -9,7 +9,7 @@ public class X86MMXType(llvmType: LLVMTypeRef) : Type(llvmType) {
     public companion object {
         @JvmStatic
         public fun new(ctx: Context = Context.getGlobalContext()): X86MMXType {
-            val ty = LLVM.LLVMX86MMXTypeInContext(ctx.llvmCtx)
+            val ty = LLVM.LLVMX86MMXTypeInContext(ctx.ref)
 
             return X86MMXType(ty)
         }
