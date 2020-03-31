@@ -14,10 +14,12 @@ import java.nio.ByteBuffer
 public class Message(private val buffer: ByteBuffer) : Disposable, AutoCloseable {
     public override var valid: Boolean = true
 
-    public override fun close() {
-        dispose(this)
-    }
-
+    /**
+     * Get a string representation of this [Message]
+     *
+     * For this method to be available the [Message] needs to be [valid]. If this was called on a deallocated object,
+     * the JVM would crash.
+     */
     public fun getString(): String {
         require(valid)
 
@@ -30,19 +32,24 @@ public class Message(private val buffer: ByteBuffer) : Disposable, AutoCloseable
         return res.toString()
     }
 
-    override fun dispose() {
-        dispose(this)
+    public override fun dispose() {
+        require(valid)
+
+        valid = false
+
+        LLVM.LLVMDisposeMessage(buffer)
     }
 
+    public override fun close() = dispose()
+
     public companion object {
+        /**
+         * Create a new Message from a [buffer]
+         *
+         * TODO: Test whether this works with ByteBuffers which are not coming from LLVM
+         */
         public fun create(buffer: ByteBuffer): Message {
             return Message(buffer)
-        }
-
-        public fun dispose(message: Message) {
-            require(message.valid)
-            message.valid = false
-            LLVM.LLVMDisposeMessage(message.buffer)
         }
     }
 }

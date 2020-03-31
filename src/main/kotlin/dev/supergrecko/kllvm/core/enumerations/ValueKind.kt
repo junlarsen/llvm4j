@@ -3,6 +3,11 @@ package dev.supergrecko.kllvm.core.enumerations
 import dev.supergrecko.kllvm.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Support type matching LLVMValueKind
+ *
+ * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
+ */
 public enum class ValueKind(public override val value: Int) : OrderedEnum<Int> {
     Argument(LLVM.LLVMArgumentValueKind),
     BasicBlock(LLVM.LLVMBasicBlockValueKind),

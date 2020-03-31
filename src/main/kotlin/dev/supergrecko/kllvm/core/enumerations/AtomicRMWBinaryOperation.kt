@@ -3,6 +3,11 @@ package dev.supergrecko.kllvm.core.enumerations
 import dev.supergrecko.kllvm.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Support type matching LLVMAtomicRMWBinOp
+ *
+ * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
+ */
 public enum class AtomicRMWBinaryOperation(public override val value: Int) : OrderedEnum<Int> {
     Xchg(LLVM.LLVMAtomicRMWBinOpXchg),
     Add(LLVM.LLVMAtomicRMWBinOpAdd),

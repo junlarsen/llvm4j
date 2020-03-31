@@ -4,7 +4,9 @@ import dev.supergrecko.kllvm.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
 /**
- * [Reference](https://llvm.org/doxygen/group__LLVMCCoreTypes.html#ga17a137327ed1a49585a00c585313ec18)
+ * Support type matching LLVMOpcode
+ *
+ * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
  */
 enum class Opcode(public override val value: Int) : OrderedEnum<Int> {
     Ret(LLVM.LLVMRet),
