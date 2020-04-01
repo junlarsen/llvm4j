@@ -3,6 +3,8 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
 import dev.supergrecko.kllvm.core.values.InstructionValue
+import dev.supergrecko.kllvm.core.values.PointerValue
+import dev.supergrecko.kllvm.core.values.StructValue
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
@@ -106,6 +108,27 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
             )
         )
     }
+
+    public fun buildAlloca(type: Type, name: String): InstructionValue {
+        return InstructionValue(LLVM.LLVMBuildAlloca(ref, type.ref, name))
+    }
+
+    public fun buildLoad(ptr: Value, name: String): InstructionValue {
+        return InstructionValue(LLVM.LLVMBuildLoad(ref, ptr.ref, name))
+    }
+
+    public fun buildStore(value: Value, toPointer: Value): InstructionValue {
+        return InstructionValue(LLVM.LLVMBuildStore(ref, value.ref, toPointer.ref))
+    }
+
+    public fun buildExtractValue(aggVal: Value, index: Int, name: String): InstructionValue {
+        return InstructionValue(LLVM.LLVMBuildExtractValue(ref, aggVal.ref, index, name))
+    }
+
+    public fun buildStructGEP(pointer: Value, index: Int, name: String): InstructionValue {
+        return InstructionValue(LLVM.LLVMBuildStructGEP(ref, pointer.ref, index, name))
+    }
+
     //endregion InstructionBuilders
 
     override fun dispose() {

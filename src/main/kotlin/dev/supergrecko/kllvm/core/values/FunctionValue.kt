@@ -18,4 +18,12 @@ public class FunctionValue internal constructor() : Value() {
     fun appendBasicBlock(name: String): BasicBlock {
         return BasicBlock(LLVM.LLVMAppendBasicBlock(getUnderlyingReference(), name))
     }
+
+    /**
+     * TODO: Maybe throw an index out of bounds exception here
+     * in case a param isn't found? Or maybe return nullable value? Up for investigation
+     */
+    fun getParam(index: Int): Value {
+        return Value(LLVM.LLVMGetParam(ref, index))
+    }
 }
