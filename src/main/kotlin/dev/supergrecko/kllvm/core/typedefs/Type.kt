@@ -10,7 +10,7 @@ import org.bytedeco.llvm.global.LLVM
 public open class Type internal constructor() {
     internal lateinit var ref: LLVMTypeRef
 
-    internal constructor(ty: LLVMTypeRef) : this() {
+    public constructor(ty: LLVMTypeRef) : this() {
         ref = ty
     }
 

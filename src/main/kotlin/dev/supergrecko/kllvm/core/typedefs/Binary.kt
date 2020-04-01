@@ -10,7 +10,7 @@ public class Binary internal constructor() : AutoCloseable,
     internal lateinit var ref: LLVMBinaryRef
     public override var valid: Boolean = true
 
-    internal constructor(binary: LLVMBinaryRef) : this() {
+    public constructor(binary: LLVMBinaryRef) : this() {
         ref = binary
     }
 

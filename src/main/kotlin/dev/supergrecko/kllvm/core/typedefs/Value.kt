@@ -14,7 +14,7 @@ import org.bytedeco.llvm.global.LLVM
 public open class Value internal constructor() {
     internal lateinit var ref: LLVMValueRef
 
-    internal constructor(value: LLVMValueRef) : this() {
+    public constructor(value: LLVMValueRef) : this() {
         ref = value
     }
 

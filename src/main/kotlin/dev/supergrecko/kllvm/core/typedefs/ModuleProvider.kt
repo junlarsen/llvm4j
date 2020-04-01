@@ -10,7 +10,7 @@ public class ModuleProvider internal constructor() :
     internal lateinit var ref: LLVMModuleProviderRef
     public override var valid: Boolean = true
 
-    internal constructor(provider: LLVMModuleProviderRef) : this() {
+    public constructor(provider: LLVMModuleProviderRef) : this() {
         ref = provider
     }
 

@@ -28,7 +28,7 @@ public class Context public constructor() : AutoCloseable, Validatable, Disposab
         ref = LLVM.LLVMContextCreate()
     }
 
-    internal constructor(ctx: LLVMContextRef) : this() {
+    public constructor(ctx: LLVMContextRef) : this() {
         ref = ctx
     }
 

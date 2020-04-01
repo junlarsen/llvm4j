@@ -4,10 +4,7 @@ import dev.supergrecko.kllvm.core.typedefs.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 
 public class CallSiteValue internal constructor() : Value() {
-    /**
-     * Internal constructor for actual reference
-     */
-    internal constructor(llvmValue: LLVMValueRef) : this() {
+    public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
 
