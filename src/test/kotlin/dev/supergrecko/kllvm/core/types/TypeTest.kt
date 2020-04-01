@@ -39,17 +39,19 @@ class TypeTest {
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
 
-        assertEquals(type.ref, IntType(underlying).ref)
+        assertEquals(type.ref, underlying.asIntType().ref)
     }
 
     @Test
     fun `casting won't fail when the underlying type is different`() {
         // it is impossible to guarantee that the underlying types is valid or invalid
+        // TODO: Actually, it is possible to check using LLVM.LLVMGetTypeKind. We should be doing this
+        // assertion in constructors that take TypeRefs
         val type = IntType(32)
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
 
-        assertEquals(type.ref, FunctionType(underlying).ref)
+        assertEquals(type.ref, underlying.asFunctionType().ref)
     }
 
     @Test
