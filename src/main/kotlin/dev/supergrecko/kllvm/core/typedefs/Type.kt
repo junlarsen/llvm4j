@@ -14,8 +14,6 @@ public open class Type internal constructor() {
         ref = ty
     }
 
-    public constructor(type: Type) : this(type.ref)
-
     //region Core::Types
     /**
      * @see [LLVM.LLVMGetTypeKind]

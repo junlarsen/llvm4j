@@ -13,6 +13,4 @@ public class MetadataType public constructor(context: Context = Context.getGloba
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
     }
-
-    public constructor(type: Type) : this(type.ref)
 }

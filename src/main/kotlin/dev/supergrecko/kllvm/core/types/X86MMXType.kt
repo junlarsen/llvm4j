@@ -13,6 +13,4 @@ public class X86MMXType public constructor(context: Context = Context.getGlobalC
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
     }
-
-    public constructor(type: Type) : this(type.ref)
 }

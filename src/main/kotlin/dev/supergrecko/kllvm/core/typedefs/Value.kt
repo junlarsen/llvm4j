@@ -18,8 +18,6 @@ public open class Value internal constructor() {
         ref = value
     }
 
-    public constructor(value: Value) : this(value.ref)
-
     //region Core::Values::Constants::GlobalVariables
     /**
      * @see [LLVM.LLVMIsExternallyInitialized]

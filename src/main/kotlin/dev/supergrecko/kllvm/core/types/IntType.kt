@@ -11,8 +11,6 @@ public class IntType internal constructor() : Type() {
         ref = llvmType
     }
 
-    public constructor(type: Type) : this(type.ref)
-
     /**
      * Create an integer type
      *

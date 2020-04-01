@@ -14,8 +14,6 @@ public class StructValue internal constructor() : Value() {
         ref = llvmValue
     }
 
-    public constructor(value: Value) : this(value.ref)
-
     /**
      * @see [LLVM.LLVMConstStructInContext]
      */

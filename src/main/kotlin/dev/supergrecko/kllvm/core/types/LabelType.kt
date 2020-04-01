@@ -14,6 +14,4 @@ public class LabelType public constructor(context: Context = Context.getGlobalCo
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
     }
-
-    public constructor(type: Type) : this(type.ref)
 }

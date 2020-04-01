@@ -15,8 +15,6 @@ public class ArrayValue internal constructor() : Value() {
         ref = llvmValue
     }
 
-    public constructor(value: Value) : this(value.ref)
-
     public constructor(content: String, nullTerminate: Boolean, context: Context = Context.getGlobalContext()) : this() {
         ref = LLVM.LLVMConstStringInContext(context.ref, content, content.length, nullTerminate.toInt())
     }

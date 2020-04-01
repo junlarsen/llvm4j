@@ -12,8 +12,6 @@ public class VectorType internal constructor() : Type() {
         ref = llvmType
     }
 
-    public constructor(type: Type) : this(type.ref)
-
     /**
      * Create a vector type
      *

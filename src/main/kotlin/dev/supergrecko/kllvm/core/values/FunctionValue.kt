@@ -10,8 +10,6 @@ public class FunctionValue internal constructor() : Value() {
         ref = llvmValue
     }
 
-    public constructor(value: Value) : this(value.ref)
-
     fun appendBasicBlock(name: String): BasicBlock {
         return BasicBlock(LLVM.LLVMAppendBasicBlock(getUnderlyingReference(), name))
     }

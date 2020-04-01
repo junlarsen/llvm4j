@@ -11,8 +11,6 @@ public class IntValue internal constructor() : Value() {
         ref = llvmValue
     }
 
-    public constructor(value: Value) : this(value.ref)
-
     /**
      * @see [LLVM.LLVMConstInt]
      */
