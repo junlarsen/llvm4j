@@ -10,6 +10,7 @@ import org.bytedeco.llvm.global.LLVM
 public class FloatType internal constructor() : Type() {
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
+        requireKind(TypeKind.Float)
     }
 
     /**

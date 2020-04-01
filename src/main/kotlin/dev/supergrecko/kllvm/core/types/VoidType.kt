@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core.types
 
+import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
@@ -12,5 +13,6 @@ public class VoidType public constructor(context: Context = Context.getGlobalCon
 
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
+        requireKind(TypeKind.Void)
     }
 }
