@@ -8,13 +8,16 @@ import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Builder internal constructor(builder: LLVMBuilderRef) :
-    AutoCloseable, Validatable, Disposable {
-    internal var ref: LLVMBuilderRef = builder
+public class Builder public constructor(context: Context = Context.getGlobalContext()) : AutoCloseable, Validatable, Disposable {
+    internal var ref: LLVMBuilderRef
     public override var valid: Boolean = true
 
-    public constructor(context: Context = Context.getGlobalContext()) {
+    init {
         ref = LLVM.LLVMCreateBuilderInContext(context.ref)
+    }
+
+    internal constructor(builder: LLVMBuilderRef) : this() {
+        ref = builder
     }
 
     public fun getUnderlyingRef(): LLVMBuilderRef {
@@ -66,6 +69,7 @@ public class Builder internal constructor(builder: LLVMBuilderRef) :
             name
         )
     }
+
     /**
      * Create a function call passing in [args] and binding the result into
      * variable [resultName]. Result discarded if no resultName supplied.
@@ -76,9 +80,10 @@ public class Builder internal constructor(builder: LLVMBuilderRef) :
         function: Value,
         args: List<Value>,
         resultName: String? = null
-    ) : InstructionValue {
+    ): InstructionValue {
         val argsPtr: PointerPointer<LLVMValueRef> =
-            PointerPointer(*(args.map { it.getUnderlyingReference() }.toTypedArray()))
+            PointerPointer(*(args.map { it.getUnderlyingReference() }
+                .toTypedArray()))
         val ref = LLVM.LLVMBuildCall(
             getUnderlyingRef(),
             function.getUnderlyingReference(),
@@ -97,7 +102,9 @@ public class Builder internal constructor(builder: LLVMBuilderRef) :
         return InstructionValue(
             LLVM.LLVMBuildRet(
                 getUnderlyingRef(),
-                value.getUnderlyingReference()))
+                value.getUnderlyingReference()
+            )
+        )
     }
     //endregion InstructionBuilders
 

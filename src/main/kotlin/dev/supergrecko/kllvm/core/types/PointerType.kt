@@ -7,7 +7,11 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class PointerType(llvmType: LLVMTypeRef) : Type(llvmType) {
+public class PointerType internal constructor() : Type() {
+    public constructor(llvmType: LLVMTypeRef) : this() {
+        ref = llvmType
+    }
+
     public constructor(type: Type) : this(type.ref)
 
     /**
@@ -15,7 +19,7 @@ public class PointerType(llvmType: LLVMTypeRef) : Type(llvmType) {
      *
      * Creates a pointer type of type [ty]. An address space may be provided, but defaults to 0.
      */
-    public constructor(type: Type, address: Int = 0) {
+    public constructor(type: Type, address: Int = 0) : this() {
         require(address >= 0) { "Cannot use negative address" }
 
         ref = LLVM.LLVMPointerType(type.ref, address)

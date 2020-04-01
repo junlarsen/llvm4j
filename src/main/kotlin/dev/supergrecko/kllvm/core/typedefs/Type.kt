@@ -7,8 +7,12 @@ import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public open class Type internal constructor(ty: LLVMTypeRef) {
-    internal var ref: LLVMTypeRef = ty
+public open class Type internal constructor() {
+    internal lateinit var ref: LLVMTypeRef
+
+    internal constructor(ty: LLVMTypeRef) : this() {
+        ref = ty
+    }
 
     public constructor(type: Type) : this(type.ref)
 
@@ -80,11 +84,11 @@ public open class Type internal constructor(ty: LLVMTypeRef) {
 
     //region Typecasting
     public fun toPointerType(addressSpace: Int = 0): PointerType =
-        PointerType.new(this, addressSpace)
+        PointerType(this, addressSpace)
 
-    public fun toArrayType(size: Int): ArrayType = ArrayType.new(this, size)
+    public fun toArrayType(size: Int): ArrayType = ArrayType(this, size)
 
-    public fun toVectorType(size: Int): VectorType = VectorType.new(this, size)
+    public fun toVectorType(size: Int): VectorType = VectorType(this, size)
     //endregion Typecasting
 
     public fun getUnderlyingReference(): LLVMTypeRef = ref

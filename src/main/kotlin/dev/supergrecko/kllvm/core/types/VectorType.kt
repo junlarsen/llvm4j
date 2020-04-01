@@ -2,14 +2,16 @@ package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.annotations.Shared
 import dev.supergrecko.kllvm.core.typedefs.Type
-import dev.supergrecko.kllvm.core.typedefs.Value
-import dev.supergrecko.kllvm.core.values.VectorValue
 import dev.supergrecko.kllvm.utils.iterateIntoType
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class VectorType(llvmType: LLVMTypeRef) : Type(llvmType) {
+public class VectorType internal constructor() : Type() {
+    internal constructor(llvmType: LLVMTypeRef) : this() {
+        ref = llvmType
+    }
+
     public constructor(type: Type) : this(type.ref)
 
     /**
@@ -17,7 +19,7 @@ public class VectorType(llvmType: LLVMTypeRef) : Type(llvmType) {
      *
      * Constructs a vector type of type [ty] with size [size].
      */
-    public constructor(type: Type, size: Int) {
+    public constructor(type: Type, size: Int) : this() {
         require(size >= 0) { "Cannot make vector of negative size" }
 
         ref = LLVM.LLVMVectorType(type.ref, size)

@@ -8,12 +8,16 @@ import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Module internal constructor(module: LLVMModuleRef) : AutoCloseable,
+public class Module internal constructor() : AutoCloseable,
     Validatable, Disposable {
-    internal var ref: LLVMModuleRef = module
+    internal lateinit var ref: LLVMModuleRef
     public override var valid: Boolean = true
 
-    public constructor(sourceFileName: String, context: Context = Context.getGlobalContext()) {
+    internal constructor(module: LLVMModuleRef) : this() {
+        ref = module
+    }
+
+    public constructor(sourceFileName: String, context: Context = Context.getGlobalContext()) : this() {
         ref = LLVM.LLVMModuleCreateWithNameInContext(sourceFileName, context.ref)
     }
 

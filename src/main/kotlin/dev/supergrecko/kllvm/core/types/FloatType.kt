@@ -4,11 +4,14 @@ import dev.supergrecko.kllvm.contracts.Unreachable
 import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
-import dev.supergrecko.kllvm.core.values.FloatValue
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class FloatType(llvmType: LLVMTypeRef) : Type(llvmType) {
+public class FloatType internal constructor() : Type() {
+    public constructor(llvmType: LLVMTypeRef) : this() {
+        ref = llvmType
+    }
+
     public constructor(type: Type) : this(type.ref)
 
     /**
@@ -16,7 +19,7 @@ public class FloatType(llvmType: LLVMTypeRef) : Type(llvmType) {
      *
      * This function will create a fp type of the provided [kind].
      */
-    public constructor(kind: TypeKind, ctx: Context = Context.getGlobalContext()) {
+    public constructor(kind: TypeKind, ctx: Context = Context.getGlobalContext()) : this() {
         ref = when (kind) {
             TypeKind.Half -> LLVM.LLVMHalfTypeInContext(ctx.ref)
             TypeKind.Float -> LLVM.LLVMFloatTypeInContext(ctx.ref)

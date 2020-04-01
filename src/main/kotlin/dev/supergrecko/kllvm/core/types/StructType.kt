@@ -2,8 +2,6 @@ package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
-import dev.supergrecko.kllvm.core.typedefs.Value
-import dev.supergrecko.kllvm.core.values.StructValue
 import dev.supergrecko.kllvm.utils.iterateIntoType
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
@@ -11,7 +9,11 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class StructType(llvmType: LLVMTypeRef) : Type(llvmType) {
+public class StructType internal constructor() : Type() {
+    public constructor(llvmType: LLVMTypeRef) : this() {
+        ref = llvmType
+    }
+
     public constructor(type: Type) : this(type.ref)
 
     /**
@@ -22,7 +24,7 @@ public class StructType(llvmType: LLVMTypeRef) : Type(llvmType) {
      *
      * The struct body will be the types provided in [tys].
      */
-    public constructor(types: List<Type>, packed: Boolean, ctx: Context = Context.getGlobalContext()) {
+    public constructor(types: List<Type>, packed: Boolean, ctx: Context = Context.getGlobalContext()) : this() {
         val arr = ArrayList(types.map { it.ref }).toTypedArray()
 
         ref = LLVM.LLVMStructTypeInContext(ctx.ref, PointerPointer(*arr), arr.size, packed.toInt())
@@ -34,7 +36,7 @@ public class StructType(llvmType: LLVMTypeRef) : Type(llvmType) {
      * This will create an opaque struct (a struct without a body, like C forward declaration) with the given [name].
      * You will be able to use [setBody] to assign a body to the opaque struct.
      */
-    public constructor(name: String, ctx: Context = Context.getGlobalContext()) {
+    public constructor(name: String, ctx: Context = Context.getGlobalContext()) : this() {
         ref = LLVM.LLVMStructCreateNamed(ctx.ref, name)
     }
 

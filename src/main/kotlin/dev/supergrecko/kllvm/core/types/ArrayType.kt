@@ -1,16 +1,17 @@
 package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.annotations.Shared
-import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
-import dev.supergrecko.kllvm.core.values.ArrayValue
 import dev.supergrecko.kllvm.utils.iterateIntoType
-import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ArrayType(llvmType: LLVMTypeRef) : Type(llvmType) {
+public class ArrayType internal constructor() : Type() {
+    public constructor(llvmType: LLVMTypeRef) : this() {
+        ref = llvmType
+    }
+
     public constructor(type: Type) : this(type.ref)
 
     /**
@@ -18,7 +19,7 @@ public class ArrayType(llvmType: LLVMTypeRef) : Type(llvmType) {
      *
      * Constructs an array of type [type] with size [size].
      */
-    public constructor(type: Type, size: Int) {
+    public constructor(type: Type, size: Int) : this() {
         require(size >= 0) { "Cannot make array of negative size" }
 
         ref = LLVM.LLVMArrayType(type.ref, size)

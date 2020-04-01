@@ -5,9 +5,12 @@ import dev.supergrecko.kllvm.core.typedefs.Type
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class TokenType(llvmType: LLVMTypeRef) : Type(llvmType) {
-
-    public constructor(context: Context = Context.getGlobalContext()) {
+public class TokenType public constructor(context: Context = Context.getGlobalContext()) : Type() {
+    init {
         ref = LLVM.LLVMTokenTypeInContext(context.ref)
+    }
+
+    internal constructor(llvmType: LLVMTypeRef) : this() {
+        ref = llvmType
     }
 }

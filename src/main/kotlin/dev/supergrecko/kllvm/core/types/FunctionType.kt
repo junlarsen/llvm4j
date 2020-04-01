@@ -8,7 +8,11 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class FunctionType(llvmType: LLVMTypeRef) : Type(llvmType) {
+public class FunctionType internal constructor() : Type() {
+    public constructor(llvmType: LLVMTypeRef) : this() {
+        ref = llvmType
+    }
+
     public constructor(type: Type) : this(type.ref)
 
     /**
@@ -18,7 +22,7 @@ public class FunctionType(llvmType: LLVMTypeRef) : Type(llvmType) {
      * parameters of the types provided in [tys]. You can mark a function type as variadic by setting the [variadic] arg
      * to true.
      */
-    public constructor(returns: Type, types: List<Type>, variadic: Boolean) {
+    public constructor(returns: Type, types: List<Type>, variadic: Boolean) : this() {
         val arr = ArrayList(types.map { it.ref }).toTypedArray()
 
         ref = LLVM.LLVMFunctionType(returns.ref, PointerPointer(*arr), arr.size, variadic.toInt())

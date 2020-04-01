@@ -5,10 +5,14 @@ import dev.supergrecko.kllvm.contracts.Validatable
 import org.bytedeco.llvm.LLVM.LLVMModuleProviderRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ModuleProvider internal constructor(provider: LLVMModuleProviderRef) :
+public class ModuleProvider internal constructor() :
     AutoCloseable, Validatable, Disposable {
-    internal var ref: LLVMModuleProviderRef = provider
+    internal lateinit var ref: LLVMModuleProviderRef
     public override var valid: Boolean = true
+
+    internal constructor(provider: LLVMModuleProviderRef) : this() {
+        ref = provider
+    }
 
     override fun dispose() {
         require(valid) { "This module has already been disposed." }

@@ -7,10 +7,14 @@ import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class FloatValue(llvmValue: LLVMValueRef) : Value(llvmValue) {
+public class FloatValue internal constructor() : Value() {
+    internal constructor(llvmValue: LLVMValueRef) : this() {
+        ref = llvmValue
+    }
+
     public constructor(value: Value) : this(value.ref)
 
-    public constructor(type: FloatType, value: Double) {
+    public constructor(type: FloatType, value: Double) : this() {
         ref = LLVM.LLVMConstReal(type.ref, value)
     }
 

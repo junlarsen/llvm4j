@@ -16,17 +16,20 @@ import org.bytedeco.llvm.global.LLVM
  * - [Documentation](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html)
  *
  * @throws IllegalArgumentException If any argument assertions fail. Most noticeably functions which involve a context ref.
+ *
+ * Note: This primary constructor is public because anyone should be able to
+ * create a context. The init block ensures the ref is valid
  */
-public class Context internal constructor(ctx: LLVMContextRef) : AutoCloseable,
-    Validatable, Disposable {
-    internal var ref: LLVMContextRef = ctx
+public class Context public constructor() : AutoCloseable, Validatable, Disposable {
+    internal var ref: LLVMContextRef
     public override var valid: Boolean = true
 
-    /**
-     * Create a new LLVM context
-     */
-    public constructor() {
+    init {
         ref = LLVM.LLVMContextCreate()
+    }
+
+    internal constructor(ctx: LLVMContextRef) : this() {
+        ref = ctx
     }
 
     //region Core::Context

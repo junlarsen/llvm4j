@@ -8,12 +8,13 @@ import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
-import java.lang.reflect.Constructor
 
-public open class Value internal constructor(
-    value: LLVMValueRef
-) {
-    internal var ref: LLVMValueRef = value
+public open class Value internal constructor() {
+    internal lateinit var ref: LLVMValueRef
+
+    internal constructor(value: LLVMValueRef) : this() {
+        ref = value
+    }
 
     public constructor(value: Value) : this(value.ref)
 

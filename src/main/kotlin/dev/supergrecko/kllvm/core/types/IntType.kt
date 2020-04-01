@@ -3,11 +3,14 @@ package dev.supergrecko.kllvm.core.types
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
 import dev.supergrecko.kllvm.core.values.IntValue
-import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class IntType(llvmType: LLVMTypeRef) : Type(llvmType) {
+public class IntType internal constructor() : Type() {
+    public constructor(llvmType: LLVMTypeRef) : this() {
+        ref = llvmType
+    }
+
     public constructor(type: Type) : this(type.ref)
 
     /**
@@ -16,7 +19,7 @@ public class IntType(llvmType: LLVMTypeRef) : Type(llvmType) {
      * This will create an integer type of the size [size]. If the size matches any of LLVM's preset integer sizes then
      * that size will be returned. Otherwise an arbitrary size int type will be returned ([LLVM.LLVMIntTypeInContext]).
      */
-    public constructor(size: Int, ctx: Context = Context.getGlobalContext()) {
+    public constructor(size: Int, ctx: Context = Context.getGlobalContext()) : this() {
         ref = when (size) {
             1 -> LLVM.LLVMInt1TypeInContext(ctx.ref)
             8 -> LLVM.LLVMInt8TypeInContext(ctx.ref)

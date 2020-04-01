@@ -5,11 +5,14 @@ import dev.supergrecko.kllvm.contracts.Validatable
 import org.bytedeco.llvm.LLVM.LLVMBinaryRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Binary internal constructor(binary: LLVMBinaryRef) : AutoCloseable,
+public class Binary internal constructor() : AutoCloseable,
     Validatable, Disposable {
-    internal var ref: LLVMBinaryRef = binary
-
+    internal lateinit var ref: LLVMBinaryRef
     public override var valid: Boolean = true
+
+    internal constructor(binary: LLVMBinaryRef) : this() {
+        ref = binary
+    }
 
     override fun dispose() {
         require(valid) { "This binary has already been disposed." }
