@@ -8,16 +8,25 @@ import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderRef) : AutoCloseable, Validatable, Disposable {
+public class Builder public constructor(context: Context = Context.getGlobalContext()) : AutoCloseable, Validatable, Disposable {
+    internal var ref: LLVMBuilderRef
     public override var valid: Boolean = true
 
+    init {
+        ref = LLVM.LLVMCreateBuilderInContext(context.ref)
+    }
+
+    internal constructor(builder: LLVMBuilderRef) : this() {
+        ref = builder
+    }
+
     public fun getUnderlyingRef(): LLVMBuilderRef {
-        return llvmBuilder
+        return ref
     }
 
     //region InstructionBuilders
     public fun buildRetVoid(): Value {
-        return Value(LLVM.LLVMBuildRetVoid(llvmBuilder))
+        return Value(LLVM.LLVMBuildRetVoid(ref))
     }
 
     /**
@@ -25,14 +34,14 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
      */
     public fun positionBefore(instruction: InstructionValue): Unit {
         // TODO: Test
-        LLVM.LLVMPositionBuilderBefore(getUnderlyingRef(), instruction.llvmValue)
+        LLVM.LLVMPositionBuilderBefore(getUnderlyingRef(), instruction.ref)
     }
 
     /**
      * LLVMPositionBuilderAtEnd
      */
     public fun positionAtEnd(basicBlock: BasicBlock): Unit {
-        LLVM.LLVMPositionBuilderAtEnd(getUnderlyingRef(), basicBlock.llvmBlock)
+        LLVM.LLVMPositionBuilderAtEnd(getUnderlyingRef(), basicBlock.ref)
     }
 
     /**
@@ -46,15 +55,21 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
     /**
      * LLVMClearInsertionPosition
      */
-    public fun clearInsertPosition(): Unit = LLVM.LLVMClearInsertionPosition(getUnderlyingRef())
+    public fun clearInsertPosition(): Unit =
+        LLVM.LLVMClearInsertionPosition(getUnderlyingRef())
 
     /**
      * LLVMInsertIntoBuilderWithName
      */
     public fun insert(instruction: InstructionValue, name: String?): Unit {
         // TODO: Test
-        LLVM.LLVMInsertIntoBuilderWithName(getUnderlyingRef(), instruction.getUnderlyingReference(), name)
+        LLVM.LLVMInsertIntoBuilderWithName(
+            getUnderlyingRef(),
+            instruction.getUnderlyingReference(),
+            name
+        )
     }
+
     /**
      * Create a function call passing in [args] and binding the result into
      * variable [resultName]. Result discarded if no resultName supplied.
@@ -65,9 +80,10 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
         function: Value,
         args: List<Value>,
         resultName: String? = null
-    ) : InstructionValue {
+    ): InstructionValue {
         val argsPtr: PointerPointer<LLVMValueRef> =
-            PointerPointer(*(args.map { it.getUnderlyingReference() }.toTypedArray()))
+            PointerPointer(*(args.map { it.getUnderlyingReference() }
+                .toTypedArray()))
         val ref = LLVM.LLVMBuildCall(
             getUnderlyingRef(),
             function.getUnderlyingReference(),
@@ -86,7 +102,9 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
         return InstructionValue(
             LLVM.LLVMBuildRet(
                 getUnderlyingRef(),
-                value.getUnderlyingReference()))
+                value.getUnderlyingReference()
+            )
+        )
     }
     //endregion InstructionBuilders
 
@@ -95,19 +113,9 @@ public class Builder internal constructor(internal val llvmBuilder: LLVMBuilderR
 
         valid = false
 
-        LLVM.LLVMDisposeBuilder(llvmBuilder)
+        LLVM.LLVMDisposeBuilder(ref)
     }
 
     override fun close() = dispose()
-
-    companion object {
-        //region InstructionBuilders
-        @JvmStatic
-        fun create(ctx: Context = Context.getGlobalContext()): Builder {
-            return Builder(LLVM.LLVMCreateBuilderInContext(ctx.llvmCtx))
-        }
-
-        //endregion InstructionBuilders
-    }
 }
 

@@ -5,13 +5,17 @@ import dev.supergrecko.kllvm.core.typedefs.Type
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class LabelType(llvmType: LLVMTypeRef) : Type(llvmType) {
-    public companion object {
-        @JvmStatic
-        public fun new(ctx: Context = Context.getGlobalContext()): LabelType {
-            val ty = LLVM.LLVMLabelTypeInContext(ctx.llvmCtx)
-
-            return LabelType(ty)
-        }
+public class LabelType public constructor(context: Context = Context.getGlobalContext()) : Type() {
+    init {
+        ref = LLVM.LLVMLabelTypeInContext(context.ref)
     }
+
+    /**
+     * Internal constructor for actual reference
+     */
+    internal constructor(llvmType: LLVMTypeRef) : this() {
+        ref = llvmType
+    }
+
+    public constructor(type: Type) : this(type.ref)
 }

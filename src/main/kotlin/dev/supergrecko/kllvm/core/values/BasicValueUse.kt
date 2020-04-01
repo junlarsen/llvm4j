@@ -4,4 +4,13 @@ import dev.supergrecko.kllvm.core.typedefs.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 
 // TODO: Learn how to use/implement this
-public class BasicValueUse(llvmValue: LLVMValueRef) : Value(llvmValue)
+public class BasicValueUse internal constructor() : Value() {
+    /**
+     * Internal constructor for actual reference
+     */
+    internal constructor(llvmValue: LLVMValueRef) : this() {
+        ref = llvmValue
+    }
+
+    public constructor(value: Value) : this(value.ref)
+}

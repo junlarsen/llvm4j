@@ -8,35 +8,40 @@ import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
-import java.lang.reflect.Constructor
 
-public open class Value internal constructor(
-        internal val llvmValue: LLVMValueRef
-) {
+public open class Value internal constructor() {
+    internal lateinit var ref: LLVMValueRef
+
+    internal constructor(value: LLVMValueRef) : this() {
+        ref = value
+    }
+
+    public constructor(value: Value) : this(value.ref)
+
     //region Core::Values::Constants::GlobalVariables
     /**
      * @see [LLVM.LLVMIsExternallyInitialized]
      * @see [LLVM.LLVMSetExternallyInitialized]
      */
     public var externallyInitialized: Boolean
-        get() = LLVM.LLVMIsExternallyInitialized(llvmValue).toBoolean()
-        set(value) = LLVM.LLVMSetExternallyInitialized(llvmValue, value.toInt())
+        get() = LLVM.LLVMIsExternallyInitialized(ref).toBoolean()
+        set(value) = LLVM.LLVMSetExternallyInitialized(ref, value.toInt())
 
     /**
      * @see [LLVM.LLVMGetInitializer]
      * @see [LLVM.LLVMSetInitializer]
      */
     public var initializer: Value
-        get() = Value(LLVM.LLVMGetInitializer(llvmValue))
-        set(value) = LLVM.LLVMSetInitializer(llvmValue, value.llvmValue)
+        get() = Value(LLVM.LLVMGetInitializer(ref))
+        set(value) = LLVM.LLVMSetInitializer(ref, value.ref)
 
     /**
      * @see [LLVM.LLVMIsGlobalConstant]
      * @see [LLVM.LLVMSetGlobalConstant]
      */
     public var globalConstant: Boolean
-        get() = LLVM.LLVMIsGlobalConstant(llvmValue).toBoolean()
-        set(value) = LLVM.LLVMSetGlobalConstant(llvmValue, value.toInt())
+        get() = LLVM.LLVMIsGlobalConstant(ref).toBoolean()
+        set(value) = LLVM.LLVMSetGlobalConstant(ref, value.toInt())
 
     /**
      * @see [LLVM.LLVMSetThreadLocalMode]
@@ -44,21 +49,21 @@ public open class Value internal constructor(
      */
     public var threadLocalMode: ThreadLocalMode
         get() {
-            val mode = LLVM.LLVMGetThreadLocalMode(llvmValue)
+            val mode = LLVM.LLVMGetThreadLocalMode(ref)
 
             return ThreadLocalMode.values()
-                    .firstOrNull { it.value == mode }
-                    ?: throw Unreachable()
+                .firstOrNull { it.value == mode }
+                ?: throw Unreachable()
         }
-        set(value) = LLVM.LLVMSetThreadLocalMode(llvmValue, value.value)
+        set(value) = LLVM.LLVMSetThreadLocalMode(ref, value.value)
 
     /**
      * @see [LLVM.LLVMSetThreadLocal]
      * @see [LLVM.LLVMIsThreadLocal]
      */
     public var threadLocal: Boolean
-        get() = LLVM.LLVMIsThreadLocal(llvmValue).toBoolean()
-        set(value) = LLVM.LLVMSetThreadLocal(llvmValue, value.toInt())
+        get() = LLVM.LLVMIsThreadLocal(ref).toBoolean()
+        set(value) = LLVM.LLVMSetThreadLocal(ref, value.toInt())
     //endregion Core::Values::Constants::GlobalVariables
 
     //region Core::Values::Constants::GeneralAPIs
@@ -68,18 +73,18 @@ public open class Value internal constructor(
      */
     public var valueName: String
         get() {
-            val ptr = LLVM.LLVMGetValueName2(llvmValue, SizeTPointer(0))
+            val ptr = LLVM.LLVMGetValueName2(ref, SizeTPointer(0))
 
             return ptr.string
         }
-        set(value) = LLVM.LLVMSetValueName2(llvmValue, value, value.length.toLong())
+        set(value) = LLVM.LLVMSetValueName2(ref, value, value.length.toLong())
 
     // TODO: Should these be properties?
     /**
      * @see [LLVM.LLVMTypeOf]
      */
     public fun getType(): Type {
-        val type = LLVM.LLVMTypeOf(llvmValue)
+        val type = LLVM.LLVMTypeOf(ref)
 
         return Type(type)
     }
@@ -88,33 +93,33 @@ public open class Value internal constructor(
      * @see [LLVM.LLVMIsUndef]
      */
     public fun isUndef(): Boolean {
-        return LLVM.LLVMIsUndef(llvmValue).toBoolean()
+        return LLVM.LLVMIsUndef(ref).toBoolean()
     }
 
     /**
      * @see [LLVM.LLVMIsConstant]
      */
     public fun isConstant(): Boolean {
-        return LLVM.LLVMIsConstant(llvmValue).toBoolean()
+        return LLVM.LLVMIsConstant(ref).toBoolean()
     }
 
     /**
      * @see [LLVM.LLVMGetValueKind]
      */
-    public fun getValueKind(): ValueKind = getValueKind(llvmValue)
+    public fun getValueKind(): ValueKind = getValueKind(ref)
 
     /**
      * @see [LLVM.LLVMDumpValue]
      */
     public fun dump() {
-        LLVM.LLVMDumpValue(llvmValue)
+        LLVM.LLVMDumpValue(ref)
     }
 
     /**
      * @see [LLVM.LLVMPrintValueToString]
      */
     public fun dumpToString(): String {
-        val ptr = LLVM.LLVMPrintValueToString(llvmValue)
+        val ptr = LLVM.LLVMPrintValueToString(ref)
 
         return ptr.string
     }
@@ -123,7 +128,7 @@ public open class Value internal constructor(
      * @see [LLVM.LLVMReplaceAllUsesWith]
      */
     public fun replaceAllUsesWith(value: Value) {
-        LLVM.LLVMReplaceAllUsesWith(llvmValue, value.llvmValue)
+        LLVM.LLVMReplaceAllUsesWith(ref, value.ref)
     }
 
     // TODO: Implement these two
@@ -136,20 +141,11 @@ public open class Value internal constructor(
      * @see [LLVM.LLVMIsNull]
      */
     public fun isNull(): Boolean {
-        return LLVM.LLVMIsNull(llvmValue).toBoolean()
+        return LLVM.LLVMIsNull(ref).toBoolean()
     }
     //endregion Core::Values::Constants
 
-    //region Typecasting
-    public inline fun <reified T : Value> cast(): T {
-        val ctor: Constructor<T> = T::class.java.getDeclaredConstructor(LLVMValueRef::class.java)
-
-        return ctor.newInstance(getUnderlyingReference())
-                ?: throw TypeCastException("Failed to cast LLVMType to T")
-    }
-    //endregion Typecasting
-
-    public fun getUnderlyingReference(): LLVMValueRef = llvmValue
+    public fun getUnderlyingReference(): LLVMValueRef = ref
 
     public companion object {
         /**
@@ -162,9 +158,9 @@ public open class Value internal constructor(
             val kind = LLVM.LLVMGetValueKind(value)
 
             return ValueKind.values()
-                    .firstOrNull { it.value == kind }
+                .firstOrNull { it.value == kind }
             // Theoretically unreachable, but kept if wrong LLVM version is used
-                    ?: throw IllegalArgumentException("Value $value has invalid value kind")
+                ?: throw IllegalArgumentException("Value $value has invalid value kind")
         }
     }
 }
