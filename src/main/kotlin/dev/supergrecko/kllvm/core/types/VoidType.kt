@@ -10,7 +10,7 @@ public class VoidType public constructor(context: Context = Context.getGlobalCon
         ref = LLVM.LLVMVoidTypeInContext(context.ref)
     }
 
-    internal constructor(llvmType: LLVMTypeRef) : this() {
+    public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
     }
 

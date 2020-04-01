@@ -5,7 +5,7 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 
 // TODO: Learn how to use/implement this
 public class BasicValueUse internal constructor() : Value() {
-    internal constructor(llvmValue: LLVMValueRef) : this() {
+    public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
 

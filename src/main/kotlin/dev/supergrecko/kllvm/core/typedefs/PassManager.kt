@@ -10,7 +10,7 @@ public class PassManager internal constructor() :
     internal lateinit var ref: LLVMPassManagerRef
     public override var valid: Boolean = true
 
-    internal constructor(pass: LLVMPassManagerRef) : this() {
+    public constructor(pass: LLVMPassManagerRef) : this() {
         ref = pass
     }
 

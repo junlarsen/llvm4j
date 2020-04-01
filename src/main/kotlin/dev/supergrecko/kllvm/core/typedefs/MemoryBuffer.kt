@@ -10,7 +10,7 @@ public class MemoryBuffer internal constructor() :
     internal lateinit var ref: LLVMMemoryBufferRef
     public override var valid: Boolean = true
 
-    internal constructor(buffer: LLVMMemoryBufferRef) : this() {
+    public constructor(buffer: LLVMMemoryBufferRef) : this() {
         ref = buffer
     }
 

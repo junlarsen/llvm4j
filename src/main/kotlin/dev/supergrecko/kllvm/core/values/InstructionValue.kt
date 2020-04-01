@@ -4,7 +4,7 @@ import dev.supergrecko.kllvm.core.typedefs.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 
 public class InstructionValue internal constructor() : Value() {
-    internal constructor(llvmValue: LLVMValueRef) : this() {
+    public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
 

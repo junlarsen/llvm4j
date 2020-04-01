@@ -13,7 +13,7 @@ public class Module internal constructor() : AutoCloseable,
     internal lateinit var ref: LLVMModuleRef
     public override var valid: Boolean = true
 
-    internal constructor(module: LLVMModuleRef) : this() {
+    public constructor(module: LLVMModuleRef) : this() {
         ref = module
     }
 

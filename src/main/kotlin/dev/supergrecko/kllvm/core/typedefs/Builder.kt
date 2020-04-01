@@ -16,7 +16,7 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
         ref = LLVM.LLVMCreateBuilderInContext(context.ref)
     }
 
-    internal constructor(builder: LLVMBuilderRef) : this() {
+    public constructor(builder: LLVMBuilderRef) : this() {
         ref = builder
     }
 

@@ -7,7 +7,7 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class IntValue internal constructor() : Value() {
-    internal constructor(llvmValue: LLVMValueRef) : this() {
+    public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
 

@@ -10,7 +10,7 @@ public class TokenType public constructor(context: Context = Context.getGlobalCo
         ref = LLVM.LLVMTokenTypeInContext(context.ref)
     }
 
-    internal constructor(llvmType: LLVMTypeRef) : this() {
+    public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
     }
 }
