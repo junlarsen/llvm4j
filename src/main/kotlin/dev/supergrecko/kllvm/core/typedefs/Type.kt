@@ -115,5 +115,12 @@ public open class Type internal constructor() {
             // Theoretically unreachable, but kept if wrong LLVM version is used
                 ?: throw IllegalArgumentException("Type $type has invalid type kind")
         }
+
+    }
+
+    internal fun requireKind(kind: TypeKind) {
+        require(getTypeKind() == kind) {
+            "TypeKind.${getTypeKind()} is not a valid kind for ${this::class}. It is required to be $kind"
+        }
     }
 }
