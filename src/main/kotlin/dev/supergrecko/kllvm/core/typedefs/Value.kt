@@ -146,7 +146,6 @@ public open class Value internal constructor() {
         return LLVM.LLVMIsNull(ref).toBoolean()
     }
 
-<<<<<<< HEAD
 
     /**
      * @see [LLVM.LLVMConstPointerCast]
@@ -156,8 +155,6 @@ public open class Value internal constructor() {
     }
     //endregion Core::Values::Constants
 
-=======
->>>>>>> 5047732a4802b1f313bbaf533826cae770011dd5
     public fun getUnderlyingReference(): LLVMValueRef = ref
 
     public companion object {
