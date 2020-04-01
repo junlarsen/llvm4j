@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core.types
 
+import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Type
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
@@ -12,5 +13,6 @@ public class TokenType public constructor(context: Context = Context.getGlobalCo
 
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
+        requireKind(TypeKind.Token)
     }
 }

@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core.types
 
+import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.typedefs.Type
 import dev.supergrecko.kllvm.utils.iterateIntoType
 import dev.supergrecko.kllvm.utils.toBoolean
@@ -11,9 +12,8 @@ import org.bytedeco.llvm.global.LLVM
 public class FunctionType internal constructor() : Type() {
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
+        requireKind(TypeKind.Function)
     }
-
-    public constructor(type: Type) : this(type.ref)
 
     /**
      * Create a function type

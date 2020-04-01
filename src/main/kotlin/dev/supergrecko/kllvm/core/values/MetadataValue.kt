@@ -7,6 +7,4 @@ public class MetadataValue internal constructor() : Value() {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
-
-    public constructor(value: Value) : this(value.ref)
 }

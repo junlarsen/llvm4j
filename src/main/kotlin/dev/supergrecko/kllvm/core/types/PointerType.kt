@@ -1,6 +1,7 @@
 package dev.supergrecko.kllvm.core.types
 
 import dev.supergrecko.kllvm.annotations.Shared
+import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.typedefs.Type
 import dev.supergrecko.kllvm.utils.iterateIntoType
 import org.bytedeco.javacpp.PointerPointer
@@ -10,9 +11,8 @@ import org.bytedeco.llvm.global.LLVM
 public class PointerType internal constructor() : Type() {
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
+        requireKind(TypeKind.Pointer)
     }
-
-    public constructor(type: Type) : this(type.ref)
 
     /**
      * Create a pointer type

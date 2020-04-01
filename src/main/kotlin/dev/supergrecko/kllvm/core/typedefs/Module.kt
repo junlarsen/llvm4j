@@ -4,6 +4,7 @@ import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
 import dev.supergrecko.kllvm.core.types.FunctionType
 import dev.supergrecko.kllvm.core.values.FunctionValue
+import dev.supergrecko.kllvm.core.values.GlobalValue
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
@@ -71,6 +72,10 @@ public class Module internal constructor() : AutoCloseable,
             return null
         }
         return FunctionValue(ref)
+    }
+
+    fun addGlobal(type: Type, name: String): GlobalValue {
+        return GlobalValue(LLVM.LLVMAddGlobal(ref, type.ref, name))
     }
     //endregion Core::Modules
 

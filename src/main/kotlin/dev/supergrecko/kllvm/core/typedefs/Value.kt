@@ -3,6 +3,8 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.contracts.Unreachable
 import dev.supergrecko.kllvm.core.enumerations.ThreadLocalMode
 import dev.supergrecko.kllvm.core.enumerations.ValueKind
+import dev.supergrecko.kllvm.core.types.PointerType
+import dev.supergrecko.kllvm.core.values.PointerValue
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.SizeTPointer
@@ -15,8 +17,6 @@ public open class Value internal constructor() {
     public constructor(value: LLVMValueRef) : this() {
         ref = value
     }
-
-    public constructor(value: Value) : this(value.ref)
 
     //region Core::Values::Constants::GlobalVariables
     /**
@@ -142,6 +142,14 @@ public open class Value internal constructor() {
      */
     public fun isNull(): Boolean {
         return LLVM.LLVMIsNull(ref).toBoolean()
+    }
+
+
+    /**
+     * @see [LLVM.LLVMConstPointerCast]
+     */
+    fun constPointerCast(toType: PointerType): PointerValue {
+        return PointerValue(LLVM.LLVMConstPointerCast(ref, toType.ref))
     }
     //endregion Core::Values::Constants
 

@@ -12,8 +12,6 @@ public class FloatValue internal constructor() : Value() {
         ref = llvmValue
     }
 
-    public constructor(value: Value) : this(value.ref)
-
     public constructor(type: FloatType, value: Double) : this() {
         ref = LLVM.LLVMConstReal(type.ref, value)
     }

@@ -6,6 +6,7 @@ import dev.supergrecko.kllvm.core.typedefs.Value
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.SizeTPointer
+import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -13,8 +14,6 @@ public class ArrayValue internal constructor() : Value() {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
-
-    public constructor(value: Value) : this(value.ref)
 
     public constructor(content: String, nullTerminate: Boolean, context: Context = Context.getGlobalContext()) : this() {
         ref = LLVM.LLVMConstStringInContext(context.ref, content, content.length, nullTerminate.toInt())

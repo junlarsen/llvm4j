@@ -14,8 +14,6 @@ public open class Type internal constructor() {
         ref = ty
     }
 
-    public constructor(type: Type) : this(type.ref)
-
     //region Core::Types
     /**
      * @see [LLVM.LLVMGetTypeKind]
@@ -89,6 +87,15 @@ public open class Type internal constructor() {
     public fun toArrayType(size: Int): ArrayType = ArrayType(this, size)
 
     public fun toVectorType(size: Int): VectorType = VectorType(this, size)
+
+    public fun asArrayType(): ArrayType = ArrayType(ref)
+    public fun asFloatType(): FloatType = FloatType(ref)
+    public fun asFunctionType(): FunctionType = FunctionType(ref)
+    public fun asIntType(): IntType = IntType(ref)
+    public fun asPointerType(): PointerType = PointerType(ref)
+    public fun asStructType(): StructType = StructType(ref)
+    public fun asVectorType(): VectorType = VectorType(ref)
+    public fun asVoidType(): VoidType = VoidType(ref)
     //endregion Typecasting
 
     public fun getUnderlyingReference(): LLVMTypeRef = ref
@@ -107,6 +114,13 @@ public open class Type internal constructor() {
                 .firstOrNull { it.value == kind }
             // Theoretically unreachable, but kept if wrong LLVM version is used
                 ?: throw IllegalArgumentException("Type $type has invalid type kind")
+        }
+
+    }
+
+    internal fun requireKind(kind: TypeKind) {
+        require(getTypeKind() == kind) {
+            "TypeKind.${getTypeKind()} is not a valid kind for ${this::class}. It is required to be $kind"
         }
     }
 }
