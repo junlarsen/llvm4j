@@ -2,9 +2,12 @@ package dev.supergrecko.kllvm.core.typedefs
 
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
+import dev.supergrecko.kllvm.core.enumerations.VerifierFailureAction
 import dev.supergrecko.kllvm.core.types.FunctionType
 import dev.supergrecko.kllvm.core.values.FunctionValue
 import dev.supergrecko.kllvm.core.values.GlobalValue
+import dev.supergrecko.kllvm.utils.toBoolean
+import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
@@ -86,6 +89,24 @@ public class Module internal constructor() : AutoCloseable,
 
         LLVM.LLVMDisposeModule(ref)
     }
+
+    //region Analysis
+    /**
+     * Verifies that the module structure is valid
+     *
+     * TODO: Find a nice way to return the string which the LLVM method returns
+     *   Because of this, the action is not a valid parameter here even though
+     *   the LLVM method has it. I also need to find out how to extract that
+     *   char** without knowing the length of the output. -supergrecko 02042020
+     */
+    public fun verify(): Boolean {
+        return LLVM.LLVMVerifyModule(
+            ref,
+            VerifierFailureAction.ReturnStatus.value,
+            BytePointer()
+        ).toBoolean()
+    }
+    //endregion Analysis
 
     public override fun close() = dispose()
 
