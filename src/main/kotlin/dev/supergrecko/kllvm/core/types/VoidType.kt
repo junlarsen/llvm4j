@@ -5,11 +5,14 @@ import dev.supergrecko.kllvm.core.typedefs.Type
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class VoidType(llvmType: LLVMTypeRef) : Type(llvmType) {
-    public companion object {
-        @JvmStatic
-        public fun new(ctx: Context = Context.getGlobalContext()): VoidType {
-            return VoidType(LLVM.LLVMVoidTypeInContext(ctx.llvmCtx))
-        }
+public class VoidType public constructor(context: Context = Context.getGlobalContext()) : Type() {
+    init {
+        ref = LLVM.LLVMVoidTypeInContext(context.ref)
     }
+
+    public constructor(llvmType: LLVMTypeRef) : this() {
+        ref = llvmType
+    }
+
+    public constructor(type: Type) : this(type.ref)
 }

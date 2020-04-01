@@ -1,6 +1,14 @@
 package dev.supergrecko.kllvm.core.typedefs
 
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
-import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 
-public class Attribute internal constructor(internal val llvmAttribute: LLVMAttributeRef)
+public class Attribute internal constructor() {
+    internal lateinit var ref: LLVMAttributeRef
+
+    /**
+     * TODO: Make these constructors internal (see #63)
+     */
+    public constructor(attribute: LLVMAttributeRef) : this() {
+        ref = attribute
+    }
+}
