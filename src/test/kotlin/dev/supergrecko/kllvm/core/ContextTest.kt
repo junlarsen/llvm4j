@@ -9,7 +9,7 @@ import kotlin.test.assertFailsWith
 class ContextTest {
     @Test
     fun `fails to reuse dropped context`() {
-        val ctx = Context.create()
+        val ctx = Context()
         ctx.dispose()
 
         assertFailsWith<IllegalArgumentException> {
@@ -19,7 +19,7 @@ class ContextTest {
 
     @Test
     fun `dropping context twice fails`() {
-        val ctx = Context.create()
+        val ctx = Context()
 
         ctx.dispose()
 
@@ -30,7 +30,7 @@ class ContextTest {
 
     @Test
     fun `modifying discard value names actually works`() {
-        val ctx = Context.create()
+        val ctx = Context()
 
         runAll(true, false) {
             ctx.discardValueNames = it

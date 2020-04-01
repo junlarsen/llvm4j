@@ -6,8 +6,8 @@ import kotlin.test.assertEquals
 class StructureTypeTest {
     @Test
     fun `test element spec matches`() {
-        val elements = listOf(IntType.new(32))
-        val struct = StructType.new(elements, false)
+        val elements = listOf(IntType(32))
+        val struct = StructType(elements, false)
 
         assertEquals(false, struct.isPacked())
         assertEquals(1, struct.getElementCount())
@@ -23,18 +23,18 @@ class StructureTypeTest {
 
     @Test
     fun `name matches`() {
-        val struct = StructType.opaque("StructureName")
+        val struct = StructType("StructureName")
 
         assertEquals("StructureName", struct.getName())
     }
 
     @Test
     fun `test opaque struct`() {
-        val struct = StructType.opaque("test_struct")
+        val struct = StructType("test_struct")
 
         assertEquals(true, struct.isOpaque())
 
-        val elements = listOf(IntType.new(32))
+        val elements = listOf(IntType(32))
         struct.setBody(elements, false)
 
         val (first) = struct.getElementTypes()

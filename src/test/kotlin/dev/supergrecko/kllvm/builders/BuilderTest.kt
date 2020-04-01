@@ -17,14 +17,14 @@ import kotlin.test.assertNull
 class BuilderTest {
     @Test
     fun `should be able to position after basic blocks`() {
-        val builder = Builder.create()
+        val builder = Builder()
         assertNull(builder.getInsertBlock())
 
-        val module = Module.create("test.ll")
+        val module = Module("test.ll")
         val function = module.addFunction(
                 "test",
-                FunctionType.new(
-                        VoidType.new(),
+                FunctionType(
+                        VoidType(),
                         listOf(),
                         false))
 
@@ -44,7 +44,7 @@ class BuilderTest {
 
     @Test
     fun `should not be able to double free`() {
-        val builder = Builder.create()
+        val builder = Builder()
         builder.dispose()
 
         assertFailsWith<IllegalArgumentException> {
@@ -54,30 +54,30 @@ class BuilderTest {
 
     @Test
     fun `should create return instruction`() {
-        val builder = Builder.create()
-        val boolTy = IntType.new(1)
+        val builder = Builder()
+        val boolTy = IntType(1)
 
-        val instruction = builder.buildRet(IntValue.new(boolTy, value = 1, signExtend = false))
+        val instruction = builder.buildRet(IntValue(boolTy, value = 1, signExtend = false))
         assertEquals("ret i1 true", instruction.dumpToString().trim())
 
-        val instruction1 = builder.buildRet(IntValue.new(boolTy, value = 0, signExtend = false))
+        val instruction1 = builder.buildRet(IntValue(boolTy, value = 0, signExtend = false))
         assertEquals("ret i1 false", instruction1.dumpToString().trim())
     }
 
     @Test
     fun `should create call instruction`() {
-        val module = Module.create("test.ll")
-        val boolType = IntType.new(1)
+        val module = Module("test.ll")
+        val boolType = IntType(1)
         module.addFunction(
             "test",
-            FunctionType.new(boolType, listOf(boolType, boolType), false))
+            FunctionType(boolType, listOf(boolType, boolType), false))
         val externFunc = module.getFunction("test")
-        val builder = Builder.create()
-        val _false = IntValue.new(boolType, 0, false)
-        val _true = IntValue.new(boolType, 1, false)
+        val builder = Builder()
+        val _false = IntValue(boolType, 0, false)
+        val _true = IntValue(boolType, 1, false)
         val caller = module.addFunction(
             "caller",
-            FunctionType.new(boolType, listOf(boolType, boolType), false))
+            FunctionType(boolType, listOf(boolType, boolType), false))
         val basicBlock = caller.appendBasicBlock("entry")
         builder.positionAtEnd(basicBlock)
 

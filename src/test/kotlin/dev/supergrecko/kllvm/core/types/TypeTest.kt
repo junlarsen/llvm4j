@@ -9,7 +9,7 @@ import kotlin.test.assertFailsWith
 class TypeTest {
     @Test
     fun `test creation of pointer type`() {
-        val type = IntType.new(64)
+        val type = IntType(64)
         val ptr = type.toPointerType()
 
         assertEquals(TypeKind.Pointer, ptr.getTypeKind())
@@ -17,7 +17,7 @@ class TypeTest {
 
     @Test
     fun `test creation of array type`() {
-        val type = IntType.new(64)
+        val type = IntType(64)
         val arr = type.toArrayType(10)
 
         assertEquals(TypeKind.Array, arr.getTypeKind())
@@ -26,7 +26,7 @@ class TypeTest {
 
     @Test
     fun `test creation of vector type`() {
-        val type = IntType.new(32)
+        val type = IntType(32)
         val vec = type.toVectorType(1000)
 
         assertEquals(TypeKind.Vector, vec.getTypeKind())
@@ -35,26 +35,26 @@ class TypeTest {
 
     @Test
     fun `casting into other type works when expected to`() {
-        val type = IntType.new(32)
+        val type = IntType(32)
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
 
-        assertEquals(type.ref, underlying.cast<IntType>().llvmType)
+        assertEquals(type.ref, IntType(underlying).ref)
     }
 
     @Test
     fun `casting won't fail when the underlying type is different`() {
         // it is impossible to guarantee that the underlying types is valid or invalid
-        val type = IntType.new(32)
+        val type = IntType(32)
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
 
-        assertEquals(type.ref, underlying.cast<FunctionType>().llvmType)
+        assertEquals(type.ref, FunctionType(underlying).ref)
     }
 
     @Test
     fun `getting a type works properly`() {
-        val type = FloatType.new(TypeKind.Float)
+        val type = FloatType(TypeKind.Float)
 
         assertEquals(TypeKind.Float, type.getTypeKind())
     }
@@ -62,36 +62,36 @@ class TypeTest {
     @Test
     fun `negative size is illegal`() {
         assertFailsWith<IllegalArgumentException> {
-            IntType.new(-1)
+            IntType(-1)
         }
     }
 
     @Test
     fun `too huge size is illegal`() {
         assertFailsWith<IllegalArgumentException> {
-            IntType.new(1238234672)
+            IntType(1238234672)
         }
     }
 
     @Test
     fun `is sized works for integer`() {
-        val type = IntType.new(192)
+        val type = IntType(192)
 
         assertEquals(true, type.isSized())
     }
 
     @Test
     fun `is sized works for struct`() {
-        val arg = FloatType.new(TypeKind.Float)
-        val type = StructType.new(listOf(arg), false)
+        val arg = FloatType(TypeKind.Float)
+        val type = StructType(listOf(arg), false)
 
         assertEquals(true, type.isSized())
     }
 
     @Test
     fun `retrieving context works`() {
-        val ctx = Context.create()
-        val type = IntType.new(32, ctx)
+        val ctx = Context()
+        val type = IntType(32, ctx)
 
         val typeCtx = type.getContext()
 
@@ -100,7 +100,7 @@ class TypeTest {
 
     @Test
     fun `getting a name representation works`() {
-        val type = IntType.new(32)
+        val type = IntType(32)
 
         val msg = type.getStringRepresentation()
 
