@@ -4,6 +4,9 @@ import dev.supergrecko.kllvm.core.typedefs.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 
 public class PointerValue internal constructor() : Value() {
+    /**
+     * Internal constructor for actual reference
+     */
     internal constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }

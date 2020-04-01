@@ -10,6 +10,9 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class StructValue internal constructor() : Value() {
+    /**
+     * Internal constructor for actual reference
+     */
     internal constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }

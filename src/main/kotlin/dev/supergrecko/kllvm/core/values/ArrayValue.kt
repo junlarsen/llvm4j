@@ -6,10 +6,14 @@ import dev.supergrecko.kllvm.core.typedefs.Value
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.SizeTPointer
+import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class ArrayValue internal constructor() : Value() {
+    /**
+     * Internal constructor for actual reference
+     */
     internal constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }

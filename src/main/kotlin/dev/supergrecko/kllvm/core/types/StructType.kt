@@ -10,7 +10,10 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class StructType internal constructor() : Type() {
-    public constructor(llvmType: LLVMTypeRef) : this() {
+    /**
+     * Internal constructor for actual reference
+     */
+    internal constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
     }
 

@@ -8,6 +8,9 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class VectorType internal constructor() : Type() {
+    /**
+     * Internal constructor for actual reference
+     */
     internal constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
     }

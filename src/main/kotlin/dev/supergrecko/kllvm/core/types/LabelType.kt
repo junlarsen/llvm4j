@@ -8,10 +8,12 @@ import org.bytedeco.llvm.global.LLVM
 public class LabelType public constructor(context: Context = Context.getGlobalContext()) : Type() {
     init {
         ref = LLVM.LLVMLabelTypeInContext(context.ref)
-
     }
 
-    public constructor(llvmType: LLVMTypeRef) : this() {
+    /**
+     * Internal constructor for actual reference
+     */
+    internal constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
     }
 

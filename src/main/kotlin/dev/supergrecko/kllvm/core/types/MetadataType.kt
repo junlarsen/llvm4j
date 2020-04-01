@@ -10,7 +10,10 @@ public class MetadataType public constructor(context: Context = Context.getGloba
         ref = LLVM.LLVMMetadataTypeInContext(context.ref)
     }
 
-    public constructor(llvmType: LLVMTypeRef) : this() {
+    /**
+     * Internal constructor for actual reference
+     */
+    internal constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
     }
 
