@@ -87,6 +87,15 @@ public open class Type internal constructor() {
     public fun toArrayType(size: Int): ArrayType = ArrayType(this, size)
 
     public fun toVectorType(size: Int): VectorType = VectorType(this, size)
+
+    public fun asArrayType(): ArrayType = ArrayType(ref)
+    public fun asFloatType(): FloatType = FloatType(ref)
+    public fun asFunctionType(): FunctionType = FunctionType(ref)
+    public fun asIntType(): IntType = IntType(ref)
+    public fun asPointerType(): PointerType = PointerType(ref)
+    public fun asStructType(): StructType = StructType(ref)
+    public fun asVectorType(): VectorType = VectorType(ref)
+    public fun asVoidType(): VoidType = VoidType(ref)
     //endregion Typecasting
 
     public fun getUnderlyingReference(): LLVMTypeRef = ref
