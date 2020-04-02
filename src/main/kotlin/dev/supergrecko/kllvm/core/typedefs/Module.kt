@@ -11,6 +11,7 @@ import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
+import java.nio.ByteBuffer
 
 public class Module internal constructor() : AutoCloseable,
     Validatable, Disposable {
@@ -94,17 +95,23 @@ public class Module internal constructor() : AutoCloseable,
     /**
      * Verifies that the module structure is valid
      *
+     * This function returns true if the module is valid as opposed to the
+     * LLVM implementation which would return 0 if the module is valid.
+     *
      * TODO: Find a nice way to return the string which the LLVM method returns
-     *   Because of this, the action is not a valid parameter here even though
-     *   the LLVM method has it. I also need to find out how to extract that
-     *   char** without knowing the length of the output. -supergrecko 02042020
+     *   Because of this. When calling this with PrintMessage or ReturnStatus
+     *   the underlying bytes in the ptr are really strange (see #67)
      */
-    public fun verify(): Boolean {
-        return LLVM.LLVMVerifyModule(
-            ref,
-            VerifierFailureAction.ReturnStatus.value,
-            BytePointer()
-        ).toBoolean()
+    public fun verify(action: VerifierFailureAction): Boolean {
+        val ptr = BytePointer(ByteBuffer.allocate(100))
+
+        val res = LLVM.LLVMVerifyModule(ref, action.value, ptr)
+
+        // LLVM Source says:
+        // > Note that this function's return value is inverted from what you would
+        // > expect of a function called "verify"
+        // Thus we invert it again ...
+        return !res.toBoolean()
     }
     //endregion Analysis
 

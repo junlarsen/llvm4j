@@ -25,8 +25,18 @@ public class FunctionValue internal constructor() : Value() {
     }
 
     //region Analysis
+    /**
+     * Verify that the function structure is valid
+     *
+     * As opposed to the LLVM implementation, this returns true if the function
+     * is valid.
+     */
     public fun verify(action: VerifierFailureAction): Boolean {
-        return LLVM.LLVMVerifyFunction(ref, action.value).toBoolean()
+        // LLVM Source says:
+        // > Note that this function's return value is inverted from what you would
+        // > expect of a function called "verify".
+        // Thus we invert it again ...
+        return !LLVM.LLVMVerifyFunction(ref, action.value).toBoolean()
     }
 
     /**
