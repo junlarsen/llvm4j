@@ -88,7 +88,7 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     public fun toFile(path: String) {
-        val res = LLVM.LLVMWriteBitcodeToFile(ref, path)
+        LLVM.LLVMWriteBitcodeToFile(ref, path)
     }
 
     public fun toFile(file: File) {

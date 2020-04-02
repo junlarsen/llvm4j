@@ -2,9 +2,13 @@ package dev.supergrecko.kllvm.core.typedefs
 
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
+import org.bytedeco.javacpp.BytePointer
+import org.bytedeco.javacpp.Pointer
+import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
+import java.io.File
 
 public class MemoryBuffer internal constructor() :
     AutoCloseable, Validatable, Disposable {
@@ -14,6 +18,31 @@ public class MemoryBuffer internal constructor() :
     public constructor(buffer: LLVMMemoryBufferRef) : this() {
         ref = buffer
     }
+
+    //region MemoryBuffers
+    public constructor(file: File) : this() {
+        require(file.exists()) { "File does not exist" }
+
+        val buf = LLVMMemoryBufferRef()
+        val ptr = PointerPointer<LLVMMemoryBufferRef>(buf)
+
+        // TODO: Solve segfault
+        LLVM.LLVMCreateMemoryBufferWithContentsOfFile(file.absolutePath, ptr, BytePointer())
+
+        val x = 100
+        ref = ptr.get(LLVMMemoryBufferRef::class.java, 0)
+    }
+
+    public fun getStart(): Char {
+        val s = LLVM.LLVMGetBufferStart(ref)
+
+        return s.get(0).toChar()
+    }
+
+    public fun getSize(): Long {
+        return LLVM.LLVMGetBufferSize(ref)
+    }
+    //endregion MemoryBuffers
 
     //region BitReader
     public fun parse(context: Context = Context.getGlobalContext()): Module {
