@@ -8,6 +8,7 @@ import dev.supergrecko.kllvm.core.values.GlobalValue
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
+import java.io.File
 
 public class Module internal constructor() : AutoCloseable,
     Validatable, Disposable {
@@ -78,6 +79,22 @@ public class Module internal constructor() : AutoCloseable,
         return GlobalValue(LLVM.LLVMAddGlobal(ref, type.ref, name))
     }
     //endregion Core::Modules
+
+    //region BitWriter
+    public fun toMemoryBuffer(): MemoryBuffer {
+        val buf = LLVM.LLVMWriteBitcodeToMemoryBuffer(ref)
+
+        return MemoryBuffer(buf)
+    }
+
+    public fun toFile(path: String) {
+        val res = LLVM.LLVMWriteBitcodeToFile(ref, path)
+    }
+
+    public fun toFile(file: File) {
+        LLVM.LLVMWriteBitcodeToFile(ref, file.absolutePath)
+    }
+    //endregion BitWriter
 
     public override fun dispose() {
         require(valid) { "This module has already been disposed." }
