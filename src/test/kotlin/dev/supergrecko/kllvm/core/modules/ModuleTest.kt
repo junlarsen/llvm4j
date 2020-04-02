@@ -1,12 +1,15 @@
 package dev.supergrecko.kllvm.core.modules
 
+import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Module
 import dev.supergrecko.kllvm.core.types.FunctionType
 import dev.supergrecko.kllvm.core.types.VoidType
 import org.junit.jupiter.api.Test
+import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class ModuleTest {
     @Test
@@ -15,6 +18,8 @@ class ModuleTest {
         mod.setModuleIdentifier("test")
 
         assertEquals("test", mod.getModuleIdentifier())
+
+        mod.dispose()
     }
 
     @Test
@@ -25,6 +30,8 @@ class ModuleTest {
         val clone = mod.clone()
 
         assertEquals(mod.getModuleIdentifier(), clone.getModuleIdentifier())
+
+        mod.dispose()
     }
 
     @Test
@@ -36,12 +43,16 @@ class ModuleTest {
         mod.setSourceFileName("test2.ll")
 
         assertEquals("test2.ll", mod.getSourceFileName())
+
+        mod.dispose()
     }
 
     @Test
     fun `test getFunction returns null when no function added`() {
         val module = Module("test.ll")
         assertNull(module.getFunction("test"))
+
+        module.dispose()
     }
 
     @Test
@@ -49,5 +60,49 @@ class ModuleTest {
         val module = Module("test.ll")
         module.addFunction("test", FunctionType(VoidType(), listOf(), false))
         assertNotNull(module.getFunction("test"))
+
+        module.dispose()
+    }
+
+    @Test
+    fun `writing to file works`() {
+        val file = File("./out.bc")
+        val module = Module("test.ll")
+
+        module.toFile(file)
+
+        assertTrue {
+            file.exists()
+        }
+
+        file.delete()
+        module.dispose()
+    }
+
+    @Test
+    fun `writing to buffer works`() {
+        val context = Context()
+        val module = Module("test.ll", context)
+
+        val buf = module.toMemoryBuffer()
+
+        val mod = buf.parse(context)
+
+        assertEquals("test.ll", mod.getSourceFileName())
+
+        module.dispose()
+        context.dispose()
+    }
+
+    @Test
+    fun `getting module from buffer works`() {
+        val context = Context()
+        val module = Module("test.ll", context)
+
+        val buf = module.toMemoryBuffer()
+
+        val mod = buf.getModule(context)
+
+        assertEquals("test.ll", mod.getSourceFileName())
     }
 }
