@@ -42,6 +42,22 @@ public class IntValue internal constructor() : Value() {
         )
     }
 
+    //region Core::Values::Constants::ScalarConstants
+    /**
+     * @see LLVM.LLVMConstIntGetZExtValue
+     */
+    public fun getUnsignedValue(): Long {
+        return LLVM.LLVMConstIntGetZExtValue(ref)
+    }
+
+    /**
+     * @see LLVM.LLVMConstIntGetSExtValue
+     */
+    public fun getSignedValue(): Long {
+        return LLVM.LLVMConstIntGetSExtValue(ref)
+    }
+    //endregion  Core::Values::Constants::ScalarConstants
+
     //region Core::Values::Constants::ConstantExpressions
     /**
      * Negate the constant value
