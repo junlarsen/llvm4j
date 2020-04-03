@@ -31,6 +31,12 @@ public class FloatValue internal constructor() : Value() {
     //endregion Core::Values::Constants::ScalarConstants
 
     //region Core::Values::Constants::ConstantExpressions
+    /**
+     * Negate this float
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     */
     public fun neg(): FloatValue {
         require(isConstant())
 
@@ -39,6 +45,12 @@ public class FloatValue internal constructor() : Value() {
         return FloatValue(ref)
     }
 
+    /**
+     * Add another float to this float
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     */
     public fun add(v: FloatValue): FloatValue {
         require(isConstant())
 
@@ -47,6 +59,12 @@ public class FloatValue internal constructor() : Value() {
         return FloatValue(ref)
     }
 
+    /**
+     * Subtract another float from this float
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     */
     public fun sub(v: FloatValue): FloatValue {
         require(isConstant())
 
@@ -55,6 +73,12 @@ public class FloatValue internal constructor() : Value() {
         return FloatValue(ref)
     }
 
+    /**
+     * Multiply this float with another float
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     */
     public fun mul(v: FloatValue): FloatValue {
         require(isConstant())
 

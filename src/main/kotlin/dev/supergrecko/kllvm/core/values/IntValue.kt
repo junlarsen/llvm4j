@@ -12,6 +12,11 @@ public class IntValue internal constructor() : Value() {
     }
 
     /**
+     * Create a new integer value of type [type]
+     *
+     * This creates a new integer from [type] with [value]. You can decide if
+     * this is signed with [signExtend].
+     *
      * @see [LLVM.LLVMConstInt]
      */
     public constructor(
@@ -23,7 +28,11 @@ public class IntValue internal constructor() : Value() {
     }
 
     /**
-     * @see [LLVM.LLVMConstIntOfArbitraryPrecision]
+     * Create a constant integer of arbitrary precision
+     *
+     * TODO: Find out [words] actually is ... and how to properly use this
+     *
+     * @see LLVM.LLVMConstIntOfArbitraryPrecision
      */
     public constructor(type: IntType, words: List<Long>) : this() {
         ref = LLVM.LLVMConstIntOfArbitraryPrecision(
@@ -35,9 +44,20 @@ public class IntValue internal constructor() : Value() {
 
     //region Core::Values::Constants::ConstantExpressions
     /**
-     * Negate the value
+     * Negate the constant value
      *
-     * @see [LLVM.LLVMConstNeg]
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     *
+     * LLVM doesn't actually have a neg instruction, but it's implemented using
+     * subtraction. It subtracts the value of max value of the type of the value
+     *
+     * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
+     * respectively. If [hasNUW] [hasNSW] are present, the result
+     * value of the add is a poison value if unsigned and/or signed overflow,
+     * respectively, occurs.
+     *
+     * @see LLVM.LLVMConstNeg
      */
     public fun neg(hasNUW: Boolean = false, hasNSW: Boolean = false): IntValue {
         require(isConstant())
@@ -53,7 +73,15 @@ public class IntValue internal constructor() : Value() {
     }
 
     /**
-     * @see [LLVM.LLVMConstNot]
+     * Invert the integer value using XOR
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     *
+     * This in short performs the same action as [neg] but instead of using
+     * subtraction it uses a bitwise XOR where B is always true.
+     *
+     * @see LLVM.LLVMConstNot
      */
     public fun not(): IntValue {
         require(isConstant())
@@ -63,6 +91,22 @@ public class IntValue internal constructor() : Value() {
         return IntValue(ref)
     }
 
+    /**
+     * Add another value to this integer
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     *
+     * If the sum has unsigned overflow, the result returned is the
+     * mathematical result modulo 2n, where n is the bit width of the result.
+     *
+     * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
+     * respectively. If [hasNUW] [hasNSW] are present, the result
+     * value of the add is a poison value if unsigned and/or signed overflow,
+     * respectively, occurs.
+     *
+     * @see LLVM.LLVMConstAdd
+     */
     public fun add(
         v: IntValue,
         hasNUW: Boolean = false,
@@ -80,6 +124,20 @@ public class IntValue internal constructor() : Value() {
         return IntValue(ref)
     }
 
+    /**
+     * Subtract another value from this integer
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     *
+     * If the sum has unsigned overflow, the result returned is the
+     * mathematical result modulo 2n, where n is the bit width of the result.
+     *
+     * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
+     * respectively. If [hasNUW] [hasNSW] are present, the result
+     * value of the add is a poison value if unsigned and/or signed overflow,
+     * respectively, occurs.
+     */
     public fun sub(
         v: IntValue,
         hasNUW: Boolean = false,
@@ -97,6 +155,20 @@ public class IntValue internal constructor() : Value() {
         return IntValue(ref)
     }
 
+    /**
+     * Multiply another value with this integer
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     *
+     * If the sum has unsigned overflow, the result returned is the
+     * mathematical result modulo 2n, where n is the bit width of the result.
+     *
+     * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
+     * respectively. If [hasNUW] [hasNSW] are present, the result
+     * value of the add is a poison value if unsigned and/or signed overflow,
+     * respectively, occurs.
+     */
     public fun mul(
         v: IntValue,
         hasNUW: Boolean = false,

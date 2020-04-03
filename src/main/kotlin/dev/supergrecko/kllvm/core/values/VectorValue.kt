@@ -35,11 +35,17 @@ public class VectorValue internal constructor() : Value() {
 
     //region Core::Values::Constants::ConstantExpressions
     /**
-     * Negate all the values in the vector
+     * Negate the constant value
      *
-     * This operation is only valid on Vectors of Integers. Use FNeg for floats
+     * LLVM doesn't actually have a neg instruction, but it's implemented using
+     * subtraction. It subtracts the value of max value of the type of the value
      *
-     * @see [LLVM.LLVMConstNeg]
+     * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
+     * respectively. If [hasNUW] [hasNSW] are present, the result
+     * value of the add is a poison value if unsigned and/or signed overflow,
+     * respectively, occurs.
+     *
+     * @see LLVM.LLVMConstNeg
      */
     public fun neg(
         hasNUW: Boolean = false,
@@ -58,6 +64,14 @@ public class VectorValue internal constructor() : Value() {
         return VectorValue(ref)
     }
 
+    /**
+     * Invert each integer value using XOR
+     *
+     * This in short performs the same action as [neg] but instead of using
+     * subtraction it uses a bitwise XOR where B is always true.
+     *
+     * @see LLVM.LLVMConstNot
+     */
     public fun not(): VectorValue {
         require(isConstant())
         require(getType().getTypeKind() == TypeKind.Integer)
@@ -67,6 +81,19 @@ public class VectorValue internal constructor() : Value() {
         return VectorValue(ref)
     }
 
+    /**
+     * Add another value to this vector of integers
+     *
+     * If the sum has unsigned overflow, the result returned is the
+     * mathematical result modulo 2n, where n is the bit width of the result.
+     *
+     * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
+     * respectively. If [hasNUW] [hasNSW] are present, the result
+     * value of the add is a poison value if unsigned and/or signed overflow,
+     * respectively, occurs.
+     *
+     * @see LLVM.LLVMConstAdd
+     */
     public fun add(
         v: IntValue,
         hasNUW: Boolean = false,
@@ -85,6 +112,17 @@ public class VectorValue internal constructor() : Value() {
         return VectorValue(ref)
     }
 
+    /**
+     * Subtract another value from this vector of integers
+     *
+     * If the sum has unsigned overflow, the result returned is the
+     * mathematical result modulo 2n, where n is the bit width of the result.
+     *
+     * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
+     * respectively. If [hasNUW] [hasNSW] are present, the result
+     * value of the add is a poison value if unsigned and/or signed overflow,
+     * respectively, occurs.
+     */
     public fun sub(
         v: IntValue,
         hasNUW: Boolean = false,
@@ -103,6 +141,17 @@ public class VectorValue internal constructor() : Value() {
         return VectorValue(ref)
     }
 
+    /**
+     * Multiply another value with this vector of integers
+     *
+     * If the sum has unsigned overflow, the result returned is the
+     * mathematical result modulo 2n, where n is the bit width of the result.
+     *
+     * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
+     * respectively. If [hasNUW] [hasNSW] are present, the result
+     * value of the add is a poison value if unsigned and/or signed overflow,
+     * respectively, occurs.
+     */
     public fun mul(
         v: IntValue,
         hasNUW: Boolean = false,
