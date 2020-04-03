@@ -29,4 +29,38 @@ public class FloatValue internal constructor() : Value() {
         return (double) to (ptr.get().toBoolean())
     }
     //endregion Core::Values::Constants::ScalarConstants
+
+    //region Core::Values::Constants::ConstantExpressions
+    public fun neg(): FloatValue {
+        require(isConstant())
+
+        val ref = LLVM.LLVMConstFNeg(ref)
+
+        return FloatValue(ref)
+    }
+
+    public fun add(v: FloatValue): FloatValue {
+        require(isConstant())
+
+        val ref = LLVM.LLVMConstFAdd(ref, v.ref)
+
+        return FloatValue(ref)
+    }
+
+    public fun sub(v: FloatValue): FloatValue {
+        require(isConstant())
+
+        val ref = LLVM.LLVMConstFSub(ref, v.ref)
+
+        return FloatValue(ref)
+    }
+
+    public fun mul(v: FloatValue): FloatValue {
+        require(isConstant())
+
+        val ref = LLVM.LLVMConstMul(ref, v.ref)
+
+        return FloatValue(ref)
+    }
+    //endregion Core::Values::Constants::ConstantExpressions
 }
