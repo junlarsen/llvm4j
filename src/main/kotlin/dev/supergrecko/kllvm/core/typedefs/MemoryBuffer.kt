@@ -3,6 +3,7 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
 import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
+import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
 public class MemoryBuffer internal constructor() :
@@ -13,6 +14,24 @@ public class MemoryBuffer internal constructor() :
     public constructor(buffer: LLVMMemoryBufferRef) : this() {
         ref = buffer
     }
+
+    //region BitReader
+    public fun parse(context: Context = Context.getGlobalContext()): Module {
+        val ptr = LLVMModuleRef()
+
+        LLVM.LLVMParseBitcodeInContext2(context.ref, ref, ptr)
+
+        return Module(ptr)
+    }
+
+    public fun getModule(context: Context = Context.getGlobalContext()): Module {
+        val ptr = LLVMModuleRef()
+
+        LLVM.LLVMGetBitcodeModuleInContext2(context.ref, ref, ptr)
+
+        return Module(ptr)
+    }
+    //endregion BitReader
 
     override fun dispose() {
         require(valid) { "This buffer has already been disposed." }
