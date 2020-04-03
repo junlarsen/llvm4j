@@ -183,6 +183,8 @@ public class VectorValue internal constructor() : Value() {
      *
      * If the [exact] arg is present, the result value of the sdiv is a poison
      * value if the result would be rounded.
+     *
+     * TODO: Find a way to determine if type is unsigned
      */
     public fun sdiv(
         v: VectorValue,
@@ -209,6 +211,8 @@ public class VectorValue internal constructor() : Value() {
      *
      * If the [exact] arg is present, the result value of the udiv is a poison
      * value if %op1 is not a multiple of %op2, eg "((a udiv exact b) mul b) == a".
+     *
+     * TODO: Find a way to determine if type is unsigned
      */
     public fun udiv(
         v: VectorValue,

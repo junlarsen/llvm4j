@@ -94,9 +94,6 @@ public class IntValue internal constructor() : Value() {
      * This value is not modified, but it returns a new value with the result of
      * the operation.
      *
-     * This in short performs the same action as [neg] but instead of using
-     * subtraction it uses a bitwise XOR where B is always true.
-     *
      * @see LLVM.LLVMConstNot
      */
     public fun not(): IntValue {
@@ -214,8 +211,9 @@ public class IntValue internal constructor() : Value() {
      * value if the result would be rounded.
      *
      * TODO: Find a way to return something more exact than Value
+     * TODO: Find a way to determine if type is unsigned
      */
-    public fun sdiv(v: IntValue, exact: Boolean): Value {
+    public fun sdiv(v: IntValue, exact: Boolean): IntValue {
         require(isConstant())
 
         val ref = if (exact) {
@@ -236,9 +234,9 @@ public class IntValue internal constructor() : Value() {
      * If the [exact] arg is present, the result value of the udiv is a poison
      * value if %op1 is not a multiple of %op2, eg "((a udiv exact b) mul b) == a".
      *
-     * TODO: Find a way to return something more exact than Value
+     * TODO: Find a way to determine if type is unsigned
      */
-    public fun udiv(v: IntValue, exact: Boolean): Value {
+    public fun udiv(v: IntValue, exact: Boolean): IntValue {
         require(isConstant())
 
         val ref = if (exact) {
@@ -247,7 +245,7 @@ public class IntValue internal constructor() : Value() {
             LLVM.LLVMConstUDiv(ref, v.ref)
         }
 
-        return Value(ref)
+        return IntValue(ref)
     }
     //endregion Core::Values::Constants::ConstantExpressions
 }
