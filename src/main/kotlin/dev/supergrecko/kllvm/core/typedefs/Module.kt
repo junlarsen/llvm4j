@@ -98,12 +98,15 @@ public class Module internal constructor() : AutoCloseable,
      * This function returns true if the module is valid as opposed to the
      * LLVM implementation which would return 0 if the module is valid.
      *
+     * This method is currently incapable of returning the value string for
+     * reasons mentioned below and in PR #67
+     *
      * TODO: Find a nice way to return the string which the LLVM method returns
      *   Because of this. When calling this with PrintMessage or ReturnStatus
      *   the underlying bytes in the ptr are really strange (see #67)
      */
     public fun verify(action: VerifierFailureAction): Boolean {
-        val ptr = BytePointer(ByteBuffer.allocate(100))
+        val ptr = BytePointer(ByteBuffer.allocate(0))
 
         val res = LLVM.LLVMVerifyModule(ref, action.value, ptr)
 
