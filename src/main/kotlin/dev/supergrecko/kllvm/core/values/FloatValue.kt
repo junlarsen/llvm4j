@@ -53,6 +53,7 @@ public class FloatValue internal constructor() : Value() {
      */
     public fun add(v: FloatValue): FloatValue {
         require(isConstant())
+        require(getType().getTypeKind() == v.getType().getTypeKind())
 
         val ref = LLVM.LLVMConstFAdd(ref, v.ref)
 
@@ -67,6 +68,7 @@ public class FloatValue internal constructor() : Value() {
      */
     public fun sub(v: FloatValue): FloatValue {
         require(isConstant())
+        require(getType().getTypeKind() == v.getType().getTypeKind())
 
         val ref = LLVM.LLVMConstFSub(ref, v.ref)
 
@@ -81,10 +83,25 @@ public class FloatValue internal constructor() : Value() {
      */
     public fun mul(v: FloatValue): FloatValue {
         require(isConstant())
+        require(getType().getTypeKind() == v.getType().getTypeKind())
 
         val ref = LLVM.LLVMConstMul(ref, v.ref)
 
         return FloatValue(ref)
+    }
+
+    /**
+     * Perform division with another float
+     *
+     * TODO: Find a way to return something more exact than Value
+     */
+    public fun div(v: FloatValue): Value {
+        require(isConstant())
+        require(getType().getTypeKind() == v.getType().getTypeKind())
+
+        val ref = LLVM.LLVMConstFDiv(ref, v.ref)
+
+        return Value(ref)
     }
     //endregion Core::Values::Constants::ConstantExpressions
 }

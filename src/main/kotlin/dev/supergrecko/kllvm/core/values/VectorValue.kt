@@ -101,6 +101,7 @@ public class VectorValue internal constructor() : Value() {
     ): VectorValue {
         require(isConstant() && v.isConstant())
         require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
         require(!(hasNSW && hasNSW)) { "Cannot add with both NSW and NUW" }
 
         val ref = when (true) {
@@ -130,6 +131,7 @@ public class VectorValue internal constructor() : Value() {
     ): VectorValue {
         require(isConstant() && v.isConstant())
         require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
         require(!(hasNSW && hasNSW)) { "Cannot sub with both NSW and NUW" }
 
         val ref = when (true) {
@@ -159,12 +161,67 @@ public class VectorValue internal constructor() : Value() {
     ): VectorValue {
         require(isConstant() && v.isConstant())
         require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
         require(!(hasNSW && hasNSW)) { "Cannot sub with both NSW and NUW" }
 
         val ref = when (true) {
             hasNSW -> LLVM.LLVMConstNSWMul(ref, v.ref)
             hasNUW -> LLVM.LLVMConstNUWMul(ref, v.ref)
             else -> LLVM.LLVMConstMul(ref, v.ref)
+        }
+
+        return VectorValue(ref)
+    }
+
+    /**
+     * Perform division with another signed integer vector
+     *
+     * Division by zero is undefined behavior. For vectors, if any element of
+     * the divisor is zero, the operation has undefined behavior. Overflow also
+     * leads to undefined behavior; this is a rare case, but can occur,
+     * for example, by doing a 32-bit division of -2147483648 by -1.
+     *
+     * If the [exact] arg is present, the result value of the sdiv is a poison
+     * value if the result would be rounded.
+     */
+    public fun sdiv(
+        v: VectorValue,
+        exact: Boolean
+    ): VectorValue {
+        require(isConstant() && v.isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = if (exact) {
+            LLVM.LLVMConstExactSDiv(ref, v.ref)
+        } else {
+            LLVM.LLVMConstSDiv(ref, v.ref)
+        }
+
+        return VectorValue(ref)
+    }
+
+    /**
+     * Perform division with another unsigned integer vector
+     *
+     * Division by zero is undefined behavior. For vectors, if any element of
+     * the divisor is zero, the operation has undefined behavior
+     *
+     * If the [exact] arg is present, the result value of the udiv is a poison
+     * value if %op1 is not a multiple of %op2, eg "((a udiv exact b) mul b) == a".
+     */
+    public fun udiv(
+        v: VectorValue,
+        exact: Boolean
+    ): VectorValue {
+        require(isConstant() && v.isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = if (exact) {
+            LLVM.LLVMConstExactUDiv(ref, v.ref)
+        } else {
+            LLVM.LLVMConstUDiv(ref, v.ref)
         }
 
         return VectorValue(ref)
