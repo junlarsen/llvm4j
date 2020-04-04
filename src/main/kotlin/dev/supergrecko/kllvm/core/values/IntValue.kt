@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.core.values
 
+import dev.supergrecko.kllvm.contracts.Unreachable
 import dev.supergrecko.kllvm.core.typedefs.Value
 import dev.supergrecko.kllvm.core.types.IntType
 import dev.supergrecko.kllvm.utils.toInt
@@ -200,49 +201,48 @@ public class IntValue internal constructor() : Value() {
     }
 
     /**
-     * Perform division with another signed integer
+     * Perform division with another integer
      *
      * Division by zero is undefined behavior. For vectors, if any element of
      * the divisor is zero, the operation has undefined behavior. Overflow also
      * leads to undefined behavior; this is a rare case, but can occur,
      * for example, by doing a 32-bit division of -2147483648 by -1.
      *
-     * If the [exact] arg is present, the result value of the sdiv is a poison
-     * value if the result would be rounded.
+     * If [unsigned] is present, UDiv/ExactUDiv will be used.
      *
-     * TODO: Find a way to return something more exact than Value
+     * If the [exact] arg is present, the result value of the sdiv/udiv is a
+     * poison value if the result would be rounded.
+     *
      * TODO: Find a way to determine if type is unsigned
      */
-    public fun sdiv(v: IntValue, exact: Boolean): IntValue {
+    public fun div(v: IntValue, exact: Boolean, unsigned: Boolean): IntValue {
         require(isConstant())
 
-        val ref = if (exact) {
-            LLVM.LLVMConstExactSDiv(ref, v.ref)
-        } else {
-            LLVM.LLVMConstSDiv(ref, v.ref)
+        val ref = when (true) {
+            unsigned && exact -> LLVM.LLVMConstExactUDiv(ref, v.ref)
+            !unsigned && exact -> LLVM.LLVMConstExactSDiv(ref, v.ref)
+            unsigned && !exact -> LLVM.LLVMConstUDiv(ref, v.ref)
+            !unsigned && !exact -> LLVM.LLVMConstSDiv(ref, v.ref)
+            else -> throw Unreachable()
         }
 
         return IntValue(ref)
     }
 
     /**
-     * Perform division with another unsigned integer
+     * Get the remainder from the unsigned division of this and another integer
      *
-     * Division by zero is undefined behavior. For vectors, if any element of
-     * the divisor is zero, the operation has undefined behavior
+     * Taking the remainder of a division by zero is undefined behavior.
      *
-     * If the [exact] arg is present, the result value of the udiv is a poison
-     * value if %op1 is not a multiple of %op2, eg "((a udiv exact b) mul b) == a".
-     *
-     * TODO: Find a way to determine if type is unsigned
+     * If [unsigned] is present, URem will be used
      */
-    public fun udiv(v: IntValue, exact: Boolean): IntValue {
+    public fun rem(v: IntValue, unsigned: Boolean): IntValue {
         require(isConstant())
 
-        val ref = if (exact) {
-            LLVM.LLVMConstExactUDiv(ref, v.ref)
+        val ref = if (unsigned) {
+            LLVM.LLVMConstURem(ref, v.ref)
         } else {
-            LLVM.LLVMConstUDiv(ref, v.ref)
+            LLVM.LLVMConstSRem(ref, v.ref)
         }
 
         return IntValue(ref)
