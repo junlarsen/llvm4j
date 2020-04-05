@@ -3,6 +3,7 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.contracts.Unreachable
 import dev.supergrecko.kllvm.core.enumerations.Opcode
 import dev.supergrecko.kllvm.core.enumerations.ThreadLocalMode
+import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.enumerations.ValueKind
 import dev.supergrecko.kllvm.core.types.*
 import dev.supergrecko.kllvm.core.values.*
@@ -185,6 +186,13 @@ public open class Value internal constructor() {
     //endregion Typecasting
     
     public fun getUnderlyingReference(): LLVMValueRef = ref
+
+    internal fun requireKind(kind: ValueKind) {
+        // TODO: Figure out how this would work with ValueKind
+        require(getValueKind() == kind) {
+            "TypeKind.${getValueKind()} is not a valid kind for ${this::class}. It is required to be $kind"
+        }
+    }
 
     public companion object {
         /**
