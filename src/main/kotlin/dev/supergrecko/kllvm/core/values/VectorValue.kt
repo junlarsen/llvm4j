@@ -1,8 +1,10 @@
 package dev.supergrecko.kllvm.core.values
 
 import dev.supergrecko.kllvm.annotations.Shared
+import dev.supergrecko.kllvm.core.enumerations.IntPredicate
 import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.typedefs.Value
+import dev.supergrecko.kllvm.core.types.IntType
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -227,6 +229,118 @@ public class VectorValue internal constructor() : Value() {
         } else {
             LLVM.LLVMConstUDiv(ref, v.ref)
         }
+
+        return VectorValue(ref)
+    }
+
+    public fun rem(v: VectorValue, unsigned: Boolean): VectorValue {
+        require(isConstant() && v.isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = if (unsigned) {
+            LLVM.LLVMConstURem(ref, v.ref)
+        } else {
+            LLVM.LLVMConstSRem(ref, v.ref)
+        }
+
+        return VectorValue(ref)
+    }
+
+
+    public fun and(v: VectorValue): VectorValue {
+        require(isConstant() && v.isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = LLVM.LLVMConstAnd(ref, v.ref)
+
+        return VectorValue(ref)
+    }
+
+    public fun or(v: VectorValue): VectorValue {
+        require(isConstant() && v.isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = LLVM.LLVMConstOr(ref, v.ref)
+
+        return VectorValue(ref)
+    }
+
+    public fun xor(v: VectorValue): VectorValue {
+        require(isConstant() && v.isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = LLVM.LLVMConstXor(ref, v.ref)
+
+        return VectorValue(ref)
+    }
+
+    public fun cmp(predicate: IntPredicate, v: VectorValue): VectorValue {
+        require(isConstant() && v.isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = LLVM.LLVMConstICmp(predicate.value, ref, v.ref)
+
+        return VectorValue(ref)
+    }
+
+    public fun shl(v: VectorValue): VectorValue {
+        require(isConstant() && v.isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = LLVM.LLVMConstShl(ref, v.ref)
+
+        return VectorValue(ref)
+    }
+
+    public fun lshr(v: VectorValue): VectorValue {
+        require(isConstant() && v.isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = LLVM.LLVMConstLShr(ref, v.ref)
+
+        return VectorValue(ref)
+    }
+
+    public fun ashr(v: VectorValue): VectorValue {
+        require(isConstant() && v.isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+        require(v.getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = LLVM.LLVMConstAShr(ref, v.ref)
+
+        return VectorValue(ref)
+    }
+
+    public fun trunc(type: IntType): VectorValue {
+        require(isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = LLVM.LLVMConstTrunc(ref, type.ref)
+
+        return VectorValue(ref)
+    }
+
+    public fun sext(type: IntType): VectorValue {
+        require(isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = LLVM.LLVMConstSExt(ref, type.ref)
+
+        return VectorValue(ref)
+    }
+
+    public fun zext(type: IntType): VectorValue {
+        require(isConstant())
+        require(getType().getTypeKind() == TypeKind.Integer)
+
+        val ref = LLVM.LLVMConstZExt(ref, type.ref)
 
         return VectorValue(ref)
     }

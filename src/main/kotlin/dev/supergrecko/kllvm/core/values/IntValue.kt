@@ -1,6 +1,7 @@
 package dev.supergrecko.kllvm.core.values
 
 import dev.supergrecko.kllvm.contracts.Unreachable
+import dev.supergrecko.kllvm.core.enumerations.IntPredicate
 import dev.supergrecko.kllvm.core.typedefs.Value
 import dev.supergrecko.kllvm.core.types.IntType
 import dev.supergrecko.kllvm.utils.toInt
@@ -237,13 +238,93 @@ public class IntValue internal constructor() : Value() {
      * If [unsigned] is present, URem will be used
      */
     public fun rem(v: IntValue, unsigned: Boolean): IntValue {
-        require(isConstant())
+        require(isConstant() && v.isConstant())
 
         val ref = if (unsigned) {
             LLVM.LLVMConstURem(ref, v.ref)
         } else {
             LLVM.LLVMConstSRem(ref, v.ref)
         }
+
+        return IntValue(ref)
+    }
+
+    public fun and(v: IntValue): IntValue {
+        require(isConstant() && v.isConstant())
+
+        val ref = LLVM.LLVMConstAnd(ref, v.ref)
+
+        return IntValue(ref)
+    }
+
+    public fun or(v: IntValue): IntValue {
+        require(isConstant() && v.isConstant())
+
+        val ref = LLVM.LLVMConstOr(ref, v.ref)
+
+        return IntValue(ref)
+    }
+
+    public fun xor(v: IntValue): IntValue {
+        require(isConstant() && v.isConstant())
+
+        val ref = LLVM.LLVMConstXor(ref, v.ref)
+
+        return IntValue(ref)
+    }
+
+    public fun cmp(predicate: IntPredicate, v: IntValue): IntValue {
+        require(isConstant() && v.isConstant())
+
+        val ref = LLVM.LLVMConstICmp(predicate.value, ref, v.ref)
+
+        return IntValue(ref)
+    }
+
+    public fun shl(v: IntValue): IntValue {
+        require(isConstant() && v.isConstant())
+
+        val ref = LLVM.LLVMConstShl(ref, v.ref)
+
+        return IntValue(ref)
+    }
+
+    public fun lshr(v: IntValue): IntValue {
+        require(isConstant() && v.isConstant())
+
+        val ref = LLVM.LLVMConstLShr(ref, v.ref)
+
+        return IntValue(ref)
+    }
+
+    public fun ashr(v: IntValue): IntValue {
+        require(isConstant() && v.isConstant())
+
+        val ref = LLVM.LLVMConstAShr(ref, v.ref)
+
+        return IntValue(ref)
+    }
+
+    public fun trunc(type: IntType): IntValue {
+        require(isConstant())
+
+        val ref = LLVM.LLVMConstTrunc(ref, type.ref)
+
+        return IntValue(ref)
+    }
+
+    public fun sext(type: IntType): IntValue {
+        require(isConstant())
+
+        val ref = LLVM.LLVMConstSExt(ref, type.ref)
+
+        return IntValue(ref)
+    }
+
+    public fun zext(type: IntType): IntValue {
+        require(isConstant())
+
+        val ref = LLVM.LLVMConstZExt(ref, type.ref)
 
         return IntValue(ref)
     }
