@@ -1,9 +1,12 @@
 package dev.supergrecko.kllvm.core.typedefs
 
 import dev.supergrecko.kllvm.contracts.Unreachable
+import dev.supergrecko.kllvm.core.enumerations.Opcode
 import dev.supergrecko.kllvm.core.enumerations.ThreadLocalMode
 import dev.supergrecko.kllvm.core.enumerations.ValueKind
+import dev.supergrecko.kllvm.core.types.IntType
 import dev.supergrecko.kllvm.core.types.PointerType
+import dev.supergrecko.kllvm.core.values.IntValue
 import dev.supergrecko.kllvm.core.values.PointerValue
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
@@ -152,6 +155,21 @@ public open class Value internal constructor() {
         return PointerValue(LLVM.LLVMConstPointerCast(ref, toType.ref))
     }
     //endregion Core::Values::Constants
+
+    //region Core::Values::Constants::ConstantExpressions
+    /**
+     * @see [LLVM.LLVMGetConstOpcode]
+     */
+    public fun getOpcode(): Opcode {
+        require(isConstant())
+
+        val int = LLVM.LLVMGetConstOpcode(ref)
+
+        return Opcode.values()
+            .firstOrNull { it.value == int }
+            ?: throw Unreachable()
+    }
+    //endregion Core::Values::Constants::ConstantExpressions
 
     public fun getUnderlyingReference(): LLVMValueRef = ref
 

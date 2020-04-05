@@ -3,6 +3,7 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.message.Message
 import dev.supergrecko.kllvm.core.types.*
+import dev.supergrecko.kllvm.core.values.IntValue
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
@@ -79,6 +80,26 @@ public open class Type internal constructor() {
         return Value(LLVM.LLVMConstPointerNull(ref))
     }
     //endregion Core::Values::Constants
+
+    //region Core::Values::Constants::ConstantExpressions
+    /**
+     * @see [LLVM.LLVMAlignOf]
+     */
+    public fun alignOf(): IntValue {
+        val ref = LLVM.LLVMAlignOf(ref)
+
+        return IntValue(ref)
+    }
+
+    /**
+     * @see [LLVM.LLVMSizeOf]
+     */
+    public fun sizeOf(): IntValue {
+        val ref = LLVM.LLVMSizeOf(ref)
+
+        return IntValue(ref)
+    }
+    //endregion Core::Values::Constants::ConstantExpressions
 
     //region Typecasting
     public fun toPointerType(addressSpace: Int = 0): PointerType =

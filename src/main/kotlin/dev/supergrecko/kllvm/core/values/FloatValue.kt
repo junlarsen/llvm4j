@@ -29,4 +29,79 @@ public class FloatValue internal constructor() : Value() {
         return (double) to (ptr.get().toBoolean())
     }
     //endregion Core::Values::Constants::ScalarConstants
+
+    //region Core::Values::Constants::ConstantExpressions
+    /**
+     * Negate this float
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     */
+    public fun neg(): FloatValue {
+        require(isConstant())
+
+        val ref = LLVM.LLVMConstFNeg(ref)
+
+        return FloatValue(ref)
+    }
+
+    /**
+     * Add another float to this float
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     */
+    public fun add(v: FloatValue): FloatValue {
+        require(isConstant())
+        require(getType().getTypeKind() == v.getType().getTypeKind())
+
+        val ref = LLVM.LLVMConstFAdd(ref, v.ref)
+
+        return FloatValue(ref)
+    }
+
+    /**
+     * Subtract another float from this float
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     */
+    public fun sub(v: FloatValue): FloatValue {
+        require(isConstant())
+        require(getType().getTypeKind() == v.getType().getTypeKind())
+
+        val ref = LLVM.LLVMConstFSub(ref, v.ref)
+
+        return FloatValue(ref)
+    }
+
+    /**
+     * Multiply this float with another float
+     *
+     * This value is not modified, but it returns a new value with the result of
+     * the operation.
+     */
+    public fun mul(v: FloatValue): FloatValue {
+        require(isConstant())
+        require(getType().getTypeKind() == v.getType().getTypeKind())
+
+        val ref = LLVM.LLVMConstMul(ref, v.ref)
+
+        return FloatValue(ref)
+    }
+
+    /**
+     * Perform division with another float
+     *
+     * TODO: Find a way to return something more exact than Value
+     */
+    public fun div(v: FloatValue): Value {
+        require(isConstant())
+        require(getType().getTypeKind() == v.getType().getTypeKind())
+
+        val ref = LLVM.LLVMConstFDiv(ref, v.ref)
+
+        return Value(ref)
+    }
+    //endregion Core::Values::Constants::ConstantExpressions
 }
