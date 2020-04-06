@@ -1,10 +1,9 @@
 package dev.supergrecko.kllvm.core.values
 
-import dev.supergrecko.kllvm.annotations.Shared
 import dev.supergrecko.kllvm.core.enumerations.IntPredicate
-import dev.supergrecko.kllvm.core.enumerations.TypeKind
+import dev.supergrecko.kllvm.types.TypeKind
 import dev.supergrecko.kllvm.core.typedefs.Value
-import dev.supergrecko.kllvm.core.types.IntType
+import dev.supergrecko.kllvm.types.IntType
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -27,8 +26,9 @@ public class VectorValue internal constructor() : Value() {
      * Get an element at specified [index] as a constant
      *
      * This is shared with [ArrayValue], [VectorValue], [StructValue]
+     *
+     * TODO: Move into contract
      */
-    @Shared
     public fun getElementAsConstant(index: Int): Value {
         val value = LLVM.LLVMGetElementAsConstant(ref, index)
 

@@ -3,7 +3,7 @@ package dev.supergrecko.kllvm.core.values
 import dev.supergrecko.kllvm.contracts.Unreachable
 import dev.supergrecko.kllvm.core.enumerations.IntPredicate
 import dev.supergrecko.kllvm.core.typedefs.Value
-import dev.supergrecko.kllvm.core.types.IntType
+import dev.supergrecko.kllvm.types.IntType
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM

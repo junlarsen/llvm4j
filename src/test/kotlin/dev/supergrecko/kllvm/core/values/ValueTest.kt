@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.core.values
 
 import dev.supergrecko.kllvm.core.enumerations.ValueKind
-import dev.supergrecko.kllvm.core.types.IntType
+import dev.supergrecko.kllvm.types.IntType
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

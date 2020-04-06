@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.core.values
 
 import dev.supergrecko.kllvm.core.typedefs.Value
-import dev.supergrecko.kllvm.core.types.FloatType
+import dev.supergrecko.kllvm.types.FloatType
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef

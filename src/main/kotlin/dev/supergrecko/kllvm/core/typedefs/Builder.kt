@@ -3,8 +3,7 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
 import dev.supergrecko.kllvm.core.values.InstructionValue
-import dev.supergrecko.kllvm.core.values.PointerValue
-import dev.supergrecko.kllvm.core.values.StructValue
+import dev.supergrecko.kllvm.types.Type
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef

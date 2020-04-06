@@ -1,9 +1,8 @@
 package dev.supergrecko.kllvm.core.values
 
-import dev.supergrecko.kllvm.annotations.Shared
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Value
-import dev.supergrecko.kllvm.core.types.StructType
+import dev.supergrecko.kllvm.types.StructType
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
@@ -47,8 +46,9 @@ public class StructValue internal constructor() : Value() {
      * Get an element at specified [index] as a constant
      *
      * This is shared with [ArrayValue], [VectorValue], [StructValue]
+     *
+     * TODO: Move into contract
      */
-    @Shared
     public fun getElementAsConstant(index: Int): Value {
         val value = LLVM.LLVMGetElementAsConstant(ref, index)
 

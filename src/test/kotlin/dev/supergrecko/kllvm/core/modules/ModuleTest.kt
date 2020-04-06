@@ -2,8 +2,8 @@ package dev.supergrecko.kllvm.core.modules
 
 import dev.supergrecko.kllvm.core.typedefs.Context
 import dev.supergrecko.kllvm.core.typedefs.Module
-import dev.supergrecko.kllvm.core.types.FunctionType
-import dev.supergrecko.kllvm.core.types.VoidType
+import dev.supergrecko.kllvm.types.FunctionType
+import dev.supergrecko.kllvm.types.VoidType
 import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertEquals
@@ -58,7 +58,13 @@ class ModuleTest {
     @Test
     fun `test getFunction returns function object when function added`() {
         val module = Module("test.ll")
-        module.addFunction("test", FunctionType(VoidType(), listOf(), false))
+        module.addFunction("test",
+            FunctionType(
+                VoidType(),
+                listOf(),
+                false
+            )
+        )
         assertNotNull(module.getFunction("test"))
 
         module.dispose()

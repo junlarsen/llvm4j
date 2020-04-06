@@ -1,4 +1,4 @@
-package dev.supergrecko.kllvm.core.enumerations
+package dev.supergrecko.kllvm.types
 
 import dev.supergrecko.kllvm.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM

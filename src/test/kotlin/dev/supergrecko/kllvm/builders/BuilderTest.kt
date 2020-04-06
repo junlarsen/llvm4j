@@ -3,12 +3,10 @@ package dev.supergrecko.kllvm.builders
 import dev.supergrecko.kllvm.core.typedefs.Builder
 import dev.supergrecko.kllvm.core.typedefs.Module
 import dev.supergrecko.kllvm.core.typedefs.Value
-import dev.supergrecko.kllvm.core.types.FunctionType
-import dev.supergrecko.kllvm.core.types.IntType
-import dev.supergrecko.kllvm.core.types.VoidType
-import dev.supergrecko.kllvm.core.values.FunctionValue
+import dev.supergrecko.kllvm.types.FunctionType
+import dev.supergrecko.kllvm.types.IntType
+import dev.supergrecko.kllvm.types.VoidType
 import dev.supergrecko.kllvm.core.values.IntValue
-import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -23,10 +21,12 @@ class BuilderTest {
         val module = Module("test.ll")
         val function = module.addFunction(
                 "test",
-                FunctionType(
-                        VoidType(),
-                        listOf(),
-                        false))
+            FunctionType(
+                VoidType(),
+                listOf(),
+                false
+            )
+        )
 
         val basicBlock = function.appendBasicBlock("entry")
         builder.positionAtEnd(basicBlock)
@@ -70,14 +70,24 @@ class BuilderTest {
         val boolType = IntType(1)
         module.addFunction(
             "test",
-            FunctionType(boolType, listOf(boolType, boolType), false))
+            FunctionType(
+                boolType,
+                listOf(boolType, boolType),
+                false
+            )
+        )
         val externFunc = module.getFunction("test")
         val builder = Builder()
         val _false = IntValue(boolType, 0, false)
         val _true = IntValue(boolType, 1, false)
         val caller = module.addFunction(
             "caller",
-            FunctionType(boolType, listOf(boolType, boolType), false))
+            FunctionType(
+                boolType,
+                listOf(boolType, boolType),
+                false
+            )
+        )
         val basicBlock = caller.appendBasicBlock("entry")
         builder.positionAtEnd(basicBlock)
 

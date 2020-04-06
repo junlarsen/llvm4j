@@ -1,7 +1,5 @@
-package dev.supergrecko.kllvm.core.types
+package dev.supergrecko.kllvm.types
 
-import dev.supergrecko.kllvm.core.enumerations.TypeKind
-import dev.supergrecko.kllvm.core.typedefs.Type
 import dev.supergrecko.kllvm.utils.iterateIntoType
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
@@ -22,10 +20,19 @@ public class FunctionType internal constructor() : Type() {
      * parameters of the types provided in [tys]. You can mark a function type as variadic by setting the [variadic] arg
      * to true.
      */
-    public constructor(returns: Type, types: List<Type>, variadic: Boolean) : this() {
+    public constructor(
+        returns: Type,
+        types: List<Type>,
+        variadic: Boolean
+    ) : this() {
         val arr = ArrayList(types.map { it.ref }).toTypedArray()
 
-        ref = LLVM.LLVMFunctionType(returns.ref, PointerPointer(*arr), arr.size, variadic.toInt())
+        ref = LLVM.LLVMFunctionType(
+            returns.ref,
+            PointerPointer(*arr),
+            arr.size,
+            variadic.toInt()
+        )
     }
 
     //region Core::Types::FunctionTypes

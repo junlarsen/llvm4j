@@ -3,9 +3,10 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.contracts.Disposable
 import dev.supergrecko.kllvm.contracts.Validatable
 import dev.supergrecko.kllvm.core.enumerations.VerifierFailureAction
-import dev.supergrecko.kllvm.core.types.FunctionType
+import dev.supergrecko.kllvm.types.FunctionType
 import dev.supergrecko.kllvm.core.values.FunctionValue
 import dev.supergrecko.kllvm.core.values.GlobalValue
+import dev.supergrecko.kllvm.types.Type
 import dev.supergrecko.kllvm.utils.toBoolean
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
@@ -92,7 +93,7 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     public fun toFile(path: String) {
-        val res = LLVM.LLVMWriteBitcodeToFile(ref, path)
+        LLVM.LLVMWriteBitcodeToFile(ref, path)
     }
 
     public fun toFile(file: File) {

@@ -1,7 +1,6 @@
-package dev.supergrecko.kllvm.core.types
+package dev.supergrecko.kllvm.types
 
 import dev.supergrecko.kllvm.core.typedefs.Context
-import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -56,7 +55,8 @@ class TypeTest {
 
     @Test
     fun `getting a type works properly`() {
-        val type = FloatType(TypeKind.Float)
+        val type =
+            FloatType(TypeKind.Float)
 
         assertEquals(TypeKind.Float, type.getTypeKind())
     }
@@ -84,8 +84,12 @@ class TypeTest {
 
     @Test
     fun `is sized works for struct`() {
-        val arg = FloatType(TypeKind.Float)
-        val type = StructType(listOf(arg), false)
+        val arg =
+            FloatType(TypeKind.Float)
+        val type = StructType(
+            listOf(arg),
+            false
+        )
 
         assertEquals(true, type.isSized())
     }
@@ -93,7 +97,8 @@ class TypeTest {
     @Test
     fun `retrieving context works`() {
         val ctx = Context()
-        val type = IntType(32, ctx)
+        val type =
+            IntType(32, ctx)
 
         val typeCtx = type.getContext()
 

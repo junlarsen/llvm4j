@@ -1,8 +1,7 @@
-package dev.supergrecko.kllvm.core.types
+package dev.supergrecko.kllvm.types
 
-import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.typedefs.Context
-import dev.supergrecko.kllvm.core.typedefs.Type
+import dev.supergrecko.kllvm.types.contracts.CompositeType
 import dev.supergrecko.kllvm.utils.iterateIntoType
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
@@ -10,7 +9,7 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class StructType internal constructor() : Type() {
+public class StructType internal constructor() : Type(), CompositeType {
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
         requireKind(TypeKind.Struct)
@@ -84,11 +83,11 @@ public class StructType internal constructor() : Type() {
         val dest = PointerPointer<LLVMTypeRef>(getElementCount().toLong())
         LLVM.LLVMGetStructElementTypes(ref, dest)
 
-        return dest.iterateIntoType { Type(it) }
-    }
-
-    public fun getElementCount(): Int {
-        return LLVM.LLVMCountStructElementTypes(ref)
+        return dest.iterateIntoType {
+            Type(
+                it
+            )
+        }
     }
     //endregion Core::Types::StructureTypes
 }
