@@ -121,6 +121,12 @@ public open class Type internal constructor() {
 
     public fun getUnderlyingReference(): LLVMTypeRef = ref
 
+    internal fun requireKind(kind: TypeKind) {
+        require(getTypeKind() == kind) {
+            "TypeKind.${getTypeKind()} is not a valid kind for ${this::class}. It is required to be $kind"
+        }
+    }
+
     companion object {
         @JvmStatic
         /**
@@ -137,11 +143,5 @@ public open class Type internal constructor() {
                 ?: throw IllegalArgumentException("Type $type has invalid type kind")
         }
 
-    }
-
-    internal fun requireKind(kind: TypeKind) {
-        require(getTypeKind() == kind) {
-            "TypeKind.${getTypeKind()} is not a valid kind for ${this::class}. It is required to be $kind"
-        }
     }
 }

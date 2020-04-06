@@ -3,11 +3,10 @@ package dev.supergrecko.kllvm.core.typedefs
 import dev.supergrecko.kllvm.contracts.Unreachable
 import dev.supergrecko.kllvm.core.enumerations.Opcode
 import dev.supergrecko.kllvm.core.enumerations.ThreadLocalMode
+import dev.supergrecko.kllvm.core.enumerations.TypeKind
 import dev.supergrecko.kllvm.core.enumerations.ValueKind
-import dev.supergrecko.kllvm.core.types.IntType
-import dev.supergrecko.kllvm.core.types.PointerType
-import dev.supergrecko.kllvm.core.values.IntValue
-import dev.supergrecko.kllvm.core.values.PointerValue
+import dev.supergrecko.kllvm.core.types.*
+import dev.supergrecko.kllvm.core.values.*
 import dev.supergrecko.kllvm.utils.toBoolean
 import dev.supergrecko.kllvm.utils.toInt
 import org.bytedeco.javacpp.SizeTPointer
@@ -171,7 +170,29 @@ public open class Value internal constructor() {
     }
     //endregion Core::Values::Constants::ConstantExpressions
 
+    //region Typecasting
+    public fun asArrayValue(): ArrayValue = ArrayValue(ref)
+    public fun asFloatValue(): FloatValue = FloatValue(ref)
+    public fun asFunctionValue(): FunctionValue = FunctionValue(ref)
+    public fun asGenericValue(): GenericValue = GenericValue(ref)
+    public fun asGlobalValue(): GlobalValue = GlobalValue(ref)
+    public fun asInstructionValue(): InstructionValue = InstructionValue(ref)
+    public fun asIntValue(): IntValue = IntValue(ref)
+    public fun asMetadataValue(): MetadataValue = MetadataValue(ref)
+    public fun asPhiValue(): PhiValue = PhiValue(ref)
+    public fun asPointerValue(): PointerValue = PointerValue(ref)
+    public fun asStructValue(): StructValue = StructValue(ref)
+    public fun asVectorValue(): VectorValue = VectorValue(ref)
+    //endregion Typecasting
+    
     public fun getUnderlyingReference(): LLVMValueRef = ref
+
+    internal fun requireKind(kind: ValueKind) {
+        // TODO: Figure out how this would work with ValueKind
+        require(getValueKind() == kind) {
+            "TypeKind.${getValueKind()} is not a valid kind for ${this::class}. It is required to be $kind"
+        }
+    }
 
     public companion object {
         /**
