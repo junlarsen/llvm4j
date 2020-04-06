@@ -11,6 +11,7 @@ import org.bytedeco.llvm.global.LLVM
 
 public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     public final override lateinit var ref: LLVMTypeRef
+        internal set
 
     public constructor(ty: LLVMTypeRef) : this() {
         ref = ty
