@@ -7,8 +7,13 @@ import kotlin.test.assertFailsWith
 class ArrayTypeTest {
     @Test
     fun `underlying type matches`() {
-        val type = IntType(32)
-        val arr = ArrayType(type, 10)
+        val type =
+            IntType(32)
+        val arr =
+            ArrayType(
+                type,
+                10
+            )
 
         assertEquals(10, arr.getElementCount())
         assertEquals(type.ref, arr.getElementType().ref)
@@ -16,8 +21,13 @@ class ArrayTypeTest {
 
     @Test
     fun `subtypes match`() {
-        val type = IntType(32)
-        val arr = ArrayType(type, 10)
+        val type =
+            IntType(32)
+        val arr =
+            ArrayType(
+                type,
+                10
+            )
 
         val children = arr.getSubtypes()
 
@@ -27,7 +37,8 @@ class ArrayTypeTest {
 
     @Test
     fun `negative size is illegal`() {
-        val type = IntType(32)
+        val type =
+            IntType(32)
 
         assertFailsWith<IllegalArgumentException> {
             type.toArrayType(-100)

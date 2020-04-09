@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.core.modules
 
-import dev.supergrecko.kllvm.core.typedefs.Context
-import dev.supergrecko.kllvm.core.typedefs.Module
+import dev.supergrecko.kllvm.llvm.typedefs.Context
+import dev.supergrecko.kllvm.llvm.typedefs.Module
 import dev.supergrecko.kllvm.types.FunctionType
 import dev.supergrecko.kllvm.types.VoidType
 import org.junit.jupiter.api.Test

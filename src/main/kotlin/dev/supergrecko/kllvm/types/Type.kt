@@ -1,11 +1,11 @@
 package dev.supergrecko.kllvm.types
 
-import dev.supergrecko.kllvm.contracts.ContainsReference
-import dev.supergrecko.kllvm.core.message.Message
-import dev.supergrecko.kllvm.core.typedefs.Context
-import dev.supergrecko.kllvm.core.typedefs.Value
-import dev.supergrecko.kllvm.core.values.IntValue
-import dev.supergrecko.kllvm.utils.toBoolean
+import dev.supergrecko.kllvm.internal.contracts.ContainsReference
+import dev.supergrecko.kllvm.llvm.Message
+import dev.supergrecko.kllvm.llvm.typedefs.Context
+import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.values.Value
+import dev.supergrecko.kllvm.values.constants.ConstantInt
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -93,28 +93,29 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     /**
      * @see [LLVM.LLVMAlignOf]
      */
-    public fun alignOf(): IntValue {
+    public fun alignOf(): ConstantInt {
         val ref = LLVM.LLVMAlignOf(ref)
 
-        return IntValue(ref)
+        return ConstantInt(
+            ref
+        )
     }
 
     /**
      * @see [LLVM.LLVMSizeOf]
      */
-    public fun sizeOf(): IntValue {
+    public fun sizeOf(): ConstantInt {
         val ref = LLVM.LLVMSizeOf(ref)
 
-        return IntValue(ref)
+        return ConstantInt(
+            ref
+        )
     }
     //endregion Core::Values::Constants::ConstantExpressions
 
     //region Typecasting
     public fun toPointerType(addressSpace: Int = 0): PointerType =
-        PointerType(
-            this,
-            addressSpace
-        )
+        PointerType(this, addressSpace)
 
     public fun toArrayType(size: Int): ArrayType =
         ArrayType(this, size)
@@ -156,12 +157,12 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     }
 
     companion object {
-        @JvmStatic
         /**
          * @see [LLVM.LLVMGetTypeKind]
          *
          * @throws IllegalArgumentException If the type kind enum returns an invalid value
          */
+        @JvmStatic
         public fun getTypeKind(type: LLVMTypeRef): TypeKind {
             val kind = LLVM.LLVMGetTypeKind(type)
 

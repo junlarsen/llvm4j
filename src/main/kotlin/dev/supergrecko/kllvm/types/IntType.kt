@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.types
 
-import dev.supergrecko.kllvm.core.typedefs.Context
-import dev.supergrecko.kllvm.core.values.IntValue
+import dev.supergrecko.kllvm.llvm.typedefs.Context
+import dev.supergrecko.kllvm.values.constants.ConstantInt
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -40,8 +40,10 @@ public class IntType internal constructor() : Type() {
     //endregion Core::Types::Int
 
     //region Core::Values::Constants
-    public fun getConstantAllOnes(): IntValue {
-        return IntValue(LLVM.LLVMConstAllOnes(ref))
+    public fun getConstantAllOnes(): ConstantInt {
+        val v = LLVM.LLVMConstAllOnes(ref)
+
+        return ConstantInt(v)
     }
     //endregion Core::Values::Constants
 }

@@ -1,8 +1,8 @@
 package dev.supergrecko.kllvm.types
 
-import dev.supergrecko.kllvm.utils.iterateIntoType
-import dev.supergrecko.kllvm.utils.toBoolean
-import dev.supergrecko.kllvm.utils.toInt
+import dev.supergrecko.kllvm.internal.util.iterateIntoType
+import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.internal.util.toInt
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
@@ -54,7 +54,11 @@ public class FunctionType internal constructor() : Type() {
         val dest = PointerPointer<LLVMTypeRef>(getParameterCount().toLong())
         LLVM.LLVMGetParamTypes(ref, dest)
 
-        return dest.iterateIntoType { Type(it) }
+        return dest.iterateIntoType {
+            Type(
+                it
+            )
+        }
     }
     //endregion Core::Types::FunctionTypes
 }

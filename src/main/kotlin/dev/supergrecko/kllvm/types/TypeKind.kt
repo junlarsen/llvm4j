@@ -1,6 +1,6 @@
 package dev.supergrecko.kllvm.types
 
-import dev.supergrecko.kllvm.contracts.OrderedEnum
+import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
 /**

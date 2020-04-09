@@ -7,9 +7,13 @@ import kotlin.test.assertFailsWith
 class VectorTypeTest {
     @Test
     fun `underlying type matches`() {
-        val type = IntType(32)
+        val type =
+            IntType(32)
         val vec =
-            VectorType(type, 10)
+            VectorType(
+                type,
+                10
+            )
 
         assertEquals(10, vec.getElementCount())
         assertEquals(type.ref, vec.getElementType().ref)
@@ -17,9 +21,13 @@ class VectorTypeTest {
 
     @Test
     fun `subtypes match`() {
-        val type = IntType(32)
+        val type =
+            IntType(32)
         val vec =
-            VectorType(type, 10)
+            VectorType(
+                type,
+                10
+            )
 
         assertEquals(10, vec.getSubtypes().size)
         assertEquals(type.ref, vec.getSubtypes().first().ref)
@@ -28,7 +36,9 @@ class VectorTypeTest {
     @Test
     fun `negative size is illegal`() {
         val type =
-            FloatType(TypeKind.Float)
+            FloatType(
+                TypeKind.Float
+            )
 
         assertFailsWith<IllegalArgumentException> {
             type.toVectorType(-100)

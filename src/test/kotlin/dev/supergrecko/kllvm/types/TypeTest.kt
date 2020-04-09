@@ -1,6 +1,6 @@
 package dev.supergrecko.kllvm.types
 
-import dev.supergrecko.kllvm.core.typedefs.Context
+import dev.supergrecko.kllvm.llvm.typedefs.Context
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -8,7 +8,8 @@ import kotlin.test.assertFailsWith
 class TypeTest {
     @Test
     fun `test creation of pointer type`() {
-        val type = IntType(64)
+        val type =
+            IntType(64)
         val ptr = type.toPointerType()
 
         assertEquals(TypeKind.Pointer, ptr.getTypeKind())
@@ -16,7 +17,8 @@ class TypeTest {
 
     @Test
     fun `test creation of array type`() {
-        val type = IntType(64)
+        val type =
+            IntType(64)
         val arr = type.toArrayType(10)
 
         assertEquals(TypeKind.Array, arr.getTypeKind())
@@ -25,7 +27,8 @@ class TypeTest {
 
     @Test
     fun `test creation of vector type`() {
-        val type = IntType(32)
+        val type =
+            IntType(32)
         val vec = type.toVectorType(1000)
 
         assertEquals(TypeKind.Vector, vec.getTypeKind())
@@ -34,7 +37,8 @@ class TypeTest {
 
     @Test
     fun `casting into other type works when expected to`() {
-        val type = IntType(32)
+        val type =
+            IntType(32)
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
 
@@ -44,7 +48,8 @@ class TypeTest {
     @Test
     fun `casting should fail when the underlying type is different`() {
         // it is impossible to guarantee that the underlying types is valid or invalid
-        val type = IntType(32)
+        val type =
+            IntType(32)
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
 
@@ -56,7 +61,9 @@ class TypeTest {
     @Test
     fun `getting a type works properly`() {
         val type =
-            FloatType(TypeKind.Float)
+            FloatType(
+                TypeKind.Float
+            )
 
         assertEquals(TypeKind.Float, type.getTypeKind())
     }
@@ -71,13 +78,16 @@ class TypeTest {
     @Test
     fun `too huge size is illegal`() {
         assertFailsWith<IllegalArgumentException> {
-            IntType(1238234672)
+            IntType(
+                1238234672
+            )
         }
     }
 
     @Test
     fun `is sized works for integer`() {
-        val type = IntType(192)
+        val type =
+            IntType(192)
 
         assertEquals(true, type.isSized())
     }
@@ -85,11 +95,14 @@ class TypeTest {
     @Test
     fun `is sized works for struct`() {
         val arg =
-            FloatType(TypeKind.Float)
-        val type = StructType(
-            listOf(arg),
-            false
-        )
+            FloatType(
+                TypeKind.Float
+            )
+        val type =
+            StructType(
+                listOf(arg),
+                false
+            )
 
         assertEquals(true, type.isSized())
     }
@@ -98,7 +111,10 @@ class TypeTest {
     fun `retrieving context works`() {
         val ctx = Context()
         val type =
-            IntType(32, ctx)
+            IntType(
+                32,
+                ctx
+            )
 
         val typeCtx = type.getContext()
 
@@ -107,7 +123,8 @@ class TypeTest {
 
     @Test
     fun `getting a name representation works`() {
-        val type = IntType(32)
+        val type =
+            IntType(32)
 
         val msg = type.getStringRepresentation()
 

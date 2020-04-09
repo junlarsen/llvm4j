@@ -1,11 +1,10 @@
 package dev.supergrecko.kllvm.types
 
-import dev.supergrecko.kllvm.types.contracts.CompositeType
-import dev.supergrecko.kllvm.types.contracts.SequentialType
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class VectorType internal constructor() : Type(), CompositeType,
+public class VectorType internal constructor() : Type(),
+    CompositeType,
     SequentialType {
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType

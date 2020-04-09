@@ -1,15 +1,15 @@
 package dev.supergrecko.kllvm.types
 
-import dev.supergrecko.kllvm.core.typedefs.Context
-import dev.supergrecko.kllvm.types.contracts.CompositeType
-import dev.supergrecko.kllvm.utils.iterateIntoType
-import dev.supergrecko.kllvm.utils.toBoolean
-import dev.supergrecko.kllvm.utils.toInt
+import dev.supergrecko.kllvm.llvm.typedefs.Context
+import dev.supergrecko.kllvm.internal.util.iterateIntoType
+import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.internal.util.toInt
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class StructType internal constructor() : Type(), CompositeType {
+public class StructType internal constructor() : Type(),
+    CompositeType {
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
         requireKind(TypeKind.Struct)

@@ -1,6 +1,6 @@
 package dev.supergrecko.kllvm.types
 
-import dev.supergrecko.kllvm.core.typedefs.Context
+import dev.supergrecko.kllvm.llvm.typedefs.Context
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 

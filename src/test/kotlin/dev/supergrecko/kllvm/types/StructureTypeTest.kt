@@ -11,10 +11,11 @@ class StructureTypeTest {
                 32
             )
         )
-        val struct = StructType(
-            elements,
-            false
-        )
+        val struct =
+            StructType(
+                elements,
+                false
+            )
 
         assertEquals(false, struct.isPacked())
         assertEquals(1, struct.getElementCount())
