@@ -1,6 +1,6 @@
 package dev.supergrecko.kllvm.passregistry
 
-import dev.supergrecko.kllvm.core.typedefs.PassRegistry
+import dev.supergrecko.kllvm.llvm.typedefs.PassRegistry
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

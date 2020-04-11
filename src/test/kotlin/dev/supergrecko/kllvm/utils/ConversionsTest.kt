@@ -1,5 +1,7 @@
 package dev.supergrecko.kllvm.utils
 
+import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.internal.util.toInt
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
