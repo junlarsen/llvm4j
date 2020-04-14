@@ -1,8 +1,8 @@
 package dev.supergrecko.kllvm.support
 
 import dev.supergrecko.kllvm.internal.contracts.Disposable
-import org.bytedeco.llvm.global.LLVM
 import java.nio.ByteBuffer
+import org.bytedeco.llvm.global.LLVM
 
 /**
  * A glorified char*

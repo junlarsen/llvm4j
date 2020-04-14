@@ -131,7 +131,6 @@ public enum class UnnamedAddr(public override val value: Int) : OrderedEnum<Int>
     Global(LLVM.LLVMGlobalUnnamedAddr)
 }
 
-
 /**
  * These flags are used for metadata about modules.
  *
