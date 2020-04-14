@@ -5,7 +5,7 @@ import dev.supergrecko.kllvm.internal.util.toInt
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.Constant
-import dev.supergrecko.kllvm.llvm.enumerations.IntPredicate
+import dev.supergrecko.kllvm.ir.instructions.IntPredicate
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 

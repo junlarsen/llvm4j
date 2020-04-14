@@ -1,4 +1,4 @@
-package dev.supergrecko.kllvm.llvm.typedefs
+package dev.supergrecko.kllvm.ir
 
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 

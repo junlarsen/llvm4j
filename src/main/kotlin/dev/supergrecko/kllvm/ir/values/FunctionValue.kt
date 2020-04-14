@@ -2,8 +2,8 @@ package dev.supergrecko.kllvm.ir.values
 
 import dev.supergrecko.kllvm.internal.util.toBoolean
 import dev.supergrecko.kllvm.ir.Value
-import dev.supergrecko.kllvm.llvm.enumerations.VerifierFailureAction
-import dev.supergrecko.kllvm.llvm.typedefs.BasicBlock
+import dev.supergrecko.kllvm.support.VerifierFailureAction
+import dev.supergrecko.kllvm.ir.BasicBlock
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -53,7 +53,7 @@ public class FunctionValue internal constructor() : Value() {
      * From the LLVM Source:
      *
      * This function is meant for use from the debugger. You can just say
-     * 'call F->viewCFG()' and a ghostview window should pop up from the
+     * 'call F->viewCFG()' and a ghost view window should pop up from the
      * program, displaying the CFG of the current function. This depends on
      * there being a 'dot' and 'gv' program in your path.
      *

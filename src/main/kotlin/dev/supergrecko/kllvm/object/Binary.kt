@@ -1,4 +1,4 @@
-package dev.supergrecko.kllvm.llvm.typedefs
+package dev.supergrecko.kllvm.`object`
 
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable

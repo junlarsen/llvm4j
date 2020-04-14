@@ -13,7 +13,6 @@ import dev.supergrecko.kllvm.ir.types.StructType
 import dev.supergrecko.kllvm.ir.types.VectorType
 import dev.supergrecko.kllvm.ir.types.VoidType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
-import dev.supergrecko.kllvm.llvm.typedefs.Context
 import dev.supergrecko.kllvm.support.Message
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM

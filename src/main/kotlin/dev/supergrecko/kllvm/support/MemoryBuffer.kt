@@ -1,7 +1,9 @@
-package dev.supergrecko.kllvm.llvm.typedefs
+package dev.supergrecko.kllvm.support
 
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
+import dev.supergrecko.kllvm.ir.Module
+import dev.supergrecko.kllvm.ir.Context
 import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
@@ -11,6 +13,9 @@ public class MemoryBuffer internal constructor() :
     internal lateinit var ref: LLVMMemoryBufferRef
     public override var valid: Boolean = true
 
+    /**
+     * Construct a new Type from an LLVM pointer reference
+     */
     public constructor(buffer: LLVMMemoryBufferRef) : this() {
         ref = buffer
     }

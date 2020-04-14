@@ -1,4 +1,4 @@
-package dev.supergrecko.kllvm.ir.values.instructions
+package dev.supergrecko.kllvm.ir.instructions
 
 import dev.supergrecko.kllvm.ir.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef

@@ -2,8 +2,8 @@ package dev.supergrecko.kllvm.core.modules
 
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.types.VoidType
-import dev.supergrecko.kllvm.llvm.typedefs.Context
-import dev.supergrecko.kllvm.llvm.typedefs.Module
+import dev.supergrecko.kllvm.ir.Context
+import dev.supergrecko.kllvm.ir.Module
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -49,7 +49,8 @@ class ModuleTest {
 
     @Test
     fun `test getFunction returns null when no function added`() {
-        val module = Module("test.ll")
+        val module =
+            Module("test.ll")
         assertNull(module.getFunction("test"))
 
         module.dispose()
@@ -57,7 +58,8 @@ class ModuleTest {
 
     @Test
     fun `test getFunction returns function object when function added`() {
-        val module = Module("test.ll")
+        val module =
+            Module("test.ll")
         module.addFunction("test",
             FunctionType(
                 VoidType(),
@@ -73,7 +75,8 @@ class ModuleTest {
     @Test
     fun `writing to file works`() {
         val file = File("./out.bc")
-        val module = Module("test.ll")
+        val module =
+            Module("test.ll")
 
         module.toFile(file)
 
@@ -88,7 +91,8 @@ class ModuleTest {
     @Test
     fun `writing to buffer works`() {
         val context = Context()
-        val module = Module("test.ll", context)
+        val module =
+            Module("test.ll", context)
 
         val buf = module.toMemoryBuffer()
 
@@ -103,7 +107,8 @@ class ModuleTest {
     @Test
     fun `getting module from buffer works`() {
         val context = Context()
-        val module = Module("test.ll", context)
+        val module =
+            Module("test.ll", context)
 
         val buf = module.toMemoryBuffer()
 

@@ -17,9 +17,8 @@ import dev.supergrecko.kllvm.ir.values.constants.ConstantFloat
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import dev.supergrecko.kllvm.ir.values.constants.ConstantStruct
 import dev.supergrecko.kllvm.ir.values.constants.ConstantVector
-import dev.supergrecko.kllvm.ir.values.instructions.Instruction
-import dev.supergrecko.kllvm.llvm.enumerations.Opcode
-import dev.supergrecko.kllvm.llvm.enumerations.ThreadLocalMode
+import dev.supergrecko.kllvm.ir.instructions.Instruction
+import dev.supergrecko.kllvm.ir.instructions.Opcode
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -223,7 +222,7 @@ public open class Value internal constructor() :
 
     //region Core::Values::Constants
     /**
-     * Determine if this value is a nullpointer
+     * Determine if this value is a null pointer
      *
      * @see LLVM.LLVMIsNull
      */

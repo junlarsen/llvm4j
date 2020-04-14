@@ -5,7 +5,7 @@ import dev.supergrecko.kllvm.internal.util.toBoolean
 import dev.supergrecko.kllvm.internal.util.toInt
 import dev.supergrecko.kllvm.ir.Type
 import dev.supergrecko.kllvm.ir.TypeKind
-import dev.supergrecko.kllvm.llvm.typedefs.Context
+import dev.supergrecko.kllvm.ir.Context
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
@@ -27,7 +27,7 @@ public class StructType internal constructor() : Type(),
      * this constructor cannot produce opaque types, use the secondary
      * constructor accepting a [String] for this.
      *
-     * The struct body will be the types provided in [tys].
+     * The struct body will be the types provided in [types].
      */
     public constructor(
         types: List<Type>,
@@ -90,7 +90,7 @@ public class StructType internal constructor() : Type(),
     }
 
     public fun getName(): String {
-        require(!isLiteral()) { "Literal structs are never named" }
+        require(!isLiteral()) { "Literal structures are never named" }
 
         val name = LLVM.LLVMGetStructName(ref)
 

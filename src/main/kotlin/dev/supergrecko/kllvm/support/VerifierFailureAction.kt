@@ -1,10 +1,13 @@
-package dev.supergrecko.kllvm.llvm.enumerations
+package dev.supergrecko.kllvm.support
 
 import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
 /**
  * Support types matching LLVMVerifierFailureAction
+ *
+ * This enum is used for determining different actions when modifying modules
+ * or functions.
  *
  * [Documentation](https://llvm.org/doxygen/group__LLVMCAnalysis.html)
  */

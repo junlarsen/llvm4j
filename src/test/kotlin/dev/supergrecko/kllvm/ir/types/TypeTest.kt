@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.ir.types
 
 import dev.supergrecko.kllvm.ir.TypeKind
-import dev.supergrecko.kllvm.llvm.typedefs.Context
+import dev.supergrecko.kllvm.ir.Context
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import org.junit.jupiter.api.Test

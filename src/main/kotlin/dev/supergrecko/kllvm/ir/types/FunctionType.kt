@@ -21,9 +21,10 @@ public class FunctionType internal constructor() : Type() {
     /**
      * Create a function types
      *
-     * This will construct a function types which returns the types provided in [returns] which expects to receive
-     * parameters of the types provided in [tys]. You can mark a function types as variadic by setting the [variadic] arg
-     * to true.
+     * This will construct a function types which returns the types provided in
+     * [returns] which expects to receive parameters of the types provided in
+     * [types]. You can mark a function types as variadic by setting the
+     * [variadic] arg to true.
      */
     public constructor(
         returns: Type,

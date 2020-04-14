@@ -1,32 +1,40 @@
-package dev.supergrecko.kllvm.llvm.typedefs
+package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.toBoolean
-import dev.supergrecko.kllvm.ir.Type
-import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GlobalValue
-import dev.supergrecko.kllvm.llvm.enumerations.VerifierFailureAction
-import java.io.File
-import java.nio.ByteBuffer
+import dev.supergrecko.kllvm.support.MemoryBuffer
+import dev.supergrecko.kllvm.support.VerifierFailureAction
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
+import java.io.File
+import java.nio.ByteBuffer
 
 public class Module internal constructor() : AutoCloseable,
     Validatable, Disposable {
     internal lateinit var ref: LLVMModuleRef
     public override var valid: Boolean = true
 
+    /**
+     * Construct a new Type from an LLVM pointer reference
+     */
     public constructor(module: LLVMModuleRef) : this() {
         ref = module
     }
 
-    public constructor(sourceFileName: String, context: Context = Context.getGlobalContext()) : this() {
-        ref = LLVM.LLVMModuleCreateWithNameInContext(sourceFileName, context.ref)
+    public constructor(
+        sourceFileName: String,
+        context: Context = Context.getGlobalContext()
+    ) : this() {
+        ref = LLVM.LLVMModuleCreateWithNameInContext(
+            sourceFileName,
+            context.ref
+        )
     }
 
     //region Core::Modules
@@ -37,12 +45,9 @@ public class Module internal constructor() : AutoCloseable,
 
     public fun addFunction(name: String, type: FunctionType): FunctionValue {
         // TODO: test
-        val value =
-            LLVM.LLVMAddFunction(ref, name, type.getUnderlyingReference())
+        val value = LLVM.LLVMAddFunction(ref, name, type.ref)
 
-        return FunctionValue(
-            value
-        )
+        return FunctionValue(value)
     }
 
     public fun clone(): Module {
@@ -76,19 +81,14 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     public fun getFunction(name: String): Value? {
-        val ref = LLVM.LLVMGetNamedFunction(getUnderlyingReference(), name)
-        if (ref == null) {
-            return null
-        }
-        return FunctionValue(
-            ref
-        )
+        val ref = LLVM.LLVMGetNamedFunction(ref, name)
+            ?: return null
+
+        return FunctionValue(ref)
     }
 
     fun addGlobal(type: Type, name: String): GlobalValue {
-        return GlobalValue(
-            LLVM.LLVMAddGlobal(ref, type.ref, name)
-        )
+        return GlobalValue(LLVM.LLVMAddGlobal(ref, type.ref, name))
     }
     //endregion Core::Modules
 

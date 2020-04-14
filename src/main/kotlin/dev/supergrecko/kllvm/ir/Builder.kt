@@ -1,16 +1,15 @@
-package dev.supergrecko.kllvm.llvm.typedefs
+package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
-import dev.supergrecko.kllvm.ir.Type
-import dev.supergrecko.kllvm.ir.Value
-import dev.supergrecko.kllvm.ir.values.instructions.Instruction
+import dev.supergrecko.kllvm.ir.instructions.Instruction
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Builder public constructor(context: Context = Context.getGlobalContext()) : AutoCloseable, Validatable, Disposable {
+public class Builder public constructor(context: Context = Context.getGlobalContext()) :
+    AutoCloseable, Validatable, Disposable {
     internal var ref: LLVMBuilderRef
     public override var valid: Boolean = true
 
@@ -18,21 +17,18 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
         ref = LLVM.LLVMCreateBuilderInContext(context.ref)
     }
 
+    /**
+     * Construct a new Type from an LLVM pointer reference
+     */
     public constructor(builder: LLVMBuilderRef) : this() {
         ref = builder
     }
 
-    public fun getUnderlyingRef(): LLVMBuilderRef {
-        return ref
-    }
-
     //region InstructionBuilders
     public fun buildRetVoid(): Value {
-        return Value(
-            LLVM.LLVMBuildRetVoid(
-                ref
-            )
-        )
+        val void = LLVM.LLVMBuildRetVoid(ref)
+
+        return Value(void)
     }
 
     /**
@@ -40,29 +36,30 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
      */
     public fun positionBefore(instruction: Instruction) {
         // TODO: Test
-        LLVM.LLVMPositionBuilderBefore(getUnderlyingRef(), instruction.ref)
+        LLVM.LLVMPositionBuilderBefore(ref, instruction.ref)
     }
 
     /**
      * LLVMPositionBuilderAtEnd
      */
     public fun positionAtEnd(basicBlock: BasicBlock) {
-        LLVM.LLVMPositionBuilderAtEnd(getUnderlyingRef(), basicBlock.ref)
+        LLVM.LLVMPositionBuilderAtEnd(ref, basicBlock.ref)
     }
 
     /**
      * LLVMGetInsertBlock
      */
     public fun getInsertBlock(): BasicBlock? {
-        val ref = LLVM.LLVMGetInsertBlock(getUnderlyingRef()) ?: return null
+        val ref = LLVM.LLVMGetInsertBlock(ref) ?: return null
         return BasicBlock(ref)
     }
 
     /**
      * LLVMClearInsertionPosition
      */
-    public fun clearInsertPosition(): Unit =
-        LLVM.LLVMClearInsertionPosition(getUnderlyingRef())
+    public fun clearInsertPosition() {
+        LLVM.LLVMClearInsertionPosition(ref)
+    }
 
     /**
      * LLVMInsertIntoBuilderWithName
@@ -70,8 +67,8 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
     public fun insert(instruction: Instruction, name: String?) {
         // TODO: Test
         LLVM.LLVMInsertIntoBuilderWithName(
-            getUnderlyingRef(),
-            instruction.getUnderlyingReference(),
+            ref,
+            instruction.ref,
             name
         )
     }
@@ -88,11 +85,10 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
         resultName: String? = null
     ): Instruction {
         val argsPtr: PointerPointer<LLVMValueRef> =
-            PointerPointer(*(args.map { it.getUnderlyingReference() }
-                .toTypedArray()))
+            PointerPointer(*(args.map { it.ref }.toTypedArray()))
         val ref = LLVM.LLVMBuildCall(
-            getUnderlyingRef(),
-            function.getUnderlyingReference(),
+            ref,
+            function.ref,
             argsPtr,
             args.size,
             // This call segfaults when null string is supplied
@@ -107,12 +103,9 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
     }
 
     public fun buildRet(value: Value): Instruction {
-        return Instruction(
-            LLVM.LLVMBuildRet(
-                getUnderlyingRef(),
-                value.getUnderlyingReference()
-            )
-        )
+        val ret = LLVM.LLVMBuildRet(ref, value.ref)
+
+        return Instruction(ret)
     }
 
     public fun buildAlloca(type: Type, name: String): Instruction {
@@ -133,13 +126,21 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
         )
     }
 
-    public fun buildExtractValue(aggVal: Value, index: Int, name: String): Instruction {
+    public fun buildExtractValue(
+        aggVal: Value,
+        index: Int,
+        name: String
+    ): Instruction {
         return Instruction(
             LLVM.LLVMBuildExtractValue(ref, aggVal.ref, index, name)
         )
     }
 
-    public fun buildStructGEP(pointer: Value, index: Int, name: String): Instruction {
+    public fun buildStructGEP(
+        pointer: Value,
+        index: Int,
+        name: String
+    ): Instruction {
         return Instruction(
             LLVM.LLVMBuildStructGEP(ref, pointer.ref, index, name)
         )

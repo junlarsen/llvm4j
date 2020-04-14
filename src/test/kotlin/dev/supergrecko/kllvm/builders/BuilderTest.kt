@@ -5,8 +5,8 @@ import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.types.VoidType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
-import dev.supergrecko.kllvm.llvm.typedefs.Builder
-import dev.supergrecko.kllvm.llvm.typedefs.Module
+import dev.supergrecko.kllvm.ir.Builder
+import dev.supergrecko.kllvm.ir.Module
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
@@ -18,7 +18,8 @@ class BuilderTest {
         val builder = Builder()
         assertNull(builder.getInsertBlock())
 
-        val module = Module("test.ll")
+        val module =
+            Module("test.ll")
         val function = module.addFunction(
             "test",
             FunctionType(
@@ -72,7 +73,8 @@ class BuilderTest {
 
     @Test
     fun `should create call instruction`() {
-        val module = Module("test.ll")
+        val module =
+            Module("test.ll")
         val boolType = IntType(1)
 
         module.addFunction(

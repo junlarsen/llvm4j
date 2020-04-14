@@ -4,7 +4,7 @@ import dev.supergrecko.kllvm.internal.util.toInt
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.StructType
 import dev.supergrecko.kllvm.ir.values.Constant
-import dev.supergrecko.kllvm.llvm.typedefs.Context
+import dev.supergrecko.kllvm.ir.Context
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
