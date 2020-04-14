@@ -3,9 +3,9 @@ package dev.supergrecko.kllvm.ir.types
 import dev.supergrecko.kllvm.internal.util.iterateIntoType
 import dev.supergrecko.kllvm.internal.util.toBoolean
 import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.Type
 import dev.supergrecko.kllvm.ir.TypeKind
-import dev.supergrecko.kllvm.ir.Context
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM

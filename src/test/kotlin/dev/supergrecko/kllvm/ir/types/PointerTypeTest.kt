@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.ir.types
 
-import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class PointerTypeTest {
     @Test

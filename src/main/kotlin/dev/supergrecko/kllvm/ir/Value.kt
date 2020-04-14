@@ -5,6 +5,8 @@ import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
 import dev.supergrecko.kllvm.internal.util.toBoolean
 import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.ir.instructions.Instruction
+import dev.supergrecko.kllvm.ir.instructions.Opcode
 import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GenericValue
@@ -17,8 +19,6 @@ import dev.supergrecko.kllvm.ir.values.constants.ConstantFloat
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import dev.supergrecko.kllvm.ir.values.constants.ConstantStruct
 import dev.supergrecko.kllvm.ir.values.constants.ConstantVector
-import dev.supergrecko.kllvm.ir.instructions.Instruction
-import dev.supergrecko.kllvm.ir.instructions.Opcode
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM

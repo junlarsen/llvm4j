@@ -2,8 +2,8 @@ package dev.supergrecko.kllvm.utils
 
 import dev.supergrecko.kllvm.internal.util.toBoolean
 import dev.supergrecko.kllvm.internal.util.toInt
-import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class ConversionsTest {
     @Test

@@ -1,8 +1,8 @@
 package dev.supergrecko.kllvm.ir.types
 
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import org.junit.jupiter.api.Test
 
 class ArrayTypeTest {
     @Test

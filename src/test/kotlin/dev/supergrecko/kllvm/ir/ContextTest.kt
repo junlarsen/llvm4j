@@ -1,10 +1,9 @@
-package dev.supergrecko.kllvm.core
+package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.internal.util.runAll
-import dev.supergrecko.kllvm.ir.Context
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import org.junit.jupiter.api.Test
 
 class ContextTest {
     @Test

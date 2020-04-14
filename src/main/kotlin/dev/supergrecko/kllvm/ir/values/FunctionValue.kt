@@ -1,9 +1,9 @@
 package dev.supergrecko.kllvm.ir.values
 
 import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.ir.BasicBlock
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.support.VerifierFailureAction
-import dev.supergrecko.kllvm.ir.BasicBlock
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 

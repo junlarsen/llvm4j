@@ -1,9 +1,9 @@
 package dev.supergrecko.kllvm.ir.types
 
+import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.Type
 import dev.supergrecko.kllvm.ir.TypeKind
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
-import dev.supergrecko.kllvm.ir.Context
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 

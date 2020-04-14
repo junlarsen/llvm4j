@@ -1,8 +1,9 @@
 package dev.supergrecko.kllvm.ir.values
 
+import dev.supergrecko.kllvm.ir.ValueKind
 import dev.supergrecko.kllvm.ir.types.IntType
-import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
 
 class ValueTest {
     @Test
