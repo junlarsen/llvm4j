@@ -1,16 +1,16 @@
 package dev.supergrecko.kllvm.builders
 
+import dev.supergrecko.kllvm.ir.Value
+import dev.supergrecko.kllvm.ir.types.FunctionType
+import dev.supergrecko.kllvm.ir.types.IntType
+import dev.supergrecko.kllvm.ir.types.VoidType
+import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import dev.supergrecko.kllvm.llvm.typedefs.Builder
 import dev.supergrecko.kllvm.llvm.typedefs.Module
-import dev.supergrecko.kllvm.types.FunctionType
-import dev.supergrecko.kllvm.types.IntType
-import dev.supergrecko.kllvm.types.VoidType
-import dev.supergrecko.kllvm.values.Value
-import dev.supergrecko.kllvm.values.constants.ConstantInt
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
+import org.junit.jupiter.api.Test
 
 class BuilderTest {
     @Test

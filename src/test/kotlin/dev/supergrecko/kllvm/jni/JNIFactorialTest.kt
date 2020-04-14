@@ -1,13 +1,13 @@
 package dev.supergrecko.kllvm.jni
 
+import kotlin.system.exitProcess
+import kotlin.test.assertEquals
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
-import kotlin.system.exitProcess
-import kotlin.test.assertEquals
 
 class JNIFactorialTest {
     @Test

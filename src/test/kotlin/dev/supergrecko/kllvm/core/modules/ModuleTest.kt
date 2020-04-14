@@ -1,15 +1,15 @@
 package dev.supergrecko.kllvm.core.modules
 
+import dev.supergrecko.kllvm.ir.types.FunctionType
+import dev.supergrecko.kllvm.ir.types.VoidType
 import dev.supergrecko.kllvm.llvm.typedefs.Context
 import dev.supergrecko.kllvm.llvm.typedefs.Module
-import dev.supergrecko.kllvm.types.FunctionType
-import dev.supergrecko.kllvm.types.VoidType
-import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
 
 class ModuleTest {
     @Test

@@ -2,19 +2,19 @@ package dev.supergrecko.kllvm.llvm.typedefs
 
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
-import dev.supergrecko.kllvm.llvm.enumerations.VerifierFailureAction
-import dev.supergrecko.kllvm.types.FunctionType
-import dev.supergrecko.kllvm.types.Type
 import dev.supergrecko.kllvm.internal.util.toBoolean
-import dev.supergrecko.kllvm.values.FunctionValue
-import dev.supergrecko.kllvm.values.GlobalValue
-import dev.supergrecko.kllvm.values.Value
+import dev.supergrecko.kllvm.ir.Type
+import dev.supergrecko.kllvm.ir.Value
+import dev.supergrecko.kllvm.ir.types.FunctionType
+import dev.supergrecko.kllvm.ir.values.FunctionValue
+import dev.supergrecko.kllvm.ir.values.GlobalValue
+import dev.supergrecko.kllvm.llvm.enumerations.VerifierFailureAction
+import java.io.File
+import java.nio.ByteBuffer
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
-import java.io.File
-import java.nio.ByteBuffer
 
 public class Module internal constructor() : AutoCloseable,
     Validatable, Disposable {

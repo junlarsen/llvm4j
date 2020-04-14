@@ -4,7 +4,7 @@ import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
 /**
- * Support type matching LLVMIntPredicate
+ * Support types matching LLVMIntPredicate
  *
  * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
  */

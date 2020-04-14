@@ -41,7 +41,7 @@ public class Context public constructor() : AutoCloseable, Validatable, Disposab
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
-     * @see [LLVM.LLVMContextSetDiscardValueNames]
+     * @see LLVM.LLVMContextSetDiscardValueNames
      */
     public var discardValueNames: Boolean
         get() {
@@ -77,7 +77,7 @@ public class Context public constructor() : AutoCloseable, Validatable, Disposab
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
-     * @see [LLVM.LLVMContextSetDiagnosticHandler]
+     * @see LLVM.LLVMContextSetDiagnosticHandler
      *
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
@@ -99,7 +99,7 @@ public class Context public constructor() : AutoCloseable, Validatable, Disposab
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
-     * @see [LLVM.LLVMContextSetDiagnosticHandler]
+     * @see LLVM.LLVMContextSetDiagnosticHandler
      *
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
@@ -112,7 +112,7 @@ public class Context public constructor() : AutoCloseable, Validatable, Disposab
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
-     * @see [LLVM.LLVMContextGetDiagnosticContext]
+     * @see LLVM.LLVMContextGetDiagnosticContext
      *
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
@@ -130,7 +130,7 @@ public class Context public constructor() : AutoCloseable, Validatable, Disposab
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
-     * @see [LLVM.LLVMContextSetYieldCallback]
+     * @see LLVM.LLVMContextSetYieldCallback
      *
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */

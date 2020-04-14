@@ -2,9 +2,9 @@ package dev.supergrecko.kllvm.llvm.typedefs
 
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
-import dev.supergrecko.kllvm.types.Type
-import dev.supergrecko.kllvm.values.Value
-import dev.supergrecko.kllvm.values.instructions.Instruction
+import dev.supergrecko.kllvm.ir.Type
+import dev.supergrecko.kllvm.ir.Value
+import dev.supergrecko.kllvm.ir.values.instructions.Instruction
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
@@ -38,7 +38,7 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
     /**
      * LLVMPositionBuilder
      */
-    public fun positionBefore(instruction: Instruction): Unit {
+    public fun positionBefore(instruction: Instruction) {
         // TODO: Test
         LLVM.LLVMPositionBuilderBefore(getUnderlyingRef(), instruction.ref)
     }
@@ -46,7 +46,7 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
     /**
      * LLVMPositionBuilderAtEnd
      */
-    public fun positionAtEnd(basicBlock: BasicBlock): Unit {
+    public fun positionAtEnd(basicBlock: BasicBlock) {
         LLVM.LLVMPositionBuilderAtEnd(getUnderlyingRef(), basicBlock.ref)
     }
 
@@ -67,7 +67,7 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
     /**
      * LLVMInsertIntoBuilderWithName
      */
-    public fun insert(instruction: Instruction, name: String?): Unit {
+    public fun insert(instruction: Instruction, name: String?) {
         // TODO: Test
         LLVM.LLVMInsertIntoBuilderWithName(
             getUnderlyingRef(),
@@ -80,7 +80,7 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
      * Create a function call passing in [args] and binding the result into
      * variable [resultName]. Result discarded if no resultName supplied.
      * @see LLVM.LLVMBuildCall
-     * TODO: Replace with CallInstruction when type is created
+     * TODO: Replace with CallInstruction when types is created
      */
     public fun buildCall(
         function: Value,
@@ -157,4 +157,3 @@ public class Builder public constructor(context: Context = Context.getGlobalCont
 
     override fun close() = dispose()
 }
-

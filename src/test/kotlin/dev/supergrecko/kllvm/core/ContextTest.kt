@@ -1,10 +1,10 @@
 package dev.supergrecko.kllvm.core
 
-import dev.supergrecko.kllvm.llvm.typedefs.Context
 import dev.supergrecko.kllvm.internal.util.runAll
-import org.junit.jupiter.api.Test
+import dev.supergrecko.kllvm.llvm.typedefs.Context
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import org.junit.jupiter.api.Test
 
 class ContextTest {
     @Test
