@@ -1,6 +1,6 @@
 package dev.supergrecko.kllvm.ir.types
 
-import dev.supergrecko.kllvm.internal.util.iterateIntoType
+import dev.supergrecko.kllvm.internal.util.map
 import dev.supergrecko.kllvm.internal.util.toBoolean
 import dev.supergrecko.kllvm.internal.util.toInt
 import dev.supergrecko.kllvm.ir.Type
@@ -60,7 +60,7 @@ public class FunctionType internal constructor() : Type() {
         val dest = PointerPointer<LLVMTypeRef>(getParameterCount().toLong())
         LLVM.LLVMGetParamTypes(ref, dest)
 
-        return dest.iterateIntoType { Type(it) }
+        return dest.map { Type(it) }
     }
     //endregion Core::Types::FunctionTypes
 }
