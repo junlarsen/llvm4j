@@ -19,7 +19,7 @@ public interface SequentialType : CompositeType, ContainsReference<LLVMTypeRef> 
         val res = mutableListOf<LLVMTypeRef>()
 
         for (i in 0 until dest.capacity()) {
-            res += dest.get(LLVMTypeRef::class.java, i)
+            res += LLVMTypeRef(dest.get(i))
         }
 
         return res.map { Type(it) }
