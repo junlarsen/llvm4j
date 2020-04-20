@@ -32,20 +32,30 @@ public class FunctionValue internal constructor() : Value() {
     /**
      * Get a parameter from this function at [index]
      *
-     * TODO: Maybe throw an index out of bounds exception here
-     *   in case a param isn't found? Or maybe return nullable value? Up for
-     *   investigation
+     * @see LLVM.LLVMGetParam
      */
     public fun getParameter(index: Int): Value {
+        require(index < getParameterCount())
+
         val value = LLVM.LLVMGetParam(ref, index)
 
         return Value(value)
     }
 
+    /**
+     * Get the amount of parameters this function expects
+     *
+     * @see LLVM.LLVMCountParams
+     */
     public fun getParameterCount(): Int {
         return LLVM.LLVMCountParams(ref)
     }
 
+    /**
+     * Get all parameters from this function
+     *
+     * @see LLVM.LLVMGetParams
+     */
     public fun getParameters(): List<Value> {
          val ptr = PointerPointer<LLVMValueRef>(getParameterCount().toLong())
 
@@ -54,12 +64,21 @@ public class FunctionValue internal constructor() : Value() {
         return ptr.map { Value(it) }
     }
 
+    /**
+     * Set the parameter alignment for parameter [value]
+     */
     public fun setParameterAlignment(value: Value, align: Int) {
         LLVM.LLVMSetParamAlignment(value.ref, align)
     }
     //endregion Core::Values::Constants::FunctionValues::FunctionParameters
 
     //region Core::Values::Constants::FunctionValues
+    /**
+     * Set the call convention for this function
+     *
+     * @see LLVM.LLVMGetFunctionCallConv
+     * @see LLVM.LLVMSetFunctionCallConv
+     */
     public var callConvention: CallConvention
         get() {
             val cc = LLVM.LLVMGetFunctionCallConv(ref)
@@ -72,6 +91,12 @@ public class FunctionValue internal constructor() : Value() {
             LLVM.LLVMSetFunctionCallConv(ref, value.value)
         }
 
+    /**
+     * Set the personality function for this function
+     *
+     * @see LLVM.LLVMGetPersonalityFn
+     * @see LLVM.LLVMSetPersonalityFn
+     */
     public var personalityFunction: FunctionValue
         get() {
             require(hasPersonalityFunction())
@@ -84,34 +109,75 @@ public class FunctionValue internal constructor() : Value() {
             LLVM.LLVMSetPersonalityFn(ref, value.ref)
         }
 
+    /**
+     * Set the garbage collector name for this function
+     *
+     * @see LLVM.LLVMGetGC
+     * @see LLVM.LLVMSetGC
+     */
     public var garbageCollector: String
         get() = LLVM.LLVMGetGC(ref).string
         set(value) = LLVM.LLVMSetGC(ref, value)
 
+    /**
+     * Determine if this function has a personality function
+     *
+     * @see LLVM.LLVMHasPersonalityFn
+     */
     public fun hasPersonalityFunction(): Boolean {
         return LLVM.LLVMHasPersonalityFn(ref).toBoolean()
     }
 
+    /**
+     * Delete this function from its parent
+     *
+     * @see LLVM.LLVMDeleteFunction
+     */
     public fun delete() {
         LLVM.LLVMDeleteFunction(ref)
     }
 
+    /**
+     * If this function is an intrinsic, get its id
+     *
+     * @see LLVM.LLVMGetIntrinsicID
+     */
     public fun getIntrinsicId(): Int {
         return LLVM.LLVMGetIntrinsicID(ref)
     }
 
+    /**
+     * Add an attribute at an [index]
+     *
+     * @see LLVM.LLVMAddAttributeAtIndex
+     */
     public fun addAttribute(index: AttributeIndex, attribute: Attribute) {
         addAttribute(index.value.toInt(), attribute)
     }
 
+    /**
+     * Add an attribute at an [index]
+     *
+     * @see LLVM.LLVMAddAttributeAtIndex
+     */
     public fun addAttribute(index: Int, attribute: Attribute) {
         LLVM.LLVMAddAttributeAtIndex(ref, index, attribute.ref)
     }
 
+    /**
+     * Get the amount of attributes at an [index]
+     *
+     * @see LLVM.LLVMGetAttributeCountAtIndex
+     */
     public fun getAttributeCount(index: AttributeIndex): Int {
         return LLVM.LLVMGetAttributeCountAtIndex(ref, index.value.toInt())
     }
 
+    /**
+     * Get all attributes at an [index] for the function
+     *
+     * @see LLVM.LLVMGetAttributesAtIndex
+     */
     public fun getAttributes(index: AttributeIndex): List<Attribute> {
         val ptr = PointerPointer<LLVMAttributeRef>(
             getAttributeCount(index).toLong()
@@ -122,6 +188,11 @@ public class FunctionValue internal constructor() : Value() {
         return ptr.map { Attribute(it) }
     }
 
+    /**
+     * Pull the attribute value from an [index] with a [kind]
+     *
+     * @see LLVM.LLVMGetEnumAttributeAtIndex
+     */
     public fun getAttribute(
         index: AttributeIndex,
         kind: Int
@@ -133,6 +204,11 @@ public class FunctionValue internal constructor() : Value() {
         return Attribute(ref)
     }
 
+    /**
+     * Pull the attribute value from an [index] with a [kind]
+     *
+     * @see LLVM.LLVMGetStringAttributeAtIndex
+     */
     public fun getAttribute(
         index: AttributeIndex,
         kind: String
@@ -144,6 +220,11 @@ public class FunctionValue internal constructor() : Value() {
         return Attribute(ref)
     }
 
+    /**
+     * Removes an attribute at the given index
+     *
+     * @see LLVM.LLVMRemoveEnumAttributeAtIndex
+     */
     public fun removeAttribute(
         index: AttributeIndex,
         kind: Int
@@ -153,6 +234,11 @@ public class FunctionValue internal constructor() : Value() {
         )
     }
 
+    /**
+     * Removes an attribute at the given index
+     *
+     * @see LLVM.LLVMRemoveStringAttributeAtIndex
+     */
     public fun removeAttribute(
         index: AttributeIndex,
         kind: String
@@ -162,6 +248,9 @@ public class FunctionValue internal constructor() : Value() {
         )
     }
 
+    /**
+     * @see LLVM.LLVMAddTargetDependentFunctionAttr
+     */
     public fun addTargetDependentAttribute(
         attribute: String,
         value: String
