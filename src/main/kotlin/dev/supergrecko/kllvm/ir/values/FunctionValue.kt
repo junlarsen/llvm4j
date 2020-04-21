@@ -7,15 +7,18 @@ import dev.supergrecko.kllvm.ir.Attribute
 import dev.supergrecko.kllvm.ir.AttributeIndex
 import dev.supergrecko.kllvm.ir.BasicBlock
 import dev.supergrecko.kllvm.ir.CallConvention
+import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.Value
+import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.support.VerifierFailureAction
 
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
+import java.lang.RuntimeException
 
-public class FunctionValue internal constructor() : Value() {
+public open class FunctionValue internal constructor() : Value() {
     // TODO: Test entire unit
     //   It is currently not possible to test this unit as there is currently
     //   no way to create a FunctionValue. - grecko 21.04.2020
@@ -75,6 +78,51 @@ public class FunctionValue internal constructor() : Value() {
         LLVM.LLVMSetParamAlignment(value.ref, align)
     }
     //endregion Core::Values::Constants::FunctionValues::FunctionParameters
+
+    //region Core::Values::Constants::FunctionValues::IndirectFunctions
+    /**
+     * @see LLVM.LLVMGetGlobalIFuncResolver
+     * @see LLVM.LLVMSetGlobalIFuncResolver
+     */
+    public var indirectFunctionResolver: IndirectFunction
+        get() {
+            val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
+
+            return if (resolver.isNull) {
+                throw RuntimeException("This function does not have an " +
+                        "indirect resolver")
+            } else {
+                IndirectFunction(resolver)
+            }
+        }
+        set(value) {
+            LLVM.LLVMSetGlobalIFuncResolver(ref, value.ref)
+        }
+
+    /**
+     * Make this indirect function global in the given [module]
+     *
+     * @see LLVM.LLVMAddGlobalIFunc
+     */
+    public fun makeGlobal(
+        module: Module,
+        name: String,
+        type: FunctionType,
+        addressSpace: Int,
+        resolver: FunctionValue
+    ): IndirectFunction {
+        val indirect = LLVM.LLVMAddGlobalIFunc(
+            module.ref,
+            name,
+            name.length.toLong(),
+            type.ref,
+            addressSpace,
+            resolver.ref
+        )
+
+        return IndirectFunction(indirect)
+    }
+    //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
     //region Core::Values::Constants::FunctionValues
     /**
@@ -137,7 +185,7 @@ public class FunctionValue internal constructor() : Value() {
      *
      * @see LLVM.LLVMDeleteFunction
      */
-    public fun delete() {
+    public open fun delete() {
         LLVM.LLVMDeleteFunction(ref)
     }
 
