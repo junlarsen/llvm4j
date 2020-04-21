@@ -9,12 +9,16 @@ import dev.supergrecko.kllvm.ir.BasicBlock
 import dev.supergrecko.kllvm.ir.CallConvention
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.support.VerifierFailureAction
+
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class FunctionValue internal constructor() : Value() {
+    // TODO: Test entire unit
+    //   It is currently not possible to test this unit as there is currently
+    //   no way to create a FunctionValue. - grecko 21.04.2020
     /**
      * Construct a new Type from an LLVM pointer reference
      */
