@@ -3,8 +3,7 @@ package dev.supergrecko.kllvm.ir
 import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
-import dev.supergrecko.kllvm.internal.util.toBoolean
-import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.instructions.Instruction
 import dev.supergrecko.kllvm.ir.instructions.Opcode
 import dev.supergrecko.kllvm.ir.types.PointerType
@@ -103,7 +102,7 @@ public open class Value internal constructor() :
      * @see LLVM.LLVMIsUndef
      */
     public fun isUndef(): Boolean {
-        return LLVM.LLVMIsUndef(ref).toBoolean()
+        return LLVM.LLVMIsUndef(ref).fromLLVMBool()
     }
 
     /**
@@ -112,7 +111,7 @@ public open class Value internal constructor() :
      * @see LLVM.LLVMIsConstant
      */
     public fun isConstant(): Boolean {
-        return LLVM.LLVMIsConstant(ref).toBoolean()
+        return LLVM.LLVMIsConstant(ref).fromLLVMBool()
     }
 
     /**
@@ -165,7 +164,7 @@ public open class Value internal constructor() :
      * @see LLVM.LLVMIsNull
      */
     public fun isNull(): Boolean {
-        return LLVM.LLVMIsNull(ref).toBoolean()
+        return LLVM.LLVMIsNull(ref).fromLLVMBool()
     }
 
     /**

@@ -2,7 +2,7 @@ package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
-import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GlobalValue
@@ -153,7 +153,7 @@ public class Module internal constructor() : AutoCloseable,
         // > Note that this function's return value is inverted from what you would
         // > expect of a function called "verify"
         // Thus we invert it again ...
-        return !res.toBoolean()
+        return !res.fromLLVMBool()
     }
     //endregion Analysis
 

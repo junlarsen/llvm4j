@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.ir.values.constants
 
-import dev.supergrecko.kllvm.internal.util.toBoolean
-import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
+import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.values.Constant
@@ -26,7 +26,7 @@ public class ConstantArray internal constructor() : Value(), Constant {
             context.ref,
             content,
             content.length,
-            nullTerminate.toInt()
+            nullTerminate.toLLVMBool()
         )
     }
 
@@ -37,7 +37,7 @@ public class ConstantArray internal constructor() : Value(), Constant {
      * @see LLVM.LLVMIsConstantString
      */
     public fun isConstantString(): Boolean {
-        return LLVM.LLVMIsConstantString(ref).toBoolean()
+        return LLVM.LLVMIsConstantString(ref).fromLLVMBool()
     }
 
     /**

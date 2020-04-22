@@ -1,8 +1,8 @@
 package dev.supergrecko.kllvm.ir.types
 
 import dev.supergrecko.kllvm.internal.util.map
-import dev.supergrecko.kllvm.internal.util.toBoolean
-import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
+import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.Type
 import dev.supergrecko.kllvm.ir.TypeKind
 import org.bytedeco.javacpp.PointerPointer
@@ -37,13 +37,13 @@ public class FunctionType internal constructor() : Type() {
             returns.ref,
             PointerPointer(*arr),
             arr.size,
-            variadic.toInt()
+            variadic.toLLVMBool()
         )
     }
 
     //region Core::Types::FunctionTypes
     public fun isVariadic(): Boolean {
-        return LLVM.LLVMIsFunctionVarArg(ref).toBoolean()
+        return LLVM.LLVMIsFunctionVarArg(ref).fromLLVMBool()
     }
 
     public fun getParameterCount(): Int {

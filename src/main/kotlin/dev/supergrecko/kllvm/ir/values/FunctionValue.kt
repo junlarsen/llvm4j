@@ -2,7 +2,7 @@ package dev.supergrecko.kllvm.ir.values
 
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
 import dev.supergrecko.kllvm.internal.util.map
-import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.Attribute
 import dev.supergrecko.kllvm.ir.AttributeIndex
 import dev.supergrecko.kllvm.ir.BasicBlock
@@ -177,7 +177,7 @@ public open class FunctionValue internal constructor() : Value() {
      * @see LLVM.LLVMHasPersonalityFn
      */
     public fun hasPersonalityFunction(): Boolean {
-        return LLVM.LLVMHasPersonalityFn(ref).toBoolean()
+        return LLVM.LLVMHasPersonalityFn(ref).fromLLVMBool()
     }
 
     /**
@@ -323,7 +323,7 @@ public open class FunctionValue internal constructor() : Value() {
         // > Note that this function's return value is inverted from what you would
         // > expect of a function called "verify".
         // Thus we invert it again ...
-        return !LLVM.LLVMVerifyFunction(ref, action.value).toBoolean()
+        return !LLVM.LLVMVerifyFunction(ref, action.value).fromLLVMBool()
     }
 
     /**

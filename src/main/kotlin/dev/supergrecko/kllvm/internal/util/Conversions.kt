@@ -6,7 +6,7 @@ package dev.supergrecko.kllvm.internal.util
  * Used because LLVM C api does not use booleans, it uses
  * C integers 1 and 0.
  */
-internal fun Int.toBoolean() = this == 1
+internal fun Int.fromLLVMBool() = this == 1
 
 /**
  * Util function to convert kotlin [Boolean] to [Int]
@@ -14,4 +14,4 @@ internal fun Int.toBoolean() = this == 1
  * Used because LLVM C api does not use booleans, it uses
  * C integers 1 and 0.
  */
-internal fun Boolean.toInt() = if (this) 1 else 0
+internal fun Boolean.toLLVMBool() = if (this) 1 else 0

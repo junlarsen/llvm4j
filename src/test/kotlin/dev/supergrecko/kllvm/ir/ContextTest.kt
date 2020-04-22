@@ -1,8 +1,13 @@
 package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.internal.util.runAll
+import org.bytedeco.javacpp.Pointer
+import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
+import org.bytedeco.llvm.LLVM.LLVMDiagnosticInfoRef
+
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+
 import org.junit.jupiter.api.Test
 
 class ContextTest {
@@ -17,7 +22,7 @@ class ContextTest {
     }
 
     @Test
-    fun `dropping context twice fails`() {
+    fun `attempting to dispose twice will fail but not cause segfault`() {
         val ctx = Context()
 
         ctx.dispose()
@@ -28,7 +33,26 @@ class ContextTest {
     }
 
     @Test
-    fun `modifying discard value names actually works`() {
+    fun `setting the diagnostic handler`() {
+        val ctx = Context()
+
+        val handler = object : LLVMDiagnosticHandler() {
+            override fun call(p0: LLVMDiagnosticInfoRef?, p1: Pointer?) {
+
+            }
+        }
+
+        ctx.setDiagnosticHandler(handler)
+
+        val res = ctx.getDiagnosticHandler().isNull
+
+        assertEquals(false, res)
+
+        ctx.dispose()
+    }
+
+    @Test
+    fun `the discardValueNames property is functional`() {
         val ctx = Context()
 
         runAll(true, false) {

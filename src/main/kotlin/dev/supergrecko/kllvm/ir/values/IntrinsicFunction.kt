@@ -1,6 +1,6 @@
 package dev.supergrecko.kllvm.ir.values
 
-import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.Type
@@ -48,7 +48,7 @@ public class IntrinsicFunction internal constructor() {
      *
      * @see LLVM.LLVMIntrinsicIsOverloaded
      */
-    public fun isOverloaded() = LLVM.LLVMIntrinsicIsOverloaded(id).toBoolean()
+    public fun isOverloaded() = LLVM.LLVMIntrinsicIsOverloaded(id).fromLLVMBool()
 
     /**
      * Get the name of an overloaded intrinsic by its parameter list

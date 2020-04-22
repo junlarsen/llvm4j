@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.ir.values.constants
 
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
-import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.instructions.IntPredicate
 import dev.supergrecko.kllvm.ir.types.IntType
@@ -27,7 +27,7 @@ public class ConstantInt internal constructor() : Value(), Constant {
         value: Long,
         signExtend: Boolean
     ) : this() {
-        ref = LLVM.LLVMConstInt(type.ref, value, signExtend.toInt())
+        ref = LLVM.LLVMConstInt(type.ref, value, signExtend.toLLVMBool())
     }
 
     /**

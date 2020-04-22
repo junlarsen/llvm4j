@@ -2,8 +2,9 @@ package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
-import dev.supergrecko.kllvm.internal.util.toBoolean
-import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
+import dev.supergrecko.kllvm.internal.util.toLLVMBool
+
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
@@ -15,12 +16,14 @@ import org.bytedeco.llvm.global.LLVM
  *
  * - [Documentation](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html)
  *
- * @throws IllegalArgumentException If any argument assertions fail. Most noticeably functions which involve a context ref.
+ * @throws IllegalArgumentException If any argument assertions fail. Most
+ * noticeably functions which involve a context ref.
  *
  * Note: This primary constructor is public because anyone should be able to
  * create a context. The init block ensures the ref is valid
  */
-public class Context public constructor() : AutoCloseable, Validatable, Disposable {
+public class Context public constructor() : AutoCloseable, Validatable,
+    Disposable {
     internal var ref: LLVMContextRef
     public override var valid: Boolean = true
 
@@ -50,13 +53,13 @@ public class Context public constructor() : AutoCloseable, Validatable, Disposab
             val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(ref)
 
             // Conversion from C++ bool to kotlin Boolean
-            return willDiscard.toBoolean()
+            return willDiscard.fromLLVMBool()
         }
         set(value) {
             require(valid) { "This module has already been disposed." }
 
             // Conversion from kotlin Boolean to C++ bool
-            val intValue = value.toInt()
+            val intValue = value.toLLVMBool()
 
             LLVM.LLVMContextSetDiscardValueNames(ref, intValue)
         }

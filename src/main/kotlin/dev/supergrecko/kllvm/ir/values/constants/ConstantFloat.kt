@@ -1,6 +1,6 @@
 package dev.supergrecko.kllvm.ir.values.constants
 
-import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.values.Constant
@@ -27,7 +27,7 @@ public class ConstantFloat internal constructor() : Value(), Constant {
         val ptr = IntPointer()
         val double = LLVM.LLVMConstRealGetDouble(ref, ptr)
 
-        return (double) to (ptr.get().toBoolean())
+        return (double) to (ptr.get().fromLLVMBool())
     }
     //endregion Core::Values::Constants::ScalarConstants
 
