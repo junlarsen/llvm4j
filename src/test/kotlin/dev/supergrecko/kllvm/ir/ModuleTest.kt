@@ -2,16 +2,17 @@ package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.types.VoidType
+import dev.supergrecko.kllvm.support.VerifierFailureAction
+import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 class ModuleTest {
     @Test
-    fun `test that module identifiers match`() {
+    fun `setting a module identifier`() {
         val mod = Module("test.ll")
         mod.setModuleIdentifier("test")
 
@@ -21,7 +22,7 @@ class ModuleTest {
     }
 
     @Test
-    fun `test that module cloning works`() {
+    fun `cloning a module with a module identifier`() {
         val mod = Module("test.ll")
         mod.setModuleIdentifier("test")
 
@@ -30,10 +31,11 @@ class ModuleTest {
         assertEquals(mod.getModuleIdentifier(), clone.getModuleIdentifier())
 
         mod.dispose()
+        clone.dispose()
     }
 
     @Test
-    fun `test that modifying source name works`() {
+    fun `modifying the module source name`() {
         val mod = Module("test.ll")
 
         assertEquals("test.ll", mod.getSourceFileName())
@@ -46,54 +48,66 @@ class ModuleTest {
     }
 
     @Test
-    fun `test getFunction returns null when no function added`() {
-        val module =
-            Module("test.ll")
+    fun `pulling an unknown function from a module is null`() {
+        val module = Module("test.ll")
+
         assertNull(module.getFunction("test"))
 
         module.dispose()
     }
 
     @Test
-    fun `test getFunction returns function object when function added`() {
-        val module =
-            Module("test.ll")
-        module.addFunction("test",
+    fun `pulling a function returns function object when function added`() {
+        val module = Module("test.ll")
+
+        module.addFunction(
+            "test",
             FunctionType(
                 VoidType(),
                 listOf(),
                 false
             )
         )
+
         assertNotNull(module.getFunction("test"))
 
         module.dispose()
     }
 
     @Test
-    fun `writing to file works`() {
+    fun `writing module to byte code file`() {
         val file = File("./out.bc")
-        val module =
-            Module("test.ll")
+
+        val module = Module("test.ll")
 
         module.toFile(file)
 
-        assertTrue {
-            file.exists()
-        }
+        assertTrue { file.exists() }
 
         file.delete()
         module.dispose()
     }
 
     @Test
-    fun `writing to buffer works`() {
+    fun `writing module to byte code by file path`() {
+        val file = File("./out.bc")
+
+        val module = Module("test.ll")
+
+        module.toFile(file.absolutePath)
+
+        assertTrue { file.exists() }
+
+        file.delete()
+        module.dispose()
+    }
+
+    @Test
+    fun `writing module to buffer and reading the buffer`() {
         val context = Context()
-        val module =
-            Module("test.ll", context)
+        val module = Module("test.ll", context)
 
         val buf = module.toMemoryBuffer()
-
         val mod = buf.parse(context)
 
         assertEquals("test.ll", mod.getSourceFileName())
@@ -103,15 +117,36 @@ class ModuleTest {
     }
 
     @Test
-    fun `getting module from buffer works`() {
+    fun `getting a module from buffer`() {
         val context = Context()
-        val module =
-            Module("test.ll", context)
+        val module = Module("test.ll", context)
 
         val buf = module.toMemoryBuffer()
 
         val mod = buf.getModule(context)
 
         assertEquals("test.ll", mod.getSourceFileName())
+    }
+
+    @Test
+    fun `dumping module`() {
+        val context = Context()
+        val module = Module("test.ll", context)
+
+        module.dump()
+
+        module.dispose()
+    }
+
+    @Test
+    fun `verifying valid module`() {
+        val context = Context()
+        val module = Module("test.ll", context)
+
+        val res = module.verify(VerifierFailureAction.ReturnStatus)
+
+        assertEquals(true, res)
+
+        module.dispose()
     }
 }

@@ -86,11 +86,23 @@ public class Module internal constructor() : AutoCloseable,
 
         return FunctionValue(ref)
     }
-
-    fun addGlobal(type: Type, name: String): GlobalValue {
-        return GlobalValue(LLVM.LLVMAddGlobal(ref, type.ref, name))
-    }
     //endregion Core::Modules
+
+    //region Core::Values::Constants::GlobalVariables
+    fun addGlobal(
+        type: Type,
+        name: String,
+        addressSpace: Int? = null
+    ): GlobalValue {
+        val global = if (addressSpace == null) {
+            LLVM.LLVMAddGlobal(ref, type.ref, name)
+        } else {
+            LLVM.LLVMAddGlobalInAddressSpace(ref, type.ref, name, addressSpace)
+        }
+
+        return GlobalValue(global)
+    }
+    //endregion Core::Values::Constants::GlobalVariables
 
     //region BitWriter
     public fun toMemoryBuffer(): MemoryBuffer {
@@ -129,6 +141,8 @@ public class Module internal constructor() : AutoCloseable,
      * TODO: Find a nice way to return the string which the LLVM method returns
      *   Because of this. When calling this with PrintMessage or ReturnStatus
      *   the underlying bytes in the ptr are really strange (see #67)
+     *
+     * TODO: Test invalid module
      */
     public fun verify(action: VerifierFailureAction): Boolean {
         val ptr = BytePointer(ByteBuffer.allocate(0))
@@ -144,6 +158,4 @@ public class Module internal constructor() : AutoCloseable,
     //endregion Analysis
 
     public override fun close() = dispose()
-
-    public fun getUnderlyingReference() = ref
 }
