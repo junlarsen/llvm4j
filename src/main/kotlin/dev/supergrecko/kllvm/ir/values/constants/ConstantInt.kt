@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.ir.values.constants
 
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
-import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.instructions.IntPredicate
 import dev.supergrecko.kllvm.ir.types.IntType
@@ -27,7 +27,7 @@ public class ConstantInt internal constructor() : Value(), Constant {
         value: Long,
         signExtend: Boolean
     ) : this() {
-        ref = LLVM.LLVMConstInt(type.ref, value, signExtend.toInt())
+        ref = LLVM.LLVMConstInt(type.ref, value, signExtend.toLLVMBool())
     }
 
     /**
@@ -69,7 +69,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * the operation.
      *
      * LLVM doesn't actually have a neg instruction, but it's implemented using
-     * subtraction. It subtracts the value of max value of the types of the value
+     * subtraction. It subtracts the value of max value of the types of the
+     * value
      *
      * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
      * respectively. If [hasNUW] [hasNSW] are present, the result
@@ -78,8 +79,10 @@ public class ConstantInt internal constructor() : Value(), Constant {
      *
      * @see LLVM.LLVMConstNeg
      */
-    public fun neg(hasNUW: Boolean = false, hasNSW: Boolean = false): ConstantInt {
-        require(isConstant())
+    public fun neg(
+        hasNUW: Boolean = false,
+        hasNSW: Boolean = false
+    ): ConstantInt {
         require(!(hasNSW && hasNSW)) { "Cannot negate with both NSW and NUW" }
 
         val ref = when (true) {
@@ -100,15 +103,13 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * @see LLVM.LLVMConstNot
      */
     public fun not(): ConstantInt {
-        require(isConstant())
-
         val ref = LLVM.LLVMConstNot(ref)
 
         return ConstantInt(ref)
     }
 
     /**
-     * Add another value to this integer
+     * Perform addition for the two operands
      *
      * This value is not modified, but it returns a new value with the result of
      * the operation.
@@ -124,24 +125,23 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * @see LLVM.LLVMConstAdd
      */
     public fun add(
-        v: ConstantInt,
+        rhs: ConstantInt,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
     ): ConstantInt {
-        require(isConstant() && v.isConstant())
         require(!(hasNSW && hasNSW)) { "Cannot add with both NSW and NUW" }
 
         val ref = when (true) {
-            hasNSW -> LLVM.LLVMConstNSWAdd(ref, v.ref)
-            hasNUW -> LLVM.LLVMConstNUWAdd(ref, v.ref)
-            else -> LLVM.LLVMConstAdd(ref, v.ref)
+            hasNSW -> LLVM.LLVMConstNSWAdd(ref, rhs.ref)
+            hasNUW -> LLVM.LLVMConstNUWAdd(ref, rhs.ref)
+            else -> LLVM.LLVMConstAdd(ref, rhs.ref)
         }
 
         return ConstantInt(ref)
     }
 
     /**
-     * Subtract another value from this integer
+     * Perform subtraction for the two operands
      *
      * This value is not modified, but it returns a new value with the result of
      * the operation.
@@ -155,24 +155,23 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * respectively, occurs.
      */
     public fun sub(
-        v: ConstantInt,
+        rhs: ConstantInt,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
     ): ConstantInt {
-        require(isConstant() && v.isConstant())
         require(!(hasNSW && hasNSW)) { "Cannot sub with both NSW and NUW" }
 
         val ref = when (true) {
-            hasNSW -> LLVM.LLVMConstNSWSub(ref, v.ref)
-            hasNUW -> LLVM.LLVMConstNUWSub(ref, v.ref)
-            else -> LLVM.LLVMConstSub(ref, v.ref)
+            hasNSW -> LLVM.LLVMConstNSWSub(ref, rhs.ref)
+            hasNUW -> LLVM.LLVMConstNUWSub(ref, rhs.ref)
+            else -> LLVM.LLVMConstSub(ref, rhs.ref)
         }
 
         return ConstantInt(ref)
     }
 
     /**
-     * Multiply another value with this integer
+     * Perform multiplication for the two operands
      *
      * This value is not modified, but it returns a new value with the result of
      * the operation.
@@ -186,24 +185,23 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * respectively, occurs.
      */
     public fun mul(
-        v: ConstantInt,
+        rhs: ConstantInt,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
     ): ConstantInt {
-        require(isConstant() && v.isConstant())
         require(!(hasNSW && hasNSW)) { "Cannot sub with both NSW and NUW" }
 
         val ref = when (true) {
-            hasNSW -> LLVM.LLVMConstNSWMul(ref, v.ref)
-            hasNUW -> LLVM.LLVMConstNUWMul(ref, v.ref)
-            else -> LLVM.LLVMConstMul(ref, v.ref)
+            hasNSW -> LLVM.LLVMConstNSWMul(ref, rhs.ref)
+            hasNUW -> LLVM.LLVMConstNUWMul(ref, rhs.ref)
+            else -> LLVM.LLVMConstMul(ref, rhs.ref)
         }
 
         return ConstantInt(ref)
     }
 
     /**
-     * Perform division with another integer
+     * Perform division for the two operands
      *
      * Division by zero is undefined behavior. For vectors, if any element of
      * the divisor is zero, the operation has undefined behavior. Overflow also
@@ -217,14 +215,16 @@ public class ConstantInt internal constructor() : Value(), Constant {
      *
      * TODO: Find a way to determine if types is unsigned
      */
-    public fun div(v: ConstantInt, exact: Boolean, unsigned: Boolean): ConstantInt {
-        require(isConstant())
-
+    public fun div(
+        rhs: ConstantInt,
+        exact: Boolean,
+        unsigned: Boolean
+    ): ConstantInt {
         val ref = when (true) {
-            unsigned && exact -> LLVM.LLVMConstExactUDiv(ref, v.ref)
-            !unsigned && exact -> LLVM.LLVMConstExactSDiv(ref, v.ref)
-            unsigned && !exact -> LLVM.LLVMConstUDiv(ref, v.ref)
-            !unsigned && !exact -> LLVM.LLVMConstSDiv(ref, v.ref)
+            unsigned && exact -> LLVM.LLVMConstExactUDiv(ref, rhs.ref)
+            !unsigned && exact -> LLVM.LLVMConstExactSDiv(ref, rhs.ref)
+            unsigned && !exact -> LLVM.LLVMConstUDiv(ref, rhs.ref)
+            !unsigned && !exact -> LLVM.LLVMConstSDiv(ref, rhs.ref)
             else -> throw Unreachable()
         }
 
@@ -232,98 +232,165 @@ public class ConstantInt internal constructor() : Value(), Constant {
     }
 
     /**
-     * Get the remainder from the unsigned division of this and another integer
+     * Get the remainder from the unsigned division for the two operands
      *
      * Taking the remainder of a division by zero is undefined behavior.
      *
      * If [unsigned] is present, URem will be used
      */
-    public fun rem(v: ConstantInt, unsigned: Boolean): ConstantInt {
-        require(isConstant() && v.isConstant())
-
+    public fun rem(rhs: ConstantInt, unsigned: Boolean): ConstantInt {
         val ref = if (unsigned) {
-            LLVM.LLVMConstURem(ref, v.ref)
+            LLVM.LLVMConstURem(ref, rhs.ref)
         } else {
-            LLVM.LLVMConstSRem(ref, v.ref)
+            LLVM.LLVMConstSRem(ref, rhs.ref)
         }
 
         return ConstantInt(ref)
     }
 
-    public fun and(v: ConstantInt): ConstantInt {
-        require(isConstant() && v.isConstant())
-
-        val ref = LLVM.LLVMConstAnd(ref, v.ref)
-
-        return ConstantInt(ref)
-    }
-
-    public fun or(v: ConstantInt): ConstantInt {
-        require(isConstant() && v.isConstant())
-
-        val ref = LLVM.LLVMConstOr(ref, v.ref)
-
-        return ConstantInt(ref)
-    }
-
-    public fun xor(v: ConstantInt): ConstantInt {
-        require(isConstant() && v.isConstant())
-
-        val ref = LLVM.LLVMConstXor(ref, v.ref)
+    /**
+     * Perform bitwise logical and for the two operands
+     *
+     * The truth table used for the 'and' instruction is:
+     *
+     * In0	In1	Out
+     * 0	0	0
+     * 0	1	0
+     * 1	0	0
+     * 1	1	1
+     */
+    public fun and(rhs: ConstantInt): ConstantInt {
+        val ref = LLVM.LLVMConstAnd(ref, rhs.ref)
 
         return ConstantInt(ref)
     }
 
-    public fun cmp(predicate: IntPredicate, v: ConstantInt): ConstantInt {
-        require(isConstant() && v.isConstant())
-
-        val ref = LLVM.LLVMConstICmp(predicate.value, ref, v.ref)
-
-        return ConstantInt(ref)
-    }
-
-    public fun shl(v: ConstantInt): ConstantInt {
-        require(isConstant() && v.isConstant())
-
-        val ref = LLVM.LLVMConstShl(ref, v.ref)
-
-        return ConstantInt(ref)
-    }
-
-    public fun lshr(v: ConstantInt): ConstantInt {
-        require(isConstant() && v.isConstant())
-
-        val ref = LLVM.LLVMConstLShr(ref, v.ref)
+    /**
+     * Perform bitwise logical or for the two operands
+     *
+     * The truth table used for the 'or' instruction is:
+     *
+     * In0	In1	Out
+     * 0	0	0
+     * 0	1	1
+     * 1	0	1
+     * 1	1	1
+     */
+    public fun or(rhs: ConstantInt): ConstantInt {
+        val ref = LLVM.LLVMConstOr(ref, rhs.ref)
 
         return ConstantInt(ref)
     }
 
-    public fun ashr(v: ConstantInt): ConstantInt {
-        require(isConstant() && v.isConstant())
-
-        val ref = LLVM.LLVMConstAShr(ref, v.ref)
+    /**
+     * Perform bitwise logical xor for the two operands
+     *
+     * The truth table used for the 'xor' instruction is:
+     *
+     * In0	In1	Out
+     * 0	0	0
+     * 0	1	1
+     * 1	0	1
+     * 1	1	0
+     */
+    public fun xor(rhs: ConstantInt): ConstantInt {
+        val ref = LLVM.LLVMConstXor(ref, rhs.ref)
 
         return ConstantInt(ref)
     }
 
+    /**
+     * Perform logical comparison for the two operands
+     *
+     * This method receives a [predicate] which determines which logical
+     * comparison method shall be used for the comparison.
+     */
+    public fun cmp(predicate: IntPredicate, rhs: ConstantInt): ConstantInt {
+        val ref = LLVM.LLVMConstICmp(predicate.value, ref, rhs.ref)
+
+        return ConstantInt(ref)
+    }
+
+    /**
+     * Shift the operand to the left [bits] number of bits
+     *
+     * LLVM-C does not support NUW/NSW attributes for this operation
+     */
+    public fun shl(bits: ConstantInt): ConstantInt {
+        val ref = LLVM.LLVMConstShl(ref, bits.ref)
+
+        return ConstantInt(ref)
+    }
+
+    /**
+     * Logically shift the operand to the right [bits] number of bits with
+     * zero fill
+     *
+     * LLVM-C does not support NUW/NSW attributes for this operation
+     */
+    public fun lshr(bits: ConstantInt): ConstantInt {
+        val ref = LLVM.LLVMConstLShr(ref, bits.ref)
+
+        return ConstantInt(ref)
+    }
+
+    /**
+     * Arithmetically shift the operand to the right [bits] number with sign
+     * extension
+     *
+     * LLVM-C does nt support the 'exact' attribute for this operation
+     */
+    public fun ashr(bits: ConstantInt): ConstantInt {
+        val ref = LLVM.LLVMConstAShr(ref, bits.ref)
+
+        return ConstantInt(ref)
+    }
+
+    /**
+     * Truncates this operand to the type [type]
+     *
+     * The bit size of this must be larger than the bit size of [type]. Equal
+     * sizes are not allowed
+     */
     public fun trunc(type: IntType): ConstantInt {
-        require(isConstant())
+        val selfWidth = getType().asIntType().getTypeWidth()
+        val destWidth = type.getTypeWidth()
+
+        require(selfWidth > destWidth)
 
         val ref = LLVM.LLVMConstTrunc(ref, type.ref)
 
         return ConstantInt(ref)
     }
 
+    /**
+     * Sign extend this value to type [type]
+     *
+     * The bit size of this must be tinier than the bit size of the
+     * destination type
+     */
     public fun sext(type: IntType): ConstantInt {
-        require(isConstant())
+        val selfWidth = getType().asIntType().getTypeWidth()
+        val destWidth = type.getTypeWidth()
+
+        require(selfWidth < destWidth)
 
         val ref = LLVM.LLVMConstSExt(ref, type.ref)
 
         return ConstantInt(ref)
     }
 
+    /**
+     * Zero extend this value to type [type]
+     *
+     * The bit size of this must be tinier than the bit size of the
+     * destination type
+     */
     public fun zext(type: IntType): ConstantInt {
-        require(isConstant())
+        val selfWidth = getType().asIntType().getTypeWidth()
+        val destWidth = type.getTypeWidth()
+
+        require(selfWidth < destWidth)
 
         val ref = LLVM.LLVMConstZExt(ref, type.ref)
 

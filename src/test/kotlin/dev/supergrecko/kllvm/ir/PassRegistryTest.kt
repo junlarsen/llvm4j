@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 
 class PassRegistryTest {
     @Test
-    fun `assert references match`() {
+    fun `pass registry references work as a singleton`() {
         val p1 = PassRegistry()
         val p2 = PassRegistry()
 

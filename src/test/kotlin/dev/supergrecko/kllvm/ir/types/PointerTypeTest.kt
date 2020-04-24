@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test
 class PointerTypeTest {
     @Test
     fun `underlying type matches`() {
-        val type =
-            IntType(32)
+        val type = IntType(32)
         val ptr = type.toPointerType()
 
         assertEquals(type.ref, ptr.getElementType().ref)
@@ -15,8 +14,7 @@ class PointerTypeTest {
 
     @Test
     fun `subtype matches`() {
-        val type =
-            IntType(32)
+        val type = IntType(32)
         val ptr = type.toPointerType()
 
         assertEquals(type.getTypeKind(), ptr.getSubtypes().first().getTypeKind())
@@ -24,17 +22,14 @@ class PointerTypeTest {
 
     @Test
     fun `count matches`() {
-        val type = IntType(
-            32
-        ).toPointerType()
+        val type = IntType(32).toPointerType()
 
         assertEquals(1, type.getElementCount())
     }
 
     @Test
     fun `address space matches`() {
-        val type =
-            IntType(32)
+        val type = IntType(32)
         val ptr = type.toPointerType(100)
 
         assertEquals(100, ptr.getAddressSpace())

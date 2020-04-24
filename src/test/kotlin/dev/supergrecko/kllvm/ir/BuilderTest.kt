@@ -15,8 +15,7 @@ class BuilderTest {
         val builder = Builder()
         assertNull(builder.getInsertBlock())
 
-        val module =
-            Module("test.ll")
+        val module = Module("test.ll")
         val function = module.addFunction(
             "test",
             FunctionType(
@@ -41,7 +40,7 @@ class BuilderTest {
     }
 
     @Test
-    fun `should not be able to double free`() {
+    fun `will fail when attempting to dispose twice`() {
         val builder = Builder()
         builder.dispose()
 
@@ -70,8 +69,7 @@ class BuilderTest {
 
     @Test
     fun `should create call instruction`() {
-        val module =
-            Module("test.ll")
+        val module = Module("test.ll")
         val boolType = IntType(1)
 
         module.addFunction(
@@ -85,8 +83,10 @@ class BuilderTest {
 
         val externFunc = module.getFunction("test")
         val builder = Builder()
-        val _false = ConstantInt(boolType, 0, false)
-        val _true = ConstantInt(boolType, 1, false)
+
+        val falseValue = ConstantInt(boolType, 0, false)
+        val trueValue = ConstantInt(boolType, 1, false)
+
         val caller = module.addFunction(
             "caller",
             FunctionType(
@@ -102,8 +102,16 @@ class BuilderTest {
         if (externFunc !is Value) {
             assertEquals("extern func", "is not a value")
         } else {
-            val instruction = builder.buildCall(externFunc, listOf(_false, _true), "util")
-            assertEquals("%util = call i1 @test(i1 false, i1 true)", instruction.dumpToString().trim())
+            val instruction = builder.buildCall(
+                externFunc, listOf(
+                    falseValue,
+                    trueValue
+                ), "util"
+            )
+            assertEquals(
+                "%util = call i1 @test(i1 false, i1 true)", instruction.dumpToString()
+                    .trim()
+            )
         }
     }
 }

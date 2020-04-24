@@ -3,7 +3,7 @@ package dev.supergrecko.kllvm.ir
 import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
-import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.types.ArrayType
 import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.types.FunctionType
@@ -68,7 +68,7 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
      * @see LLVM.LLVMTypeIsSized
      */
     public fun isSized(): Boolean {
-        return LLVM.LLVMTypeIsSized(ref).toBoolean()
+        return LLVM.LLVMTypeIsSized(ref).fromLLVMBool()
     }
 
     /**

@@ -1,8 +1,8 @@
 package dev.supergrecko.kllvm.ir.types
 
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.internal.util.map
-import dev.supergrecko.kllvm.internal.util.toBoolean
-import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.Type
 import dev.supergrecko.kllvm.ir.TypeKind
@@ -37,7 +37,7 @@ public class StructType internal constructor() : Type(),
         val arr = ArrayList(types.map { it.ref }).toTypedArray()
 
         ref =
-            LLVM.LLVMStructTypeInContext(ctx.ref, PointerPointer(*arr), arr.size, packed.toInt())
+            LLVM.LLVMStructTypeInContext(ctx.ref, PointerPointer(*arr), arr.size, packed.toLLVMBool())
     }
 
     /**
@@ -57,15 +57,15 @@ public class StructType internal constructor() : Type(),
 
     //region Core::Types::StructureTypes
     public fun isPacked(): Boolean {
-        return LLVM.LLVMIsPackedStruct(ref).toBoolean()
+        return LLVM.LLVMIsPackedStruct(ref).fromLLVMBool()
     }
 
     public fun isOpaque(): Boolean {
-        return LLVM.LLVMIsOpaqueStruct(ref).toBoolean()
+        return LLVM.LLVMIsOpaqueStruct(ref).fromLLVMBool()
     }
 
     public fun isLiteral(): Boolean {
-        return LLVM.LLVMIsLiteralStruct(ref).toBoolean()
+        return LLVM.LLVMIsLiteralStruct(ref).fromLLVMBool()
     }
 
     public fun setBody(elementTypes: List<Type>, packed: Boolean) {
@@ -75,7 +75,7 @@ public class StructType internal constructor() : Type(),
         val array = ArrayList(types).toTypedArray()
         val ptr = PointerPointer(*array)
 
-        LLVM.LLVMStructSetBody(ref, ptr, array.size, packed.toInt())
+        LLVM.LLVMStructSetBody(ref, ptr, array.size, packed.toLLVMBool())
     }
 
     public fun getElementTypeAt(index: Int): Type {

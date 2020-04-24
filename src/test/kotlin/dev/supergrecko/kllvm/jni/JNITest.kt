@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.jni
 
+import kotlin.test.assertTrue
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.Test
  */
 class JNITest {
     @Test
-    fun `test llvm bindings work`() {
+    fun `raw bindings work without any library interference`() {
         LLVM.LLVMLinkInMCJIT()
         LLVM.LLVMInitializeNativeAsmPrinter()
         LLVM.LLVMInitializeNativeAsmParser()
@@ -20,7 +21,7 @@ class JNITest {
         val mod = LLVM.LLVMModuleCreateWithName("test_module")
         val builder = LLVM.LLVMCreateBuilder()
 
-        assert(mod is LLVMModuleRef)
+        assertTrue { mod is LLVMModuleRef }
 
         LLVM.LLVMDisposeModule(mod)
         LLVM.LLVMDisposeBuilder(builder)

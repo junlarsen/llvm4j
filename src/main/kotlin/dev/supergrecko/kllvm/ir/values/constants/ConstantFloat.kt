@@ -1,6 +1,6 @@
 package dev.supergrecko.kllvm.ir.values.constants
 
-import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.values.Constant
@@ -21,13 +21,14 @@ public class ConstantFloat internal constructor() : Value(), Constant {
     /**
      * Obtains the double value for a floating point const value
      *
-     * The returned [Pair] contains the obtained value and whether precision was lost or not.
+     * The returned [Pair] contains the obtained value and whether precision was
+     * lost or not.
      */
     public fun getDouble(): Pair<Double, Boolean> {
         val ptr = IntPointer()
         val double = LLVM.LLVMConstRealGetDouble(ref, ptr)
 
-        return (double) to (ptr.get().toBoolean())
+        return (double) to (ptr.get().fromLLVMBool())
     }
     //endregion Core::Values::Constants::ScalarConstants
 
@@ -52,11 +53,11 @@ public class ConstantFloat internal constructor() : Value(), Constant {
      * This value is not modified, but it returns a new value with the result of
      * the operation.
      */
-    public fun add(v: ConstantFloat): ConstantFloat {
+    public fun add(rhs: ConstantFloat): ConstantFloat {
         require(isConstant())
-        require(getType().getTypeKind() == v.getType().getTypeKind())
+        require(getType().getTypeKind() == rhs.getType().getTypeKind())
 
-        val ref = LLVM.LLVMConstFAdd(ref, v.ref)
+        val ref = LLVM.LLVMConstFAdd(ref, rhs.ref)
 
         return ConstantFloat(ref)
     }
@@ -67,11 +68,11 @@ public class ConstantFloat internal constructor() : Value(), Constant {
      * This value is not modified, but it returns a new value with the result of
      * the operation.
      */
-    public fun sub(v: ConstantFloat): ConstantFloat {
+    public fun sub(rhs: ConstantFloat): ConstantFloat {
         require(isConstant())
-        require(getType().getTypeKind() == v.getType().getTypeKind())
+        require(getType().getTypeKind() == rhs.getType().getTypeKind())
 
-        val ref = LLVM.LLVMConstFSub(ref, v.ref)
+        val ref = LLVM.LLVMConstFSub(ref, rhs.ref)
 
         return ConstantFloat(ref)
     }
@@ -82,25 +83,23 @@ public class ConstantFloat internal constructor() : Value(), Constant {
      * This value is not modified, but it returns a new value with the result of
      * the operation.
      */
-    public fun mul(v: ConstantFloat): ConstantFloat {
+    public fun mul(rhs: ConstantFloat): ConstantFloat {
         require(isConstant())
-        require(getType().getTypeKind() == v.getType().getTypeKind())
+        require(getType().getTypeKind() == rhs.getType().getTypeKind())
 
-        val ref = LLVM.LLVMConstMul(ref, v.ref)
+        val ref = LLVM.LLVMConstMul(ref, rhs.ref)
 
         return ConstantFloat(ref)
     }
 
     /**
      * Perform division with another float
-     *
-     * TODO: Find a way to return something more exact than Value
      */
-    public fun div(v: ConstantFloat): ConstantFloat {
+    public fun div(rhs: ConstantFloat): ConstantFloat {
         require(isConstant())
-        require(getType().getTypeKind() == v.getType().getTypeKind())
+        require(getType().getTypeKind() == rhs.getType().getTypeKind())
 
-        val ref = LLVM.LLVMConstFDiv(ref, v.ref)
+        val ref = LLVM.LLVMConstFDiv(ref, rhs.ref)
 
         return ConstantFloat(ref)
     }

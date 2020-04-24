@@ -2,10 +2,10 @@ package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
-import dev.supergrecko.kllvm.internal.util.toBoolean
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
-import dev.supergrecko.kllvm.ir.values.GlobalValue
+import dev.supergrecko.kllvm.ir.values.GlobalVariable
 import dev.supergrecko.kllvm.support.MemoryBuffer
 import dev.supergrecko.kllvm.support.VerifierFailureAction
 import java.io.File
@@ -86,11 +86,23 @@ public class Module internal constructor() : AutoCloseable,
 
         return FunctionValue(ref)
     }
-
-    fun addGlobal(type: Type, name: String): GlobalValue {
-        return GlobalValue(LLVM.LLVMAddGlobal(ref, type.ref, name))
-    }
     //endregion Core::Modules
+
+    //region Core::Values::Constants::GlobalVariables
+    fun addGlobal(
+        type: Type,
+        name: String,
+        addressSpace: Int? = null
+    ): GlobalVariable {
+        val global = if (addressSpace == null) {
+            LLVM.LLVMAddGlobal(ref, type.ref, name)
+        } else {
+            LLVM.LLVMAddGlobalInAddressSpace(ref, type.ref, name, addressSpace)
+        }
+
+        return GlobalVariable(global)
+    }
+    //endregion Core::Values::Constants::GlobalVariables
 
     //region BitWriter
     public fun toMemoryBuffer(): MemoryBuffer {
@@ -129,6 +141,8 @@ public class Module internal constructor() : AutoCloseable,
      * TODO: Find a nice way to return the string which the LLVM method returns
      *   Because of this. When calling this with PrintMessage or ReturnStatus
      *   the underlying bytes in the ptr are really strange (see #67)
+     *
+     * TODO: Test invalid module
      */
     public fun verify(action: VerifierFailureAction): Boolean {
         val ptr = BytePointer(ByteBuffer.allocate(0))
@@ -136,14 +150,12 @@ public class Module internal constructor() : AutoCloseable,
         val res = LLVM.LLVMVerifyModule(ref, action.value, ptr)
 
         // LLVM Source says:
-        // > Note that this function's return value is inverted from what you would
-        // > expect of a function called "verify"
+        // > Note that this function's return value is inverted from what you
+        // would expect of a function called "verify"
         // Thus we invert it again ...
-        return !res.toBoolean()
+        return !res.fromLLVMBool()
     }
     //endregion Analysis
 
     public override fun close() = dispose()
-
-    public fun getUnderlyingReference() = ref
 }

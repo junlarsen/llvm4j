@@ -12,13 +12,8 @@ class IntegerTypeTest {
         val ctx = Context()
 
         runAll(1, 8, 16, 32, 64, 128) {
-            val contextType =
-                IntType(
-                    it,
-                    ctx
-                )
-            val globalType =
-                IntType(it)
+            val contextType = IntType(it, ctx)
+            val globalType = IntType(it)
 
             assertEquals(contextType.getTypeWidth(), globalType.getTypeWidth())
         }
@@ -29,11 +24,7 @@ class IntegerTypeTest {
         val ctx = Context()
 
         runAll(1, 8, 16, 32, 64, 128) {
-            val type =
-                IntType(
-                    it,
-                    ctx
-                )
+            val type = IntType(it, ctx)
 
             assertTrue { !type.ref.isNull }
         }

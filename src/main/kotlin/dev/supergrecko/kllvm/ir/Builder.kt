@@ -8,8 +8,9 @@ import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Builder public constructor(context: Context = Context.getGlobalContext()) :
-    AutoCloseable, Validatable, Disposable {
+public class Builder public constructor(
+    context: Context = Context.getGlobalContext()
+) : AutoCloseable, Validatable, Disposable {
     internal var ref: LLVMBuilderRef
     public override var valid: Boolean = true
 

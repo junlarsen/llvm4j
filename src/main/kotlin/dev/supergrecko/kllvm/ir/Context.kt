@@ -2,8 +2,8 @@ package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
-import dev.supergrecko.kllvm.internal.util.toBoolean
-import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
+import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
@@ -15,12 +15,14 @@ import org.bytedeco.llvm.global.LLVM
  *
  * - [Documentation](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html)
  *
- * @throws IllegalArgumentException If any argument assertions fail. Most noticeably functions which involve a context ref.
+ * @throws IllegalArgumentException If any argument assertions fail. Most
+ * noticeably functions which involve a context ref.
  *
  * Note: This primary constructor is public because anyone should be able to
  * create a context. The init block ensures the ref is valid
  */
-public class Context public constructor() : AutoCloseable, Validatable, Disposable {
+public class Context public constructor() : AutoCloseable, Validatable,
+    Disposable {
     internal var ref: LLVMContextRef
     public override var valid: Boolean = true
 
@@ -50,30 +52,19 @@ public class Context public constructor() : AutoCloseable, Validatable, Disposab
             val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(ref)
 
             // Conversion from C++ bool to kotlin Boolean
-            return willDiscard.toBoolean()
+            return willDiscard.fromLLVMBool()
         }
         set(value) {
             require(valid) { "This module has already been disposed." }
 
             // Conversion from kotlin Boolean to C++ bool
-            val intValue = value.toInt()
+            val intValue = value.toLLVMBool()
 
             LLVM.LLVMContextSetDiscardValueNames(ref, intValue)
         }
 
     /**
-     * A LLVM Context has a diagnostic handler. The receiving pointer will be passed to the handler.
-     *
-     * The C++ code for the DiagnosticHandler looks a little like this.
-     *
-     * struct DiagnosticHandler {
-     *   void *DiagnosticContext = nullptr;
-     *   DiagnosticHandler(void *DiagContext = nullptr)
-     *     : DiagnosticContext(DiagContext) {}
-     * }
-     *
-     * @param handler The diagnostic handler to use
-     * @param diagnosticContext The diagnostic context. Pointer types: DiagnosticContext*
+     * Set the DiagnosticHandler for this context
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
@@ -92,10 +83,6 @@ public class Context public constructor() : AutoCloseable, Validatable, Disposab
 
     /**
      * Sets the diagnostic handler without a specified context.
-     *
-     * This sets the context to be a nullptr.
-     *
-     * @param handler The diagnostic handler to use
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
@@ -125,9 +112,6 @@ public class Context public constructor() : AutoCloseable, Validatable, Disposab
     /**
      * Register a yield callback with the given context.
      *
-     * @param callback Callback to register. C++ Type: void (*)(LLVMContext *Context, void *OpaqueHandle)
-     * @param opaqueHandle Pointer types: void*
-     *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
      * @see LLVM.LLVMContextSetYieldCallback
@@ -150,8 +134,8 @@ public class Context public constructor() : AutoCloseable, Validatable, Disposab
      * Note that after using this, the [Context] should not be used again as
      * its LLVM reference has been disposed.
      *
-     * Any calls referencing this context after it has been dropped will most likely fail
-     * as the inner LLVM Context will be set to a null pointer after
+     * Any calls referencing this context after it has been dropped will most
+     * likely fail as the inner LLVM Context will be set to a null pointer after
      * this is called.
      *
      * @throws IllegalArgumentException If internal instance has been dropped.

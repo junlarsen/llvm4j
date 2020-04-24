@@ -1,7 +1,6 @@
 package dev.supergrecko.kllvm.ir.values
 
 import dev.supergrecko.kllvm.ir.Module
-import dev.supergrecko.kllvm.ir.types.FunctionType
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -60,8 +59,7 @@ public class IndirectFunction internal constructor() : FunctionValue() {
 
             return if (fn.isNull) {
                 throw IllegalArgumentException(
-                    "Function $name could not be " +
-                            "found in module"
+                    "Function $name could not be found in module."
                 )
             } else {
                 IndirectFunction(fn)

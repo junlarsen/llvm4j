@@ -11,7 +11,8 @@ import org.bytedeco.llvm.global.LLVM
  *
  * [Documentation](https://llvm.org/doxygen/group__LLVMCAnalysis.html)
  */
-public enum class VerifierFailureAction(public override val value: Int) : OrderedEnum<Int> {
+public enum class VerifierFailureAction(public override val value: Int) :
+    OrderedEnum<Int> {
     AbortProcess(LLVM.LLVMAbortProcessAction),
     PrintMessage(LLVM.LLVMPrintMessageAction),
     ReturnStatus(LLVM.LLVMReturnStatusAction)

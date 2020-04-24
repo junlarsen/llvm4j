@@ -3,14 +3,13 @@ package dev.supergrecko.kllvm.ir
 import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
-import dev.supergrecko.kllvm.internal.util.toBoolean
-import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.instructions.Instruction
 import dev.supergrecko.kllvm.ir.instructions.Opcode
 import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GenericValue
-import dev.supergrecko.kllvm.ir.values.GlobalValue
+import dev.supergrecko.kllvm.ir.values.GlobalVariable
 import dev.supergrecko.kllvm.ir.values.MetadataValue
 import dev.supergrecko.kllvm.ir.values.PhiValue
 import dev.supergrecko.kllvm.ir.values.PointerValue
@@ -71,68 +70,6 @@ public open class Value internal constructor() :
         ref = value
     }
 
-    //region Core::Values::Constants::GlobalVariables
-    /**
-     * Use whether this value is externally initialized or not
-     *
-     * @see LLVM.LLVMIsExternallyInitialized
-     * @see LLVM.LLVMSetExternallyInitialized
-     */
-    public var externallyInitialized: Boolean
-        get() = LLVM.LLVMIsExternallyInitialized(ref).toBoolean()
-        set(value) = LLVM.LLVMSetExternallyInitialized(ref, value.toInt())
-
-    /**
-     * Use the initializer value for this value
-     *
-     * @see LLVM.LLVMGetInitializer
-     * @see LLVM.LLVMSetInitializer
-     */
-    public var initializer: Value
-        get() = Value(
-            LLVM.LLVMGetInitializer(
-                ref
-            )
-        )
-        set(value) = LLVM.LLVMSetInitializer(ref, value.ref)
-
-    /**
-     * Determine whether this value should be global or not
-     *
-     * @see LLVM.LLVMIsGlobalConstant
-     * @see LLVM.LLVMSetGlobalConstant
-     */
-    public var globalConstant: Boolean
-        get() = LLVM.LLVMIsGlobalConstant(ref).toBoolean()
-        set(value) = LLVM.LLVMSetGlobalConstant(ref, value.toInt())
-
-    /**
-     * Use the thread local mode for this value
-     *
-     * @see LLVM.LLVMSetThreadLocalMode
-     * @see LLVM.LLVMGetThreadLocalMode
-     */
-    public var threadLocalMode: ThreadLocalMode
-        get() {
-            val mode = LLVM.LLVMGetThreadLocalMode(ref)
-
-            return ThreadLocalMode.values()
-                .firstOrNull { it.value == mode }
-                ?: throw Unreachable()
-        }
-        set(value) = LLVM.LLVMSetThreadLocalMode(ref, value.value)
-
-    /**
-     * Use whether this value is thread local
-     *
-     * @see LLVM.LLVMSetThreadLocal
-     * @see LLVM.LLVMIsThreadLocal
-     */
-    public var threadLocal: Boolean
-        get() = LLVM.LLVMIsThreadLocal(ref).toBoolean()
-        set(value) = LLVM.LLVMSetThreadLocal(ref, value.toInt())
-    //endregion Core::Values::Constants::GlobalVariables
-
     //region Core::Values::Constants::GeneralAPIs
     /**
      * Use the IR name for this value
@@ -165,7 +102,7 @@ public open class Value internal constructor() :
      * @see LLVM.LLVMIsUndef
      */
     public fun isUndef(): Boolean {
-        return LLVM.LLVMIsUndef(ref).toBoolean()
+        return LLVM.LLVMIsUndef(ref).fromLLVMBool()
     }
 
     /**
@@ -174,7 +111,7 @@ public open class Value internal constructor() :
      * @see LLVM.LLVMIsConstant
      */
     public fun isConstant(): Boolean {
-        return LLVM.LLVMIsConstant(ref).toBoolean()
+        return LLVM.LLVMIsConstant(ref).fromLLVMBool()
     }
 
     /**
@@ -227,7 +164,7 @@ public open class Value internal constructor() :
      * @see LLVM.LLVMIsNull
      */
     public fun isNull(): Boolean {
-        return LLVM.LLVMIsNull(ref).toBoolean()
+        return LLVM.LLVMIsNull(ref).fromLLVMBool()
     }
 
     /**
@@ -269,7 +206,7 @@ public open class Value internal constructor() :
     public fun asFloatValue() = ConstantFloat(ref)
     public fun asFunctionValue() = FunctionValue(ref)
     public fun asGenericValue() = GenericValue(ref)
-    public fun asGlobalValue() = GlobalValue(ref)
+    public fun asGlobalValue() = GlobalVariable(ref)
     public fun asInstructionValue() = Instruction(ref)
     public fun asIntValue() = ConstantInt(ref)
     public fun asMetadataValue() = MetadataValue(ref)
@@ -292,7 +229,9 @@ public open class Value internal constructor() :
             return ValueKind.values()
                 .firstOrNull { it.value == kind }
             // Theoretically unreachable, but kept if wrong LLVM version is used
-                ?: throw IllegalArgumentException("Value $value has invalid value kind")
+                ?: throw IllegalArgumentException(
+                    "Value $value has invalid value kind"
+                )
         }
     }
 }

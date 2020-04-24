@@ -1,6 +1,6 @@
 package dev.supergrecko.kllvm.ir.values.constants
 
-import dev.supergrecko.kllvm.internal.util.toInt
+import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.StructType
@@ -28,7 +28,7 @@ public class ConstantStruct internal constructor() : Value(), Constant {
             context.ref,
             PointerPointer(*ptr),
             ptr.size,
-            packed.toInt()
+            packed.toLLVMBool()
         )
     }
 
