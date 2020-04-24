@@ -5,6 +5,8 @@ import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
+import dev.supergrecko.kllvm.ir.values.GlobalAlias
+import dev.supergrecko.kllvm.ir.values.GlobalValue
 import dev.supergrecko.kllvm.ir.values.GlobalVariable
 import dev.supergrecko.kllvm.support.MemoryBuffer
 import dev.supergrecko.kllvm.support.VerifierFailureAction
@@ -87,6 +89,44 @@ public class Module internal constructor() : AutoCloseable,
         return FunctionValue(ref)
     }
     //endregion Core::Modules
+
+    //region Core::Values::Constants::GlobalAliases
+    /**
+     * Add an alias of a global variable or function inside this module
+     *
+     * @see LLVM.LLVMAddAlias
+     */
+    public fun addAlias(type: Type, aliasOf: Value, name: String): GlobalAlias {
+        require(aliasOf.getType().getTypeKind() == type.getTypeKind())
+
+        val alias = LLVM.LLVMAddAlias(ref, type.ref, aliasOf.ref, name)
+
+        return GlobalAlias(alias)
+    }
+
+    /**
+     * Get a named alias from this module
+     *
+     * Returns null if the alias does not exist
+     *
+     * @see LLVM.LLVMGetNamedGlobalAlias
+     *
+     * TODO: Check if .isNull is enough to determine nullity
+     */
+    public fun getAlias(name: String): GlobalAlias? {
+        val alias = LLVM.LLVMGetNamedGlobalAlias(
+            ref,
+            name,
+            name.length.toLong()
+        )
+
+        return if (alias.isNull) {
+            null
+        } else {
+            GlobalAlias(alias)
+        }
+    }
+    //endregion Core::Values::Constants::GlobalAliases
 
     //region Core::Values::Constants::GlobalVariables
     fun addGlobal(
