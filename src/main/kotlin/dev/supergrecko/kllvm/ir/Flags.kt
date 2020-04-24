@@ -125,7 +125,7 @@ public enum class AttributeIndex(public override val value: Long) :
  * Used for `unnamed_addr`. In LLVM variables can be marked with unnamed_addr,
  * either local, global or none
  */
-public enum class UnnamedAddr(public override val value: Int) :
+public enum class UnnamedAddress(public override val value: Int) :
     OrderedEnum<Int> {
     None(LLVM.LLVMNoUnnamedAddr),
     Local(LLVM.LLVMLocalUnnamedAddr),
