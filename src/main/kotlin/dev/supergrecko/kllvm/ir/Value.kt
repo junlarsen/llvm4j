@@ -90,7 +90,7 @@ public open class Value internal constructor() :
      *
      * @see LLVM.LLVMTypeOf
      */
-    public fun getType(): Type {
+    public open fun getType(): Type {
         val type = LLVM.LLVMTypeOf(ref)
 
         return Type(type)
