@@ -38,7 +38,7 @@ public enum class Linkage(public override val value: Int) : OrderedEnum<Int> {
     PrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage),
 }
 
-public class GlobalValue internal constructor(): Value() {
+public open class GlobalValue internal constructor(): Value(), Constant {
     /**
      * Construct a new Type from an LLVM pointer reference
      */
