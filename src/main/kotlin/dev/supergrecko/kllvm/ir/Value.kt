@@ -9,7 +9,7 @@ import dev.supergrecko.kllvm.ir.instructions.Opcode
 import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GenericValue
-import dev.supergrecko.kllvm.ir.values.GlobalValue
+import dev.supergrecko.kllvm.ir.values.GlobalVariable
 import dev.supergrecko.kllvm.ir.values.MetadataValue
 import dev.supergrecko.kllvm.ir.values.PhiValue
 import dev.supergrecko.kllvm.ir.values.PointerValue
@@ -206,7 +206,7 @@ public open class Value internal constructor() :
     public fun asFloatValue() = ConstantFloat(ref)
     public fun asFunctionValue() = FunctionValue(ref)
     public fun asGenericValue() = GenericValue(ref)
-    public fun asGlobalValue() = GlobalValue(ref)
+    public fun asGlobalValue() = GlobalVariable(ref)
     public fun asInstructionValue() = Instruction(ref)
     public fun asIntValue() = ConstantInt(ref)
     public fun asMetadataValue() = MetadataValue(ref)

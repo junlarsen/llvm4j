@@ -1,4 +1,4 @@
-package dev.supergrecko.kllvm.ir.values
+package dev.supergrecko.kllvm.ir.values.constants
 
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt

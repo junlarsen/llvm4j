@@ -1,4 +1,4 @@
-package dev.supergrecko.kllvm.ir.values
+package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.ir.ValueKind
 import dev.supergrecko.kllvm.ir.types.IntType

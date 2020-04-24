@@ -5,7 +5,7 @@ import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
-import dev.supergrecko.kllvm.ir.values.GlobalValue
+import dev.supergrecko.kllvm.ir.values.GlobalVariable
 import dev.supergrecko.kllvm.support.MemoryBuffer
 import dev.supergrecko.kllvm.support.VerifierFailureAction
 import java.io.File
@@ -93,14 +93,14 @@ public class Module internal constructor() : AutoCloseable,
         type: Type,
         name: String,
         addressSpace: Int? = null
-    ): GlobalValue {
+    ): GlobalVariable {
         val global = if (addressSpace == null) {
             LLVM.LLVMAddGlobal(ref, type.ref, name)
         } else {
             LLVM.LLVMAddGlobalInAddressSpace(ref, type.ref, name, addressSpace)
         }
 
-        return GlobalValue(global)
+        return GlobalVariable(global)
     }
     //endregion Core::Values::Constants::GlobalVariables
 
