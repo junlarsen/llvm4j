@@ -10,7 +10,8 @@ import org.bytedeco.llvm.global.LLVM
  *
  * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
  */
-public enum class IntPredicate(public override val value: Int) : OrderedEnum<Int> {
+public enum class IntPredicate(public override val value: Int) :
+    OrderedEnum<Int> {
     EQ(LLVM.LLVMIntEQ),
     NE(LLVM.LLVMIntNE),
     UGT(LLVM.LLVMIntUGT),
@@ -28,7 +29,8 @@ public enum class IntPredicate(public override val value: Int) : OrderedEnum<Int
  *
  * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
  */
-public enum class RealPredicate(public override val value: Int) : OrderedEnum<Int> {
+public enum class RealPredicate(public override val value: Int) :
+    OrderedEnum<Int> {
     PredicateFalse(LLVM.LLVMRealPredicateFalse),
     OEQ(LLVM.LLVMRealOEQ),
     OGT(LLVM.LLVMRealOGT),

@@ -2,13 +2,10 @@ package dev.supergrecko.kllvm.ir.types
 
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.TypeKind
-
-import org.bytedeco.llvm.global.LLVM
-
-import org.junit.jupiter.api.Test
-
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.bytedeco.llvm.global.LLVM
+import org.junit.jupiter.api.Test
 
 class FunctionTypeTest {
     @Test

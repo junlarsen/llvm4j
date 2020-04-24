@@ -2,9 +2,7 @@ package dev.supergrecko.kllvm.internal
 
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.internal.util.toLLVMBool
-
 import kotlin.test.assertEquals
-
 import org.junit.jupiter.api.Test
 
 class ConversionsTest {

@@ -1,8 +1,8 @@
 package dev.supergrecko.kllvm.ir.values
 
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
-import dev.supergrecko.kllvm.internal.util.map
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
+import dev.supergrecko.kllvm.internal.util.map
 import dev.supergrecko.kllvm.ir.Attribute
 import dev.supergrecko.kllvm.ir.AttributeIndex
 import dev.supergrecko.kllvm.ir.BasicBlock
@@ -11,12 +11,11 @@ import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.support.VerifierFailureAction
-
+import java.lang.RuntimeException
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
-import java.lang.RuntimeException
 
 public open class FunctionValue internal constructor() : Value() {
     // TODO: Test entire unit
@@ -64,7 +63,7 @@ public open class FunctionValue internal constructor() : Value() {
      * @see LLVM.LLVMGetParams
      */
     public fun getParameters(): List<Value> {
-         val ptr = PointerPointer<LLVMValueRef>(getParameterCount().toLong())
+        val ptr = PointerPointer<LLVMValueRef>(getParameterCount().toLong())
 
         LLVM.LLVMGetParams(ref, ptr)
 
@@ -320,8 +319,8 @@ public open class FunctionValue internal constructor() : Value() {
      */
     public fun verify(action: VerifierFailureAction): Boolean {
         // LLVM Source says:
-        // > Note that this function's return value is inverted from what you would
-        // > expect of a function called "verify".
+        // > Note that this function's return value is inverted from what you
+        // > would expect of a function called "verify".
         // Thus we invert it again ...
         return !LLVM.LLVMVerifyFunction(ref, action.value).fromLLVMBool()
     }

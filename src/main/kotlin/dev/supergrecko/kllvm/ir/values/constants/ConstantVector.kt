@@ -42,7 +42,8 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * Negate the constant value
      *
      * LLVM doesn't actually have a neg instruction, but it's implemented using
-     * subtraction. It subtracts the value of max value of the types of the value
+     * subtraction. It subtracts the value of max value of the types of the
+     * value
      *
      * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
      * respectively. If [hasNUW] [hasNSW] are present, the result
@@ -327,7 +328,10 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * This method receives a [predicate] which determines which logical
      * comparison method shall be used for the comparison.
      */
-    public fun cmp(predicate: IntPredicate, rhs: ConstantVector): ConstantVector {
+    public fun cmp(
+        predicate: IntPredicate,
+        rhs: ConstantVector
+    ): ConstantVector {
         require(getType().getTypeKind() == TypeKind.Integer)
         require(rhs.getType().getTypeKind() == TypeKind.Integer)
 

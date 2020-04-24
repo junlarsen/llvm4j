@@ -69,7 +69,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * the operation.
      *
      * LLVM doesn't actually have a neg instruction, but it's implemented using
-     * subtraction. It subtracts the value of max value of the types of the value
+     * subtraction. It subtracts the value of max value of the types of the
+     * value
      *
      * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
      * respectively. If [hasNUW] [hasNSW] are present, the result
@@ -78,7 +79,10 @@ public class ConstantInt internal constructor() : Value(), Constant {
      *
      * @see LLVM.LLVMConstNeg
      */
-    public fun neg(hasNUW: Boolean = false, hasNSW: Boolean = false): ConstantInt {
+    public fun neg(
+        hasNUW: Boolean = false,
+        hasNSW: Boolean = false
+    ): ConstantInt {
         require(!(hasNSW && hasNSW)) { "Cannot negate with both NSW and NUW" }
 
         val ref = when (true) {
@@ -211,7 +215,11 @@ public class ConstantInt internal constructor() : Value(), Constant {
      *
      * TODO: Find a way to determine if types is unsigned
      */
-    public fun div(rhs: ConstantInt, exact: Boolean, unsigned: Boolean): ConstantInt {
+    public fun div(
+        rhs: ConstantInt,
+        exact: Boolean,
+        unsigned: Boolean
+    ): ConstantInt {
         val ref = when (true) {
             unsigned && exact -> LLVM.LLVMConstExactUDiv(ref, rhs.ref)
             !unsigned && exact -> LLVM.LLVMConstExactSDiv(ref, rhs.ref)

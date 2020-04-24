@@ -48,7 +48,9 @@ public class IntrinsicFunction internal constructor() {
      *
      * @see LLVM.LLVMIntrinsicIsOverloaded
      */
-    public fun isOverloaded() = LLVM.LLVMIntrinsicIsOverloaded(id).fromLLVMBool()
+    public fun isOverloaded(): Boolean {
+        return LLVM.LLVMIntrinsicIsOverloaded(id).fromLLVMBool()
+    }
 
     /**
      * Get the name of an overloaded intrinsic by its parameter list

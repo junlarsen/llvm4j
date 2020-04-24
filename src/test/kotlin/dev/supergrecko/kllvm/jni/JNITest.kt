@@ -1,10 +1,8 @@
 package dev.supergrecko.kllvm.jni
 
 import kotlin.test.assertTrue
-
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
-
 import org.junit.jupiter.api.Test
 
 /**

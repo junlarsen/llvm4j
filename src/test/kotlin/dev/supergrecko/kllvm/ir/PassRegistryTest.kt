@@ -1,7 +1,6 @@
 package dev.supergrecko.kllvm.ir
 
 import kotlin.test.assertEquals
-
 import org.junit.jupiter.api.Test
 
 class PassRegistryTest {

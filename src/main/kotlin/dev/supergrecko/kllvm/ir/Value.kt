@@ -229,7 +229,9 @@ public open class Value internal constructor() :
             return ValueKind.values()
                 .firstOrNull { it.value == kind }
             // Theoretically unreachable, but kept if wrong LLVM version is used
-                ?: throw IllegalArgumentException("Value $value has invalid value kind")
+                ?: throw IllegalArgumentException(
+                    "Value $value has invalid value kind"
+                )
         }
     }
 }

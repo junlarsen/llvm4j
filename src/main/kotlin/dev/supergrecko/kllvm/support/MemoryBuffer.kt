@@ -29,7 +29,9 @@ public class MemoryBuffer internal constructor() :
         return Module(ptr)
     }
 
-    public fun getModule(context: Context = Context.getGlobalContext()): Module {
+    public fun getModule(
+        context: Context = Context.getGlobalContext()
+    ): Module {
         val ptr = LLVMModuleRef()
 
         LLVM.LLVMGetBitcodeModuleInContext2(context.ref, ref, ptr)

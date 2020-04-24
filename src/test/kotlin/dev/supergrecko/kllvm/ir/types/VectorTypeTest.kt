@@ -1,9 +1,9 @@
 package dev.supergrecko.kllvm.ir.types
 
 import dev.supergrecko.kllvm.ir.TypeKind
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import org.junit.jupiter.api.Test
 
 class VectorTypeTest {
     @Test

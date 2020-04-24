@@ -5,11 +5,9 @@ import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.ThreadLocalMode
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
-
-import org.junit.jupiter.api.Test
-
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import org.junit.jupiter.api.Test
 
 class GlobalVariableTest {
     @Test
@@ -43,4 +41,3 @@ class GlobalVariableTest {
         }
     }
 }
-

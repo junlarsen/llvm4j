@@ -72,7 +72,7 @@ public enum class Visibility(public override val value: Int) :
 /**
  * This is used for exception handling with the landing pad instruction type
  *
- * [Documentation](https://llvm.org/docs/LangRef.html#i-landingpad)
+ * [See](https://llvm.org/docs/LangRef.html#i-landingpad)
  */
 public enum class LandingPadClauseType(public override val value: Int) :
     OrderedEnum<Int> {
@@ -113,7 +113,7 @@ public enum class AtomicRMWBinaryOperation(public override val value: Int) :
 /**
  * Used for LLVM AttributeLists
  *
- * [Documentation](https://llvm.org/docs/HowToUseAttributes.html#attributelist)
+ * [See](https://llvm.org/docs/HowToUseAttributes.html#attributelist)
  */
 public enum class AttributeIndex(public override val value: Long) :
     OrderedEnum<Long> {
@@ -125,7 +125,8 @@ public enum class AttributeIndex(public override val value: Long) :
  * Used for `unnamed_addr`. In LLVM variables can be marked with unnamed_addr,
  * either local, global or none
  */
-public enum class UnnamedAddr(public override val value: Int) : OrderedEnum<Int> {
+public enum class UnnamedAddr(public override val value: Int) :
+    OrderedEnum<Int> {
     None(LLVM.LLVMNoUnnamedAddr),
     Local(LLVM.LLVMLocalUnnamedAddr),
     Global(LLVM.LLVMGlobalUnnamedAddr)
@@ -134,9 +135,10 @@ public enum class UnnamedAddr(public override val value: Int) : OrderedEnum<Int>
 /**
  * These flags are used for metadata about modules.
  *
- * [Documentation](https://llvm.org/docs/LangRef.html#module-flags-metadata)
+ * [See](https://llvm.org/docs/LangRef.html#module-flags-metadata)
  */
-public enum class ModuleFlagBehavior(public override val value: Int) : OrderedEnum<Int> {
+public enum class ModuleFlagBehavior(public override val value: Int) :
+    OrderedEnum<Int> {
     Error(LLVM.LLVMModuleFlagBehaviorError),
     Warning(LLVM.LLVMModuleFlagBehaviorWarning),
     Require(LLVM.LLVMModuleFlagBehaviorRequire),
@@ -147,10 +149,9 @@ public enum class ModuleFlagBehavior(public override val value: Int) : OrderedEn
 
 /**
  * Used for setting severity levels on diagnostics
- *
- * [Documentation](https://llvm.org/doxygen/namespacellvm.html#abfcab32516704f11d146c757f402ad5c)
  */
-public enum class DiagnosticSeverity(public override val value: Int) : OrderedEnum<Int> {
+public enum class DiagnosticSeverity(public override val value: Int) :
+    OrderedEnum<Int> {
     Error(LLVM.LLVMDSError),
     Warning(LLVM.LLVMDSWarning),
     Remark(LLVM.LLVMDSRemark),
@@ -160,9 +161,10 @@ public enum class DiagnosticSeverity(public override val value: Int) : OrderedEn
 /**
  * Used for marking DLL Storage Class types
  *
- * [Documentation](https://llvm.org/docs/LangRef.html#dll-storage-classes)
+ * [See](https://llvm.org/docs/LangRef.html#dll-storage-classes)
  */
-public enum class DLLStorageClass(public override val value: Int) : OrderedEnum<Int> {
+public enum class DLLStorageClass(public override val value: Int) :
+    OrderedEnum<Int> {
     Default(LLVM.LLVMDefaultStorageClass),
     DLLImport(LLVM.LLVMDLLImportStorageClass),
     DLLExport(LLVM.LLVMDLLExportStorageClass)
@@ -172,7 +174,7 @@ public enum class DLLStorageClass(public override val value: Int) : OrderedEnum<
  * Used for setting which inline assembly dialect an inline assembly
  * expression uses.
  *
- * [Documentation](https://llvm.org/docs/LangRef.html#inline-assembler-expressions)
+ * [See](https://llvm.org/docs/LangRef.html#inline-assembler-expressions)
  */
 public enum class InlineAsmDialect(public override val value: Int) :
     OrderedEnum<Int> {

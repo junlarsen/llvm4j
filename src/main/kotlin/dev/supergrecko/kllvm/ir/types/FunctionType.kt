@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.ir.types
 
-import dev.supergrecko.kllvm.internal.util.map
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
+import dev.supergrecko.kllvm.internal.util.map
 import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.Type
 import dev.supergrecko.kllvm.ir.TypeKind

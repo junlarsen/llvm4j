@@ -4,7 +4,6 @@ import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.internal.util.toLLVMBool
-
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
@@ -65,18 +64,7 @@ public class Context public constructor() : AutoCloseable, Validatable,
         }
 
     /**
-     * A LLVM Context has a diagnostic handler. The receiving pointer will be passed to the handler.
-     *
-     * The C++ code for the DiagnosticHandler looks a little like this.
-     *
-     * struct DiagnosticHandler {
-     *   void *DiagnosticContext = nullptr;
-     *   DiagnosticHandler(void *DiagContext = nullptr)
-     *     : DiagnosticContext(DiagContext) {}
-     * }
-     *
-     * @param handler The diagnostic handler to use
-     * @param diagnosticContext The diagnostic context. Pointer types: DiagnosticContext*
+     * Set the DiagnosticHandler for this context
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
@@ -95,10 +83,6 @@ public class Context public constructor() : AutoCloseable, Validatable,
 
     /**
      * Sets the diagnostic handler without a specified context.
-     *
-     * This sets the context to be a nullptr.
-     *
-     * @param handler The diagnostic handler to use
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
@@ -128,9 +112,6 @@ public class Context public constructor() : AutoCloseable, Validatable,
     /**
      * Register a yield callback with the given context.
      *
-     * @param callback Callback to register. C++ Type: void (*)(LLVMContext *Context, void *OpaqueHandle)
-     * @param opaqueHandle Pointer types: void*
-     *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
      * @see LLVM.LLVMContextSetYieldCallback
@@ -153,8 +134,8 @@ public class Context public constructor() : AutoCloseable, Validatable,
      * Note that after using this, the [Context] should not be used again as
      * its LLVM reference has been disposed.
      *
-     * Any calls referencing this context after it has been dropped will most likely fail
-     * as the inner LLVM Context will be set to a null pointer after
+     * Any calls referencing this context after it has been dropped will most
+     * likely fail as the inner LLVM Context will be set to a null pointer after
      * this is called.
      *
      * @throws IllegalArgumentException If internal instance has been dropped.

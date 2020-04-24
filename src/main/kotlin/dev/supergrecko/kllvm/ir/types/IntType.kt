@@ -19,10 +19,14 @@ public class IntType internal constructor() : Type() {
     /**
      * Create an integer types
      *
-     * This will create an integer types of the size [size]. If the size matches any of LLVM's preset integer sizes then
-     * that size will be returned. Otherwise an arbitrary size int types will be returned ([LLVM.LLVMIntTypeInContext]).
+     * This will create an integer types of the size [size]. If the size matches
+     * any of LLVM's preset integer sizes then that size will be returned.
+     * Otherwise an arbitrary size int types will be returned.
      */
-    public constructor(size: Int, ctx: Context = Context.getGlobalContext()) : this() {
+    public constructor(
+        size: Int,
+        ctx: Context = Context.getGlobalContext()
+    ) : this() {
         ref = when (size) {
             1 -> LLVM.LLVMInt1TypeInContext(ctx.ref)
             8 -> LLVM.LLVMInt8TypeInContext(ctx.ref)
@@ -31,7 +35,9 @@ public class IntType internal constructor() : Type() {
             64 -> LLVM.LLVMInt64TypeInContext(ctx.ref)
             128 -> LLVM.LLVMInt128TypeInContext(ctx.ref)
             else -> {
-                require(size in 1..8388606) { "LLVM only supports integers of 2^23-1 bits size" }
+                require(size in 1..8388606) {
+                    "LLVM only supports integers of 2^23-1 bits size"
+                }
 
                 LLVM.LLVMIntTypeInContext(ctx.ref, size)
             }

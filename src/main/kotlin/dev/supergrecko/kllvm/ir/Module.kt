@@ -150,8 +150,8 @@ public class Module internal constructor() : AutoCloseable,
         val res = LLVM.LLVMVerifyModule(ref, action.value, ptr)
 
         // LLVM Source says:
-        // > Note that this function's return value is inverted from what you would
-        // > expect of a function called "verify"
+        // > Note that this function's return value is inverted from what you
+        // would expect of a function called "verify"
         // Thus we invert it again ...
         return !res.fromLLVMBool()
     }
