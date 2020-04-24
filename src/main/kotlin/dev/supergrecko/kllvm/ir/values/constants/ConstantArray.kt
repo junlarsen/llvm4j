@@ -4,12 +4,14 @@ import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.Value
+import dev.supergrecko.kllvm.ir.values.AggregateValue
 import dev.supergrecko.kllvm.ir.values.Constant
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantArray internal constructor() : Value(), Constant {
+public class ConstantArray internal constructor() : Value(), Constant,
+    AggregateValue {
     /**
      * Construct a new Type from an LLVM pointer reference
      */

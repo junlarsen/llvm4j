@@ -4,7 +4,9 @@ import dev.supergrecko.kllvm.internal.contracts.Unreachable
 import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.instructions.IntPredicate
+import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.types.IntType
+import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.ir.values.Constant
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -47,6 +49,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
 
     //region Core::Values::Constants::ScalarConstants
     /**
+     * Get the zero extended (unsigned) value of this Constant
+     *
      * @see LLVM.LLVMConstIntGetZExtValue
      */
     public fun getUnsignedValue(): Long {
@@ -54,6 +58,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
     }
 
     /**
+     * Get the sign extended (signed) value of this Constant
+     *
      * @see LLVM.LLVMConstIntGetSExtValue
      */
     public fun getSignedValue(): Long {
@@ -63,10 +69,7 @@ public class ConstantInt internal constructor() : Value(), Constant {
 
     //region Core::Values::Constants::ConstantExpressions
     /**
-     * Negate the constant value
-     *
-     * This value is not modified, but it returns a new value with the result of
-     * the operation.
+     * Negate this operand
      *
      * LLVM doesn't actually have a neg instruction, but it's implemented using
      * subtraction. It subtracts the value of max value of the types of the
@@ -97,9 +100,6 @@ public class ConstantInt internal constructor() : Value(), Constant {
     /**
      * Invert the integer value using XOR
      *
-     * This value is not modified, but it returns a new value with the result of
-     * the operation.
-     *
      * @see LLVM.LLVMConstNot
      */
     public fun not(): ConstantInt {
@@ -111,11 +111,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
     /**
      * Perform addition for the two operands
      *
-     * This value is not modified, but it returns a new value with the result of
-     * the operation.
-     *
      * If the sum has unsigned overflow, the result returned is the
-     * mathematical result modulo 2n, where n is the bit width of the result.
+     * mathematical result modulo 2^n, where n is the bit width of the result.
      *
      * NUW and NSW stand for "No Unsigned Wrap" and "No Signed Wrap",
      * respectively. If [hasNUW] [hasNSW] are present, the result
@@ -143,9 +140,6 @@ public class ConstantInt internal constructor() : Value(), Constant {
     /**
      * Perform subtraction for the two operands
      *
-     * This value is not modified, but it returns a new value with the result of
-     * the operation.
-     *
      * If the sum has unsigned overflow, the result returned is the
      * mathematical result modulo 2n, where n is the bit width of the result.
      *
@@ -153,6 +147,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * respectively. If [hasNUW] [hasNSW] are present, the result
      * value of the add is a poison value if unsigned and/or signed overflow,
      * respectively, occurs.
+     *
+     * @see LLVM.LLVMConstSub
      */
     public fun sub(
         rhs: ConstantInt,
@@ -173,9 +169,6 @@ public class ConstantInt internal constructor() : Value(), Constant {
     /**
      * Perform multiplication for the two operands
      *
-     * This value is not modified, but it returns a new value with the result of
-     * the operation.
-     *
      * If the sum has unsigned overflow, the result returned is the
      * mathematical result modulo 2n, where n is the bit width of the result.
      *
@@ -183,6 +176,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * respectively. If [hasNUW] [hasNSW] are present, the result
      * value of the add is a poison value if unsigned and/or signed overflow,
      * respectively, occurs.
+     *
+     * @see LLVM.LLVMConstMul
      */
     public fun mul(
         rhs: ConstantInt,
@@ -214,6 +209,9 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * poison value if the result would be rounded.
      *
      * TODO: Find a way to determine if types is unsigned
+     *
+     * @see LLVM.LLVMConstUDiv
+     * @see LLVM.LLVMConstSDiv
      */
     public fun div(
         rhs: ConstantInt,
@@ -232,11 +230,49 @@ public class ConstantInt internal constructor() : Value(), Constant {
     }
 
     /**
-     * Get the remainder from the unsigned division for the two operands
+     * Perform division with another unsigned integer vector
+     *
+     * Division by zero is undefined behavior. If any element of
+     * the divisor is zero, the operation has undefined behavior
+     *
+     * If the [exact] arg is present, the result value of the udiv is a poison
+     * value if %op1 is not a multiple of %op2.
+     * eg "((a udiv exact b) mul b) == a".
+     *
+     * @see LLVM.LLVMConstUDiv
+     */
+    public fun udiv(
+        rhs: ConstantInt,
+        exact: Boolean
+    ): ConstantInt = div(rhs, exact, true)
+
+    /**
+     * Perform division with another signed integer vector
+     *
+     * Division by zero is undefined behavior. For vectors, if any element of
+     * the divisor is zero, the operation has undefined behavior. Overflow also
+     * leads to undefined behavior; this is a rare case, but can occur,
+     * for example, by doing a 32-bit division of -2147483648 by -1.
+     *
+     * If the [exact] arg is present, the result value of the sdiv is a poison
+     * value if the result would be rounded.
+     *
+     * @see LLVM.LLVMConstSDiv
+     */
+    public fun sdiv(
+        rhs: ConstantInt,
+        exact: Boolean
+    ): ConstantInt = div(rhs, exact, false)
+
+    /**
+     * Get the remainder from the division of the two operands
      *
      * Taking the remainder of a division by zero is undefined behavior.
      *
-     * If [unsigned] is present, URem will be used
+     * If [unsigned] is present, URem will be used'
+     *
+     * @see LLVM.LLVMSRem
+     * @see LLVM.LLVMURem
      */
     public fun rem(rhs: ConstantInt, unsigned: Boolean): ConstantInt {
         val ref = if (unsigned) {
@@ -249,6 +285,24 @@ public class ConstantInt internal constructor() : Value(), Constant {
     }
 
     /**
+     * Get the remainder from the division of the two operands
+     *
+     * Taking the remainder of a division by zero is undefined behavior.
+     *
+     * @see LLVM.LLVMURem
+     */
+    public fun urem(rhs: ConstantInt): ConstantInt = rem(rhs, true)
+
+    /**
+     * Get the remainder from the division of the two operands
+     *
+     * Taking the remainder of a division by zero is undefined behavior.
+     *
+     * @see LLVM.LLVMSRem
+     */
+    public fun srem(rhs: ConstantInt): ConstantInt = rem(rhs, false)
+
+    /**
      * Perform bitwise logical and for the two operands
      *
      * The truth table used for the 'and' instruction is:
@@ -258,6 +312,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * 0	1	0
      * 1	0	0
      * 1	1	1
+     *
+     * @see LLVM.LLVMConstAdd
      */
     public fun and(rhs: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstAnd(ref, rhs.ref)
@@ -275,6 +331,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * 0	1	1
      * 1	0	1
      * 1	1	1
+     *
+     * @see LLVM.LLVMConstOr
      */
     public fun or(rhs: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstOr(ref, rhs.ref)
@@ -292,6 +350,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * 0	1	1
      * 1	0	1
      * 1	1	0
+     *
+     * @see LLVM.LLVMConstXor
      */
     public fun xor(rhs: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstXor(ref, rhs.ref)
@@ -304,6 +364,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      *
      * This method receives a [predicate] which determines which logical
      * comparison method shall be used for the comparison.
+     *
+     * @see LLVM.LLVMConstICmp
      */
     public fun cmp(predicate: IntPredicate, rhs: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstICmp(predicate.value, ref, rhs.ref)
@@ -315,6 +377,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * Shift the operand to the left [bits] number of bits
      *
      * LLVM-C does not support NUW/NSW attributes for this operation
+     *
+     * @see LLVM.LLVMConstShl
      */
     public fun shl(bits: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstShl(ref, bits.ref)
@@ -327,6 +391,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * zero fill
      *
      * LLVM-C does not support NUW/NSW attributes for this operation
+     *
+     * @see LLVM.LLVMConstLShr
      */
     public fun lshr(bits: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstLShr(ref, bits.ref)
@@ -339,6 +405,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      * extension
      *
      * LLVM-C does nt support the 'exact' attribute for this operation
+     *
+     * @see LLVM.LLVMConstAShr
      */
     public fun ashr(bits: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstAShr(ref, bits.ref)
@@ -351,6 +419,8 @@ public class ConstantInt internal constructor() : Value(), Constant {
      *
      * The bit size of this must be larger than the bit size of [type]. Equal
      * sizes are not allowed
+     *
+     * @see LLVM.LLVMConstTrunc
      */
     public fun trunc(type: IntType): ConstantInt {
         val selfWidth = getType().asIntType().getTypeWidth()
@@ -364,37 +434,110 @@ public class ConstantInt internal constructor() : Value(), Constant {
     }
 
     /**
-     * Sign extend this value to type [type]
+     * Extend this value to type [type]
      *
      * The bit size of this must be tinier than the bit size of the
      * destination type
+     *
+     * @see LLVM.LLVMConstSExt
+     * @see LLVM.LLVMConstZExt
      */
-    public fun sext(type: IntType): ConstantInt {
+    public fun ext(type: IntType, signExtend: Boolean): ConstantInt {
         val selfWidth = getType().asIntType().getTypeWidth()
         val destWidth = type.getTypeWidth()
 
         require(selfWidth < destWidth)
 
-        val ref = LLVM.LLVMConstSExt(ref, type.ref)
+        val ref = if (signExtend) {
+            LLVM.LLVMConstSExt(ref, type.ref)
+        } else {
+            LLVM.LLVMConstZExt(ref, type.ref)
+        }
 
         return ConstantInt(ref)
     }
+
+    /**
+     * Sign extend this value to type [type]
+     *
+     * The bit size of this must be tinier than the bit size of the
+     * destination type
+     *
+     * @see LLVM.LLVMConstSExt
+     */
+    public fun sext(type: IntType): ConstantInt = ext(type, true)
 
     /**
      * Zero extend this value to type [type]
      *
      * The bit size of this must be tinier than the bit size of the
      * destination type
+     *
+     * @see LLVM.LLVMConstZExt
      */
-    public fun zext(type: IntType): ConstantInt {
-        val selfWidth = getType().asIntType().getTypeWidth()
-        val destWidth = type.getTypeWidth()
+    public fun zext(type: IntType): ConstantInt = ext(type, false)
 
-        require(selfWidth < destWidth)
+    /**
+     * Conversion to float type using this as unsigned
+     *
+     * @see LLVM.LLVMConstUIToFP
+     *
+     * TODO: Find a way to check if type is signed
+     */
+    public fun uitofp(type: FloatType): ConstantFloat {
+        val ref = LLVM.LLVMConstUIToFP(ref, type.ref)
 
-        val ref = LLVM.LLVMConstZExt(ref, type.ref)
+        return ConstantFloat(ref)
+    }
+
+    /**
+     * Conversion to float type using this as signed
+     *
+     * @see LLVM.LLVMConstSIToFP
+     *
+     * TODO: Find a way to check if type is signed
+     */
+    public fun sitofp(type: FloatType): ConstantFloat {
+        val ref = LLVM.LLVMConstSIToFP(ref, type.ref)
+
+        return ConstantFloat(ref)
+    }
+
+    /**
+     * Conversion to integer pointer
+     *
+     * @see LLVM.LLVMConstIntToPtr
+     */
+    public fun ptrcast(type: PointerType): ConstantPointer {
+        val ref = LLVM.LLVMConstIntToPtr(ref, type.ref)
+
+        return ConstantPointer(ref)
+    }
+
+    /**
+     * Cast to another integer type
+     *
+     * @see LLVM.LLVMConstIntCast
+     */
+    public fun intcast(type: IntType, signExtend: Boolean): ConstantInt {
+        val ref = LLVM.LLVMConstIntCast(ref, type.ref, signExtend.toLLVMBool())
 
         return ConstantInt(ref)
+    }
+
+    /**
+     * Perform a select based on this current value
+     *
+     * This instruction only works on integers of size 1
+     *
+     * @see LLVM.LLVMConstSelect
+     */
+    public fun select(ifTrue: Value, ifFalse: Value): Value {
+        require(getType().asIntType().getTypeWidth() == 1)
+
+        val ref = LLVM.LLVMConstSelect(ref, ifTrue.ref, ifFalse.ref)
+
+        return Value(ref)
     }
     //endregion Core::Values::Constants::ConstantExpressions
 }

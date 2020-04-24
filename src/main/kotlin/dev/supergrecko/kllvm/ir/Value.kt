@@ -12,10 +12,10 @@ import dev.supergrecko.kllvm.ir.values.GenericValue
 import dev.supergrecko.kllvm.ir.values.GlobalVariable
 import dev.supergrecko.kllvm.ir.values.MetadataValue
 import dev.supergrecko.kllvm.ir.values.PhiValue
-import dev.supergrecko.kllvm.ir.values.PointerValue
 import dev.supergrecko.kllvm.ir.values.constants.ConstantArray
 import dev.supergrecko.kllvm.ir.values.constants.ConstantFloat
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
+import dev.supergrecko.kllvm.ir.values.constants.ConstantPointer
 import dev.supergrecko.kllvm.ir.values.constants.ConstantStruct
 import dev.supergrecko.kllvm.ir.values.constants.ConstantVector
 import org.bytedeco.javacpp.SizeTPointer
@@ -172,10 +172,10 @@ public open class Value internal constructor() :
      *
      * @see LLVM.LLVMConstPointerCast
      */
-    fun constPointerCast(toType: PointerType): PointerValue {
+    fun constPointerCast(toType: PointerType): ConstantPointer {
         val value = LLVM.LLVMConstPointerCast(ref, toType.ref)
 
-        return PointerValue(value)
+        return ConstantPointer(value)
     }
     //endregion Core::Values::Constants
 
@@ -196,6 +196,74 @@ public open class Value internal constructor() :
             .firstOrNull { it.value == int }
             ?: throw Unreachable()
     }
+
+    /**
+     * Perform a cast without changing any bits
+     *
+     * This requires both this and the destination type to be non-aggregate,
+     * first-class types.
+     *
+     * @see LLVM.LLVMConstBitCast
+     *
+     * TODO: Determine that this is not an aggregate type
+     */
+    public fun bitcast(type: Type): Value {
+        val ref = LLVM.LLVMConstBitCast(ref, type.ref)
+
+        return Value(ref)
+    }
+
+    /**
+     * Attempt to convert using extension, default to bitcast
+     *
+     * This is an LLVM-C/C++ specific API. It is not a part of the
+     * instruction set.
+     *
+     * @see LLVM.LLVMConstSExtOrBitCast
+     * @see LLVM.LLVMConstZExtOrBitCast
+     *
+     * TODO: Find out which types are compatible here, int?
+     */
+    public fun extOrBitcast(type: Type, signExtend: Boolean): Value {
+        val ref = if(signExtend) {
+            LLVM.LLVMConstSExtOrBitCast(ref, type.ref)
+        } else {
+            LLVM.LLVMConstZExtOrBitCast(ref, type.ref)
+        }
+
+        return Value(ref)
+    }
+
+    /**
+     * Attempt to convert using zero extension, default to bitcast
+     *
+     * @see LLVM.LLVMConstZExtOrBitCast
+     */
+    public fun zextOrBitcast(type: Type): Value {
+        return extOrBitcast(type, false)
+    }
+
+    /**
+     * Attempt to convert using sign extension, default to bitcast
+     *
+     * @see LLVM.LLVMConstSExtOrBitCast
+     */
+    public fun sextOrBitcast(type: Type): Value {
+        return extOrBitcast(type, true)
+    }
+
+    /**
+     * Attempt to truncate, default to bitcast
+     *
+     * @see LLVM.LLVMConstTruncOrBitCast
+     *
+     * TODO: Find out which types are compatible here, int?
+     */
+    public fun truncOrBitcast(type: Type): Value {
+        val ref = LLVM.LLVMConstTruncOrBitCast(ref, type.ref)
+
+        return Value(ref)
+    }
     //endregion Core::Values::Constants::ConstantExpressions
 
     //region Typecasting
@@ -211,7 +279,7 @@ public open class Value internal constructor() :
     public fun asIntValue() = ConstantInt(ref)
     public fun asMetadataValue() = MetadataValue(ref)
     public fun asPhiValue() = PhiValue(ref)
-    public fun asPointerValue() = PointerValue(ref)
+    public fun asPointerValue() = ConstantPointer(ref)
     public fun asStructValue() = ConstantStruct(ref)
     public fun asVectorValue() = ConstantVector(ref)
     //endregion Typecasting

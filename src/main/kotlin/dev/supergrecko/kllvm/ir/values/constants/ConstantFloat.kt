@@ -2,7 +2,9 @@ package dev.supergrecko.kllvm.ir.values.constants
 
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.Value
+import dev.supergrecko.kllvm.ir.instructions.RealPredicate
 import dev.supergrecko.kllvm.ir.types.FloatType
+import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.Constant
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
@@ -23,6 +25,8 @@ public class ConstantFloat internal constructor() : Value(), Constant {
      *
      * The returned [Pair] contains the obtained value and whether precision was
      * lost or not.
+     *
+     * @see LLVM.LLVMConstRealGetDouble
      */
     public fun getDouble(): Pair<Double, Boolean> {
         val ptr = IntPointer()
@@ -34,27 +38,29 @@ public class ConstantFloat internal constructor() : Value(), Constant {
 
     //region Core::Values::Constants::ConstantExpressions
     /**
-     * Negate this float
+     * Negate this operand
      *
-     * This value is not modified, but it returns a new value with the result of
-     * the operation.
+     * LLVM doesn't actually have a neg instruction, but it's implemented using
+     * subtraction. It subtracts the value of max value of the types of the
+     * value
+     *
+     * @see LLVM.LLVMConstFNeg
      */
     public fun neg(): ConstantFloat {
-        require(isConstant())
-
         val ref = LLVM.LLVMConstFNeg(ref)
 
         return ConstantFloat(ref)
     }
 
     /**
-     * Add another float to this float
+     * Perform addition for the two operands
      *
-     * This value is not modified, but it returns a new value with the result of
-     * the operation.
+     * If the sum has unsigned overflow, the result returned is the
+     * mathematical result modulo 2^n, where n is the bit width of the result.
+     *
+     * @see LLVM.LLVMConstFAdd
      */
     public fun add(rhs: ConstantFloat): ConstantFloat {
-        require(isConstant())
         require(getType().getTypeKind() == rhs.getType().getTypeKind())
 
         val ref = LLVM.LLVMConstFAdd(ref, rhs.ref)
@@ -65,11 +71,12 @@ public class ConstantFloat internal constructor() : Value(), Constant {
     /**
      * Subtract another float from this float
      *
-     * This value is not modified, but it returns a new value with the result of
-     * the operation.
+     * If the sum has unsigned overflow, the result returned is the
+     * mathematical result modulo 2n, where n is the bit width of the result.
+     *
+     * @see LLVM.LLVMConstFSub
      */
     public fun sub(rhs: ConstantFloat): ConstantFloat {
-        require(isConstant())
         require(getType().getTypeKind() == rhs.getType().getTypeKind())
 
         val ref = LLVM.LLVMConstFSub(ref, rhs.ref)
@@ -78,28 +85,128 @@ public class ConstantFloat internal constructor() : Value(), Constant {
     }
 
     /**
-     * Multiply this float with another float
+     * Perform multiplication for the two operands
      *
-     * This value is not modified, but it returns a new value with the result of
-     * the operation.
+     * @see LLVM.LLVMConstFMul
      */
     public fun mul(rhs: ConstantFloat): ConstantFloat {
-        require(isConstant())
         require(getType().getTypeKind() == rhs.getType().getTypeKind())
 
-        val ref = LLVM.LLVMConstMul(ref, rhs.ref)
+        val ref = LLVM.LLVMConstFMul(ref, rhs.ref)
 
         return ConstantFloat(ref)
     }
 
     /**
-     * Perform division with another float
+     * Perform division for the two operands
+     *
+     * @see LLVM.LLVMConstFDiv
      */
     public fun div(rhs: ConstantFloat): ConstantFloat {
-        require(isConstant())
         require(getType().getTypeKind() == rhs.getType().getTypeKind())
 
         val ref = LLVM.LLVMConstFDiv(ref, rhs.ref)
+
+        return ConstantFloat(ref)
+    }
+
+    /**
+     * Get the remainder from the division of the two operands
+     *
+     * @see LLVM.LLVMFRem
+     */
+    public fun rem(rhs: ConstantFloat): ConstantFloat {
+        require(getType().getTypeKind() == rhs.getType().getTypeKind())
+
+        val ref = LLVM.LLVMConstFRem(ref, rhs.ref)
+
+        return ConstantFloat(ref)
+    }
+
+    /**
+     * Perform logical comparison for the two operands
+     *
+     * This method receives a [predicate] which determines which logical
+     * comparison method shall be used for the comparison.
+     *
+     * @see LLVM.LLVMConstFCmp
+     */
+    public fun cmp(
+        predicate: RealPredicate,
+        rhs: ConstantFloat
+    ): ConstantFloat {
+        require(getType().getTypeKind() == rhs.getType().getTypeKind())
+
+        val ref = LLVM.LLVMConstFCmp(predicate.value, ref, rhs.ref)
+
+        return ConstantFloat(ref)
+    }
+
+    /**
+     * Truncates this operand to the type [type]
+     *
+     * The bit size of this must be larger than the bit size of [type]. Equal
+     * sizes are not allowed
+     *
+     * @see LLVM.LLVMConstFPTrunc
+     *
+     * TODO: Find a way to check type sizes
+     */
+    public fun trunc(type: FloatType): ConstantFloat {
+        val ref = LLVM.LLVMConstFPTrunc(ref, type.ref)
+
+        return ConstantFloat(ref)
+    }
+
+    /**
+     * Extend this value to type [type]
+     *
+     * The bit size of this must be tinier than the bit size of the
+     * destination type
+     *
+     * @see LLVM.LLVMConstFPExt
+     *
+     * TODO: Find a way to check type sizes
+     */
+    public fun ext(type: FloatType): ConstantFloat {
+        val ref = LLVM.LLVMConstFPExt(ref, type.ref)
+
+        return ConstantFloat(ref)
+    }
+
+    /**
+     * Conversion to signed integer type
+     *
+     * @see LLVM.LLVMConstFPToSI
+     *
+     * TODO: Find a way to check if type is signed
+     */
+    public fun fptosi(type: IntType): ConstantInt {
+        val ref = LLVM.LLVMConstFPToSI(ref, type.ref)
+
+        return ConstantInt(ref)
+    }
+
+    /**
+     * Conversion to unsigned integer type
+     *
+     * @see LLVM.LLVMConstFPToUI
+     *
+     * TODO: Find a way to check if type is signed
+     */
+    public fun fptoui(type: IntType): ConstantInt {
+        val ref = LLVM.LLVMConstFPToUI(ref, type.ref)
+
+        return ConstantInt(ref)
+    }
+
+    /**
+     * Cast to another float type
+     *
+     * @see LLVM.LLVMConstFPCast
+     */
+    public fun fpcast(type: FloatType): ConstantFloat {
+        val ref = LLVM.LLVMConstFPCast(ref, type.ref)
 
         return ConstantFloat(ref)
     }

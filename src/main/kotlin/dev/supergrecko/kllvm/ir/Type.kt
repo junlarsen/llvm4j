@@ -188,6 +188,30 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     public fun asVoidType(): VoidType = VoidType(ref)
     //endregion Typecasting
 
+    //region TypeAssertions
+    /**
+     * Determine if this type is of x type
+     */
+    public fun isIntType(): Boolean = getTypeKind() == TypeKind.Integer
+    public fun isVectorType(): Boolean = getTypeKind() == TypeKind.Vector
+    public fun isFloatType(): Boolean = getTypeKind() in FloatType.kinds
+
+    public fun isIntOrIntVectorType(): Boolean {
+        return if (isVectorType()) {
+            asVectorType().getElementType().isIntType()
+        } else {
+            isIntType()
+        }
+    }
+    public fun isFloatOrFloatVectorType(): Boolean {
+        return if (isVectorType()) {
+            asVectorType().getElementType().isFloatType()
+        } else {
+            isFloatOrFloatVectorType()
+        }
+    }
+    //endregion TypeAssertions
+
     /**
      * Assert that the type kind of this is [kind]
      */

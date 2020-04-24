@@ -35,4 +35,18 @@ public class FloatType internal constructor() : Type() {
             else -> throw Unreachable()
         }
     }
+
+    public companion object {
+        /**
+         * List of all floating point types
+         */
+        public val kinds = listOf(
+            TypeKind.Half,
+            TypeKind.Float,
+            TypeKind.Double,
+            TypeKind.X86_FP80,
+            TypeKind.FP128,
+            TypeKind.PPC_FP128
+        )
+    }
 }
