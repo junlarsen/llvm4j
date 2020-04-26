@@ -15,6 +15,7 @@ import java.nio.ByteBuffer
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
+import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class Module internal constructor() : AutoCloseable,
@@ -114,13 +115,13 @@ public class Module internal constructor() : AutoCloseable,
      * TODO: Check if .isNull is enough to determine nullity
      */
     public fun getAlias(name: String): GlobalAlias? {
-        val alias = LLVM.LLVMGetNamedGlobalAlias(
+        val alias: LLVMValueRef? = LLVM.LLVMGetNamedGlobalAlias(
             ref,
             name,
             name.length.toLong()
         )
 
-        return if (alias.isNull) {
+        return if (alias == null) {
             null
         } else {
             GlobalAlias(alias)

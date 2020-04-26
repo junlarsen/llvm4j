@@ -70,4 +70,6 @@ public class ConstantArray internal constructor() : Value(), Constant,
         return Value(value)
     }
     //endregion Core::Values::Constants::CompositeConstants
+
+    override fun toString(): String = getAsString()
 }

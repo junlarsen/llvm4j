@@ -5,10 +5,9 @@ import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.instructions.Instruction
-import dev.supergrecko.kllvm.ir.instructions.Opcode
-import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GenericValue
+import dev.supergrecko.kllvm.ir.values.GlobalValue
 import dev.supergrecko.kllvm.ir.values.GlobalVariable
 import dev.supergrecko.kllvm.ir.values.MetadataValue
 import dev.supergrecko.kllvm.ir.values.PhiValue
@@ -70,7 +69,7 @@ public open class Value internal constructor() :
         ref = value
     }
 
-    //region Core::Values::Constants::GeneralAPIs
+    //region Core::Values::GeneralAPIs
     /**
      * Use the IR name for this value
      *
@@ -83,7 +82,24 @@ public open class Value internal constructor() :
 
             return ptr.string
         }
-        set(value) = LLVM.LLVMSetValueName2(ref, value, value.length.toLong())
+        /**
+         * If this yields unexpected results, see the source code for this file
+         *
+         * LLVM-C does not provide a way for us to check if a value has a
+         * name or not and thus we cannot implement all the checks LLVM-C++
+         * does in their source file which means this may yield unwanted or
+         * unexpected results.
+         *
+         * https://llvm.org/doxygen/Value_8cpp_source.html#l00223
+         *
+         * TODO: Research if there is any other way we can determine the above
+         * TODO: Test when viable solution has been found
+         */
+        set(value) {
+            require(!(getContext().discardValueNames && this !is GlobalValue))
+
+            LLVM.LLVMSetValueName2(ref, value, value.length.toLong())
+        }
 
     /**
      * Get the type of this value
@@ -119,10 +135,23 @@ public open class Value internal constructor() :
      *
      * @see LLVM.LLVMGetValueKind
      */
-    public fun getValueKind(): ValueKind = getValueKind(ref)
+    public fun getValueKind(): ValueKind {
+        val kind = LLVM.LLVMGetValueKind(ref)
+
+        return ValueKind.values()
+            .firstOrNull { it.value == kind }
+            ?: throw Unreachable()
+    }
 
     /**
-     * Dump the value
+     * All values hold a context through their type
+     *
+     * Fetches the context this value was created in.
+     */
+    public fun getContext(): Context = getType().getContext()
+
+    /**
+     * Dump the string representation of this value to stderr
      *
      * @see LLVM.LLVMDumpValue
      */
@@ -152,10 +181,24 @@ public open class Value internal constructor() :
         LLVM.LLVMReplaceAllUsesWith(ref, value.ref)
     }
 
-    // TODO: Implement these two
-    public fun isAMDNode() {}
-    public fun isAMDString() {}
-    //endregion Core::Values::Constants::GeneralAPIs
+    /**
+     * Is this value a metadata node?
+     *
+     * @see LLVM.LLVMIsAMDNode
+     */
+    public fun isMetadataNode(): Boolean {
+        return LLVM.LLVMIsAMDNode(ref) != null
+    }
+
+    /**
+     * Is this value a metadata string?
+     *
+     * @see LLVM.LLVMIsAMDString
+     */
+    public fun isMetadataString(): Boolean {
+        return LLVM.LLVMIsAMDString(ref) != null
+    }
+    //endregion Core::Values::GeneralAPIs
 
     //region Core::Values::Constants
     /**
@@ -166,105 +209,7 @@ public open class Value internal constructor() :
     public fun isNull(): Boolean {
         return LLVM.LLVMIsNull(ref).fromLLVMBool()
     }
-
-    /**
-     * Cast this to a Constant Pointer to the current value
-     *
-     * @see LLVM.LLVMConstPointerCast
-     */
-    fun constPointerCast(toType: PointerType): ConstantPointer {
-        val value = LLVM.LLVMConstPointerCast(ref, toType.ref)
-
-        return ConstantPointer(value)
-    }
     //endregion Core::Values::Constants
-
-    //region Core::Values::Constants::ConstantExpressions
-    /**
-     * Get the opcode for a constant value
-     *
-     * TODO: Move this, presumably to instructions?
-     *
-     * @see LLVM.LLVMGetConstOpcode
-     */
-    public fun getOpcode(): Opcode {
-        require(isConstant())
-
-        val int = LLVM.LLVMGetConstOpcode(ref)
-
-        return Opcode.values()
-            .firstOrNull { it.value == int }
-            ?: throw Unreachable()
-    }
-
-    /**
-     * Perform a cast without changing any bits
-     *
-     * This requires both this and the destination type to be non-aggregate,
-     * first-class types.
-     *
-     * @see LLVM.LLVMConstBitCast
-     *
-     * TODO: Determine that this is not an aggregate type
-     */
-    public fun bitcast(type: Type): Value {
-        val ref = LLVM.LLVMConstBitCast(ref, type.ref)
-
-        return Value(ref)
-    }
-
-    /**
-     * Attempt to convert using extension, default to bitcast
-     *
-     * This is an LLVM-C/C++ specific API. It is not a part of the
-     * instruction set.
-     *
-     * @see LLVM.LLVMConstSExtOrBitCast
-     * @see LLVM.LLVMConstZExtOrBitCast
-     *
-     * TODO: Find out which types are compatible here, int?
-     */
-    public fun extOrBitcast(type: Type, signExtend: Boolean): Value {
-        val ref = if(signExtend) {
-            LLVM.LLVMConstSExtOrBitCast(ref, type.ref)
-        } else {
-            LLVM.LLVMConstZExtOrBitCast(ref, type.ref)
-        }
-
-        return Value(ref)
-    }
-
-    /**
-     * Attempt to convert using zero extension, default to bitcast
-     *
-     * @see LLVM.LLVMConstZExtOrBitCast
-     */
-    public fun zextOrBitcast(type: Type): Value {
-        return extOrBitcast(type, false)
-    }
-
-    /**
-     * Attempt to convert using sign extension, default to bitcast
-     *
-     * @see LLVM.LLVMConstSExtOrBitCast
-     */
-    public fun sextOrBitcast(type: Type): Value {
-        return extOrBitcast(type, true)
-    }
-
-    /**
-     * Attempt to truncate, default to bitcast
-     *
-     * @see LLVM.LLVMConstTruncOrBitCast
-     *
-     * TODO: Find out which types are compatible here, int?
-     */
-    public fun truncOrBitcast(type: Type): Value {
-        val ref = LLVM.LLVMConstTruncOrBitCast(ref, type.ref)
-
-        return Value(ref)
-    }
-    //endregion Core::Values::Constants::ConstantExpressions
 
     //region Typecasting
     /**
@@ -283,23 +228,4 @@ public open class Value internal constructor() :
     public fun asStructValue() = ConstantStruct(ref)
     public fun asVectorValue() = ConstantVector(ref)
     //endregion Typecasting
-
-    public companion object {
-        /**
-         * Obtain the value kind for this value
-         *
-         * @see LLVM.LLVMGetValueKind
-         */
-        @JvmStatic
-        public fun getValueKind(value: LLVMValueRef): ValueKind {
-            val kind = LLVM.LLVMGetValueKind(value)
-
-            return ValueKind.values()
-                .firstOrNull { it.value == kind }
-            // Theoretically unreachable, but kept if wrong LLVM version is used
-                ?: throw IllegalArgumentException(
-                    "Value $value has invalid value kind"
-                )
-        }
-    }
 }
