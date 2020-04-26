@@ -5,12 +5,12 @@ import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.instructions.RealPredicate
 import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.types.IntType
-import dev.supergrecko.kllvm.ir.values.Constant
+import dev.supergrecko.kllvm.ir.values.ConstantValue
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantFloat internal constructor() : Value(), Constant {
+public class ConstantFloat internal constructor() : Value(), ConstantValue {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }

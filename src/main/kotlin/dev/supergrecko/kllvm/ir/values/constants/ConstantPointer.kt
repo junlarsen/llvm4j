@@ -1,13 +1,15 @@
 package dev.supergrecko.kllvm.ir.values.constants
 
+import dev.supergrecko.kllvm.ir.Type
+import dev.supergrecko.kllvm.ir.TypeKind
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.types.PointerType
-import dev.supergrecko.kllvm.ir.values.Constant
+import dev.supergrecko.kllvm.ir.values.ConstantValue
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantPointer internal constructor() : Value(), Constant {
+public class ConstantPointer internal constructor() : Value(), ConstantValue {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
@@ -25,6 +27,30 @@ public class ConstantPointer internal constructor() : Value(), Constant {
 
         return ConstantInt(ref)
     }
+
+    /**
+     * Cast this value to another type
+     *
+     * The specified type must be an integer or pointer type or a vector of
+     * either of these types.
+     *
+     * @see LLVM.LLVMConstPointerCast
+     */
+    fun cast(toType: Type): ConstantPointer {
+        val typeKind = toType.getTypeKind()
+
+        require(typeKind == TypeKind.Vector || typeKind == TypeKind.Integer)
+
+        if (typeKind == TypeKind.Vector) {
+            val vecType = toType.asVectorType().getElementType().getTypeKind()
+            require(vecType == TypeKind.Integer || vecType == TypeKind.Pointer)
+        }
+
+        val value = LLVM.LLVMConstPointerCast(ref, toType.ref)
+
+        return ConstantPointer(value)
+    }
+
 
     /**
      * Convert this value to the target pointer type's address space

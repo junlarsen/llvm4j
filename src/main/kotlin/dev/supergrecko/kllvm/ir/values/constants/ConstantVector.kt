@@ -7,12 +7,14 @@ import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.instructions.IntPredicate
 import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.types.IntType
-import dev.supergrecko.kllvm.ir.values.Constant
+import dev.supergrecko.kllvm.ir.values.CompositeValue
+import dev.supergrecko.kllvm.ir.values.ConstantValue
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantVector internal constructor() : Value(), Constant {
+public class ConstantVector internal constructor() : Value(), ConstantValue,
+    CompositeValue {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
@@ -38,19 +40,6 @@ public class ConstantVector internal constructor() : Value(), Constant {
      */
     public fun isVectorOf(types: List<TypeKind>) = types.any {
         isVectorOf(it)
-    }
-
-    /**
-     * Get an element at specified [index] as a constant
-     *
-     * This is shared with [ConstantArray], [ConstantVector], [ConstantStruct]
-     *
-     * TODO: Move into contract
-     */
-    public fun getElementAsConstant(index: Int): Value {
-        val value = LLVM.LLVMGetElementAsConstant(ref, index)
-
-        return Value(value)
     }
 
     //region Core::Values::Constants::ConstantExpressions

@@ -98,7 +98,6 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     //endregion Core::Types
 
     //region Core::Values::Constants
-    // TODO: Move these
     /**
      * @see LLVM.LLVMConstNull
      */

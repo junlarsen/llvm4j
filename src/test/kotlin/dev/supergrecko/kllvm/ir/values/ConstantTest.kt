@@ -13,14 +13,9 @@ class ConstantTest {
         val ptrTy = PointerType(type)
         val value = ConstantInt(type, 1L, true)
 
-        /* TODO: Fix jvm crash
-        val ptr = value.toConstPointer(ptrTy)
+        val ptr = value.ptrcast(ptrTy.toPointerType())
+        val res = ptr.cast(type)
 
-        println()
-
-        val int = ptr.intcast(IntType(32))
-
-        assertEquals(1L, int.getSignedValue())
-         */
+        assertEquals(1L, res.asIntValue().getSignedValue())
     }
 }

@@ -14,19 +14,8 @@ import org.bytedeco.llvm.global.LLVM
 /**
  * Type to which acts like a supertype for all constant LLVM values
  */
-public interface Constant : ContainsReference<LLVMValueRef> {
+public interface ConstantValue : ContainsReference<LLVMValueRef> {
     //region Core::Values::Constants::ConstantExpressions
-    /**
-     * Cast this to a Constant Pointer to the current value
-     *
-     * @see LLVM.LLVMConstPointerCast
-     */
-    fun toConstPointer(toType: PointerType): ConstantPointer {
-        val value = LLVM.LLVMConstPointerCast(ref, toType.ref)
-
-        return ConstantPointer(value)
-    }
-
     /**
      * Get the opcode for a constant value
      *

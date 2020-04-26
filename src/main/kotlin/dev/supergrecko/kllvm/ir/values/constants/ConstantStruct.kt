@@ -5,13 +5,14 @@ import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.StructType
 import dev.supergrecko.kllvm.ir.values.AggregateValue
-import dev.supergrecko.kllvm.ir.values.Constant
+import dev.supergrecko.kllvm.ir.values.CompositeValue
+import dev.supergrecko.kllvm.ir.values.ConstantValue
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantStruct internal constructor() : Value(), Constant,
-    AggregateValue {
+public class ConstantStruct internal constructor() : Value(), ConstantValue,
+    AggregateValue, CompositeValue {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
@@ -43,19 +44,4 @@ public class ConstantStruct internal constructor() : Value(), Constant,
         ref =
             LLVM.LLVMConstNamedStruct(type.ref, PointerPointer(*ptr), ptr.size)
     }
-
-    //region Core::Values::Constants::CompositeConstants
-    /**
-     * Get an element at specified [index] as a constant
-     *
-     * This is shared with [ConstantArray], [ConstantVector], [ConstantStruct]
-     *
-     * TODO: Move into contract
-     */
-    public fun getElementAsConstant(index: Int): Value {
-        val value = LLVM.LLVMGetElementAsConstant(ref, index)
-
-        return Value(value)
-    }
-    //endregion Core::Values::Constants::CompositeConstants
 }

@@ -38,7 +38,7 @@ public enum class Linkage(public override val value: Int) : OrderedEnum<Int> {
     PrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage),
 }
 
-public open class GlobalValue internal constructor(): Value(), Constant {
+public open class GlobalValue internal constructor(): Value(), ConstantValue {
     /**
      * Construct a new Type from an LLVM pointer reference
      */
@@ -177,7 +177,6 @@ public open class GlobalValue internal constructor(): Value(), Constant {
      * @see LLVM.LLVMGlobalCopyAllMetadata
      */
     public fun copyMetadata(): MetadataEntries {
-        // TODO: Resolve LLVM ptr type
         val ptr = SizeTPointer(0)
 
         val entries = LLVM.LLVMGlobalCopyAllMetadata(ref, ptr)

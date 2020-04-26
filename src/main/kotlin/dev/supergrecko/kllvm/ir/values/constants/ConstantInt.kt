@@ -7,11 +7,11 @@ import dev.supergrecko.kllvm.ir.instructions.IntPredicate
 import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.types.PointerType
-import dev.supergrecko.kllvm.ir.values.Constant
+import dev.supergrecko.kllvm.ir.values.ConstantValue
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantInt internal constructor() : Value(), Constant {
+public class ConstantInt internal constructor() : Value(), ConstantValue {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
