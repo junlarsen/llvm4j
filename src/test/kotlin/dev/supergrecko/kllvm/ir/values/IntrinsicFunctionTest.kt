@@ -44,9 +44,9 @@ class IntrinsicFunctionTest {
 
     @Test
     fun `intrinsic names match`() {
-        val intrinsic = IntrinsicFunction("llvm.va_args")
+        val intrinsic = IntrinsicFunction("llvm.va_start")
 
-        assertEquals("llvm.va_args", intrinsic.getName())
+        assertEquals("llvm.va_start", intrinsic.getName())
     }
 
     @Test
