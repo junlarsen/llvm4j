@@ -4,12 +4,15 @@ import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.Value
-import dev.supergrecko.kllvm.ir.values.Constant
+import dev.supergrecko.kllvm.ir.values.AggregateValue
+import dev.supergrecko.kllvm.ir.values.CompositeValue
+import dev.supergrecko.kllvm.ir.values.ConstantValue
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantArray internal constructor() : Value(), Constant {
+public class ConstantArray internal constructor() : Value(), ConstantValue,
+    AggregateValue, CompositeValue {
     /**
      * Construct a new Type from an LLVM pointer reference
      */
@@ -52,20 +55,7 @@ public class ConstantArray internal constructor() : Value(), Constant {
 
         return ptr.string
     }
-
-    /**
-     * Get an element at specified [index] as a constant
-     *
-     * This is shared with [ConstantArray], [ConstantVector], [ConstantStruct]
-     *
-     * TODO: Move into shared contract
-     *
-     * @see LLVM.LLVMGetElementAsConstant
-     */
-    public fun getElementAsConstant(index: Int): Value {
-        val value = LLVM.LLVMGetElementAsConstant(ref, index)
-
-        return Value(value)
-    }
     //endregion Core::Values::Constants::CompositeConstants
+
+    override fun toString(): String = getAsString()
 }

@@ -87,7 +87,7 @@ public open class FunctionValue internal constructor() : Value() {
         get() {
             val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
 
-            return if (resolver.isNull) {
+            return if (resolver == null) {
                 throw RuntimeException("This function does not have an " +
                         "indirect resolver")
             } else {

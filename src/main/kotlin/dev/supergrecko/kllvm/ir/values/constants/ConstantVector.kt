@@ -1,16 +1,20 @@
 package dev.supergrecko.kllvm.ir.values.constants
 
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
+import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.TypeKind
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.instructions.IntPredicate
+import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.types.IntType
-import dev.supergrecko.kllvm.ir.values.Constant
+import dev.supergrecko.kllvm.ir.values.CompositeValue
+import dev.supergrecko.kllvm.ir.values.ConstantValue
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantVector internal constructor() : Value(), Constant {
+public class ConstantVector internal constructor() : Value(), ConstantValue,
+    CompositeValue {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
@@ -25,16 +29,17 @@ public class ConstantVector internal constructor() : Value(), Constant {
     }
 
     /**
-     * Get an element at specified [index] as a constant
-     *
-     * This is shared with [ConstantArray], [ConstantVector], [ConstantStruct]
-     *
-     * TODO: Move into contract
+     * Determine if this vector's element type is [type]
      */
-    public fun getElementAsConstant(index: Int): Value {
-        val value = LLVM.LLVMGetElementAsConstant(ref, index)
+    public fun isVectorOf(type: TypeKind): Boolean {
+        return getType().asVectorType().getElementType().getTypeKind() == type
+    }
 
-        return Value(value)
+    /**
+     * Determine if this vector's element type is any of [types]
+     */
+    public fun isVectorOf(types: List<TypeKind>) = types.any {
+        isVectorOf(it)
     }
 
     //region Core::Values::Constants::ConstantExpressions
@@ -56,7 +61,7 @@ public class ConstantVector internal constructor() : Value(), Constant {
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
     ): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
         require(!(hasNSW && hasNSW)) { "Cannot negate with both NSW and NUW" }
 
         val ref = when (true) {
@@ -77,7 +82,7 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * @see LLVM.LLVMConstNot
      */
     public fun not(): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
 
         val ref = LLVM.LLVMConstNot(ref)
 
@@ -98,12 +103,12 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * @see LLVM.LLVMConstAdd
      */
     public fun add(
-        rhs: ConstantInt,
+        rhs: ConstantVector,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
     ): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
-        require(rhs.getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
+        require(rhs.isVectorOf(TypeKind.Integer))
         require(!(hasNSW && hasNSW)) { "Cannot add with both NSW and NUW" }
 
         val ref = when (true) {
@@ -127,12 +132,12 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * respectively, occurs.
      */
     public fun sub(
-        rhs: ConstantInt,
+        rhs: ConstantVector,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
     ): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
-        require(rhs.getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
+        require(rhs.isVectorOf(TypeKind.Integer))
         require(!(hasNSW && hasNSW)) { "Cannot sub with both NSW and NUW" }
 
         val ref = when (true) {
@@ -156,12 +161,12 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * respectively, occurs.
      */
     public fun mul(
-        rhs: ConstantInt,
+        rhs: ConstantVector,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
     ): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
-        require(rhs.getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
+        require(rhs.isVectorOf(TypeKind.Integer))
         require(!(hasNSW && hasNSW)) { "Cannot sub with both NSW and NUW" }
 
         val ref = when (true) {
@@ -193,8 +198,8 @@ public class ConstantVector internal constructor() : Value(), Constant {
         exact: Boolean,
         unsigned: Boolean
     ): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
-        require(rhs.getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
+        require(rhs.isVectorOf(TypeKind.Integer))
 
         val ref = when (true) {
             unsigned && exact -> LLVM.LLVMConstExactUDiv(ref, rhs.ref)
@@ -217,8 +222,6 @@ public class ConstantVector internal constructor() : Value(), Constant {
      *
      * If the [exact] arg is present, the result value of the sdiv is a poison
      * value if the result would be rounded.
-     *
-     * TODO: Find a way to determine if types is unsigned
      */
     public fun sdiv(
         rhs: ConstantVector,
@@ -234,8 +237,6 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * If the [exact] arg is present, the result value of the udiv is a poison
      * value if %op1 is not a multiple of %op2.
      * eg "((a udiv exact b) mul b) == a".
-     *
-     * TODO: Find a way to determine if types is unsigned
      */
     public fun udiv(
         rhs: ConstantVector,
@@ -250,8 +251,8 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * If [unsigned] is present, URem will be used
      */
     public fun rem(rhs: ConstantVector, unsigned: Boolean): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
-        require(rhs.getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
+        require(rhs.isVectorOf(TypeKind.Integer))
 
         val ref = if (unsigned) {
             LLVM.LLVMConstURem(ref, rhs.ref)
@@ -274,8 +275,8 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * 1	1	1
      */
     public fun and(rhs: ConstantVector): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
-        require(rhs.getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
+        require(rhs.isVectorOf(TypeKind.Integer))
 
         val ref = LLVM.LLVMConstAnd(ref, rhs.ref)
 
@@ -294,8 +295,8 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * 1	1	1
      */
     public fun or(rhs: ConstantVector): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
-        require(rhs.getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
+        require(rhs.isVectorOf(TypeKind.Integer))
 
         val ref = LLVM.LLVMConstOr(ref, rhs.ref)
 
@@ -314,8 +315,8 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * 1	1	0
      */
     public fun xor(rhs: ConstantVector): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
-        require(rhs.getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
+        require(rhs.isVectorOf(TypeKind.Integer))
 
         val ref = LLVM.LLVMConstXor(ref, rhs.ref)
 
@@ -332,8 +333,8 @@ public class ConstantVector internal constructor() : Value(), Constant {
         predicate: IntPredicate,
         rhs: ConstantVector
     ): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
-        require(rhs.getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
+        require(rhs.isVectorOf(TypeKind.Integer))
 
         val ref = LLVM.LLVMConstICmp(predicate.value, ref, rhs.ref)
 
@@ -346,8 +347,8 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * LLVM-C does not support NUW/NSW attributes for this operation
      */
     public fun shl(rhs: ConstantVector): ConstantVector {
-        require(getType().getTypeKind() == TypeKind.Integer)
-        require(rhs.getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
+        require(rhs.isVectorOf(TypeKind.Integer))
 
         val ref = LLVM.LLVMConstShl(ref, rhs.ref)
 
@@ -361,8 +362,7 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * LLVM-C does not support NUW/NSW attributes for this operation
      */
     public fun lshr(bits: ConstantVector): ConstantVector {
-        require(isConstant() && bits.isConstant())
-        require(getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
         require(bits.getType().getTypeKind() == TypeKind.Integer)
 
         val ref = LLVM.LLVMConstLShr(ref, bits.ref)
@@ -377,8 +377,7 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * LLVM-C does nt support the 'exact' attribute for this operation
      */
     public fun ashr(bits: ConstantVector): ConstantVector {
-        require(isConstant() && bits.isConstant())
-        require(getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
         require(bits.getType().getTypeKind() == TypeKind.Integer)
 
         val ref = LLVM.LLVMConstAShr(ref, bits.ref)
@@ -393,8 +392,7 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * sizes are not allowed
      */
     public fun trunc(type: IntType): ConstantVector {
-        require(isConstant())
-        require(getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
 
         val ref = LLVM.LLVMConstTrunc(ref, type.ref)
 
@@ -408,8 +406,7 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * destination type
      */
     public fun sext(type: IntType): ConstantVector {
-        require(isConstant())
-        require(getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
 
         val ref = LLVM.LLVMConstSExt(ref, type.ref)
 
@@ -423,10 +420,110 @@ public class ConstantVector internal constructor() : Value(), Constant {
      * destination type
      */
     public fun zext(type: IntType): ConstantVector {
-        require(isConstant())
-        require(getType().getTypeKind() == TypeKind.Integer)
+        require(isVectorOf(TypeKind.Integer))
 
         val ref = LLVM.LLVMConstZExt(ref, type.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
+     * Cast to another integer type
+     *
+     * @see LLVM.LLVMConstIntCast
+     */
+    public fun intcast(type: IntType, signExtend: Boolean): ConstantVector {
+        require(isVectorOf(TypeKind.Integer))
+
+        val ref = LLVM.LLVMConstIntCast(ref, type.ref, signExtend.toLLVMBool())
+
+        return ConstantVector(ref)
+    }
+
+    /**
+     * Cast to another float type
+     *
+     * @see LLVM.LLVMConstFPCast
+     */
+    public fun fpcast(type: FloatType): ConstantVector {
+        require(isVectorOf(FloatType.kinds))
+
+        val ref = LLVM.LLVMConstFPCast(ref, type.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
+     * Perform a select based on this current value
+     *
+     * This instruction only works on integers of size 1
+     *
+     * @see LLVM.LLVMConstSelect
+     */
+    public fun select(ifTrue: Value, ifFalse: Value): ConstantVector {
+        require(isVectorOf(TypeKind.Integer))
+
+        val selfWidth = getType().asVectorType()
+            .getElementType()
+            .asIntType()
+            .getTypeWidth()
+
+        require(selfWidth == 1)
+
+        val ref = LLVM.LLVMConstSelect(ref, ifTrue.ref, ifFalse.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
+     * Extract an element from a vector at specified [index]
+     *
+     * @see LLVM.LLVMConstExtractElement
+     */
+    public fun extract(index: ConstantInt): Value {
+        val ref = LLVM.LLVMConstExtractElement(ref, index.ref)
+
+        return Value(ref)
+    }
+
+
+    /**
+     * Insert an element at [index] in this vector
+     *
+     * The [value] must be of the same type as what this vector holds.
+     */
+    public fun insert(index: ConstantInt, value: Value): ConstantVector {
+        val selfType = getType().asVectorType().getElementType()
+        val elemType = value.getType()
+
+        require(selfType.getTypeKind() == elemType.getTypeKind())
+
+        // LLVM has InsertElement(this, value, index) which is why args are
+        // swapped
+        val ref = LLVM.LLVMConstInsertElement(ref, value.ref, index.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
+     * Construct a permutation of both vectors
+     *
+     * This returns a vector with the same element type as the input length
+     * that is the same as the shuffle mask.
+     */
+    public fun shuffle(
+        other: ConstantVector,
+        mask: ConstantVector
+    ): ConstantVector {
+        val selfType = getType().asVectorType().getElementType()
+        val elemType = other.getType()
+        val maskType = other.getType()
+
+        require(selfType.getTypeKind() == elemType.getTypeKind())
+        require(maskType.getTypeKind() == TypeKind.Integer)
+        require(maskType.asIntType().getTypeWidth() == 32)
+
+        val ref = LLVM.LLVMConstShuffleVector(ref, other.ref, mask.ref)
 
         return ConstantVector(ref)
     }

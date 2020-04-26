@@ -8,6 +8,7 @@ import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import org.junit.jupiter.api.Test
+import kotlin.test.assertTrue
 
 class GlobalVariableTest {
     @Test
@@ -20,10 +21,22 @@ class GlobalVariableTest {
 
         assertFalse { value.globalConstant }
         assertFalse { value.threadLocal }
+        assertFalse { value.externallyInitialized }
 
         assertEquals(100L, value.initializer.asIntValue().getSignedValue())
         assertEquals("v", value.valueName)
         assertEquals(ThreadLocalMode.NotThreadLocal, value.threadLocalMode)
+    }
+
+    @Test
+    fun `set global constant`() {
+        val ty = IntType(32)
+        val value = Module("test.ll").addGlobal(ty, "v")
+
+        value.initializer = ConstantInt(IntType(32), 100L, true)
+        value.globalConstant = true
+
+        assertTrue { value.globalConstant }
     }
 
     @Test

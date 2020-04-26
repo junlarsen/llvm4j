@@ -38,7 +38,7 @@ public enum class Linkage(public override val value: Int) : OrderedEnum<Int> {
     PrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage),
 }
 
-public open class GlobalValue internal constructor(): Value(), Constant {
+public open class GlobalValue internal constructor(): Value(), ConstantValue {
     /**
      * Construct a new Type from an LLVM pointer reference
      */
@@ -91,6 +91,14 @@ public open class GlobalValue internal constructor(): Value(), Constant {
         }
         set(value) = LLVM.LLVMSetUnnamedAddress(ref, value.value)
 
+    /**
+     * Determine if this is just a signature for something
+     *
+     * Returns true if the primary definition of this global value is outside
+     * of the current translation unit.
+     *
+     * @see LLVM.LLVMIsDeclaration
+     */
     public fun isDeclaration(): Boolean {
         return LLVM.LLVMIsDeclaration(ref).fromLLVMBool()
     }
@@ -104,36 +112,71 @@ public open class GlobalValue internal constructor(): Value(), Constant {
         return Module(mod)
     }
 
+    /**
+     * Get the type of this value
+     *
+     * @see LLVM.LLVMGlobalGetValueType
+     */
     public override fun getType(): Type {
         val ty = LLVM.LLVMGlobalGetValueType(ref)
 
         return Type(ty)
     }
 
+    /**
+     * Set the alignment (alignas) of this value
+     *
+     * @see LLVM.LLVMSetAlignment
+     */
     public fun setAlignment(align: Int) {
-        // TODO: Find a way to elevate this into a property
         return LLVM.LLVMSetAlignment(ref, align)
     }
 
+    /**
+     * Get the alignment (alignas) of this value
+     *
+     * @see LLVM.LLVMGetAlignment
+     */
     public fun getAlignment(): Int {
-        // TODO: Find a way to elevate this into a property
         return LLVM.LLVMGetAlignment(ref)
     }
 
+    /**
+     * Attach a [kind] of metadata
+     *
+     * @see LLVM.LLVMGlobalSetMetadata
+     */
     public fun setMetadata(kind: Int, metadata: Metadata) {
         LLVM.LLVMGlobalSetMetadata(ref, kind, metadata.ref)
     }
 
+    /**
+     * Erases a piece of metadata at [kind] if it exists
+     *
+     * @see LLVM.LLVMGlobalEraseMetadata
+     */
     public fun eraseMetadata(kind: Int) {
         LLVM.LLVMGlobalEraseMetadata(ref, kind)
     }
 
+    /**
+     * Removes all metadata from this value
+     *
+     * @see LLVM.LLVMGlobalClearMetadata
+     */
     public fun clearMetadata() {
         LLVM.LLVMGlobalClearMetadata(ref)
     }
 
+    /**
+     * Copies all the metadata from this  value
+     *
+     * This produces a [MetadataEntries] which must be de-allocated by the
+     * user via [MetadataEntries.dispose] otherwise memory will be leaked.
+     *
+     * @see LLVM.LLVMGlobalCopyAllMetadata
+     */
     public fun copyMetadata(): MetadataEntries {
-        // TODO: Resolve LLVM ptr type
         val ptr = SizeTPointer(0)
 
         val entries = LLVM.LLVMGlobalCopyAllMetadata(ref, ptr)

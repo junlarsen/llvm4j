@@ -19,7 +19,10 @@ public class PointerType internal constructor() : Type(),
     /**
      * Create a pointer types
      *
-     * Creates a pointer types of types [type]. An address space may be provided, but defaults to 0.
+     * Creates a pointer types of types [type]. An address space may be provided
+     * but defaults to 0.
+     *
+     * @see LLVM.LLVMPointerType
      */
     public constructor(type: Type, address: Int = 0) : this() {
         require(address >= 0) { "Cannot use negative address" }
@@ -28,6 +31,11 @@ public class PointerType internal constructor() : Type(),
     }
 
     //region Core::Types::SequentialTypes
+    /**
+     * Get the address of this pointer
+     *
+     * @see LLVM.LLVMGetPointerAddressSpace
+     */
     public fun getAddressSpace(): Int {
         return LLVM.LLVMGetPointerAddressSpace(ref)
     }

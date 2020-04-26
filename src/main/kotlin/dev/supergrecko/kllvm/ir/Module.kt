@@ -4,6 +4,7 @@ import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.types.FunctionType
+import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GlobalAlias
 import dev.supergrecko.kllvm.ir.values.GlobalValue
@@ -15,6 +16,7 @@ import java.nio.ByteBuffer
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
+import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class Module internal constructor() : AutoCloseable,
@@ -94,11 +96,13 @@ public class Module internal constructor() : AutoCloseable,
     /**
      * Add an alias of a global variable or function inside this module
      *
+     * [type] Must be a pointer type even though LLVM-C types it as Type, C++
+     * casts this to a PointerType regardless which means that if our passed
+     * type is not a pointer type the jvm will crash.
+     *
      * @see LLVM.LLVMAddAlias
      */
-    public fun addAlias(type: Type, aliasOf: Value, name: String): GlobalAlias {
-        require(aliasOf.getType().getTypeKind() == type.getTypeKind())
-
+    public fun addAlias(type: PointerType, aliasOf: Value, name: String): GlobalAlias {
         val alias = LLVM.LLVMAddAlias(ref, type.ref, aliasOf.ref, name)
 
         return GlobalAlias(alias)
@@ -110,17 +114,15 @@ public class Module internal constructor() : AutoCloseable,
      * Returns null if the alias does not exist
      *
      * @see LLVM.LLVMGetNamedGlobalAlias
-     *
-     * TODO: Check if .isNull is enough to determine nullity
      */
     public fun getAlias(name: String): GlobalAlias? {
-        val alias = LLVM.LLVMGetNamedGlobalAlias(
+        val alias: LLVMValueRef? = LLVM.LLVMGetNamedGlobalAlias(
             ref,
             name,
             name.length.toLong()
         )
 
-        return if (alias.isNull) {
+        return if (alias == null) {
             null
         } else {
             GlobalAlias(alias)

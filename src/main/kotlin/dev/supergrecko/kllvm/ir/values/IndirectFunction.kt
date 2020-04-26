@@ -57,7 +57,7 @@ public class IndirectFunction internal constructor() : FunctionValue() {
                 name.length.toLong()
             )
 
-            return if (fn.isNull) {
+            return if (fn == null) {
                 throw IllegalArgumentException(
                     "Function $name could not be found in module."
                 )

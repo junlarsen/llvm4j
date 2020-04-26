@@ -26,7 +26,7 @@ class IntegerTypeTest {
         runAll(1, 8, 16, 32, 64, 128) {
             val type = IntType(it, ctx)
 
-            assertTrue { !type.ref.isNull }
+            assertEquals(it, type.getTypeWidth())
         }
     }
 }

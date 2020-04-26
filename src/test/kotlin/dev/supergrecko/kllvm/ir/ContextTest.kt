@@ -7,6 +7,7 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticInfoRef
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFalse
 
 class ContextTest {
     @Test
@@ -41,9 +42,9 @@ class ContextTest {
 
         ctx.setDiagnosticHandler(handler)
 
-        val res = ctx.getDiagnosticHandler().isNull
+        val res: LLVMDiagnosticHandler? = ctx.getDiagnosticHandler()
 
-        assertEquals(false, res)
+        assertFalse { res == null }
 
         ctx.dispose()
     }
