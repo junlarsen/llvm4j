@@ -27,15 +27,19 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
     public constructor(
         type: IntType,
         value: Long,
-        signExtend: Boolean
+        signExtend: Boolean = true
     ) : this() {
         ref = LLVM.LLVMConstInt(type.ref, value, signExtend.toLLVMBool())
     }
 
+    public constructor(
+        type: IntType,
+        value: Int,
+        signExtend: Boolean = true
+    ) : this(type, value.toLong(), signExtend)
+
     /**
      * Create a constant integer of arbitrary precision
-     *
-     * TODO: Find out [words] actually is ... and how to properly use this
      *
      * @see LLVM.LLVMConstIntOfArbitraryPrecision
      */

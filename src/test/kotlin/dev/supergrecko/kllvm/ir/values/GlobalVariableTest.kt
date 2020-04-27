@@ -1,9 +1,8 @@
 package dev.supergrecko.kllvm.ir.values
 
-import dev.supergrecko.kllvm.internal.util.runAll
+import dev.supergrecko.kllvm.test.runAll
 import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.ThreadLocalMode
-import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import kotlin.test.assertEquals
@@ -59,7 +58,7 @@ class GlobalVariableTest {
         value.threadLocal = true
 
         // While this may seem redundant it is not, see impl for the getter
-        runAll(*ThreadLocalMode.values()) {
+        runAll(*ThreadLocalMode.values()) { it, _ ->
             value.threadLocalMode = it
 
             assertEquals(it, value.threadLocalMode)
