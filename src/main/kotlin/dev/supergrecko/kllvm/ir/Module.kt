@@ -7,17 +7,16 @@ import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GlobalAlias
-import dev.supergrecko.kllvm.ir.values.GlobalValue
 import dev.supergrecko.kllvm.ir.values.GlobalVariable
 import dev.supergrecko.kllvm.support.MemoryBuffer
 import dev.supergrecko.kllvm.support.VerifierFailureAction
-import java.io.File
-import java.nio.ByteBuffer
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
+import java.io.File
+import java.nio.ByteBuffer
 
 public class Module internal constructor() : AutoCloseable,
     Validatable, Disposable {
@@ -42,49 +41,79 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     //region Core::Modules
-    public fun dump() {
-        // TODO: test
-        LLVM.LLVMDumpModule(ref)
-    }
+    /**
+     * Dump the module contents to stderr
+     *
+     * @see LLVM.LLVMDumpModule
+     */
+    public fun dump() = LLVM.LLVMDumpModule(ref)
 
+    /**
+     * Create a function inside this module with the given [name]
+     *
+     * @see LLVM.LLVMAddFunction
+     */
     public fun addFunction(name: String, type: FunctionType): FunctionValue {
-        // TODO: test
         val value = LLVM.LLVMAddFunction(ref, name, type.ref)
 
         return FunctionValue(value)
     }
 
+    /**
+     * Clone this module
+     *
+     * @see LLVM.LLVMCloneModule
+     */
     public fun clone(): Module {
         val mod = LLVM.LLVMCloneModule(ref)
 
         return Module(mod)
     }
 
-    public fun getModuleIdentifier(): String {
-        val ptr = LLVM.LLVMGetModuleIdentifier(ref, SizeTPointer(0))
+    /**
+     * A module identifier is a unique name for a module
+     *
+     * @see LLVM.LLVMGetModuleIdentifier
+     * @see LLVM.LLVMSetModuleIdentifier
+     */
+    public var moduleIdentifier: String
+        get() {
+            val ptr = LLVM.LLVMGetModuleIdentifier(ref, SizeTPointer(0))
 
-        return ptr.string
-    }
+            return ptr.string
+        }
+        set(value) {
+            LLVM.LLVMSetModuleIdentifier(
+                ref,
+                value,
+                value.length.toLong()
+            )
+        }
 
-    public fun setModuleIdentifier(identifier: String) {
-        LLVM.LLVMSetModuleIdentifier(
+    /**
+     * Set the "source name" for this module
+     *
+     * @see LLVM.LLVMGetSourceFileName
+     * @see LLVM.LLVMSetSourceFileName
+     */
+    public var sourceFileName: String
+        get() {
+            val ptr = LLVM.LLVMGetSourceFileName(ref, SizeTPointer(0))
+
+            return ptr.string
+        }
+        set(value) = LLVM.LLVMSetSourceFileName(
             ref,
-            identifier,
-            identifier.length.toLong()
+            value,
+            value.length.toLong()
         )
-    }
 
-    public fun getSourceFileName(): String {
-        val ptr = LLVM.LLVMGetSourceFileName(ref, SizeTPointer(0))
-
-        return ptr.string
-    }
-
-    public fun setSourceFileName(sourceName: String) {
-        LLVM.LLVMSetSourceFileName(ref, sourceName, sourceName.length.toLong())
-    }
-
-    public fun getFunction(name: String): Value? {
+    /**
+     * Get a function in the module if it exists
+     *
+     * @see LLVM.LLVMGetNamedFunction
+     */
+    public fun getFunction(name: String): FunctionValue? {
         val ref = LLVM.LLVMGetNamedFunction(ref, name)
             ?: return null
 
@@ -102,7 +131,11 @@ public class Module internal constructor() : AutoCloseable,
      *
      * @see LLVM.LLVMAddAlias
      */
-    public fun addAlias(type: PointerType, aliasOf: Value, name: String): GlobalAlias {
+    public fun addAlias(
+        type: PointerType,
+        aliasOf: Value,
+        name: String
+    ): GlobalAlias {
         val alias = LLVM.LLVMAddAlias(ref, type.ref, aliasOf.ref, name)
 
         return GlobalAlias(alias)
@@ -131,9 +164,16 @@ public class Module internal constructor() : AutoCloseable,
     //endregion Core::Values::Constants::GlobalAliases
 
     //region Core::Values::Constants::GlobalVariables
+    /**
+     * Add a global variable to this module
+     *
+     * To add functions, use [addFunction]
+     *
+     * @see LLVM.LLVMAddGlobal
+     */
     fun addGlobal(
-        type: Type,
         name: String,
+        type: Type,
         addressSpace: Int? = null
     ): GlobalVariable {
         val global = if (addressSpace == null) {
@@ -147,16 +187,31 @@ public class Module internal constructor() : AutoCloseable,
     //endregion Core::Values::Constants::GlobalVariables
 
     //region BitWriter
+    /**
+     * Write the module bit-code to a memory buffer
+     *
+     * @see LLVM.LLVMWriteBitcodeToMemoryBuffer
+     */
     public fun toMemoryBuffer(): MemoryBuffer {
         val buf = LLVM.LLVMWriteBitcodeToMemoryBuffer(ref)
 
         return MemoryBuffer(buf)
     }
 
+    /**
+     * Write module bit-code to a path
+     *
+     * @see LLVM.LLVMWriteBitcodeToFile
+     */
     public fun toFile(path: String) {
         LLVM.LLVMWriteBitcodeToFile(ref, path)
     }
 
+    /**
+     * Write module bit-code to a Java [file]
+     *
+     * @see LLVM.LLVMWriteBitcodeToFile
+     */
     public fun toFile(file: File) {
         LLVM.LLVMWriteBitcodeToFile(ref, file.absolutePath)
     }

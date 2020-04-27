@@ -1,6 +1,7 @@
 package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.ir.types.FunctionType
+import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.types.VoidType
 import dev.supergrecko.kllvm.support.VerifierFailureAction
 import java.io.File
@@ -14,9 +15,9 @@ class ModuleTest {
     @Test
     fun `setting a module identifier`() {
         val mod = Module("test.ll")
-        mod.setModuleIdentifier("test")
+        mod.moduleIdentifier = "test"
 
-        assertEquals("test", mod.getModuleIdentifier())
+        assertEquals("test", mod.moduleIdentifier)
 
         mod.dispose()
     }
@@ -24,11 +25,11 @@ class ModuleTest {
     @Test
     fun `cloning a module with a module identifier`() {
         val mod = Module("test.ll")
-        mod.setModuleIdentifier("test")
+        mod.moduleIdentifier = "test"
 
         val clone = mod.clone()
 
-        assertEquals(mod.getModuleIdentifier(), clone.getModuleIdentifier())
+        assertEquals(mod.moduleIdentifier, clone.moduleIdentifier)
 
         mod.dispose()
         clone.dispose()
@@ -38,11 +39,11 @@ class ModuleTest {
     fun `modifying the module source name`() {
         val mod = Module("test.ll")
 
-        assertEquals("test.ll", mod.getSourceFileName())
+        assertEquals("test.ll", mod.sourceFileName)
 
-        mod.setSourceFileName("test2.ll")
+        mod.sourceFileName = "test2.ll"
 
-        assertEquals("test2.ll", mod.getSourceFileName())
+        assertEquals("test2.ll", mod.sourceFileName)
 
         mod.dispose()
     }
@@ -110,7 +111,7 @@ class ModuleTest {
         val buf = module.toMemoryBuffer()
         val mod = buf.parse(context)
 
-        assertEquals("test.ll", mod.getSourceFileName())
+        assertEquals("test.ll", mod.sourceFileName)
 
         module.dispose()
         context.dispose()
@@ -125,17 +126,7 @@ class ModuleTest {
 
         val mod = buf.getModule(context)
 
-        assertEquals("test.ll", mod.getSourceFileName())
-    }
-
-    @Test
-    fun `dumping module`() {
-        val context = Context()
-        val module = Module("test.ll", context)
-
-        module.dump()
-
-        module.dispose()
+        assertEquals("test.ll", mod.sourceFileName)
     }
 
     @Test
@@ -148,5 +139,15 @@ class ModuleTest {
         assertEquals(true, res)
 
         module.dispose()
+    }
+
+    @Test
+    fun `creation of function`() {
+        val fnTy = FunctionType(IntType(32), listOf(), false)
+        val module = Module("test.ll")
+
+        val fn = module.addFunction("test", fnTy)
+
+        assertEquals(0, fn.getParameterCount())
     }
 }

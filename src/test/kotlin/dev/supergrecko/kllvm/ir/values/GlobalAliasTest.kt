@@ -5,6 +5,7 @@ import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class GlobalAliasTest {
     @Test
@@ -13,7 +14,7 @@ class GlobalAliasTest {
 
         val ty = IntType(32)
         val v = ConstantInt(ty, 32L, true)
-        val global = mod.addGlobal(ty, "value_1")
+        val global = mod.addGlobal("value_1", ty)
         global.initializer = v
 
         val alias = mod.addAlias(ty.toPointerType(), global, "value_2")
@@ -27,10 +28,19 @@ class GlobalAliasTest {
     }
 
     @Test
+    fun `non-existing alias returns null`() {
+        val mod = Module("test.ll")
+
+        val alias = mod.getAlias("unknown_alias")
+
+        assertNull(alias)
+    }
+
+    @Test
     fun `fetching alias from module`() {
         val mod = Module("test.ll")
         val ty = IntType(32).toPointerType()
-        val global = mod.addGlobal(ty, "value_1")
+        val global = mod.addGlobal("value_1", ty)
         val alias = mod.addAlias(ty, global, "alias_1")
         val aliasOf = mod.getAlias("alias_1")
 
