@@ -4,6 +4,7 @@ import dev.supergrecko.kllvm.test.runAll
 import dev.supergrecko.kllvm.ir.Context
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFailsWith
 
 class IntegerTypeTest {
     @Test
@@ -27,5 +28,26 @@ class IntegerTypeTest {
 
             assertEquals(it, type.getTypeWidth())
         }
+    }
+
+    @Test
+    fun `negative size is illegal`() {
+        assertFailsWith<IllegalArgumentException> {
+            IntType(-1)
+        }
+    }
+
+    @Test
+    fun `too huge size is illegal`() {
+        assertFailsWith<IllegalArgumentException> {
+            IntType(1238234672)
+        }
+    }
+
+    @Test
+    fun `is sized works for integer`() {
+        val type = IntType(192)
+
+        assertEquals(true, type.isSized())
     }
 }

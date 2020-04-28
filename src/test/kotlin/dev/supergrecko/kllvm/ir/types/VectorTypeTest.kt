@@ -7,6 +7,23 @@ import org.junit.jupiter.api.Test
 
 class VectorTypeTest {
     @Test
+    fun `user land creation of type`() {
+        val type = IntType(32)
+        val vec = type.toVectorType(1000)
+
+        assertEquals(TypeKind.Vector, vec.getTypeKind())
+        assertEquals(1000, vec.getElementCount())
+    }
+
+    @Test
+    fun `ref creation of type`() {
+        val type = IntType(16).toVectorType(10)
+        val second = VectorType(type.ref)
+
+        assertEquals(TypeKind.Vector, second.getTypeKind())
+    }
+
+    @Test
     fun `underlying type matches`() {
         val type = IntType(32)
         val vec = VectorType(type, 10)

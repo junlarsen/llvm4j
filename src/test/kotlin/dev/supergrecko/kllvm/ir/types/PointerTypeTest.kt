@@ -1,9 +1,26 @@
 package dev.supergrecko.kllvm.ir.types
 
+import dev.supergrecko.kllvm.ir.TypeKind
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 
 class PointerTypeTest {
+    @Test
+    fun `user land creation of type`() {
+        val type = IntType(64)
+        val ptr = type.toPointerType()
+
+        assertEquals(TypeKind.Pointer, ptr.getTypeKind())
+    }
+
+    @Test
+    fun `ref creation of type`() {
+        val type = IntType(1).toPointerType(10)
+        val second = PointerType(type.ref)
+
+        assertEquals(TypeKind.Pointer, second.getTypeKind())
+    }
+
     @Test
     fun `underlying type matches`() {
         val type = IntType(32)

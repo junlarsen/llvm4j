@@ -1,9 +1,26 @@
 package dev.supergrecko.kllvm.ir.types
 
+import dev.supergrecko.kllvm.ir.TypeKind
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 
 class StructureTypeTest {
+    @Test
+    fun `ref creation of type`() {
+        val type = StructType(listOf(IntType(16)), false)
+        val second = StructType(type.ref)
+
+        assertEquals(TypeKind.Struct, second.getTypeKind())
+    }
+
+    @Test
+    fun `is sized works for struct`() {
+        val arg = FloatType(TypeKind.Float)
+        val type = StructType(listOf(arg), false)
+
+        assertEquals(true, type.isSized())
+    }
+
     @Test
     fun `test element spec matches`() {
         val elements = listOf(IntType(32))
