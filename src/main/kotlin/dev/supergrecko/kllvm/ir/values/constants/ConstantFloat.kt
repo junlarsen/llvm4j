@@ -7,8 +7,12 @@ import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.ConstantValue
 import org.bytedeco.javacpp.IntPointer
+import org.bytedeco.javacpp.Pointer
+import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
+import java.nio.ByteBuffer
+import java.nio.IntBuffer
 
 public class ConstantFloat internal constructor() : Value(), ConstantValue {
     public constructor(llvmValue: LLVMValueRef) : this() {
@@ -23,16 +27,23 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
     /**
      * Obtains the double value for a floating point const value
      *
-     * The returned [Pair] contains the obtained value and whether precision was
-     * lost or not.
-     *
      * @see LLVM.LLVMConstRealGetDouble
      */
-    public fun getDouble(): Pair<Double, Boolean> {
-        val ptr = IntPointer()
-        val double = LLVM.LLVMConstRealGetDouble(ref, ptr)
+    public fun getDouble(): Double {
+        val buf = IntArray(1)
 
-        return (double) to (ptr.get().fromLLVMBool())
+        return LLVM.LLVMConstRealGetDouble(ref, buf)
+    }
+
+    /**
+     * Determine whether [getDouble] will lose precision when converting
+     */
+    public fun getDoubleLosesPrecision(): Boolean {
+        val buf = IntArray(1)
+
+        LLVM.LLVMConstRealGetDouble(ref, buf)
+
+        return buf.first().fromLLVMBool()
     }
     //endregion Core::Values::Constants::ScalarConstants
 

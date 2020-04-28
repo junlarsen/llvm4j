@@ -9,13 +9,13 @@ class GlobalValueTest {
     @Test
     fun `fetching module`() {
         val module = Module("test.ll")
-        module.setModuleIdentifier("basic")
+        module.moduleIdentifier = "basic"
 
-        val global = module.addGlobal(IntType(32), "my_int")
+        val global = module.addGlobal("my_int", IntType(32))
         val globalModule = global.asGlobalValue().getModule()
 
         assertEquals(
-            module.getModuleIdentifier(), globalModule.getModuleIdentifier()
+            module.moduleIdentifier, globalModule.moduleIdentifier
         )
     }
 }

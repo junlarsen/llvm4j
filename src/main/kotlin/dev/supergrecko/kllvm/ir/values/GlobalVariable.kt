@@ -7,6 +7,7 @@ import dev.supergrecko.kllvm.ir.ThreadLocalMode
 import dev.supergrecko.kllvm.ir.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
+import java.lang.RuntimeException
 
 public class GlobalVariable internal constructor() : Value() {
     /**
@@ -34,11 +35,15 @@ public class GlobalVariable internal constructor() : Value() {
      * @see LLVM.LLVMSetInitializer
      */
     public var initializer: Value
-        get() = Value(
-            LLVM.LLVMGetInitializer(
-                ref
-            )
-        )
+        get() {
+            val v = LLVM.LLVMGetInitializer(ref)
+
+            return if (v == null) {
+                throw RuntimeException("$this does not have an initializer")
+            } else {
+                Value(v)
+            }
+        }
         set(value) = LLVM.LLVMSetInitializer(ref, value.ref)
 
     /**

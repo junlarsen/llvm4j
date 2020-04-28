@@ -13,7 +13,8 @@ public class FloatType internal constructor() : Type() {
      */
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
-        requireKind(TypeKind.Float)
+
+        require(getTypeKind() in kinds)
     }
 
     /**

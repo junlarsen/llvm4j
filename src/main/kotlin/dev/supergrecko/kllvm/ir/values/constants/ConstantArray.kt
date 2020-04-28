@@ -3,10 +3,12 @@ package dev.supergrecko.kllvm.ir.values.constants
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.ir.Context
+import dev.supergrecko.kllvm.ir.Type
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.values.AggregateValue
 import dev.supergrecko.kllvm.ir.values.CompositeValue
 import dev.supergrecko.kllvm.ir.values.ConstantValue
+import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -20,6 +22,18 @@ public class ConstantArray internal constructor() : Value(), ConstantValue,
         ref = llvmValue
     }
 
+    public constructor(type: Type, values: List<Value>) : this() {
+        val ptr = values.map { it.ref }.toTypedArray()
+
+        ref = LLVM.LLVMConstArray(type.ref, PointerPointer(*ptr), ptr.size)
+    }
+
+    /**
+     * Constructor to make an LLVM string
+     *
+     * A LLVM string is an array of i8's which contain the different
+     * characters the string contains
+     */
     public constructor(
         content: String,
         nullTerminate: Boolean,
@@ -35,7 +49,7 @@ public class ConstantArray internal constructor() : Value(), ConstantValue,
 
     //region Core::Values::Constants::CompositeConstants
     /**
-     * Determine whether this is a constant string
+     * Determine whether this is an array of i8's
      *
      * @see LLVM.LLVMIsConstantString
      */
@@ -44,7 +58,7 @@ public class ConstantArray internal constructor() : Value(), ConstantValue,
     }
 
     /**
-     * Get the array in a string representation
+     * Get the string for this array if it's an array of i8
      *
      * @see LLVM.LLVMGetAsString
      */
@@ -56,6 +70,4 @@ public class ConstantArray internal constructor() : Value(), ConstantValue,
         return ptr.string
     }
     //endregion Core::Values::Constants::CompositeConstants
-
-    override fun toString(): String = getAsString()
 }

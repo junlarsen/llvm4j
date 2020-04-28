@@ -1,13 +1,13 @@
 package dev.supergrecko.kllvm.ir
 
-import dev.supergrecko.kllvm.internal.util.runAll
+import dev.supergrecko.kllvm.test.runAll
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticInfoRef
 import org.junit.jupiter.api.Test
-import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 
 class ContextTest {
     @Test
@@ -44,7 +44,7 @@ class ContextTest {
 
         val res: LLVMDiagnosticHandler? = ctx.getDiagnosticHandler()
 
-        assertFalse { res == null }
+        assertNotNull(res)
 
         ctx.dispose()
     }
@@ -53,7 +53,7 @@ class ContextTest {
     fun `the discardValueNames property is functional`() {
         val ctx = Context()
 
-        runAll(true, false) {
+        runAll(true, false) { it, _ ->
             ctx.discardValueNames = it
             assertEquals(it, ctx.discardValueNames)
         }
