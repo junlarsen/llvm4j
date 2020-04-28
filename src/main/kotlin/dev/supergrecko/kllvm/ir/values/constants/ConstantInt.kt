@@ -481,31 +481,36 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      */
     public fun zext(type: IntType): ConstantInt = ext(type, false)
 
+
+    /**
+     * Converstion to float type
+     *
+     * @see LLVM.LLVMConstSIToFP
+     * @see LLVM.LLVMConstUIToFP
+     */
+    public fun tofp(type: FloatType, signExtend: Boolean): ConstantFloat {
+        val ref = if (signExtend) {
+            LLVM.LLVMConstSIToFP(ref, type.ref)
+        } else {
+            LLVM.LLVMConstUIToFP(ref, type.ref)
+        }
+
+        return ConstantFloat(ref)
+    }
+
     /**
      * Conversion to float type using this as unsigned
      *
      * @see LLVM.LLVMConstUIToFP
-     *
-     * TODO: Find a way to check if type is signed
      */
-    public fun uitofp(type: FloatType): ConstantFloat {
-        val ref = LLVM.LLVMConstUIToFP(ref, type.ref)
-
-        return ConstantFloat(ref)
-    }
+    public fun uitofp(type: FloatType): ConstantFloat = tofp(type, false)
 
     /**
      * Conversion to float type using this as signed
      *
      * @see LLVM.LLVMConstSIToFP
-     *
-     * TODO: Find a way to check if type is signed
      */
-    public fun sitofp(type: FloatType): ConstantFloat {
-        val ref = LLVM.LLVMConstSIToFP(ref, type.ref)
-
-        return ConstantFloat(ref)
-    }
+    public fun sitofp(type: FloatType): ConstantFloat = tofp(type, false)
 
     /**
      * Conversion to integer pointer

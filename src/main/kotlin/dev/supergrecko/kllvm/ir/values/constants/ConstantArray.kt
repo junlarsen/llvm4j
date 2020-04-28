@@ -49,7 +49,7 @@ public class ConstantArray internal constructor() : Value(), ConstantValue,
 
     //region Core::Values::Constants::CompositeConstants
     /**
-     * Determine whether this is a constant string
+     * Determine whether this is an array of i8's
      *
      * @see LLVM.LLVMIsConstantString
      */
@@ -58,7 +58,7 @@ public class ConstantArray internal constructor() : Value(), ConstantValue,
     }
 
     /**
-     * Get the array in a string representation
+     * Get the string for this array if it's an array of i8
      *
      * @see LLVM.LLVMGetAsString
      */
@@ -70,6 +70,4 @@ public class ConstantArray internal constructor() : Value(), ConstantValue,
         return ptr.string
     }
     //endregion Core::Values::Constants::CompositeConstants
-
-    override fun toString(): String = getAsString()
 }

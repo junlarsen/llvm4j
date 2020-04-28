@@ -1,12 +1,16 @@
 package dev.supergrecko.kllvm.ir.values.constants
 
-import dev.supergrecko.kllvm.internal.util.toLLVMBool
+import dev.supergrecko.kllvm.ir.TypeKind
 import dev.supergrecko.kllvm.test.runAll
 import dev.supergrecko.kllvm.ir.instructions.IntPredicate
+import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.types.IntType
+import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.test.constIntPairOf
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class ConstantIntTest {
     @Test
@@ -212,5 +216,64 @@ class ConstantIntTest {
         val trunc = lhs.trunc(IntType(1))
 
         assertEquals(0, trunc.getUnsignedValue())
+    }
+
+    @Test
+    fun `type extension`() {
+        val lhs = ConstantInt(IntType(8), 64)
+
+        val sext = lhs.sext(IntType(16))
+        val zext = lhs.zext(IntType(16))
+
+        assertEquals(64, sext.getSignedValue())
+        assertEquals(64, zext.getUnsignedValue())
+    }
+
+    @Test
+    fun `convert to float`() {
+        val lhs = ConstantInt(IntType(64), 64)
+
+        val si = lhs.sitofp(FloatType(TypeKind.Float))
+        val ui = lhs.uitofp(FloatType(TypeKind.Double))
+
+        assertEquals(64.0, si.getDouble())
+        assertEquals(64.0, ui.getDouble())
+        assertFalse { si.getDoubleLosesPrecision() }
+        assertFalse { si.getDoubleLosesPrecision() }
+    }
+
+    @Test
+    fun `convert to pointer`() {
+        val ty = IntType(64)
+        val lhs = ConstantInt(ty, 100)
+        val ptr = lhs.ptrcast(PointerType(ty))
+
+        assertTrue { ptr.isConstant() }
+
+        val num = ptr.intcast(ty)
+
+        assertEquals(lhs.getSignedValue(), num.getSignedValue())
+    }
+
+    @Test
+    fun `convert to other int type`() {
+        val targetTy = IntType(128)
+        val lhs = ConstantInt(IntType(32), 100000)
+
+        val second = lhs.intcast(targetTy, true)
+
+        assertEquals(lhs.getSignedValue(), second.getSignedValue())
+    }
+
+    @Test
+    fun `select instruction`() {
+        // true
+        val cond = ConstantInt(IntType(1), 1)
+
+        val (lhs, rhs) = constIntPairOf(10, 20)
+
+        val res = cond.select(lhs, rhs)
+
+        assertEquals(10, res.asIntValue().getSignedValue())
     }
 }
