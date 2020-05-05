@@ -1,6 +1,7 @@
 package dev.supergrecko.kllvm.ir
 
 import org.bytedeco.llvm.LLVM.LLVMUseRef
+import org.bytedeco.llvm.global.LLVM
 
 public class Use internal constructor() {
     internal lateinit var ref: LLVMUseRef
@@ -11,4 +12,44 @@ public class Use internal constructor() {
     public constructor(use: LLVMUseRef) : this() {
         ref = use
     }
+
+    //region Core::Values::Usage
+    /**
+     * Get the next usage in an iterator
+     *
+     * This should be used with [Value.getFirstUse] as this continues the
+     * underlying C++ iterator.
+     */
+    public fun nextUse(): Use? {
+        val use = LLVM.LLVMGetNextUse(ref)
+
+        return if (use != null) {
+            Use(use)
+        } else {
+            null
+        }
+    }
+
+    /**
+     * Get the llvm::User from this use
+     *
+     * @see LLVM.LLVMGetUser
+     */
+    public fun getUser(): User {
+        val user = LLVM.LLVMGetUser(ref)
+
+        return User(user)
+    }
+
+    /**
+     * Get the value this usage points to
+     *
+     * @see LLVM.LLVMGetUsedValue
+     */
+    public fun getUsedValue(): Value {
+        val value = LLVM.LLVMGetUsedValue(ref)
+
+        return Value(value)
+    }
+    //endregion Core::Values::Usage
 }

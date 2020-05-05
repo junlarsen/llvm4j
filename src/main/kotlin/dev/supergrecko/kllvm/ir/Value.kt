@@ -8,7 +8,6 @@ import dev.supergrecko.kllvm.ir.instructions.Instruction
 import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GenericValue
 import dev.supergrecko.kllvm.ir.values.GlobalValue
-import dev.supergrecko.kllvm.ir.values.GlobalVariable
 import dev.supergrecko.kllvm.ir.values.MetadataValue
 import dev.supergrecko.kllvm.ir.values.PhiValue
 import dev.supergrecko.kllvm.ir.values.constants.ConstantArray
@@ -199,6 +198,24 @@ public open class Value internal constructor() :
         return LLVM.LLVMIsAMDString(ref) != null
     }
     //endregion Core::Values::GeneralAPIs
+
+    //region Core::Values::Usage
+    /**
+     * Get the first use for this value, the next value can be retrieved by
+     * calling [Use.nextUse] on the returned value.
+     *
+     * @see LLVM.LLVMGetFirstUse
+     */
+    public fun getFirstUse(): Use? {
+        val use = LLVM.LLVMGetFirstUse(ref)
+
+        return if (use != null) {
+            Use(use)
+        } else {
+            null
+        }
+    }
+    //endregion Core::Values::Usage
 
     //region Core::Values::Constants
     /**
