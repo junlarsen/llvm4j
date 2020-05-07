@@ -228,6 +228,32 @@ public open class Value internal constructor() :
     }
     //endregion Core::Values::Constants
 
+    //region Core::BasicBlock
+    /**
+     * Is this value a basic block?
+     *
+     * @see LLVM.LLVMIsABasicBlock
+     */
+    public fun isBasicBlock(): Boolean {
+        return LLVM.LLVMIsABasicBlock(ref) != null
+    }
+
+    /**
+     * Converts this value into a Basic Block
+     *
+     * This is done by unwrapping the instance into a BasicBlock
+     *
+     * TODO: Research more about this cast
+     *
+     * @see LLVM.LLVMValueAsBasicBlock
+     */
+    public fun toBasicBlock(): BasicBlock {
+        val bb = LLVM.LLVMValueAsBasicBlock(ref)
+
+        return BasicBlock(bb)
+    }
+    //endregion Core::BasicBlock
+
     //region Typecasting
     /**
      * Attempts to use the current [ref] for a new value

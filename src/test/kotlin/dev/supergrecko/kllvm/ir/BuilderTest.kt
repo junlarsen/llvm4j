@@ -25,7 +25,7 @@ class BuilderTest {
             )
         )
 
-        val basicBlock = function.appendBasicBlock("entry")
+        val basicBlock = function.addBlock("entry")
         builder.positionAtEnd(basicBlock)
 
         // A simple comparison won't do because even though the
@@ -96,7 +96,7 @@ class BuilderTest {
             )
         )
 
-        val basicBlock = caller.appendBasicBlock("entry")
+        val basicBlock = caller.addBlock("entry")
         builder.positionAtEnd(basicBlock)
 
         if (externFunc !is Value) {

@@ -15,7 +15,7 @@ public class Use internal constructor() {
 
     //region Core::Values::Usage
     /**
-     * Get the next usage in an iterator
+     * Get the next usage in the iterator
      *
      * This should be used with [Value.getFirstUse] as this continues the
      * underlying C++ iterator.
