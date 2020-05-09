@@ -32,14 +32,14 @@ public open class FunctionValue internal constructor() : Value() {
 
     //region Core::BasicBlock
     /**
-     * Adds a new basic block to this function and returns it
+     * Add a new basic block to this function and returns it
      *
      * You may optionally pass a context which the block will reside in. If
      * no context is passed, the context of this function will be used.
      *
      * @see LLVM.LLVMAppendBasicBlock
      */
-    public fun addBlock(
+    public fun createBlock(
         name: String,
         context: Context = getContext()
     ): BasicBlock {
@@ -50,6 +50,17 @@ public open class FunctionValue internal constructor() : Value() {
         )
 
         return BasicBlock(bb)
+    }
+
+    /**
+     * Append an already-existing basic block
+     *
+     * These blocks can be acquire via BasicBlock(Context, String)
+     *
+     * @see LLVM.LLVMAppendExistingBasicBlock
+     */
+    public fun appendBlock(block: BasicBlock) {
+        LLVM.LLVMAppendExistingBasicBlock(ref, block.ref)
     }
 
     /**
