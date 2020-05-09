@@ -1,5 +1,9 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.Iterator
+import dev.supergrecko.kllvm.internal.contracts.LLVMIterable
+import dev.supergrecko.kllvm.internal.contracts.NextIterator
+import dev.supergrecko.kllvm.internal.contracts.PrevIterator
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.wrap
 import dev.supergrecko.kllvm.ir.instructions.Instruction
@@ -7,7 +11,8 @@ import dev.supergrecko.kllvm.ir.values.FunctionValue
 import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.global.LLVM
 
-public class BasicBlock internal constructor() : Validatable {
+public class BasicBlock internal constructor() : Validatable,
+    LLVMIterable<BasicBlock> {
     override var valid = true
     public lateinit var ref: LLVMBasicBlockRef
 
@@ -80,34 +85,6 @@ public class BasicBlock internal constructor() : Validatable {
         val instr = LLVM.LLVMGetBasicBlockTerminator(ref)
 
         return wrap(instr) { Instruction(it) }
-    }
-
-    /**
-     * Get the next block in the iterator
-     *
-     * Use with [BasicBlock.getNextBlock] and [BasicBlock.getPreviousBlock]
-     * to move the iterator
-     */
-    public fun getNextBlock(): BasicBlock? {
-        require(valid)
-
-        val bb = LLVM.LLVMGetNextBasicBlock(ref)
-
-        return wrap(bb) { BasicBlock(it) }
-    }
-
-    /**
-     * Get the previous block in the iterator
-     *
-     * Use with [BasicBlock.getNextBlock] and [BasicBlock.getPreviousBlock]
-     * to move the iterator
-     */
-    public fun getPreviousBlock(): BasicBlock? {
-        require(valid)
-
-        val bb = LLVM.LLVMGetPreviousBasicBlock(ref)
-
-        return wrap(bb) { BasicBlock(it) }
     }
 
     /**
@@ -193,4 +170,35 @@ public class BasicBlock internal constructor() : Validatable {
         return wrap(instr) { Instruction(it) }
     }
     //endregion Core::BasicBlock
+
+    //region LLVMIterator
+    public override fun iter(): BasicBlockIterator {
+        return BasicBlockIterator()
+    }
+
+    public inner class BasicBlockIterator : NextIterator<BasicBlock>,
+        PrevIterator<BasicBlock> {
+        /**
+         * Get the next block in the iterator
+         */
+        public override fun next(): BasicBlock? {
+            require(valid)
+
+            val bb = LLVM.LLVMGetNextBasicBlock(ref)
+
+            return wrap(bb) { BasicBlock(it) }
+        }
+
+        /**
+         * Get the previous block in the iterator
+         */
+        public override fun prev(): BasicBlock? {
+            require(valid)
+
+            val bb = LLVM.LLVMGetPreviousBasicBlock(ref)
+
+            return wrap(bb) { BasicBlock(it) }
+        }
+    }
+    //endregion LLVMIterator
 }

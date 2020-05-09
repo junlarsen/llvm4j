@@ -1,6 +1,8 @@
 package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.internal.contracts.ContainsReference
+import dev.supergrecko.kllvm.internal.contracts.IsA
+import dev.supergrecko.kllvm.internal.contracts.LLVMIsA
 import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
@@ -58,7 +60,7 @@ public enum class ValueKind(public override val value: Int) : OrderedEnum<Int> {
  * Base class mirroring llvm::Value
  */
 public open class Value internal constructor() :
-    ContainsReference<LLVMValueRef> {
+    ContainsReference<LLVMValueRef>, LLVMIsA {
     public final override lateinit var ref: LLVMValueRef
         internal set
 
@@ -181,24 +183,6 @@ public open class Value internal constructor() :
     public fun replaceAllUsesWith(value: Value) {
         LLVM.LLVMReplaceAllUsesWith(ref, value.ref)
     }
-
-    /**
-     * Is this value a metadata node?
-     *
-     * @see LLVM.LLVMIsAMDNode
-     */
-    public fun isMetadataNode(): Boolean {
-        return LLVM.LLVMIsAMDNode(ref) != null
-    }
-
-    /**
-     * Is this value a metadata string?
-     *
-     * @see LLVM.LLVMIsAMDString
-     */
-    public fun isMetadataString(): Boolean {
-        return LLVM.LLVMIsAMDString(ref) != null
-    }
     //endregion Core::Values::GeneralAPIs
 
     //region Core::Values::Usage
@@ -228,15 +212,6 @@ public open class Value internal constructor() :
 
     //region Core::BasicBlock
     /**
-     * Is this value a basic block?
-     *
-     * @see LLVM.LLVMIsABasicBlock
-     */
-    public fun isBasicBlock(): Boolean {
-        return LLVM.LLVMIsABasicBlock(ref) != null
-    }
-
-    /**
      * Converts this value into a Basic Block
      *
      * This is done by unwrapping the instance into a BasicBlock
@@ -251,6 +226,26 @@ public open class Value internal constructor() :
         return BasicBlock(bb)
     }
     //endregion Core::BasicBlock
+
+    //region LLVMIsA
+    public override fun isa(): ValueIsA {
+        return ValueIsA()
+    }
+
+    public inner class ValueIsA : IsA {
+        public fun basicBlock(): Boolean {
+            return LLVM.LLVMIsABasicBlock(ref) != null
+        }
+
+        public fun metadataNode(): Boolean {
+            return LLVM.LLVMIsAMDNode(ref) != null
+        }
+
+        public fun metadataString(): Boolean {
+            return LLVM.LLVMIsAMDString(ref) != null
+        }
+    }
+    //endregion LLVMIsA
 
     //region Typecasting
     /**

@@ -1,9 +1,12 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.LLVMIterable
+import dev.supergrecko.kllvm.internal.contracts.NextIterator
+import dev.supergrecko.kllvm.internal.util.wrap
 import org.bytedeco.llvm.LLVM.LLVMUseRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Use internal constructor() {
+public class Use internal constructor() : LLVMIterable<Use> {
     internal lateinit var ref: LLVMUseRef
 
     /**
@@ -13,23 +16,27 @@ public class Use internal constructor() {
         ref = use
     }
 
-    //region Core::Values::Usage
-    /**
-     * Get the next usage in the iterator
-     *
-     * This should be used with [Value.getFirstUse] as this continues the
-     * underlying C++ iterator.
-     */
-    public fun nextUse(): Use? {
-        val use = LLVM.LLVMGetNextUse(ref)
-
-        return if (use != null) {
-            Use(use)
-        } else {
-            null
-        }
+    //region LLVMIterator
+    public override fun iter(): UseIterator {
+        return UseIterator()
     }
 
+    public inner class UseIterator : NextIterator<Use> {
+        /**
+         * Get the next usage in the iterator
+         *
+         * This should be used with [Value.getFirstUse] as this continues the
+         * underlying C++ iterator.
+         */
+        override fun next(): Use? {
+            val use = LLVM.LLVMGetNextUse(ref)
+
+            return wrap(use) { Use(it) }
+        }
+    }
+    //endregion LLVMIterator
+
+    //region Core::Values::Usage
     /**
      * Get the llvm::User from this use
      *

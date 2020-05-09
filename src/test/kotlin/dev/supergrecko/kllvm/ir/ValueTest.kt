@@ -47,7 +47,7 @@ class ValueTest {
     @Test
     fun `value type matches`() {
         val type = IntType(32)
-        val value = ConstantInt(type, 1L, true)
+        val value = ConstantInt(type, 1)
 
         val valueType = value.getType()
 
@@ -59,9 +59,9 @@ class ValueTest {
     @Test
     fun `isa checks match`() {
         val type = IntType(32)
-        val value = ConstantInt(type, 1L, true)
+        val value = ConstantInt(type, 1)
 
-        assertFalse { value.isMetadataNode() }
-        assertFalse { value.isMetadataString() }
+        assertFalse { value.isa().metadataNode() }
+        assertFalse { value.isa().metadataString() }
     }
 }
