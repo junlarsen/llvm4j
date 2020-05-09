@@ -8,7 +8,7 @@ import org.bytedeco.javacpp.Pointer
  * Used because LLVM C api does not use booleans, it uses
  * C integers 1 and 0.
  */
-internal inline fun Int.fromLLVMBool() = this == 1
+internal fun Int.fromLLVMBool() = this == 1
 
 /**
  * Util function to convert kotlin [Boolean] to [Int]
@@ -16,7 +16,7 @@ internal inline fun Int.fromLLVMBool() = this == 1
  * Used because LLVM C api does not use booleans, it uses
  * C integers 1 and 0.
  */
-internal inline fun Boolean.toLLVMBool() = if (this) 1 else 0
+internal fun Boolean.toLLVMBool() = if (this) 1 else 0
 
 /**
  * Wrap a nullable LLVM ref into a new type or null.

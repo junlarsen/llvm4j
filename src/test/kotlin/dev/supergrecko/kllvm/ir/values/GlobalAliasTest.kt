@@ -11,20 +11,22 @@ class GlobalAliasTest {
     @Test
     fun `aliases track the value`() {
         val mod = Module("test.ll")
-
         val ty = IntType(32)
         val v = ConstantInt(ty, 32L, true)
-        val global = mod.addGlobal("value_1", ty)
-        global.initializer = v
+
+        val global = mod.addGlobal("value_1", ty).apply {
+            setInitializer(v)
+        }
 
         val alias = mod.addAlias(ty.toPointerType(), global, "value_2")
-
-        val aliasValue = alias.aliasOf
+        val aliasValue = alias.getAliasOf()
 
         assertEquals(
             aliasValue.asIntValue().getSignedValue(),
             global.asIntValue().getSignedValue()
         )
+
+        mod.dispose()
     }
 
     @Test
@@ -34,6 +36,8 @@ class GlobalAliasTest {
         val alias = mod.getAlias("unknown_alias")
 
         assertNull(alias)
+
+        mod.dispose()
     }
 
     @Test
@@ -41,9 +45,12 @@ class GlobalAliasTest {
         val mod = Module("test.ll")
         val ty = IntType(32).toPointerType()
         val global = mod.addGlobal("value_1", ty)
+
         val alias = mod.addAlias(ty, global, "alias_1")
         val aliasOf = mod.getAlias("alias_1")
 
         assertEquals(alias.ref, aliasOf?.ref)
+
+        mod.dispose()
     }
 }

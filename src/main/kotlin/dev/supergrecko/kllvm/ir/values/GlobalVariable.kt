@@ -77,13 +77,12 @@ public class GlobalVariable internal constructor() : Value() {
     /**
      * Get the thread local mode for this variable
      *
+     * This does not need to test for [isThreadLocal] as it will return
+     * [ThreadLocalMode.NotThreadLocal] if it is not thread local.
+     *
      * @see LLVM.LLVMGetThreadLocalMode
      */
     public fun getThreadLocalMode(): ThreadLocalMode {
-        if (!isThreadLocal()) {
-            throw IllegalArgumentException("This variable is not thread local.")
-        }
-
         val tlm = LLVM.LLVMGetThreadLocalMode(ref)
 
         return ThreadLocalMode.values().first { it.value == tlm }

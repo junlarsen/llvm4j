@@ -8,14 +8,15 @@ import kotlin.test.assertEquals
 class GlobalValueTest {
     @Test
     fun `fetching module`() {
-        val module = Module("test.ll")
-        module.moduleIdentifier = "basic"
+        val module = Module("test.ll").apply {
+            setModuleIdentifier("basic")
+        }
 
         val global = module.addGlobal("my_int", IntType(32))
         val globalModule = global.asGlobalValue().getModule()
 
         assertEquals(
-            module.moduleIdentifier, globalModule.moduleIdentifier
+            module.getModuleIdentifier(), globalModule.getModuleIdentifier()
         )
     }
 }

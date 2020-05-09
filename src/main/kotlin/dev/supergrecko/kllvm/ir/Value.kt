@@ -97,7 +97,7 @@ public open class Value internal constructor() :
      * TODO: Test when viable solution has been found
      */
     public fun setName(name: String) {
-        require(!(getContext().discardValueNames && this !is GlobalValue))
+        require(!(getContext().isDiscardingValueNames() && this !is GlobalValue))
 
         LLVM.LLVMSetValueName2(ref, name, name.length.toLong())
     }

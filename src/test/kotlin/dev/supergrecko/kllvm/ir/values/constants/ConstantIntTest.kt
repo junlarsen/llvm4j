@@ -43,8 +43,7 @@ class ConstantIntTest {
 
     @Test
     fun `addition of values`() {
-        val ty =
-            IntType(32)
+        val ty = IntType(32)
 
         val v1 = ConstantInt(ty, 100)
         val v2 = ConstantInt(ty, 300)
