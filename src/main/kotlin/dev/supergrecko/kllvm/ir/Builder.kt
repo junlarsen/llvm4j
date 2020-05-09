@@ -11,7 +11,7 @@ import org.bytedeco.llvm.global.LLVM
 public class Builder public constructor(
     context: Context = Context.getGlobalContext()
 ) : AutoCloseable, Validatable, Disposable {
-    internal var ref: LLVMBuilderRef
+    public var ref: LLVMBuilderRef
     public override var valid: Boolean = true
 
     init {
@@ -145,6 +145,27 @@ public class Builder public constructor(
         return Instruction(
             LLVM.LLVMBuildStructGEP(ref, pointer.ref, index, name)
         )
+    }
+
+    /**
+     * @see LLVM.LLVMBuildCondBr
+     */
+    public fun buildCondBr(
+        condition: Value,
+        ifTrue: BasicBlock,
+        ifFalse: BasicBlock
+    ): Instruction {
+        return Instruction(LLVM.LLVMBuildCondBr(ref, condition.ref, ifTrue.ref, ifFalse.ref))
+    }
+
+    /**
+     * @see LLVM.LLVMBuildNot
+     */
+    public fun buildNot(
+        value: Value,
+        name: String
+    ) : Instruction {
+        return Instruction(LLVM.LLVMBuildNot(ref, value.ref, name))
     }
 
     //endregion InstructionBuilders

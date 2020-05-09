@@ -21,7 +21,7 @@ import java.nio.ByteBuffer
 
 public class Module internal constructor() : AutoCloseable,
     Validatable, Disposable {
-    internal lateinit var ref: LLVMModuleRef
+    public lateinit var ref: LLVMModuleRef
     public override var valid: Boolean = true
 
     /**

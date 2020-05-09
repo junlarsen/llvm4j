@@ -7,7 +7,7 @@ import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.global.LLVM
 
 public class BasicBlock internal constructor() {
-    internal lateinit var ref: LLVMBasicBlockRef
+    public lateinit var ref: LLVMBasicBlockRef
 
     /**
      * Construct a new Type from an LLVM pointer reference
