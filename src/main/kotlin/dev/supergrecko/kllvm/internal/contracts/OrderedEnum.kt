@@ -9,6 +9,6 @@ package dev.supergrecko.kllvm.internal.contracts
  * Multiple of the enums from LLVM have modified ordinals which is why we need
  * to do this.
  */
-public interface OrderedEnum<T> {
+public interface OrderedEnum<T : Number> {
     public val value: T
 }

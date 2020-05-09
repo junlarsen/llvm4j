@@ -1,5 +1,8 @@
 package dev.supergrecko.kllvm.ir
 
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import org.bytedeco.llvm.LLVM.LLVMUseRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -20,13 +23,13 @@ public class Use internal constructor() {
      * This should be used with [Value.getFirstUse] as this continues the
      * underlying C++ iterator.
      */
-    public fun nextUse(): Use? {
+    public fun nextUse(): Option<Use> {
         val use = LLVM.LLVMGetNextUse(ref)
 
         return if (use != null) {
-            Use(use)
+            Some(Use(use))
         } else {
-            null
+            None
         }
     }
 

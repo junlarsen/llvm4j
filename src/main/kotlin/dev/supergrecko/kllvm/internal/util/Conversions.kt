@@ -1,5 +1,8 @@
 package dev.supergrecko.kllvm.internal.util
 
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
 import org.bytedeco.javacpp.Pointer
 
 /**
@@ -19,16 +22,19 @@ internal fun Int.fromLLVMBool() = this == 1
 internal fun Boolean.toLLVMBool() = if (this) 1 else 0
 
 /**
- * Wrap a nullable LLVM ref into a new type or null.
+ * Wrap a nullable LLVM ref into an option of said type.
  *
  * A lot of the LLVM functions return nullable types to mimic C++'s nullptr.
  *
  * Instead of returning an if-expression this is used.
  */
-internal inline fun <T : Pointer, R> wrap(item: T?, apply: (T) -> R): R? {
+internal inline fun <T : Pointer, R> wrap(
+    item: T?,
+    apply: (T) -> R
+): Option<R> {
     return if (item == null) {
-        null
+        None
     } else {
-        apply(item)
+        Some(apply(item))
     }
 }

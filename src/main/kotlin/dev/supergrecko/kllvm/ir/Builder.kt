@@ -1,7 +1,9 @@
 package dev.supergrecko.kllvm.ir
 
+import arrow.core.Option
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
+import dev.supergrecko.kllvm.internal.util.wrap
 import dev.supergrecko.kllvm.ir.instructions.Instruction
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
@@ -33,7 +35,7 @@ public class Builder public constructor(
     }
 
     /**
-     * LLVMPositionBuilder
+     * @see LLVM.LLVMPositionBuilder
      */
     public fun positionBefore(instruction: Instruction) {
         // TODO: Test
@@ -41,29 +43,30 @@ public class Builder public constructor(
     }
 
     /**
-     * LLVMPositionBuilderAtEnd
+     * @see LLVM.LLVMPositionBuilderAtEnd
      */
     public fun positionAtEnd(basicBlock: BasicBlock) {
         LLVM.LLVMPositionBuilderAtEnd(ref, basicBlock.ref)
     }
 
     /**
-     * LLVMGetInsertBlock
+     * @see LLVM.LLVMGetInsertBlock
      */
-    public fun getInsertBlock(): BasicBlock? {
-        val ref = LLVM.LLVMGetInsertBlock(ref) ?: return null
-        return BasicBlock(ref)
+    public fun getInsertBlock(): Option<BasicBlock> {
+        val ref = LLVM.LLVMGetInsertBlock(ref)
+
+        return wrap(ref) { BasicBlock(it) }
     }
 
     /**
-     * LLVMClearInsertionPosition
+     * @see LLVM.LLVMClearInsertionPosition
      */
     public fun clearInsertPosition() {
         LLVM.LLVMClearInsertionPosition(ref)
     }
 
     /**
-     * LLVMInsertIntoBuilderWithName
+     * @see LLVM.LLVMInsertIntoBuilderWithName
      */
     public fun insert(instruction: Instruction, name: String?) {
         // TODO: Test
@@ -98,9 +101,7 @@ public class Builder public constructor(
             // string
             resultName ?: ""
         )
-        return Instruction(
-            ref
-        )
+        return Instruction(ref)
     }
 
     public fun buildRet(value: Value): Instruction {

@@ -61,8 +61,7 @@ public class IntrinsicFunction internal constructor() {
         require(isOverloaded()) { "This intrinsic is not overloaded." }
 
         val ptr = SizeTPointer(0)
-        val arr = ArrayList(parameters.map { it.ref })
-            .toTypedArray()
+        val arr = parameters.map { it.ref }.toTypedArray()
 
         return LLVM.LLVMIntrinsicCopyOverloadedName(
             id,
@@ -92,8 +91,7 @@ public class IntrinsicFunction internal constructor() {
         module: Module,
         parameters: List<Type>
     ): FunctionValue {
-        val arr = ArrayList(parameters.map { it.ref })
-            .toTypedArray()
+        val arr = parameters.map { it.ref }.toTypedArray()
 
         val decl = LLVM.LLVMGetIntrinsicDeclaration(
             module.ref,
@@ -111,8 +109,7 @@ public class IntrinsicFunction internal constructor() {
      * @see LLVM.LLVMIntrinsicGetType
      */
     public fun getType(context: Context, parameters: List<Type>): FunctionType {
-        val arr = ArrayList(parameters.map { it.ref })
-            .toTypedArray()
+        val arr = parameters.map { it.ref }.toTypedArray()
 
         val type = LLVM.LLVMIntrinsicGetType(
             context.ref,

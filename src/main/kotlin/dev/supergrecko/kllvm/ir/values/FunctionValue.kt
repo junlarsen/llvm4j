@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.ir.values
 
+import arrow.core.Option
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.internal.util.map
@@ -57,7 +58,7 @@ public open class FunctionValue internal constructor() : Value() {
      *
      * @see LLVM.LLVMGetEntryBasicBlock
      */
-    public fun getEntryBlock(): BasicBlock? {
+    public fun getEntryBlock(): Option<BasicBlock> {
         val bb = LLVM.LLVMGetEntryBasicBlock(ref)
 
         return wrap(bb) { BasicBlock(it) }
@@ -71,7 +72,7 @@ public open class FunctionValue internal constructor() : Value() {
      *
      * @see LLVM.LLVMGetFirstBasicBlock
      */
-    public fun getFirstBlock(): BasicBlock? {
+    public fun getFirstBlock(): Option<BasicBlock> {
         val bb = LLVM.LLVMGetFirstBasicBlock(ref)
 
         return wrap(bb) { BasicBlock(it) }
@@ -85,7 +86,7 @@ public open class FunctionValue internal constructor() : Value() {
      *
      * @see LLVM.LLVMGetLastBasicBlock
      */
-    public fun getLastBlock(): BasicBlock? {
+    public fun getLastBlock(): Option<BasicBlock> {
         val bb = LLVM.LLVMGetLastBasicBlock(ref)
 
         return wrap(bb) { BasicBlock(it) }
@@ -160,7 +161,7 @@ public open class FunctionValue internal constructor() : Value() {
     //endregion Core::Values::Constants::FunctionValues::FunctionParameters
 
     //region Core::Values::Constants::FunctionValues::IndirectFunctions
-    public fun getIndirectResolver(): IndirectFunction? {
+    public fun getIndirectResolver(): Option<IndirectFunction> {
         val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
 
         return wrap(resolver) { IndirectFunction(it) }

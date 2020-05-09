@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.ir
 
+import arrow.core.Option
 import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
@@ -208,7 +209,7 @@ public open class Value internal constructor() :
      *
      * @see LLVM.LLVMGetFirstUse
      */
-    public fun getFirstUse(): Use? {
+    public fun getFirstUse(): Option<Use> {
         val use = LLVM.LLVMGetFirstUse(ref)
 
         return wrap(use) { Use(it) }

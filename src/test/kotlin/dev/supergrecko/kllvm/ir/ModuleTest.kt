@@ -1,8 +1,11 @@
 package dev.supergrecko.kllvm.ir
 
+import arrow.core.None
+import arrow.core.Some
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.types.VoidType
+import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.support.VerifierFailureAction
 import java.io.File
 import kotlin.test.assertEquals
@@ -10,6 +13,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
+import kotlin.test.fail
 
 class ModuleTest {
     @Test
@@ -54,7 +58,9 @@ class ModuleTest {
     fun `pulling an unknown function from a module is null`() {
         val module = Module("test.ll")
 
-        assertNull(module.getFunction("test"))
+        val fn = module.getFunction("test")
+
+        assertTrue { fn.isEmpty() }
 
         module.dispose()
     }

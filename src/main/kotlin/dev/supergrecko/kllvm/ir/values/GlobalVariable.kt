@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.ir.values
 
+import arrow.core.Option
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.internal.util.wrap
@@ -41,7 +42,7 @@ public class GlobalVariable internal constructor() : Value() {
      *
      * @see LLVM.LLVMGetInitializer
      */
-    public fun getInitializer(): Value? {
+    public fun getInitializer(): Option<Value> {
         val value = LLVM.LLVMGetInitializer(ref)
 
         return wrap(value) { Value(it) }

@@ -1,7 +1,10 @@
 package dev.supergrecko.kllvm.ir.values
 
+import arrow.core.None
+import arrow.core.Some
 import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.ThreadLocalMode
+import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import dev.supergrecko.kllvm.test.runAll
@@ -11,6 +14,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class GlobalVariableTest {
     @Test
@@ -28,9 +32,10 @@ class GlobalVariableTest {
             assertFalse { isThreadLocal() }
             assertFalse { isExternallyInitialized() }
 
-            val initializer = value.getInitializer()
-                ?.asIntValue()
-                ?.getSignedValue()
+            val initializer = when (val init = value.getInitializer()) {
+                is Some<Value> -> init.t.asIntValue().getSignedValue()
+                is None -> fail()
+            }
 
             assertEquals(100L, initializer)
             assertEquals("v", getName())
@@ -61,7 +66,7 @@ class GlobalVariableTest {
         val module = Module("test.ll")
         val v = module.addGlobal("v", IntType(32), 0x03f7d)
 
-        assertNull(v.getInitializer())
+        assertTrue { v.getInitializer().isEmpty() }
 
         module.dispose()
     }

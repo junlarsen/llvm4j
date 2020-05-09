@@ -7,7 +7,8 @@ import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class IntType internal constructor() : Type() {
+public class
+IntType internal constructor() : Type() {
     /**
      * Construct a new Type from an LLVM pointer reference
      */

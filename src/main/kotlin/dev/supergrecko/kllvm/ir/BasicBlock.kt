@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.ir
 
+import arrow.core.Option
 import dev.supergrecko.kllvm.internal.util.wrap
 import dev.supergrecko.kllvm.ir.instructions.Instruction
 import dev.supergrecko.kllvm.ir.values.FunctionValue
@@ -57,7 +58,7 @@ public class BasicBlock internal constructor() {
      *
      * @see LLVM.LLVMGetBasicBlockTerminator
      */
-    public fun getTerminator(): Instruction? {
+    public fun getTerminator(): Option<Instruction> {
         val instr = LLVM.LLVMGetBasicBlockTerminator(ref)
 
         return wrap(instr) { Instruction(it) }
@@ -69,7 +70,7 @@ public class BasicBlock internal constructor() {
      * Use with [BasicBlock.getNextBlock] and [BasicBlock.getPreviousBlock]
      * to move the iterator
      */
-    public fun getNextBlock(): BasicBlock? {
+    public fun getNextBlock(): Option<BasicBlock> {
         val bb = LLVM.LLVMGetNextBasicBlock(ref)
 
         return wrap(bb) { BasicBlock(it) }
@@ -81,7 +82,7 @@ public class BasicBlock internal constructor() {
      * Use with [BasicBlock.getNextBlock] and [BasicBlock.getPreviousBlock]
      * to move the iterator
      */
-    public fun getPreviousBlock(): BasicBlock? {
+    public fun getPreviousBlock(): Option<BasicBlock> {
         val bb = LLVM.LLVMGetPreviousBasicBlock(ref)
 
         return wrap(bb) { BasicBlock(it) }

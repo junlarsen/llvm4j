@@ -1,19 +1,24 @@
 package dev.supergrecko.kllvm.ir
 
+import arrow.core.None
+import arrow.core.Some
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.types.VoidType
+import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertNull
-import org.junit.jupiter.api.Test
+import kotlin.test.assertTrue
+import kotlin.test.fail
 
 class BuilderTest {
     @Test
     fun `should be able to position after basic blocks`() {
         val builder = Builder()
-        assertNull(builder.getInsertBlock())
+
+        assertTrue { builder.getInsertBlock().isEmpty() }
 
         val module = Module("test.ll")
         val function = module.addFunction(
@@ -33,11 +38,16 @@ class BuilderTest {
         // that holds the reference is different
         // TODO?: Implement equals/hashCode for Builder by comparing underlying
         //   refs?
-        assertEquals(builder.getInsertBlock()?.ref, basicBlock.ref)
+        val ref = when (val block = builder.getInsertBlock()) {
+            is Some<BasicBlock> -> block.t.ref
+            is None -> fail()
+        }
+
+        assertEquals(ref, basicBlock.ref)
 
         builder.clearInsertPosition()
 
-        assertNull(builder.getInsertBlock())
+        assertTrue { builder.getInsertBlock().isEmpty() }
     }
 
     @Test
@@ -71,6 +81,7 @@ class BuilderTest {
     @Test
     fun `should create call instruction`() {
         val module = Module("test.ll")
+        val builder = Builder()
         val boolType = IntType(1)
 
         module.addFunction(
@@ -82,11 +93,13 @@ class BuilderTest {
             )
         )
 
-        val externFunc = module.getFunction("test")
-        val builder = Builder()
+        val externFunc = when (val fn = module.getFunction("test")) {
+            is Some<FunctionValue> -> fn.t
+            is None -> fail()
+        }
 
-        val falseValue = ConstantInt(boolType, 0, false)
-        val trueValue = ConstantInt(boolType, 1, false)
+        val falseValue = ConstantInt(boolType, 0)
+        val trueValue = ConstantInt(boolType, 1)
 
         val caller = module.addFunction(
             "caller",
@@ -100,19 +113,16 @@ class BuilderTest {
         val basicBlock = caller.addBlock("entry")
         builder.positionAtEnd(basicBlock)
 
-        if (externFunc !is Value) {
-            assertEquals("extern func", "is not a value")
-        } else {
-            val instruction = builder.buildCall(
-                externFunc, listOf(
-                    falseValue,
-                    trueValue
-                ), "util"
-            )
-            assertEquals(
-                "%util = call i1 @test(i1 false, i1 true)", instruction.dumpToString()
-                    .trim()
-            )
-        }
+        val instruction = builder.buildCall(
+            externFunc, listOf(
+                falseValue,
+                trueValue
+            ), "util"
+        )
+
+        assertEquals(
+            "%util = call i1 @test(i1 false, i1 true)",
+            instruction.dumpToString().trim()
+        )
     }
 }

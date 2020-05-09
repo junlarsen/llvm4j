@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.ir
 
+import arrow.core.Option
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
@@ -119,7 +120,7 @@ public class Module internal constructor() : AutoCloseable,
      *
      * @see LLVM.LLVMGetNamedFunction
      */
-    public fun getFunction(name: String): FunctionValue? {
+    public fun getFunction(name: String): Option<FunctionValue> {
         val ref = LLVM.LLVMGetNamedFunction(ref, name)
 
         return wrap(ref) { FunctionValue(it) }
