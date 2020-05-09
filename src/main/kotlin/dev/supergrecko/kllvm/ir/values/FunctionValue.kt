@@ -3,17 +3,19 @@ package dev.supergrecko.kllvm.ir.values
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.internal.util.map
+import dev.supergrecko.kllvm.internal.util.wrap
 import dev.supergrecko.kllvm.ir.Attribute
 import dev.supergrecko.kllvm.ir.AttributeIndex
 import dev.supergrecko.kllvm.ir.BasicBlock
 import dev.supergrecko.kllvm.ir.CallConvention
+import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.support.VerifierFailureAction
-import java.lang.RuntimeException
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
+import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -29,8 +31,87 @@ public open class FunctionValue internal constructor() : Value() {
     }
 
     //region Core::BasicBlock
-    public fun appendBasicBlock(name: String): BasicBlock {
-        return BasicBlock(LLVM.LLVMAppendBasicBlock(ref, name))
+    /**
+     * Adds a new basic block to this function and returns it
+     *
+     * You may optionally pass a context which the block will reside in. If
+     * no context is passed, the context of this function will be used.
+     *
+     * @see LLVM.LLVMAppendBasicBlock
+     */
+    public fun addBlock(
+        name: String,
+        context: Context = getContext()
+    ): BasicBlock {
+        val bb = LLVM.LLVMAppendBasicBlockInContext(
+            context.ref,
+            ref,
+            name
+        )
+
+        return BasicBlock(bb)
+    }
+
+    /**
+     * Get the entry basic block for this function
+     *
+     * @see LLVM.LLVMGetEntryBasicBlock
+     */
+    public fun getEntryBlock(): BasicBlock? {
+        val bb = LLVM.LLVMGetEntryBasicBlock(ref)
+
+        return wrap(bb) { BasicBlock(it) }
+    }
+
+    /**
+     * Get the first basic block inside this function.
+     *
+     * Use [BasicBlock.getNextBlock] to advance this iterator on the returned
+     * basic block instance.
+     *
+     * @see LLVM.LLVMGetFirstBasicBlock
+     */
+    public fun getFirstBlock(): BasicBlock? {
+        val bb = LLVM.LLVMGetFirstBasicBlock(ref)
+
+        return wrap(bb) { BasicBlock(it) }
+    }
+
+    /**
+     * Get the last basic block inside this function.
+     *
+     * Use [BasicBlock.getPreviousBlock] to advance this iterator on the
+     * returned basic block instance.
+     *
+     * @see LLVM.LLVMGetLastBasicBlock
+     */
+    public fun getLastBlock(): BasicBlock? {
+        val bb = LLVM.LLVMGetLastBasicBlock(ref)
+
+        return wrap(bb) { BasicBlock(it) }
+    }
+
+    /**
+     * Get how many blocks reside inside this function
+     *
+     * @see LLVM.LLVMCountBasicBlocks
+     */
+    public fun getBlockCount(): Int {
+        return LLVM.LLVMCountBasicBlocks(ref)
+    }
+
+    /**
+     * Get all the blocks in this function
+     *
+     * @see LLVM.LLVMGetBasicBlocks
+     */
+    public fun getBlocks(): List<BasicBlock> {
+        // Allocate a pointer with size of block count
+        val ptr = PointerPointer<LLVMBasicBlockRef>(getBlockCount().toLong())
+
+        LLVM.LLVMGetBasicBlocks(ref, ptr)
+
+        return ptr.map { BasicBlock(it) }
     }
     //endregion Core::BasicBlock
 
@@ -79,24 +160,15 @@ public open class FunctionValue internal constructor() : Value() {
     //endregion Core::Values::Constants::FunctionValues::FunctionParameters
 
     //region Core::Values::Constants::FunctionValues::IndirectFunctions
-    /**
-     * @see LLVM.LLVMGetGlobalIFuncResolver
-     * @see LLVM.LLVMSetGlobalIFuncResolver
-     */
-    public var indirectFunctionResolver: IndirectFunction
-        get() {
-            val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
+    public fun getIndirectResolver(): IndirectFunction? {
+        val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
 
-            return if (resolver == null) {
-                throw RuntimeException("This function does not have an " +
-                        "indirect resolver")
-            } else {
-                IndirectFunction(resolver)
-            }
-        }
-        set(value) {
-            LLVM.LLVMSetGlobalIFuncResolver(ref, value.ref)
-        }
+        return wrap(resolver) { IndirectFunction(it) }
+    }
+
+    public fun setIndirectResolver(function: IndirectFunction) {
+        LLVM.LLVMSetGlobalIFuncResolver(ref, function.ref)
+    }
 
     /**
      * Make this indirect function global in the given [module]
@@ -124,51 +196,39 @@ public open class FunctionValue internal constructor() : Value() {
     //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
     //region Core::Values::Constants::FunctionValues
-    /**
-     * Set the call convention for this function
-     *
-     * @see LLVM.LLVMGetFunctionCallConv
-     * @see LLVM.LLVMSetFunctionCallConv
-     */
-    public var callConvention: CallConvention
-        get() {
-            val cc = LLVM.LLVMGetFunctionCallConv(ref)
+    public fun getCallConvention(): CallConvention {
+        val cc = LLVM.LLVMGetFunctionCallConv(ref)
 
-            return CallConvention.values()
-                .firstOrNull { it.value == cc }
-                ?: throw Unreachable()
-        }
-        set(value) {
-            LLVM.LLVMSetFunctionCallConv(ref, value.value)
-        }
+        return CallConvention.values()
+            .firstOrNull { it.value == cc }
+            ?: throw Unreachable()
+    }
 
-    /**
-     * Set the personality function for this function
-     *
-     * @see LLVM.LLVMGetPersonalityFn
-     * @see LLVM.LLVMSetPersonalityFn
-     */
-    public var personalityFunction: FunctionValue
-        get() {
-            require(hasPersonalityFunction())
+    public fun setCallConvention(convention: CallConvention) {
+        LLVM.LLVMSetFunctionCallConv(ref, convention.value)
+    }
 
-            val fn = LLVM.LLVMGetPersonalityFn(ref)
-
-            return FunctionValue(fn)
-        }
-        set(value) {
-            LLVM.LLVMSetPersonalityFn(ref, value.ref)
+    public fun getPersonalityFunction(): FunctionValue {
+        require(hasPersonalityFunction()) {
+            "This function does not have a personality function"
         }
 
-    /**
-     * Set the garbage collector name for this function
-     *
-     * @see LLVM.LLVMGetGC
-     * @see LLVM.LLVMSetGC
-     */
-    public var garbageCollector: String
-        get() = LLVM.LLVMGetGC(ref).string
-        set(value) = LLVM.LLVMSetGC(ref, value)
+        val fn = LLVM.LLVMGetPersonalityFn(ref)
+
+        return FunctionValue(fn)
+    }
+
+    public fun setPersonalityFunction(function: FunctionValue) {
+        LLVM.LLVMSetPersonalityFn(ref, function.ref)
+    }
+
+    public fun getGarbageCollector(): String {
+        return LLVM.LLVMGetGC(ref).string
+    }
+
+    public fun setGarbageCollector(collector: String) {
+        LLVM.LLVMSetGC(ref, collector)
+    }
 
     /**
      * Determine if this function has a personality function

@@ -4,6 +4,7 @@ import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
 import dev.supergrecko.kllvm.internal.contracts.Unreachable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
+import dev.supergrecko.kllvm.internal.util.wrap
 import dev.supergrecko.kllvm.ir.instructions.Instruction
 import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GenericValue
@@ -70,35 +71,36 @@ public open class Value internal constructor() :
 
     //region Core::Values::GeneralAPIs
     /**
-     * Use the IR name for this value
+     * Get the IR name for this value
      *
      * @see LLVM.LLVMGetValueName2
-     * @see LLVM.LLVMSetValueName2
      */
-    public var valueName: String
-        get() {
-            val ptr = LLVM.LLVMGetValueName2(ref, SizeTPointer(0))
+    public fun getName(): String {
+        val ptr = LLVM.LLVMGetValueName2(ref, SizeTPointer(0))
 
-            return ptr.string
-        }
-        /**
-         * If this yields unexpected results, see the source code for this file
-         *
-         * LLVM-C does not provide a way for us to check if a value has a
-         * name or not and thus we cannot implement all the checks LLVM-C++
-         * does in their source file which means this may yield unwanted or
-         * unexpected results.
-         *
-         * https://llvm.org/doxygen/Value_8cpp_source.html#l00223
-         *
-         * TODO: Research if there is any other way we can determine the above
-         * TODO: Test when viable solution has been found
-         */
-        set(value) {
-            require(!(getContext().discardValueNames && this !is GlobalValue))
+        return ptr.string
+    }
 
-            LLVM.LLVMSetValueName2(ref, value, value.length.toLong())
-        }
+    /**
+     * Set the IR name for this value
+     *
+     * If this yields unexpected results, see the source code for this file
+     *
+     * LLVM-C does not provide a way for us to check if a value has a
+     * name or not and thus we cannot implement all the checks LLVM-C++
+     * does in their source file which means this may yield unwanted or
+     * unexpected results.
+     *
+     * https://llvm.org/doxygen/Value_8cpp_source.html#l00223
+     *
+     * TODO: Research if there is any other way we can determine the above
+     * TODO: Test when viable solution has been found
+     */
+    public fun setName(name: String) {
+        require(!(getContext().isDiscardingValueNames() && this !is GlobalValue))
+
+        LLVM.LLVMSetValueName2(ref, name, name.length.toLong())
+    }
 
     /**
      * Get the type of this value
@@ -209,11 +211,7 @@ public open class Value internal constructor() :
     public fun getFirstUse(): Use? {
         val use = LLVM.LLVMGetFirstUse(ref)
 
-        return if (use != null) {
-            Use(use)
-        } else {
-            null
-        }
+        return wrap(use) { Use(it) }
     }
     //endregion Core::Values::Usage
 
@@ -228,9 +226,37 @@ public open class Value internal constructor() :
     }
     //endregion Core::Values::Constants
 
+    //region Core::BasicBlock
+    /**
+     * Is this value a basic block?
+     *
+     * @see LLVM.LLVMIsABasicBlock
+     */
+    public fun isBasicBlock(): Boolean {
+        return LLVM.LLVMIsABasicBlock(ref) != null
+    }
+
+    /**
+     * Converts this value into a Basic Block
+     *
+     * This is done by unwrapping the instance into a BasicBlock
+     *
+     * TODO: Research more about this cast
+     *
+     * @see LLVM.LLVMValueAsBasicBlock
+     */
+    public fun toBasicBlock(): BasicBlock {
+        val bb = LLVM.LLVMValueAsBasicBlock(ref)
+
+        return BasicBlock(bb)
+    }
+    //endregion Core::BasicBlock
+
     //region Typecasting
     /**
      * Attempts to use the current [ref] for a new value
+     *
+     * TODO: Do something about these
      */
     public fun asArrayValue() = ConstantArray(ref)
     public fun asFloatValue() = ConstantFloat(ref)

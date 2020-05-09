@@ -25,13 +25,14 @@ class BuilderTest {
             )
         )
 
-        val basicBlock = function.appendBasicBlock("entry")
+        val basicBlock = function.addBlock("entry")
         builder.positionAtEnd(basicBlock)
 
         // A simple comparison won't do because even though the
         // underlying reference is the same, the Builder object
         // that holds the reference is different
-        // TODO?: Implement equals/hashCode for Builder by comparing underlying refs?
+        // TODO?: Implement equals/hashCode for Builder by comparing underlying
+        //   refs?
         assertEquals(builder.getInsertBlock()?.ref, basicBlock.ref)
 
         builder.clearInsertPosition()
@@ -96,7 +97,7 @@ class BuilderTest {
             )
         )
 
-        val basicBlock = caller.appendBasicBlock("entry")
+        val basicBlock = caller.addBlock("entry")
         builder.positionAtEnd(basicBlock)
 
         if (externFunc !is Value) {

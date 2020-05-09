@@ -13,16 +13,22 @@ public class GlobalAlias internal constructor(): GlobalValue() {
     }
 
     /**
-     * Manage the value this alias is an alias for
+     * Get the value this alias is an alias for
      *
      * @see LLVM.LLVMAliasGetAliasee
+     */
+    public fun getAliasOf(): Value {
+        val value = LLVM.LLVMAliasGetAliasee(ref)
+
+        return Value(value)
+    }
+
+    /**
+     * Set the value this aliases
+     *
      * @see LLVM.LLVMAliasSetAliasee
      */
-    public var aliasOf: Value
-        get() {
-            val value = LLVM.LLVMAliasGetAliasee(ref)
-
-            return Value(value)
-        }
-        set(value) = LLVM.LLVMAliasSetAliasee(ref, value.ref)
+    public fun setAliasOf(value: Value) {
+        LLVM.LLVMAliasSetAliasee(ref, value.ref)
+    }
 }

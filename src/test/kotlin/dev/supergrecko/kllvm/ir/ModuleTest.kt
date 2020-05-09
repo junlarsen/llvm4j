@@ -14,22 +14,24 @@ import org.junit.jupiter.api.Test
 class ModuleTest {
     @Test
     fun `setting a module identifier`() {
-        val mod = Module("test.ll")
-        mod.moduleIdentifier = "test"
+        val mod = Module("test.ll").apply {
+            setModuleIdentifier("test")
+        }
 
-        assertEquals("test", mod.moduleIdentifier)
+        assertEquals("test", mod.getModuleIdentifier())
 
         mod.dispose()
     }
 
     @Test
     fun `cloning a module with a module identifier`() {
-        val mod = Module("test.ll")
-        mod.moduleIdentifier = "test"
+        val mod = Module("test.ll").apply {
+            setModuleIdentifier("test")
+        }
 
         val clone = mod.clone()
 
-        assertEquals(mod.moduleIdentifier, clone.moduleIdentifier)
+        assertEquals(mod.getModuleIdentifier(), clone.getModuleIdentifier())
 
         mod.dispose()
         clone.dispose()
@@ -39,11 +41,11 @@ class ModuleTest {
     fun `modifying the module source name`() {
         val mod = Module("test.ll")
 
-        assertEquals("test.ll", mod.sourceFileName)
+        assertEquals("test.ll", mod.getSourceFileName())
 
-        mod.sourceFileName = "test2.ll"
+        mod.setSourceFileName("test2.ll")
 
-        assertEquals("test2.ll", mod.sourceFileName)
+        assertEquals("test2.ll", mod.getSourceFileName())
 
         mod.dispose()
     }
@@ -92,7 +94,6 @@ class ModuleTest {
     @Test
     fun `writing module to byte code by file path`() {
         val file = File("./out.bc")
-
         val module = Module("test.ll")
 
         module.toFile(file.absolutePath)
@@ -111,7 +112,7 @@ class ModuleTest {
         val buf = module.toMemoryBuffer()
         val mod = buf.parse(context)
 
-        assertEquals("test.ll", mod.sourceFileName)
+        assertEquals("test.ll", mod.getSourceFileName())
 
         module.dispose()
         context.dispose()
@@ -126,7 +127,7 @@ class ModuleTest {
 
         val mod = buf.getModule(context)
 
-        assertEquals("test.ll", mod.sourceFileName)
+        assertEquals("test.ll", mod.getSourceFileName())
     }
 
     @Test

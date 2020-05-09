@@ -54,8 +54,8 @@ class ContextTest {
         val ctx = Context()
 
         runAll(true, false) { it, _ ->
-            ctx.discardValueNames = it
-            assertEquals(it, ctx.discardValueNames)
+            ctx.setDiscardValueNames(it)
+            assertEquals(it, ctx.isDiscardingValueNames())
         }
     }
 }
