@@ -18,19 +18,27 @@ import org.bytedeco.llvm.global.LLVM
 import java.io.File
 import java.nio.ByteBuffer
 
-public class Module public constructor(
-    public val ref: LLVMModuleRef
-) : AutoCloseable,
+public class Module internal constructor() : AutoCloseable,
     Validatable, Disposable {
+    internal lateinit var ref: LLVMModuleRef
     public override var valid: Boolean = true
+
+    /**
+     * Construct a new Type from an LLVM pointer reference
+     */
+    public constructor(module: LLVMModuleRef) : this() {
+        ref = module
+    }
 
     public constructor(
         sourceFileName: String,
         context: Context = Context.getGlobalContext()
-    ) : this(LLVM.LLVMModuleCreateWithNameInContext(
-        sourceFileName,
-        context.ref
-    ))
+    ) : this() {
+        ref = LLVM.LLVMModuleCreateWithNameInContext(
+            sourceFileName,
+            context.ref
+        )
+    }
 
     //region Core::Modules
     /**
