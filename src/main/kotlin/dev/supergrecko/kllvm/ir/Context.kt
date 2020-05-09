@@ -36,32 +36,24 @@ public class Context public constructor() : AutoCloseable, Validatable,
 
     //region Core::Context
     /**
-     * Property determining whether the given context discards all value names.
+     * Does this context discard the IR names for values
      *
-     * If true, only the names of GlobalValue objects will be available in the IR.
-     * This can be used to save memory and runtime, especially in release mode.
-     *
-     * @throws IllegalArgumentException If internal instance has been dropped.
+     * @see LLVM.LLVMContextShouldDiscardValueNames
+     */
+    public fun isDiscardingValueNames(): Boolean {
+        require(valid)
+
+        return LLVM.LLVMContextShouldDiscardValueNames(ref).fromLLVMBool()
+    }
+
+    /**
+     * Set whether this module should discard value names
      *
      * @see LLVM.LLVMContextSetDiscardValueNames
      */
-    public var discardValueNames: Boolean
-        get() {
-            require(valid) { "This module has already been disposed." }
-
-            val willDiscard = LLVM.LLVMContextShouldDiscardValueNames(ref)
-
-            // Conversion from C++ bool to kotlin Boolean
-            return willDiscard.fromLLVMBool()
-        }
-        set(value) {
-            require(valid) { "This module has already been disposed." }
-
-            // Conversion from kotlin Boolean to C++ bool
-            val intValue = value.toLLVMBool()
-
-            LLVM.LLVMContextSetDiscardValueNames(ref, intValue)
-        }
+    public fun setDiscardValueNames(discard: Boolean) {
+        LLVM.LLVMContextSetDiscardValueNames(ref, discard.toLLVMBool())
+    }
 
     /**
      * Set the DiagnosticHandler for this context
@@ -70,7 +62,7 @@ public class Context public constructor() : AutoCloseable, Validatable,
      *
      * @see LLVM.LLVMContextSetDiagnosticHandler
      *
-     * TODO: Find out how to actually call this thing from Kotlin/Java
+     * TODO: Find out pointer type of [diagnosticContext]
      */
     public fun setDiagnosticHandler(
         handler: LLVMDiagnosticHandler,
@@ -88,7 +80,7 @@ public class Context public constructor() : AutoCloseable, Validatable,
      *
      * @see LLVM.LLVMContextSetDiagnosticHandler
      *
-     * TODO: Find out how to actually call this thing from Kotlin/Java
+     * TODO: Do something about Pointer() because right now it's just a nullptr
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler) {
         setDiagnosticHandler(handler, Pointer())

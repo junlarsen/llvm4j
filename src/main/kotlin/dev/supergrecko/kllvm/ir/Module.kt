@@ -3,6 +3,7 @@ package dev.supergrecko.kllvm.ir
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
+import dev.supergrecko.kllvm.internal.util.wrap
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
@@ -71,42 +72,47 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     /**
-     * A module identifier is a unique name for a module
+     * Get the name for this module
      *
      * @see LLVM.LLVMGetModuleIdentifier
-     * @see LLVM.LLVMSetModuleIdentifier
      */
-    public var moduleIdentifier: String
-        get() {
-            val ptr = LLVM.LLVMGetModuleIdentifier(ref, SizeTPointer(0))
+    public fun getModuleIdentifier(): String {
+        val ptr = LLVM.LLVMGetModuleIdentifier(ref, SizeTPointer(0))
 
-            return ptr.string
-        }
-        set(value) {
-            LLVM.LLVMSetModuleIdentifier(
-                ref,
-                value,
-                value.length.toLong()
-            )
-        }
+        return ptr.string
+    }
 
     /**
-     * Set the "source name" for this module
+     * Set the name for this module
+     *
+     * @see LLVM.LLVMSetModuleIdentifier
+     */
+    public fun setModuleIdentifier(id: String) {
+        LLVM.LLVMSetModuleIdentifier(ref, id, id.length.toLong())
+    }
+
+    /**
+     * Get the source name for this module
+     *
+     * LLVM can give "file names" for modules which show up while debugging
+     * and codegen.
      *
      * @see LLVM.LLVMGetSourceFileName
+     */
+    public fun getSourceFileName(): String {
+        val ptr = LLVM.LLVMGetSourceFileName(ref, SizeTPointer(0))
+
+        return ptr.string
+    }
+
+    /**
+     * Set the source name for this module
+     *
      * @see LLVM.LLVMSetSourceFileName
      */
-    public var sourceFileName: String
-        get() {
-            val ptr = LLVM.LLVMGetSourceFileName(ref, SizeTPointer(0))
-
-            return ptr.string
-        }
-        set(value) = LLVM.LLVMSetSourceFileName(
-            ref,
-            value,
-            value.length.toLong()
-        )
+    public fun setSourceFileName(name: String) {
+        LLVM.LLVMSetSourceFileName(ref, name, name.length.toLong())
+    }
 
     /**
      * Get a function in the module if it exists
@@ -115,9 +121,8 @@ public class Module internal constructor() : AutoCloseable,
      */
     public fun getFunction(name: String): FunctionValue? {
         val ref = LLVM.LLVMGetNamedFunction(ref, name)
-            ?: return null
 
-        return FunctionValue(ref)
+        return wrap(ref) { FunctionValue(it) }
     }
     //endregion Core::Modules
 

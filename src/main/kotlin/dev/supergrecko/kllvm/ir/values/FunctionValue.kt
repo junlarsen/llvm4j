@@ -160,26 +160,15 @@ public open class FunctionValue internal constructor() : Value() {
     //endregion Core::Values::Constants::FunctionValues::FunctionParameters
 
     //region Core::Values::Constants::FunctionValues::IndirectFunctions
-    /**
-     * @see LLVM.LLVMGetGlobalIFuncResolver
-     * @see LLVM.LLVMSetGlobalIFuncResolver
-     */
-    public var indirectFunctionResolver: IndirectFunction
-        get() {
-            val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
+    public fun getIndirectResolver(): IndirectFunction? {
+        val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
 
-            return if (resolver == null) {
-                throw RuntimeException(
-                    "This function does not have an " +
-                            "indirect resolver"
-                )
-            } else {
-                IndirectFunction(resolver)
-            }
-        }
-        set(value) {
-            LLVM.LLVMSetGlobalIFuncResolver(ref, value.ref)
-        }
+        return wrap(resolver) { IndirectFunction(it) }
+    }
+
+    public fun setIndirectResolver(function: IndirectFunction) {
+        LLVM.LLVMSetGlobalIFuncResolver(ref, function.ref)
+    }
 
     /**
      * Make this indirect function global in the given [module]
@@ -207,51 +196,39 @@ public open class FunctionValue internal constructor() : Value() {
     //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
     //region Core::Values::Constants::FunctionValues
-    /**
-     * Set the call convention for this function
-     *
-     * @see LLVM.LLVMGetFunctionCallConv
-     * @see LLVM.LLVMSetFunctionCallConv
-     */
-    public var callConvention: CallConvention
-        get() {
-            val cc = LLVM.LLVMGetFunctionCallConv(ref)
+    public fun getCallConvention(): CallConvention {
+        val cc = LLVM.LLVMGetFunctionCallConv(ref)
 
-            return CallConvention.values()
-                .firstOrNull { it.value == cc }
-                ?: throw Unreachable()
-        }
-        set(value) {
-            LLVM.LLVMSetFunctionCallConv(ref, value.value)
-        }
+        return CallConvention.values()
+            .firstOrNull { it.value == cc }
+            ?: throw Unreachable()
+    }
 
-    /**
-     * Set the personality function for this function
-     *
-     * @see LLVM.LLVMGetPersonalityFn
-     * @see LLVM.LLVMSetPersonalityFn
-     */
-    public var personalityFunction: FunctionValue
-        get() {
-            require(hasPersonalityFunction())
+    public fun setCallConvention(convention: CallConvention) {
+        LLVM.LLVMSetFunctionCallConv(ref, convention.value)
+    }
 
-            val fn = LLVM.LLVMGetPersonalityFn(ref)
-
-            return FunctionValue(fn)
-        }
-        set(value) {
-            LLVM.LLVMSetPersonalityFn(ref, value.ref)
+    public fun getPersonalityFunction(): FunctionValue {
+        require(hasPersonalityFunction()) {
+            "This function does not have a personality function"
         }
 
-    /**
-     * Set the garbage collector name for this function
-     *
-     * @see LLVM.LLVMGetGC
-     * @see LLVM.LLVMSetGC
-     */
-    public var garbageCollector: String
-        get() = LLVM.LLVMGetGC(ref).string
-        set(value) = LLVM.LLVMSetGC(ref, value)
+        val fn = LLVM.LLVMGetPersonalityFn(ref)
+
+        return FunctionValue(fn)
+    }
+
+    public fun setPersonalityFunction(function: FunctionValue) {
+        LLVM.LLVMSetPersonalityFn(ref, function.ref)
+    }
+
+    public fun getGarbageCollector(): String {
+        return LLVM.LLVMGetGC(ref).string
+    }
+
+    public fun setGarbageCollector(collector: String) {
+        LLVM.LLVMSetGC(ref, collector)
+    }
 
     /**
      * Determine if this function has a personality function

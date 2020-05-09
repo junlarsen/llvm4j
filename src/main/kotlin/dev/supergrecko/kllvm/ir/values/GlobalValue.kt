@@ -47,49 +47,53 @@ public open class GlobalValue internal constructor(): Value(), ConstantValue {
     }
 
     //region Core::Values::Constants::GlobalValues
-    public var linkage: Linkage
-        get() {
-            val refLinkage = LLVM.LLVMGetLinkage(ref)
+    public fun getLinkage(): Linkage {
+        val ln = LLVM.LLVMGetLinkage(ref)
 
-            return Linkage.values()
-                .firstOrNull { it.value == refLinkage }
-                ?: throw Unreachable()
-        }
-        set(value) = LLVM.LLVMSetLinkage(ref, value.value)
+        return Linkage.values().first { it.value == ln }
+    }
 
-    public var section: String
-        get() = LLVM.LLVMGetSection(ref).string
-        set(value) = LLVM.LLVMSetSection(ref, value)
+    public fun setLinkage(linkage: Linkage) {
+       LLVM.LLVMSetLinkage(ref, linkage.value)
+    }
 
-    public var visibility: Visibility
-        get() {
-            val refVisibility = LLVM.LLVMGetVisibility(ref)
+    public fun getSection(): String {
+        return LLVM.LLVMGetSection(ref).string
+    }
 
-            return Visibility.values()
-                .firstOrNull { it.value == refVisibility }
-                ?: throw Unreachable()
-        }
-    set(value) = LLVM.LLVMSetVisibility(ref, value.value)
+    public fun setSection(data: String) {
+        LLVM.LLVMSetSection(ref, data)
+    }
 
-    public var dllStorageClass: DLLStorageClass
-        get() {
-            val refStorageClass = LLVM.LLVMGetDLLStorageClass(ref)
+    public fun getVisibility(): Visibility {
+        val visibility = LLVM.LLVMGetVisibility(ref)
 
-            return DLLStorageClass.values()
-                .firstOrNull { it.value == refStorageClass }
-                ?: throw Unreachable()
-        }
-        set(value) = LLVM.LLVMSetDLLStorageClass(ref, value.value)
+        return Visibility.values().first { it.value == visibility }
+    }
 
-    public var unnamedAddress: UnnamedAddress
-        get() {
-            val refUnnamedAddress = LLVM.LLVMGetUnnamedAddress(ref)
+    public fun setVisibility(visibility: Visibility) {
+        LLVM.LLVMSetVisibility(ref, visibility.value)
+    }
 
-            return UnnamedAddress.values()
-                .firstOrNull { it.value == refUnnamedAddress }
-                ?: throw Unreachable()
-        }
-        set(value) = LLVM.LLVMSetUnnamedAddress(ref, value.value)
+    public fun getStorageClass(): DLLStorageClass {
+        val storage = LLVM.LLVMGetDLLStorageClass(ref)
+
+        return DLLStorageClass.values().first { it.value == storage }
+    }
+
+    public fun setStorageClass(storageClass: DLLStorageClass) {
+        LLVM.LLVMSetDLLStorageClass(ref, storageClass.value)
+    }
+
+    public fun getUnnamedAddress(): UnnamedAddress {
+        val addr = LLVM.LLVMGetUnnamedAddress(ref)
+
+        return UnnamedAddress.values().first { it.value == addr }
+    }
+
+    public fun setUnnamedAddress(address: UnnamedAddress) {
+        LLVM.LLVMSetUnnamedAddress(ref, address.value)
+    }
 
     /**
      * Determine if this is just a signature for something
