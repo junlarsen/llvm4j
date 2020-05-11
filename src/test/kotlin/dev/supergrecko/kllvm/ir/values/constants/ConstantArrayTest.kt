@@ -1,4 +1,4 @@
-package dev.supergrecko.kllvm.ir.values
+package dev.supergrecko.kllvm.ir.values.constants
 
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantArray
@@ -9,8 +9,16 @@ import kotlin.test.assertTrue
 
 class ConstantArrayTest {
     @Test
+    fun `borrowing into new object`() {
+        val str = ConstantArray("Hello")
+        val borrow = ConstantArray(str.ref)
+
+        assertEquals(str.ref, borrow.ref)
+    }
+
+    @Test
     fun `creation of string`() {
-        val str = ConstantArray("Hello", true)
+        val str = ConstantArray("Hello")
 
         assertTrue { str.isConstantString() }
 
