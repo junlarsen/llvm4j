@@ -3,6 +3,7 @@ package dev.supergrecko.kllvm.ir
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.ir.instructions.Instruction
+import dev.supergrecko.kllvm.ir.instructions.Opcode
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
@@ -166,6 +167,13 @@ public class Builder public constructor(
         name: String
     ) : Instruction {
         return Instruction(LLVM.LLVMBuildNot(ref, value.ref, name))
+    }
+
+    /**
+     * @see LLVM.LLVMBuildBinOp
+     */
+    public fun buildBinOp(operator: Opcode, lhs: Value, rhs: Value, name: String): Instruction {
+        return Instruction(LLVM.LLVMBuildBinOp(ref, operator.value, lhs.ref, rhs.ref, name))
     }
 
     //endregion InstructionBuilders
