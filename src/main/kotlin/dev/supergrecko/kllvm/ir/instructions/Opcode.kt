@@ -51,4 +51,5 @@ enum class Opcode(public override val value: Int) : OrderedEnum<Int> {
     PtrToInt(LLVM.LLVMPtrToInt),
     IntToPtr(LLVM.LLVMIntToPtr),
     BitCast(LLVM.LLVMBitCast),
+    ICmp(LLVM.LLVMICmp),
 }
