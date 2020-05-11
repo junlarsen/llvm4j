@@ -44,26 +44,52 @@ public class MemoryBuffer internal constructor() :
     //endregion BitReader
 
     //region MemoryBuffers
+    /**
+     * Loads file contents into a memory buffer
+     *
+     * @see LLVM.LLVMCreateMemoryBufferWithContentsOfFile
+     */
     public constructor(file: File) : this() {
         require(file.exists()) { "File does not exist" }
 
         val ptr = PointerPointer<LLVMMemoryBufferRef>(1L)
+        val outMessage = BytePointer()
 
-        LLVM.LLVMCreateMemoryBufferWithContentsOfFile(
+        val res = LLVM.LLVMCreateMemoryBufferWithContentsOfFile(
             file.absolutePath,
             ptr,
-            BytePointer()
+            outMessage
         )
+
+        if (res != 0) {
+            throw RuntimeException("Error occurred while creating buffer from" +
+                    " file. Provided LLVM Error: $outMessage")
+        }
 
         ref = ptr.get(LLVMMemoryBufferRef::class.java, 0)
     }
 
+    /**
+     * Get the first char in the buffer
+     *
+     * @see LLVM.LLVMGetBufferStart
+     *
+     * TODO: How to advance and get the next characters?
+     */
     public fun getStart(): Char {
         val s = LLVM.LLVMGetBufferStart(ref)
 
         return s.get(0).toChar()
     }
 
+    /**
+     * Get the size of the buffer
+     *
+     * @see LLVM.LLVMGetBufferSize
+     *
+     * TODO: Find a reliable, x-platform way to test this as different
+     *   platforms return different sizes for values
+     */
     public fun getSize(): Long {
         return LLVM.LLVMGetBufferSize(ref)
     }

@@ -5,6 +5,7 @@ import dev.supergrecko.kllvm.ir.Module
 import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 
 class MemoryBufferTest {
@@ -14,8 +15,6 @@ class MemoryBufferTest {
         val module = Module("test.ll", context)
 
         val buf = module.toMemoryBuffer()
-
-        assertEquals(963, buf.getSize())
 
         // module bytecode starts with "BC"
         assertEquals('B', buf.getStart())
@@ -36,5 +35,12 @@ class MemoryBufferTest {
 
         buf.dispose()
         mod.dispose()
+    }
+
+    @Test
+    fun `will fail if file does not exist`() {
+        assertFailsWith<IllegalArgumentException> {
+            MemoryBuffer(File("unknown file which does not exist"))
+        }
     }
 }
