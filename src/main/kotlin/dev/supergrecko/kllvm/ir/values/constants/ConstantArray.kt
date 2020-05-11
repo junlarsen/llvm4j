@@ -36,7 +36,7 @@ public class ConstantArray internal constructor() : Value(), ConstantValue,
      */
     public constructor(
         content: String,
-        nullTerminate: Boolean,
+        nullTerminate: Boolean = true,
         context: Context = Context.getGlobalContext()
     ) : this() {
         ref = LLVM.LLVMConstStringInContext(
