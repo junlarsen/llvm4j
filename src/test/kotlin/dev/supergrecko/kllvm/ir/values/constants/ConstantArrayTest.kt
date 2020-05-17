@@ -9,7 +9,7 @@ import kotlin.test.assertTrue
 
 class ConstantArrayTest {
     @Test
-    fun `borrowing into new object`() {
+    fun `Creation via LLVM reference`() {
         val str = ConstantArray("Hello")
         val borrow = ConstantArray(str.ref)
 
@@ -17,7 +17,7 @@ class ConstantArrayTest {
     }
 
     @Test
-    fun `creation of string`() {
+    fun `Creation of string (i8 array) from user-land`() {
         val str = ConstantArray("Hello")
 
         assertTrue { str.isConstantString() }
@@ -27,7 +27,7 @@ class ConstantArrayTest {
     }
 
     @Test
-    fun `creation of basic array`() {
+    fun `Creation from user-land constructor`() {
         val ty = IntType(8)
         val (one, two) = constIntPairOf(1, 2)
         val arr = ConstantArray(ty, listOf(one, two))

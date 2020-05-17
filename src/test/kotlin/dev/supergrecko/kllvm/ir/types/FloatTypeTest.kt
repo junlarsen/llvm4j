@@ -9,7 +9,7 @@ import kotlin.test.assertFailsWith
 
 class FloatTypeTest {
     @Test
-    fun `user land creation of type`() {
+    fun `Creation from user-land constructor`() {
         runAll(*FloatType.kinds.toTypedArray()) { it, _ ->
             val type = FloatType(it)
 
@@ -18,7 +18,7 @@ class FloatTypeTest {
     }
 
     @Test
-    fun `ref creation of type`() {
+    fun `Creation via LLVM reference`() {
         val ref = FloatType(TypeKind.Float)
         val second = FloatType(ref.ref)
 
@@ -26,7 +26,7 @@ class FloatTypeTest {
     }
 
     @Test
-    fun `ref creation with wrong type`() {
+    fun `Attempting to use reference constructor with wrong type fails`() {
         val ref = IntType(32)
 
         assertFailsWith<IllegalArgumentException> {

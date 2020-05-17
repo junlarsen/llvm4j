@@ -342,7 +342,7 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
     }
 
     /**
-     * Shift the operand to the left [bits] number of bits
+     * Shift the operand to the left [rhs] number of bits
      *
      * LLVM-C does not support NUW/NSW attributes for this operation
      */

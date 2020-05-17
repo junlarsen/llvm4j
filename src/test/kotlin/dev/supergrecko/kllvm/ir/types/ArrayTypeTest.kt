@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 
 class ArrayTypeTest {
     @Test
-    fun `user land creation of type`() {
+    fun `Creation from user-land constructor`() {
         val type = IntType(64)
         val arr = type.toArrayType(10)
 
@@ -16,7 +16,7 @@ class ArrayTypeTest {
     }
 
     @Test
-    fun `ref creation of type`() {
+    fun `Creation via LLVM reference`() {
         val type = IntType(1).toArrayType(10)
         val second = ArrayType(type.ref)
 
@@ -24,7 +24,7 @@ class ArrayTypeTest {
     }
 
     @Test
-    fun `underlying type matches`() {
+    fun `The LLVMType references match each other`() {
         val type = IntType(32)
         val arr = ArrayType(type, 10)
 
@@ -33,7 +33,7 @@ class ArrayTypeTest {
     }
 
     @Test
-    fun `subtypes match`() {
+    fun `The Subtype trait refers to the same LLVMType`() {
         val type = IntType(32)
         val arr = ArrayType(type, 10)
 
@@ -44,7 +44,7 @@ class ArrayTypeTest {
     }
 
     @Test
-    fun `negative size is illegal`() {
+    fun `Declaring type of negative size fails`() {
         val type = IntType(32)
 
         assertFailsWith<IllegalArgumentException> {

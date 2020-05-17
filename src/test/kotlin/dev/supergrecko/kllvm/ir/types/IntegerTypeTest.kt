@@ -2,13 +2,29 @@ package dev.supergrecko.kllvm.ir.types
 
 import dev.supergrecko.kllvm.test.runAll
 import dev.supergrecko.kllvm.ir.Context
+import dev.supergrecko.kllvm.ir.TypeKind
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
 
 class IntegerTypeTest {
     @Test
-    fun `global module values equate to module values`() {
+    fun `Creation from user-land constructor`() {
+        val type = IntType(64)
+
+        assertEquals(TypeKind.Integer, type.getTypeKind())
+    }
+
+    @Test
+    fun `Creation via LLVM reference`() {
+        val type = IntType(1)
+        val second = IntType(type.ref)
+
+        assertEquals(type.ref, second.ref)
+    }
+
+    @Test
+    fun `Type width does not change across modules`() {
         val ctx = Context()
 
         runAll(1, 8, 16, 32, 64, 128) { it, _ ->
@@ -20,7 +36,7 @@ class IntegerTypeTest {
     }
 
     @Test
-    fun `it actually grabs types instead of null pointers`() {
+    fun `Type width matches returned value`() {
         val ctx = Context()
 
         runAll(1, 8, 16, 32, 64, 128) { it, _ ->
@@ -31,21 +47,21 @@ class IntegerTypeTest {
     }
 
     @Test
-    fun `negative size is illegal`() {
+    fun `Creation with negative size fails`() {
         assertFailsWith<IllegalArgumentException> {
             IntType(-1)
         }
     }
 
     @Test
-    fun `too huge size is illegal`() {
+    fun `Creation with size larger than 8388606 fails`() {
         assertFailsWith<IllegalArgumentException> {
             IntType(1238234672)
         }
     }
 
     @Test
-    fun `is sized works for integer`() {
+    fun `The type is sized`() {
         val type = IntType(192)
 
         assertEquals(true, type.isSized())

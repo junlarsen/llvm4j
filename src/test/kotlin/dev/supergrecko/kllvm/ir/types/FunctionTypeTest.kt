@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 
 class FunctionTypeTest {
     @Test
-    fun `creation of zero arg type works`() {
+    fun `Creation of parameter-less function`() {
         val ret = IntType(64)
         val fn = FunctionType(ret, listOf(), true)
 
@@ -18,27 +18,16 @@ class FunctionTypeTest {
     }
 
     @Test
-    fun `variadic arguments work`() {
+    fun `Creation of variadic function`() {
         val ret = IntType(64)
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)
 
-        assertEquals(fn.isVariadic(), true)
+        assertTrue { fn.isVariadic() }
     }
 
     @Test
-    fun `test variadic wrapper works`() {
-        val ret = IntType(64)
-        val args = listOf(FloatType(TypeKind.Float))
-        val fn = FunctionType(ret, args, true)
-
-        assertEquals(
-            LLVM.LLVMIsFunctionVarArg(fn.ref).fromLLVMBool(), fn.isVariadic()
-        )
-    }
-
-    @Test
-    fun `test parameter count wrapper works`() {
+    fun `Parameter size matches`() {
         val ret = IntType(64)
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)
@@ -47,7 +36,7 @@ class FunctionTypeTest {
     }
 
     @Test
-    fun `test parameter list matches`() {
+    fun `List of parameters match`() {
         val ret = IntType(64)
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)
@@ -55,9 +44,20 @@ class FunctionTypeTest {
         val params = fn.getParameterTypes()
 
         for (i in args.indices) {
-            val x = params[i].ref
+            val x = args[i].ref
             val y = params[i].ref
             assertEquals(x, y)
         }
+    }
+
+    @Test
+    fun `Return type matches`() {
+        val ret = IntType(64)
+        val args = listOf(FloatType(TypeKind.Float))
+        val fn = FunctionType(ret, args, true)
+
+        val returns = fn.getReturnType()
+
+        assertEquals(ret.ref, returns.ref)
     }
 }
