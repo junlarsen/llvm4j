@@ -1,11 +1,10 @@
 package dev.supergrecko.kllvm.ir.values.constants
 
 import dev.supergrecko.kllvm.ir.types.IntType
-import dev.supergrecko.kllvm.ir.values.constants.ConstantArray
 import dev.supergrecko.kllvm.test.constIntPairOf
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
 
 class ConstantArrayTest {
     @Test

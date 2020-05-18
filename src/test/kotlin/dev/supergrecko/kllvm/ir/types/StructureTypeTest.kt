@@ -2,9 +2,8 @@ package dev.supergrecko.kllvm.ir.types
 
 import dev.supergrecko.kllvm.ir.TypeKind
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
 
 class StructureTypeTest {
     @Test

@@ -486,7 +486,6 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
         return Value(ref)
     }
 
-
     /**
      * Insert an element at [index] in this vector
      *

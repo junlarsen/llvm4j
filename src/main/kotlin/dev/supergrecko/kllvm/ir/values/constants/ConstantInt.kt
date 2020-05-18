@@ -483,7 +483,6 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      */
     public fun zext(type: IntType): ConstantInt = ext(type, false)
 
-
     /**
      * Converstion to float type
      *

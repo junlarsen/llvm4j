@@ -2,11 +2,11 @@ package dev.supergrecko.kllvm.support
 
 import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.Module
-import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
+import org.junit.jupiter.api.Test
 
 class MemoryBufferTest {
     @Test

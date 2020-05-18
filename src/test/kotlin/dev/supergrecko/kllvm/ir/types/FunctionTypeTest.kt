@@ -1,6 +1,5 @@
 package dev.supergrecko.kllvm.ir.types
 
-import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.TypeKind
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

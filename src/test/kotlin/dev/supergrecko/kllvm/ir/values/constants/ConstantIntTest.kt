@@ -1,18 +1,18 @@
 package dev.supergrecko.kllvm.ir.values.constants
 
 import dev.supergrecko.kllvm.ir.TypeKind
-import dev.supergrecko.kllvm.test.runAll
 import dev.supergrecko.kllvm.ir.instructions.IntPredicate
 import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.test.constIntPairOf
-import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
+import dev.supergrecko.kllvm.test.runAll
 import java.lang.IllegalArgumentException
+import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
 
 class ConstantIntTest {
     @Test

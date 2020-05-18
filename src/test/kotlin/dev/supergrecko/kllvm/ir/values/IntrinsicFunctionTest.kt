@@ -5,10 +5,10 @@ import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.TypeKind
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.types.VectorType
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
 
 class IntrinsicFunctionTest {
     @Test

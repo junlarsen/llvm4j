@@ -3,9 +3,9 @@ package dev.supergrecko.kllvm.ir.values
 import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import org.junit.jupiter.api.Test
 
 class GlobalAliasTest {
     @Test

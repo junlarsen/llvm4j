@@ -1,11 +1,11 @@
 package dev.supergrecko.kllvm.ir.types
 
-import dev.supergrecko.kllvm.test.runAll
 import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.ir.TypeKind
+import dev.supergrecko.kllvm.test.runAll
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 import kotlin.test.assertFailsWith
+import org.junit.jupiter.api.Test
 
 class IntegerTypeTest {
     @Test

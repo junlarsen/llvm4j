@@ -2,10 +2,10 @@ package dev.supergrecko.kllvm.ir.types
 
 import dev.supergrecko.kllvm.ir.TypeKind
 import dev.supergrecko.kllvm.test.runAll
-import org.junit.jupiter.api.Test
 import java.lang.IllegalArgumentException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import org.junit.jupiter.api.Test
 
 class FloatTypeTest {
     @Test

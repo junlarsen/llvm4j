@@ -7,7 +7,6 @@ import dev.supergrecko.kllvm.ir.ThreadLocalMode
 import dev.supergrecko.kllvm.ir.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
-import java.lang.IllegalArgumentException
 
 public class GlobalVariable internal constructor() : Value() {
     /**

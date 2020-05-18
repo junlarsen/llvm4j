@@ -1,12 +1,11 @@
 package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.ir.types.IntType
-import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
 
 class ValueTest {
     @Test
