@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 
 class JNIFactorialTest {
     @Test
-    fun `raw bindings works with bytedeco's jit example`() {
+    fun `Factorial example from bytedeco`() {
         val error = BytePointer(null as Pointer?)
 
         LLVM.LLVMLinkInMCJIT()

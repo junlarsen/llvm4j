@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 
 class ModuleTest {
     @Test
-    fun `setting a module identifier`() {
+    fun `Modules can have identifiers`() {
         val mod = Module("test.ll").apply {
             setModuleIdentifier("test")
         }
@@ -24,7 +24,7 @@ class ModuleTest {
     }
 
     @Test
-    fun `cloning a module with a module identifier`() {
+    fun `Cloning a module clones the identifier`() {
         val mod = Module("test.ll").apply {
             setModuleIdentifier("test")
         }
@@ -38,7 +38,7 @@ class ModuleTest {
     }
 
     @Test
-    fun `modifying the module source name`() {
+    fun `Modifying the module's source file name`() {
         val mod = Module("test.ll")
 
         assertEquals("test.ll", mod.getSourceFileName())
@@ -51,7 +51,7 @@ class ModuleTest {
     }
 
     @Test
-    fun `pulling an unknown function from a module is null`() {
+    fun `Fetching a function which does not exist returns null`() {
         val module = Module("test.ll")
 
         assertNull(module.getFunction("test"))
@@ -60,7 +60,7 @@ class ModuleTest {
     }
 
     @Test
-    fun `pulling a function returns function object when function added`() {
+    fun `Fetching an existing function returns said function`() {
         val module = Module("test.ll")
 
         module.addFunction(
@@ -78,7 +78,7 @@ class ModuleTest {
     }
 
     @Test
-    fun `writing module to byte code file`() {
+    fun `Write the module byte-code to file`() {
         val file = File("./out.bc")
 
         val module = Module("test.ll")
@@ -92,7 +92,7 @@ class ModuleTest {
     }
 
     @Test
-    fun `writing module to byte code by file path`() {
+    fun `Write the module byte-code to file path`() {
         val file = File("./out.bc")
         val module = Module("test.ll")
 
@@ -105,21 +105,20 @@ class ModuleTest {
     }
 
     @Test
-    fun `writing module to buffer and reading the buffer`() {
+    fun `Writing to MemoryBuffer`() {
         val context = Context()
         val module = Module("test.ll", context)
 
         val buf = module.toMemoryBuffer()
-        val mod = buf.parse(context)
 
-        assertEquals("test.ll", mod.getSourceFileName())
+        assertEquals('B', buf.getStart())
 
         module.dispose()
         context.dispose()
     }
 
     @Test
-    fun `getting a module from buffer`() {
+    fun `Get module from MemoryBuffer`() {
         val context = Context()
         val module = Module("test.ll", context)
 
@@ -131,7 +130,7 @@ class ModuleTest {
     }
 
     @Test
-    fun `verifying valid module`() {
+    fun `Verification of a valid module`() {
         val context = Context()
         val module = Module("test.ll", context)
 
@@ -143,7 +142,7 @@ class ModuleTest {
     }
 
     @Test
-    fun `creation of function`() {
+    fun `Creation of function inside module`() {
         val fnTy = FunctionType(IntType(32), listOf(), false)
         val module = Module("test.ll")
 

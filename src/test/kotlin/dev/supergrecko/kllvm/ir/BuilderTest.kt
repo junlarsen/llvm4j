@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 
 class BuilderTest {
     @Test
-    fun `should be able to position after basic blocks`() {
+    fun `Should be able to position after basic block`() {
         val builder = Builder()
         assertNull(builder.getInsertBlock())
 
@@ -41,7 +41,7 @@ class BuilderTest {
     }
 
     @Test
-    fun `will fail when attempting to dispose twice`() {
+    fun `Attempting to dispose twice fails`() {
         val builder = Builder()
         builder.dispose()
 
@@ -51,7 +51,7 @@ class BuilderTest {
     }
 
     @Test
-    fun `should create return instruction`() {
+    fun `Creation of return instruction`() {
         val builder = Builder()
         val boolTy = IntType(1)
 
@@ -69,7 +69,7 @@ class BuilderTest {
     }
 
     @Test
-    fun `should create call instruction`() {
+    fun `Creation of call instruction`() {
         val module = Module("test.ll")
         val boolType = IntType(1)
 

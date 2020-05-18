@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 
 class GlobalVariableTest {
     @Test
-    fun `creating a global value`() {
+    fun `Creation of global variable`() {
         val ty = IntType(32)
         val v = ConstantInt(ty, 100L, true)
 
@@ -40,7 +40,7 @@ class GlobalVariableTest {
     }
 
     @Test
-    fun `set global constant`() {
+    fun `Turning a global constant`() {
         val ty = IntType(32)
         val v = ConstantInt(IntType(32), 100L, true)
         val mod = Module("test.ll")
@@ -56,7 +56,7 @@ class GlobalVariableTest {
     }
 
     @Test
-    fun `adding a value in an address space`() {
+    fun `Assigning a global to an address space`() {
         val module = Module("test.ll")
         val v = module.addGlobal("v", IntType(32), 0x03f7d)
 
@@ -66,7 +66,7 @@ class GlobalVariableTest {
     }
 
     @Test
-    fun `thread localization properties works as expected`() {
+    fun `Mutating thread localization`() {
         val ty = IntType(32)
         val mod = Module("test.ll")
         val value = mod.addGlobal("v", ty).apply {

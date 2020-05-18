@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 
 class GlobalValueTest {
     @Test
-    fun `fetching module`() {
+    fun `Fetching the module from a global works`() {
         val module = Module("test.ll").apply {
             setModuleIdentifier("basic")
         }

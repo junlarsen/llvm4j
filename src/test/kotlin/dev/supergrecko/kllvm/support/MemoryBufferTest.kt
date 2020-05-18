@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 
 class MemoryBufferTest {
     @Test
-    fun `getting the buffer size`() {
+    fun `The buffer byte-code starts with B for BC`() {
         val context = Context()
         val module = Module("test.ll", context)
 
@@ -25,7 +25,7 @@ class MemoryBufferTest {
     }
 
     @Test
-    fun `creation from file`() {
+    fun `Create MemoryBuffer from byte-code file`() {
         val target = File("test.ll.2")
         val mod = Module("test.ll")
         mod.toFile(target)
@@ -38,7 +38,7 @@ class MemoryBufferTest {
     }
 
     @Test
-    fun `will fail if file does not exist`() {
+    fun `Creation from unknown path fails`() {
         assertFailsWith<IllegalArgumentException> {
             MemoryBuffer(File("unknown file which does not exist"))
         }

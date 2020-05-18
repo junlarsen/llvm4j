@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 
 class ConstantTest {
     @Test
-    fun `casting to pointer`() {
+    fun `Casting a constant into a pointer`() {
         val type = IntType(32)
         val ptrTy = PointerType(type)
         val value = ConstantInt(type, 1L, true)
