@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test
 
 class ValueTest {
     @Test
-    fun `Creation of "ConstAllOne" type`() {
+    fun `Creation of ConstAllOne type`() {
         val type = IntType(32)
         val value = type.getConstantAllOnes()
 
@@ -17,7 +17,7 @@ class ValueTest {
     }
 
     @Test
-    fun `Creation of "ConstNull" type`() {
+    fun `Creation of ConstNull type`() {
         val type = IntType(32)
         val value = type.getConstantNull()
 
