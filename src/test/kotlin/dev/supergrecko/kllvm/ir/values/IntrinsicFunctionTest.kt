@@ -5,35 +5,35 @@ import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.TypeKind
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.types.VectorType
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
 
 class IntrinsicFunctionTest {
     @Test
-    fun `searching for an intrinsic`() {
+    fun `Search for intrinsic function`() {
         val intrinsic = IntrinsicFunction("llvm.va_start")
 
         assertTrue { intrinsic.exists() }
     }
 
     @Test
-    fun `searching for unknown intrinsic`() {
+    fun `Invalid intrinsic name fails`() {
         assertFailsWith<IllegalArgumentException> {
             IntrinsicFunction("not.a.valid.intrinsic")
         }
     }
 
     @Test
-    fun `finding overloaded intrinsics`() {
+    fun `Search for overloaded intrinsic`() {
         val intrinsic = IntrinsicFunction("llvm.ctpop")
 
         assertTrue { intrinsic.isOverloaded() }
     }
 
     @Test
-    fun `finding overloaded name`() {
+    fun `Get name by overloaded intrinsic's arguments`() {
         val ty = VectorType(IntType(8), 4)
         val intrinsic = IntrinsicFunction("llvm.ctpop")
 
@@ -43,14 +43,14 @@ class IntrinsicFunctionTest {
     }
 
     @Test
-    fun `intrinsic names match`() {
+    fun `Intrinsic name matches getter`() {
         val intrinsic = IntrinsicFunction("llvm.va_start")
 
         assertEquals("llvm.va_start", intrinsic.getName())
     }
 
     @Test
-    fun `fetching function declaration`() {
+    fun `Function declaration can be retrieved from intrinsic`() {
         val ty = VectorType(IntType(8), 4)
         val intrinsic = IntrinsicFunction("llvm.ctpop")
         val mod = Module("test.ll")
@@ -60,7 +60,7 @@ class IntrinsicFunctionTest {
     }
 
     @Test
-    fun `fetching type for intrinsic`() {
+    fun `Function type can be retrieved from intrinsic`() {
         val intrinsic = IntrinsicFunction("llvm.va_start")
         val args = listOf(IntType(8).toPointerType())
         val types = intrinsic.getType(Context.getGlobalContext(), args)

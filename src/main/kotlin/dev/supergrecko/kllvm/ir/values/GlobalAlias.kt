@@ -4,7 +4,7 @@ import dev.supergrecko.kllvm.ir.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class GlobalAlias internal constructor(): GlobalValue() {
+public class GlobalAlias internal constructor() : GlobalValue() {
     /**
      * Construct a new Type from an LLVM pointer reference
      */

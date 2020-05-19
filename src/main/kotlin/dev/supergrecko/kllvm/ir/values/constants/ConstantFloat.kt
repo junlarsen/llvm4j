@@ -6,13 +6,8 @@ import dev.supergrecko.kllvm.ir.instructions.RealPredicate
 import dev.supergrecko.kllvm.ir.types.FloatType
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.ConstantValue
-import org.bytedeco.javacpp.IntPointer
-import org.bytedeco.javacpp.Pointer
-import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
-import java.nio.ByteBuffer
-import java.nio.IntBuffer
 
 public class ConstantFloat internal constructor() : Value(), ConstantValue {
     public constructor(llvmValue: LLVMValueRef) : this() {

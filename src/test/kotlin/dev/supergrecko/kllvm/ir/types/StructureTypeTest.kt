@@ -2,11 +2,19 @@ package dev.supergrecko.kllvm.ir.types
 
 import dev.supergrecko.kllvm.ir.TypeKind
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 
 class StructureTypeTest {
     @Test
-    fun `ref creation of type`() {
+    fun `Creation from user-land constructor`() {
+        val type = StructType(listOf(), false)
+
+        assertEquals(TypeKind.Struct, type.getTypeKind())
+    }
+
+    @Test
+    fun `Creation via LLVM reference`() {
         val type = StructType(listOf(IntType(16)), false)
         val second = StructType(type.ref)
 
@@ -14,39 +22,60 @@ class StructureTypeTest {
     }
 
     @Test
-    fun `is sized works for struct`() {
+    fun `All structures are sized`() {
         val arg = FloatType(TypeKind.Float)
         val type = StructType(listOf(arg), false)
 
-        assertEquals(true, type.isSized())
+        assertTrue { type.isSized() }
+
+        val struct = StructType(listOf(), false)
+
+        assertTrue { struct.isSized() }
     }
 
     @Test
-    fun `test element spec matches`() {
+    fun `Struct element size matches`() {
+        val struct1 = StructType(listOf(), false)
+        val struct2 = StructType(listOf(IntType(32)), false)
+
+        assertEquals(0, struct1.getElementCount())
+        assertEquals(1, struct2.getElementCount())
+    }
+
+    @Test
+    fun `Element types match`() {
         val elements = listOf(IntType(32))
         val struct = StructType(elements, false)
 
-        assertEquals(false, struct.isPacked())
-        assertEquals(1, struct.getElementCount())
-        assertEquals(true, struct.isLiteral())
-        assertEquals(false, struct.isOpaque())
-
         val (first) = struct.getElementTypes()
         assertEquals(elements.first().ref, first.ref)
-
-        val type = struct.getElementTypeAt(0)
-        assertEquals(type.ref, elements.first().ref)
     }
 
     @Test
-    fun `name matches`() {
+    fun `A packed struct is packed`() {
+        val struct = StructType(listOf(), true)
+
+        assertTrue { struct.isPacked() }
+    }
+
+    @Test
+    fun `An unnamed struct is literal`() {
+        val struct = StructType(listOf(), true)
+
+        assertTrue { struct.isLiteral() }
+    }
+
+    @Test
+    fun `Giving a structure a name matches`() {
         val struct = StructType("StructureName")
 
         assertEquals("StructureName", struct.getName())
+
+        assertTrue { struct.isOpaque() }
     }
 
     @Test
-    fun `test opaque struct`() {
+    fun `An opaque struct is no longer opaque after body is set`() {
         val struct = StructType("test_struct")
 
         assertEquals(true, struct.isOpaque())
@@ -54,8 +83,6 @@ class StructureTypeTest {
         val elements = listOf(IntType(32))
         struct.setBody(elements, false)
 
-        val (first) = struct.getElementTypes()
-        assertEquals(elements.first().ref, first.ref)
         assertEquals(false, struct.isOpaque())
     }
 }

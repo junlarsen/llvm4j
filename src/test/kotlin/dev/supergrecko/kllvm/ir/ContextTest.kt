@@ -3,15 +3,15 @@ package dev.supergrecko.kllvm.ir
 import dev.supergrecko.kllvm.test.runAll
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticInfoRef
 import org.junit.jupiter.api.Test
-import kotlin.test.assertNotNull
 
 class ContextTest {
     @Test
-    fun `fails to reuse dropped context`() {
+    fun `Attempting to dispose twice fails`() {
         val ctx = Context()
         ctx.dispose()
 
@@ -21,18 +21,8 @@ class ContextTest {
     }
 
     @Test
-    fun `attempting to dispose twice will fail but not cause segfault`() {
-        val ctx = Context()
-
-        ctx.dispose()
-
-        assertFailsWith<IllegalArgumentException> {
-            ctx.dispose()
-        }
-    }
-
-    @Test
-    fun `setting the diagnostic handler`() {
+    fun `Passing a callback hook`() {
+        // TODO: Rewrite these with kt lambdas
         val ctx = Context()
 
         val handler = object : LLVMDiagnosticHandler() {
@@ -50,7 +40,7 @@ class ContextTest {
     }
 
     @Test
-    fun `the discardValueNames property is functional`() {
+    fun `Mutating discard value names`() {
         val ctx = Context()
 
         runAll(true, false) { it, _ ->

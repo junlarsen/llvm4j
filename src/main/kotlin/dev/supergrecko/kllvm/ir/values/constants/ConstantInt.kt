@@ -42,6 +42,8 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      * Create a constant integer of arbitrary precision
      *
      * @see LLVM.LLVMConstIntOfArbitraryPrecision
+     *
+     * TODO: Find out how the words constructor actually works
      */
     public constructor(type: IntType, words: List<Long>) : this() {
         ref = LLVM.LLVMConstIntOfArbitraryPrecision(
@@ -481,7 +483,6 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      */
     public fun zext(type: IntType): ConstantInt = ext(type, false)
 
-
     /**
      * Converstion to float type
      *
@@ -525,6 +526,8 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
 
     /**
      * Cast to another integer type
+     *
+     * Casting to self has no effect
      *
      * @see LLVM.LLVMConstIntCast
      */

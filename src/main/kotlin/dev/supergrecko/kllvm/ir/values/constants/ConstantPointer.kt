@@ -14,7 +14,7 @@ public class ConstantPointer internal constructor() : Value(), ConstantValue {
         ref = llvmValue
     }
 
-    //core Core::Values::Constants::ConstantExpressions
+    // core Core::Values::Constants::ConstantExpressions
     /**
      * Conversion to integer
      *
@@ -50,7 +50,6 @@ public class ConstantPointer internal constructor() : Value(), ConstantValue {
 
         return ConstantPointer(value)
     }
-
 
     /**
      * Convert this value to the target pointer type's address space

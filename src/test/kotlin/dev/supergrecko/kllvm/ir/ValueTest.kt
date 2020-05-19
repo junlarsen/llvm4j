@@ -1,16 +1,15 @@
 package dev.supergrecko.kllvm.ir
 
 import dev.supergrecko.kllvm.ir.types.IntType
-import dev.supergrecko.kllvm.ir.types.PointerType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
 
 class ValueTest {
     @Test
-    fun `creating const all one type`() {
+    fun `Creation of ConstAllOne type`() {
         val type = IntType(32)
         val value = type.getConstantAllOnes()
 
@@ -18,7 +17,7 @@ class ValueTest {
     }
 
     @Test
-    fun `creating zero value`() {
+    fun `Creation of ConstNull type`() {
         val type = IntType(32)
         val value = type.getConstantNull()
 
@@ -27,7 +26,7 @@ class ValueTest {
     }
 
     @Test
-    fun `null pointer creation`() {
+    fun `Creation of nullptr type`() {
         val type = IntType(32)
         val nullptr = type.getConstantNullPointer()
 
@@ -36,7 +35,7 @@ class ValueTest {
     }
 
     @Test
-    fun `creation of undefined type object`() {
+    fun `Creation of undefined type`() {
         val type = IntType(1032)
         val undef = type.getConstantUndef()
 
@@ -45,7 +44,7 @@ class ValueTest {
     }
 
     @Test
-    fun `value type matches`() {
+    fun `Value's pulled type matches input type`() {
         val type = IntType(32)
         val value = ConstantInt(type, 1L, true)
 
@@ -54,14 +53,5 @@ class ValueTest {
         assertEquals(type.getTypeKind(), valueType.getTypeKind())
         assertEquals(type.getTypeWidth(), valueType.asIntType().getTypeWidth())
         assertTrue { value.isConstant() }
-    }
-
-    @Test
-    fun `isa checks match`() {
-        val type = IntType(32)
-        val value = ConstantInt(type, 1L, true)
-
-        assertFalse { value.isMetadataNode() }
-        assertFalse { value.isMetadataString() }
     }
 }

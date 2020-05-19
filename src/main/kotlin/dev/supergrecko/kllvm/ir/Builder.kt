@@ -166,7 +166,7 @@ public class Builder public constructor(
     public fun buildNot(
         value: Value,
         name: String
-    ) : Instruction {
+    ): Instruction {
         return Instruction(LLVM.LLVMBuildNot(ref, value.ref, name))
     }
 

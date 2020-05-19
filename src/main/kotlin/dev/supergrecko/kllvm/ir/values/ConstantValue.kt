@@ -6,8 +6,6 @@ import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.Type
 import dev.supergrecko.kllvm.ir.Value
 import dev.supergrecko.kllvm.ir.instructions.Opcode
-import dev.supergrecko.kllvm.ir.types.PointerType
-import dev.supergrecko.kllvm.ir.values.constants.ConstantPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -62,7 +60,7 @@ public interface ConstantValue : ContainsReference<LLVMValueRef> {
      * TODO: Find out which types are compatible here, int?
      */
     public fun extOrBitcast(type: Type, signExtend: Boolean): Value {
-        val ref = if(signExtend) {
+        val ref = if (signExtend) {
             LLVM.LLVMConstSExtOrBitCast(ref, type.ref)
         } else {
             LLVM.LLVMConstZExtOrBitCast(ref, type.ref)

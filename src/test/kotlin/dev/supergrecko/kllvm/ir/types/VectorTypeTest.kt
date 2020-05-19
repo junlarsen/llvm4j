@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 
 class VectorTypeTest {
     @Test
-    fun `user land creation of type`() {
+    fun `Creation from user-land constructor`() {
         val type = IntType(32)
         val vec = type.toVectorType(1000)
 
@@ -16,7 +16,7 @@ class VectorTypeTest {
     }
 
     @Test
-    fun `ref creation of type`() {
+    fun `Creation via LLVM reference`() {
         val type = IntType(16).toVectorType(10)
         val second = VectorType(type.ref)
 
@@ -24,7 +24,7 @@ class VectorTypeTest {
     }
 
     @Test
-    fun `underlying type matches`() {
+    fun `The type of the elements match the vector type`() {
         val type = IntType(32)
         val vec = VectorType(type, 10)
 
@@ -33,7 +33,7 @@ class VectorTypeTest {
     }
 
     @Test
-    fun `subtypes match`() {
+    fun `The subtypes match`() {
         val type = IntType(32)
         val vec = VectorType(type, 10)
 
@@ -42,7 +42,7 @@ class VectorTypeTest {
     }
 
     @Test
-    fun `negative size is illegal`() {
+    fun `Allocating a vector type with negative size fails`() {
         val type = FloatType(TypeKind.Float)
 
         assertFailsWith<IllegalArgumentException> {

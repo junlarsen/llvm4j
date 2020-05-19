@@ -2,12 +2,12 @@ package dev.supergrecko.kllvm.ir.values
 
 import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.types.IntType
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import org.junit.jupiter.api.Test
 
 class GlobalValueTest {
     @Test
-    fun `fetching module`() {
+    fun `Fetching the module from a global works`() {
         val module = Module("test.ll").apply {
             setModuleIdentifier("basic")
         }

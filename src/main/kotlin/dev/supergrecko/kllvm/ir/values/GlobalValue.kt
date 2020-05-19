@@ -1,7 +1,6 @@
 package dev.supergrecko.kllvm.ir.values
 
 import dev.supergrecko.kllvm.internal.contracts.OrderedEnum
-import dev.supergrecko.kllvm.internal.contracts.Unreachable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.ir.DLLStorageClass
 import dev.supergrecko.kllvm.ir.Metadata
@@ -38,7 +37,7 @@ public enum class Linkage(public override val value: Int) : OrderedEnum<Int> {
     PrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage),
 }
 
-public open class GlobalValue internal constructor(): Value(), ConstantValue {
+public open class GlobalValue internal constructor() : Value(), ConstantValue {
     /**
      * Construct a new Type from an LLVM pointer reference
      */

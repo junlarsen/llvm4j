@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 
 class TypeTest {
     @Test
-    fun `casting into other type works when expected to`() {
+    fun `Casting into the same type will work`() {
         val type = IntType(32)
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
@@ -16,8 +16,9 @@ class TypeTest {
     }
 
     @Test
-    fun `casting should fail when the underlying type is different`() {
-        // it is impossible to guarantee that the underlying types is valid or invalid
+    fun `Casting to the wrong type will fail at runtime`() {
+        // it is impossible to guarantee that the underlying types is valid or
+        // invalid
         val type = IntType(32)
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
@@ -28,7 +29,7 @@ class TypeTest {
     }
 
     @Test
-    fun `retrieving context works`() {
+    fun `The context the type was made in is retrievable`() {
         val ctx = Context()
         val type = IntType(32, ctx)
 
@@ -38,7 +39,7 @@ class TypeTest {
     }
 
     @Test
-    fun `getting a name representation works`() {
+    fun `The name of the type can be retrieved`() {
         val type = IntType(32)
 
         val msg = type.getStringRepresentation()

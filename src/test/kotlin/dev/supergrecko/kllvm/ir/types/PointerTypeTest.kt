@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 
 class PointerTypeTest {
     @Test
-    fun `user land creation of type`() {
+    fun `Creation from user-land constructor`() {
         val type = IntType(64)
         val ptr = type.toPointerType()
 
@@ -14,7 +14,7 @@ class PointerTypeTest {
     }
 
     @Test
-    fun `ref creation of type`() {
+    fun `Creation via LLVM reference`() {
         val type = IntType(1).toPointerType(10)
         val second = PointerType(type.ref)
 
@@ -22,7 +22,7 @@ class PointerTypeTest {
     }
 
     @Test
-    fun `underlying type matches`() {
+    fun `The underlying type matches`() {
         val type = IntType(32)
         val ptr = type.toPointerType()
 
@@ -30,7 +30,7 @@ class PointerTypeTest {
     }
 
     @Test
-    fun `subtype matches`() {
+    fun `The element subtype matches`() {
         val type = IntType(32)
         val ptr = type.toPointerType()
 
@@ -38,14 +38,14 @@ class PointerTypeTest {
     }
 
     @Test
-    fun `count matches`() {
+    fun `The element count is 1 for pointers`() {
         val type = IntType(32).toPointerType()
 
         assertEquals(1, type.getElementCount())
     }
 
     @Test
-    fun `address space matches`() {
+    fun `A given address space matches`() {
         val type = IntType(32)
         val ptr = type.toPointerType(100)
 

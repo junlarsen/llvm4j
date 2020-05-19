@@ -18,7 +18,7 @@ public class IndirectFunction internal constructor() : FunctionValue() {
     /**
      * Convert a regular function to an indirect one
      *
-     * Can be used for assigning [FunctionValue.indirectFunctionResolver]
+     * Can be used for assigning [FunctionValue.getIndirectResolver]
      */
     public constructor(function: FunctionValue) : this() {
         ref = function.ref

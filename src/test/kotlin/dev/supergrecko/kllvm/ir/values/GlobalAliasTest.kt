@@ -3,13 +3,13 @@ package dev.supergrecko.kllvm.ir.values
 import dev.supergrecko.kllvm.ir.Module
 import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
-import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import org.junit.jupiter.api.Test
 
 class GlobalAliasTest {
     @Test
-    fun `aliases track the value`() {
+    fun `A module alias copies any globals`() {
         val mod = Module("test.ll")
         val ty = IntType(32)
         val v = ConstantInt(ty, 32L, true)
@@ -30,7 +30,7 @@ class GlobalAliasTest {
     }
 
     @Test
-    fun `non-existing alias returns null`() {
+    fun `A non-existing alias returns null`() {
         val mod = Module("test.ll")
 
         val alias = mod.getAlias("unknown_alias")
@@ -41,7 +41,7 @@ class GlobalAliasTest {
     }
 
     @Test
-    fun `fetching alias from module`() {
+    fun `Retrieving aliases works as expected`() {
         val mod = Module("test.ll")
         val ty = IntType(32).toPointerType()
         val global = mod.addGlobal("value_1", ty)

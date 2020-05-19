@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
  */
 class JNITest {
     @Test
-    fun `raw bindings work without any library interference`() {
+    fun `The raw bytedeco bindings work by themselves`() {
         LLVM.LLVMLinkInMCJIT()
         LLVM.LLVMInitializeNativeAsmPrinter()
         LLVM.LLVMInitializeNativeAsmParser()
