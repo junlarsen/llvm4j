@@ -15,15 +15,12 @@ import org.bytedeco.llvm.global.LLVM
  *
  * - [Documentation](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html)
  *
- * @throws IllegalArgumentException If any argument assertions fail. Most
- * noticeably functions which involve a context ref.
- *
- * Note: This primary constructor is public because anyone should be able to
+ * This primary constructor is public because anyone should be able to
  * create a context. The init block ensures the ref is valid
  */
 public class Context public constructor() : AutoCloseable, Validatable,
     Disposable {
-    internal var ref: LLVMContextRef
+    public var ref: LLVMContextRef
     public override var valid: Boolean = true
 
     init {
@@ -58,8 +55,6 @@ public class Context public constructor() : AutoCloseable, Validatable,
     /**
      * Set the DiagnosticHandler for this context
      *
-     * @throws IllegalArgumentException If internal instance has been dropped.
-     *
      * @see LLVM.LLVMContextSetDiagnosticHandler
      *
      * TODO: Find out pointer type of [diagnosticContext]
@@ -78,8 +73,6 @@ public class Context public constructor() : AutoCloseable, Validatable,
      *
      * @throws IllegalArgumentException If internal instance has been dropped.
      *
-     * @see LLVM.LLVMContextSetDiagnosticHandler
-     *
      * TODO: Do something about Pointer() because right now it's just a nullptr
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler) {
@@ -89,9 +82,7 @@ public class Context public constructor() : AutoCloseable, Validatable,
     /**
      * Get the diagnostic handler for this context.
      *
-     * @throws IllegalArgumentException If internal instance has been dropped.
-     *
-     * @see LLVM.LLVMContextGetDiagnosticContext
+     * @see LLVM.LLVMContextGetDiagnosticHandler
      *
      * TODO: Find out how to actually call this thing from Kotlin/Java
      */
@@ -102,9 +93,19 @@ public class Context public constructor() : AutoCloseable, Validatable,
     }
 
     /**
-     * Register a yield callback with the given context.
+     * Get the llvm::DiagnosticContext for this context
      *
-     * @throws IllegalArgumentException If internal instance has been dropped.
+     * @see LLVM.LLVMContextGetDiagnosticContext
+     *
+     * TODO: Find out if there is any reasonable way to work with this thing
+     */
+    public fun getDiagnosticContext(): Nothing {
+        TODO("The LLVM function returns a shared_ptr which is unusable in " +
+                "Kotlin and thus this doesn't actually do anything for now")
+    }
+
+    /**
+     * Register a yield callback with the given context.
      *
      * @see LLVM.LLVMContextSetYieldCallback
      *
@@ -118,6 +119,26 @@ public class Context public constructor() : AutoCloseable, Validatable,
 
         LLVM.LLVMContextSetYieldCallback(ref, callback, opaqueHandle)
     }
+
+    /**
+     * Get the metadata kind id [name]
+     *
+     * You should pull metadata kind ids from a context as
+     * [LLVM.LLVMGetMDKindID] just calls it from the global context. You can
+     * do something like this:
+     *
+     * ```kotlin
+     * Context.getGlobalContext().getMetadataKindId(...)
+     * ```
+     *
+     * @see LLVM.LLVMGetMDKindID
+     * @see LLVM.LLVMGetMDKindIDInContext
+     */
+    public fun getMetadataKindId(name: String): Int {
+        return LLVM.LLVMGetMDKindIDInContext(ref, name, name.length)
+    }
+
+
     //endregion Core::Context
 
     /**
