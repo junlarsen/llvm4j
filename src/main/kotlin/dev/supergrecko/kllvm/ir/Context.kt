@@ -137,8 +137,6 @@ public class Context public constructor() : AutoCloseable, Validatable,
     public fun getMetadataKindId(name: String): Int {
         return LLVM.LLVMGetMDKindIDInContext(ref, name, name.length)
     }
-
-
     //endregion Core::Context
 
     /**

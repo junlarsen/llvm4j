@@ -4,8 +4,7 @@
   <img alt="Logo" src="assets/kllvm.png" width="480" height="480" />
 </p>
 
-![Build & Test for Ubuntu + Windows + OSX](https://github.com/supergrecko/kllvm
-/workflows/Build%20&%20Test%20for%20Ubuntu%20+%20Windows%20+%20OSX/badge.svg)
+![Build & Test for Ubuntu + Windows + OSX](https://github.com/supergrecko/kllvm/workflows/Build%20&%20Test%20for%20Ubuntu%20+%20Windows%20+%20OSX/badge.svg)
 
 There were no decent options to utilize the LLVM from JVM. KLLVM is the missing link between Kotlin/JVM and LLVM.
 
@@ -16,3 +15,5 @@ with the LLVM.
 ### Meta
 
 KLLVM is in active development. There are no public releases yet.
+
+Interested in contributing? Shoot me an email at [(me at supergrecko dot dev)](mailto:me@supergrecko.dev), open an issue or join [the Discord](https://discord.gg/MPWD84h)
