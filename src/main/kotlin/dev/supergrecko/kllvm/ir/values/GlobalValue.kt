@@ -53,7 +53,7 @@ public open class GlobalValue internal constructor() : Value(), ConstantValue {
     }
 
     public fun setLinkage(linkage: Linkage) {
-       LLVM.LLVMSetLinkage(ref, linkage.value)
+        LLVM.LLVMSetLinkage(ref, linkage.value)
     }
 
     public fun getSection(): String {
