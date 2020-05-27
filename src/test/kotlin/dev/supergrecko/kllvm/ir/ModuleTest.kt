@@ -83,7 +83,7 @@ class ModuleTest {
 
         val module = Module("test.ll")
 
-        module.toFile(file)
+        module.writeBitCodeToFile(file)
 
         assertTrue { file.exists() }
 
@@ -96,7 +96,7 @@ class ModuleTest {
         val file = File("./out.bc")
         val module = Module("test.ll")
 
-        module.toFile(file.absolutePath)
+        module.writeBitCodeToFile(file.absolutePath)
 
         assertTrue { file.exists() }
 

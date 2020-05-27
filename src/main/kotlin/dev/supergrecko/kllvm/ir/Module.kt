@@ -10,6 +10,7 @@ import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GlobalAlias
 import dev.supergrecko.kllvm.ir.values.GlobalVariable
 import dev.supergrecko.kllvm.support.MemoryBuffer
+import dev.supergrecko.kllvm.support.Message
 import dev.supergrecko.kllvm.support.VerifierFailureAction
 import java.io.File
 import java.nio.ByteBuffer
@@ -42,35 +43,6 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     //region Core::Modules
-    /**
-     * Dump the module contents to stderr
-     *
-     * @see LLVM.LLVMDumpModule
-     */
-    public fun dump() = LLVM.LLVMDumpModule(ref)
-
-    /**
-     * Create a function inside this module with the given [name]
-     *
-     * @see LLVM.LLVMAddFunction
-     */
-    public fun addFunction(name: String, type: FunctionType): FunctionValue {
-        val value = LLVM.LLVMAddFunction(ref, name, type.ref)
-
-        return FunctionValue(value)
-    }
-
-    /**
-     * Clone this module
-     *
-     * @see LLVM.LLVMCloneModule
-     */
-    public fun clone(): Module {
-        val mod = LLVM.LLVMCloneModule(ref)
-
-        return Module(mod)
-    }
-
     /**
      * Get the name for this module
      *
@@ -115,6 +87,111 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     /**
+     * Get the data layout which specifies how data is to be laid out in memory
+     *
+     * See: https://llvm.org/docs/LangRef.html#data-layout
+     *
+     * @see LLVM.LLVMGetDataLayoutStr
+     */
+    public fun getDataLayout(): String {
+        return LLVM.LLVMGetDataLayoutStr(ref).string
+    }
+
+    /**
+     * Set the data layout which specifies how data is to be laid out in memory
+     *
+     * See: https://llvm.org/docs/LangRef.html#data-layout
+     *
+     * @see LLVM.LLVMSetDataLayout
+     */
+    public fun setDataLayout(layout: String) {
+        LLVM.LLVMSetDataLayout(ref, layout)
+    }
+
+    /**
+     * Get the target triple
+     *
+     * See: https://llvm.org/docs/LangRef.html#target-triple
+     *
+     * @see LLVM.LLVMGetTarget
+     */
+    public fun getTarget(): String {
+        return LLVM.LLVMGetTarget(ref).string
+    }
+
+    /**
+     * Set the target triple
+     *
+     * See: https://llvm.org/docs/LangRef.html#target-triple
+     *
+     * @see LLVM.LLVMSetTarget
+     */
+    public fun setTarget(target: String) {
+        LLVM.LLVMSetTarget(ref, target)
+    }
+
+    /**
+     * Dump the module contents to stderr
+     *
+     * @see LLVM.LLVMDumpModule
+     */
+    public fun dump() = LLVM.LLVMDumpModule(ref)
+
+    /**
+     * Print the module's IR to a file
+     *
+     * This method returns a [Message] if there was an error while printing
+     * to file.
+     *
+     * @see LLVM.LLVMPrintModuleToFile
+     */
+    public fun writeIRToFile(fileName: String): Message? {
+        val message = BytePointer()
+
+        val failed = LLVM.LLVMPrintModuleToFile(ref, fileName, message)
+            .fromLLVMBool()
+
+        return if (failed) {
+            Message(message.asByteBuffer())
+        } else {
+            null
+        }
+    }
+
+    /**
+     * Get the IR as a string.
+     *
+     * @see LLVM.LLVMPrintModuleToString
+     */
+    public fun getIR(): String {
+        val ir = LLVM.LLVMPrintModuleToString(ref)
+
+        return ir.string
+    }
+
+    /**
+     * Get the context this module is associated with
+     *
+     * @see LLVM.LLVMGetModuleContext
+     */
+    public fun getContext(): Context {
+        val context = LLVM.LLVMGetModuleContext(ref)
+
+        return Context(context)
+    }
+
+    /**
+     * Create a function inside this module with the given [name]
+     *
+     * @see LLVM.LLVMAddFunction
+     */
+    public fun addFunction(name: String, type: FunctionType): FunctionValue {
+        val value = LLVM.LLVMAddFunction(ref, name, type.ref)
+
+        return FunctionValue(value)
+    }
+
+    /**
      * Get a function in the module if it exists
      *
      * @see LLVM.LLVMGetNamedFunction
@@ -123,6 +200,17 @@ public class Module internal constructor() : AutoCloseable,
         val ref = LLVM.LLVMGetNamedFunction(ref, name)
 
         return wrap(ref) { FunctionValue(it) }
+    }
+
+    /**
+     * Clone this module
+     *
+     * @see LLVM.LLVMCloneModule
+     */
+    public fun clone(): Module {
+        val mod = LLVM.LLVMCloneModule(ref)
+
+        return Module(mod)
     }
     //endregion Core::Modules
 
@@ -208,7 +296,7 @@ public class Module internal constructor() : AutoCloseable,
      *
      * @see LLVM.LLVMWriteBitcodeToFile
      */
-    public fun toFile(path: String) {
+    public fun writeBitCodeToFile(path: String) {
         LLVM.LLVMWriteBitcodeToFile(ref, path)
     }
 
@@ -217,7 +305,7 @@ public class Module internal constructor() : AutoCloseable,
      *
      * @see LLVM.LLVMWriteBitcodeToFile
      */
-    public fun toFile(file: File) {
+    public fun writeBitCodeToFile(file: File) {
         LLVM.LLVMWriteBitcodeToFile(ref, file.absolutePath)
     }
     //endregion BitWriter
