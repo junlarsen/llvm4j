@@ -1,5 +1,5 @@
 CLASSES = :ext/junit.jar:build/classes/kotlin/main:build/classes/kotlin/test
-TESTCLASS ?= dev.supergrecko.kllvm.jni.JNITestKt
+TESTCLASS ?= dev.supergrecko.kllvm.integration.jni.JNITestKt
 
 lint:
 	java -jar ext/ktlint.jar --format
