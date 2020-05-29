@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.`object`
 
-import dev.supergrecko.kllvm.internal.contracts.Disposable
-import dev.supergrecko.kllvm.internal.contracts.Validatable
+import dev.supergrecko.kllvm.unit.internal.contracts.Disposable
+import dev.supergrecko.kllvm.unit.internal.contracts.Validatable
 import org.bytedeco.llvm.LLVM.LLVMBinaryRef
 import org.bytedeco.llvm.global.LLVM
 
