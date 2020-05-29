@@ -6,6 +6,7 @@ import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import dev.supergrecko.kllvm.internal.util.wrap
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.types.PointerType
+import dev.supergrecko.kllvm.ir.types.StructType
 import dev.supergrecko.kllvm.ir.values.FunctionValue
 import dev.supergrecko.kllvm.ir.values.GlobalAlias
 import dev.supergrecko.kllvm.ir.values.GlobalVariable
@@ -17,6 +18,7 @@ import java.nio.ByteBuffer
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
+import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -145,7 +147,7 @@ public class Module internal constructor() : AutoCloseable,
      *
      * @see LLVM.LLVMPrintModuleToFile
      */
-    public fun writeIRToFile(fileName: String): Message? {
+    public fun toFile(fileName: String): Message? {
         val message = BytePointer()
 
         val failed = LLVM.LLVMPrintModuleToFile(ref, fileName, message)
@@ -163,10 +165,46 @@ public class Module internal constructor() : AutoCloseable,
      *
      * @see LLVM.LLVMPrintModuleToString
      */
-    public fun getIR(): String {
+    public override fun toString(): String {
         val ir = LLVM.LLVMPrintModuleToString(ref)
 
         return ir.string
+    }
+
+    /**
+     * Get the inline asm for this module
+     *
+     * @see LLVM.LLVMGetModuleInlineAsm
+     *
+     * TODO: Do something with the length?
+     */
+    public fun getInlineAssembly(): String {
+        val length = SizeTPointer()
+        val asm = LLVM.LLVMGetModuleInlineAsm(ref, length)
+
+        return asm.string
+    }
+
+    /**
+     * Set the inline assembly for this module
+     *
+     * @see LLVM.LLVMSetModuleInlineAsm
+     * @see LLVM.LLVMSetModuleInlineAsm2
+     */
+    public fun setInlineAssembly(asm: String) {
+        LLVM.LLVMSetModuleInlineAsm2(ref, asm, asm.length.toLong())
+    }
+
+    /**
+     * Appends a line of inline assembly to the module
+     *
+     * [setInlineAssembly] erases any existing module asm, this simply
+     * appends to the already existing asm.
+     *
+     * @see LLVM.LLVMAppendModuleInlineAsm
+     */
+    public fun appendInlineAssembly(asm: String) {
+        LLVM.LLVMAppendModuleInlineAsm(ref, asm, asm.length.toLong())
     }
 
     /**
@@ -178,6 +216,19 @@ public class Module internal constructor() : AutoCloseable,
         val context = LLVM.LLVMGetModuleContext(ref)
 
         return Context(context)
+    }
+
+    /**
+     * Get a struct type in this module by its name
+     *
+     * Null is returned if the type was not found
+     *
+     * @see LLVM.LLVMGetTypeByName
+     */
+    public fun getTypeByName(name: String): StructType? {
+        val type: LLVMTypeRef = LLVM.LLVMGetTypeByName(ref, name)
+
+        return wrap(type) { StructType(it) }
     }
 
     /**
