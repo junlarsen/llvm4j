@@ -28,7 +28,7 @@ class MemoryBufferTest {
     fun `Create MemoryBuffer from byte-code file`() {
         val target = File("test.ll.2")
         val mod = Module("test.ll")
-        mod.toFile(target)
+        mod.writeBitCodeToFile(target)
 
         val buf = MemoryBuffer(target)
         assertNotNull(buf)
