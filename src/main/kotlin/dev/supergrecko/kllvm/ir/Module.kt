@@ -179,7 +179,7 @@ public class Module internal constructor() : AutoCloseable,
      * TODO: Do something with the length?
      */
     public fun getInlineAssembly(): String {
-        val length = SizeTPointer()
+        val length = SizeTPointer(0)
         val asm = LLVM.LLVMGetModuleInlineAsm(ref, length)
 
         return asm.string
@@ -221,7 +221,10 @@ public class Module internal constructor() : AutoCloseable,
     /**
      * Get a struct type in this module by its name
      *
-     * Null is returned if the type was not found
+     * Null is returned if the type was not found. These types are pulled
+     * from the context this module resides in. Adding types to this
+     * collection is done by creating the type in the same context this
+     * module resides in. Said context can be found via [getContext]
      *
      * @see LLVM.LLVMGetTypeByName
      */
