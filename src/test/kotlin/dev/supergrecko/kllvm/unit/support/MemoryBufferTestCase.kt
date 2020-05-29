@@ -27,9 +27,10 @@ internal class MemoryBufferTestCase : KLLVMTestCase() {
     fun `Create MemoryBuffer from byte-code file`() {
         val target = File("utils.ll.2")
         val mod = Module("utils.ll")
-        val buf = MemoryBuffer(target)
 
         mod.writeBitCodeToFile(target)
+
+        val buf = MemoryBuffer(target)
 
         assertNotNull(buf)
         cleanup(mod, buf)
