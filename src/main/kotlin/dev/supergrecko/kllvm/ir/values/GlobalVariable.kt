@@ -8,7 +8,8 @@ import dev.supergrecko.kllvm.ir.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class GlobalVariable internal constructor() : Value() {
+public class GlobalVariable internal constructor() : Value(),
+    DebugLocationValue {
     /**
      * Construct a new Type from an LLVM pointer reference
      */

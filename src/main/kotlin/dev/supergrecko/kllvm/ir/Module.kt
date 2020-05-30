@@ -257,6 +257,34 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     /**
+     * Get the first function inside this module.
+     *
+     * Use [FunctionValue.getNextFunction] to advance this iterator on the
+     * returned basic block instance.
+     *
+     * @see LLVM.LLVMGetFirstFunction
+     */
+    public fun getFirstFunction(): FunctionValue? {
+        val fn = LLVM.LLVMGetFirstFunction(ref)
+
+        return wrap(fn) { FunctionValue(it) }
+    }
+
+    /**
+     * Get the last basic block inside this function.
+     *
+     * Use [FunctionValue.getPreviousFunction] to advance this iterator on the
+     * returned basic block instance.
+     *
+     * @see LLVM.LLVMGetLastFunction
+     */
+    public fun getLastFunction(): FunctionValue? {
+        val fn = LLVM.LLVMGetLastFunction(ref)
+
+        return wrap(fn) { FunctionValue(it) }
+    }
+
+    /**
      * Clone this module
      *
      * @see LLVM.LLVMCloneModule
