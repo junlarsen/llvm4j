@@ -1,8 +1,8 @@
 package dev.supergrecko.kllvm.utils
 
 import dev.supergrecko.kllvm.unit.internal.contracts.Disposable
-import org.junit.jupiter.api.AfterEach
 import java.io.File
+import org.junit.jupiter.api.AfterEach
 
 internal open class KLLVMTestCase {
     internal val allocator = DisposablePool()
@@ -60,7 +60,7 @@ internal open class KLLVMTestCase {
         internal val pool: MutableList<File> = mutableListOf()
 
         internal fun reset() {
-            pool.filter { it.exists()}.map { it.delete() }
+            pool.filter { it.exists() }.map { it.delete() }
         }
     }
 }

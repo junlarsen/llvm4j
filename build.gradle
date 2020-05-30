@@ -25,7 +25,7 @@ dependencies {
 }
 
 dokka {
-    outputFormat = 'html'
+    outputFormat = 'gfm'
     outputDirectory = "$buildDir/dokka"
 }
 
@@ -55,6 +55,8 @@ test {
     }
 }
 
-task("cp") {
-    println sourceSets.main.compileClasspath.asPath
+task classpath {
+    doLast {
+        println sourceSets.main.compileClasspath.asPath
+    }
 }

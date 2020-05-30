@@ -6,12 +6,11 @@ import dev.supergrecko.kllvm.unit.ir.types.StructType
 import dev.supergrecko.kllvm.unit.ir.types.VoidType
 import dev.supergrecko.kllvm.unit.support.VerifierFailureAction
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
-import org.junit.jupiter.api.Test
-import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
 
 internal class ModuleTest : KLLVMTestCase() {
     @Test
