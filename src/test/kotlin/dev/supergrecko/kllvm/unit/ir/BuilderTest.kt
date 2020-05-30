@@ -3,15 +3,13 @@ package dev.supergrecko.kllvm.unit.ir
 import dev.supergrecko.kllvm.unit.ir.types.FunctionType
 import dev.supergrecko.kllvm.unit.ir.types.IntType
 import dev.supergrecko.kllvm.unit.ir.types.VoidType
-import dev.supergrecko.kllvm.unit.ir.values.FunctionValue
 import dev.supergrecko.kllvm.unit.ir.values.constants.ConstantInt
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import org.junit.jupiter.api.Test
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 internal class BuilderTest : KLLVMTestCase() {
     @Test

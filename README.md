@@ -1,7 +1,7 @@
 # Kotlin LLVM
 
 <p align="center">
-  <img alt="Logo" src="assets/kllvm.png" width="480" height="480" />
+  <img alt="Logo" src="logo.png" width="480" height="480" />
 </p>
 
 ![Build & Test for Ubuntu + Windows + OSX](https://github.com/supergrecko/kllvm/workflows/Build%20&%20Test%20for%20Ubuntu%20+%20Windows%20+%20OSX/badge.svg)
