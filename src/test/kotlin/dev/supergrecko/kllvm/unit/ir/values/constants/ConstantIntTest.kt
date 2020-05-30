@@ -1,10 +1,11 @@
 package dev.supergrecko.kllvm.unit.ir.values.constants
 
-import dev.supergrecko.kllvm.unit.ir.TypeKind
-import dev.supergrecko.kllvm.unit.ir.instructions.IntPredicate
-import dev.supergrecko.kllvm.unit.ir.types.FloatType
-import dev.supergrecko.kllvm.unit.ir.types.IntType
-import dev.supergrecko.kllvm.unit.ir.types.PointerType
+import dev.supergrecko.kllvm.ir.TypeKind
+import dev.supergrecko.kllvm.ir.instructions.IntPredicate
+import dev.supergrecko.kllvm.ir.types.FloatType
+import dev.supergrecko.kllvm.ir.types.IntType
+import dev.supergrecko.kllvm.ir.types.PointerType
+import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import dev.supergrecko.kllvm.utils.constIntPairOf
 import dev.supergrecko.kllvm.utils.runAll

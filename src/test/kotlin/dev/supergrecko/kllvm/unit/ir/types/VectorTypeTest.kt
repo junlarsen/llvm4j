@@ -1,6 +1,9 @@
 package dev.supergrecko.kllvm.unit.ir.types
 
-import dev.supergrecko.kllvm.unit.ir.TypeKind
+import dev.supergrecko.kllvm.ir.TypeKind
+import dev.supergrecko.kllvm.ir.types.FloatType
+import dev.supergrecko.kllvm.ir.types.IntType
+import dev.supergrecko.kllvm.ir.types.VectorType
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

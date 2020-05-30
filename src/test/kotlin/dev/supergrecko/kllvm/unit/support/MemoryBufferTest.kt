@@ -1,7 +1,8 @@
 package dev.supergrecko.kllvm.unit.support
 
-import dev.supergrecko.kllvm.unit.ir.Context
-import dev.supergrecko.kllvm.unit.ir.Module
+import dev.supergrecko.kllvm.ir.Context
+import dev.supergrecko.kllvm.ir.Module
+import dev.supergrecko.kllvm.support.MemoryBuffer
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import java.io.File
 import kotlin.test.assertEquals

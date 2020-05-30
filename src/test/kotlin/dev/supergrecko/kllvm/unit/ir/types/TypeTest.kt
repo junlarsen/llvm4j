@@ -1,6 +1,7 @@
 package dev.supergrecko.kllvm.unit.ir.types
 
-import dev.supergrecko.kllvm.unit.ir.Context
+import dev.supergrecko.kllvm.ir.Context
+import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

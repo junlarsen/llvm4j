@@ -1,10 +1,12 @@
 package dev.supergrecko.kllvm.unit.ir
 
-import dev.supergrecko.kllvm.unit.ir.types.FunctionType
-import dev.supergrecko.kllvm.unit.ir.types.IntType
-import dev.supergrecko.kllvm.unit.ir.types.StructType
-import dev.supergrecko.kllvm.unit.ir.types.VoidType
-import dev.supergrecko.kllvm.unit.support.VerifierFailureAction
+import dev.supergrecko.kllvm.ir.Context
+import dev.supergrecko.kllvm.ir.Module
+import dev.supergrecko.kllvm.ir.types.FunctionType
+import dev.supergrecko.kllvm.ir.types.IntType
+import dev.supergrecko.kllvm.ir.types.StructType
+import dev.supergrecko.kllvm.ir.types.VoidType
+import dev.supergrecko.kllvm.support.VerifierFailureAction
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull

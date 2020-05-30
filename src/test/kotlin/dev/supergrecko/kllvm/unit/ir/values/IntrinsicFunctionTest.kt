@@ -1,10 +1,11 @@
 package dev.supergrecko.kllvm.unit.ir.values
 
-import dev.supergrecko.kllvm.unit.ir.Context
-import dev.supergrecko.kllvm.unit.ir.Module
-import dev.supergrecko.kllvm.unit.ir.TypeKind
-import dev.supergrecko.kllvm.unit.ir.types.IntType
-import dev.supergrecko.kllvm.unit.ir.types.VectorType
+import dev.supergrecko.kllvm.ir.Context
+import dev.supergrecko.kllvm.ir.Module
+import dev.supergrecko.kllvm.ir.TypeKind
+import dev.supergrecko.kllvm.ir.types.IntType
+import dev.supergrecko.kllvm.ir.types.VectorType
+import dev.supergrecko.kllvm.ir.values.IntrinsicFunction
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith

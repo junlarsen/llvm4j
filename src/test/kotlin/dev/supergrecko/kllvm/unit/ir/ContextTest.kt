@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.unit.ir
 
+import dev.supergrecko.kllvm.ir.Context
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import dev.supergrecko.kllvm.utils.runAll
 import kotlin.test.assertEquals

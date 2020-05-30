@@ -1,6 +1,7 @@
 package dev.supergrecko.kllvm.unit.ir.values.constants
 
-import dev.supergrecko.kllvm.unit.ir.types.IntType
+import dev.supergrecko.kllvm.ir.types.IntType
+import dev.supergrecko.kllvm.ir.values.constants.ConstantArray
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import dev.supergrecko.kllvm.utils.constIntPairOf
 import kotlin.test.assertEquals

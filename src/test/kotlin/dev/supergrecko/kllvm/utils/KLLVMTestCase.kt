@@ -1,6 +1,6 @@
 package dev.supergrecko.kllvm.utils
 
-import dev.supergrecko.kllvm.unit.internal.contracts.Disposable
+import dev.supergrecko.kllvm.internal.contracts.Disposable
 import java.io.File
 import org.junit.jupiter.api.AfterEach
 
