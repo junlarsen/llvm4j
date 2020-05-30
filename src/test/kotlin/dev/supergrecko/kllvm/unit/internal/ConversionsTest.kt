@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.unit.internal
 
-import dev.supergrecko.kllvm.unit.internal.util.fromLLVMBool
-import dev.supergrecko.kllvm.unit.internal.util.toLLVMBool
+import dev.supergrecko.kllvm.internal.util.fromLLVMBool
+import dev.supergrecko.kllvm.internal.util.toLLVMBool
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test

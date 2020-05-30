@@ -1,9 +1,9 @@
 package dev.supergrecko.kllvm.unit.ir.values
 
-import dev.supergrecko.kllvm.unit.ir.Module
-import dev.supergrecko.kllvm.unit.ir.ThreadLocalMode
-import dev.supergrecko.kllvm.unit.ir.types.IntType
-import dev.supergrecko.kllvm.unit.ir.values.constants.ConstantInt
+import dev.supergrecko.kllvm.ir.Module
+import dev.supergrecko.kllvm.ir.ThreadLocalMode
+import dev.supergrecko.kllvm.ir.types.IntType
+import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import dev.supergrecko.kllvm.utils.runAll
 import kotlin.test.assertEquals

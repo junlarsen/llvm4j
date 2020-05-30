@@ -1,7 +1,8 @@
 package dev.supergrecko.kllvm.unit.ir.values.constants
 
-import dev.supergrecko.kllvm.unit.ir.TypeKind
-import dev.supergrecko.kllvm.unit.ir.types.FloatType
+import dev.supergrecko.kllvm.ir.TypeKind
+import dev.supergrecko.kllvm.ir.types.FloatType
+import dev.supergrecko.kllvm.ir.values.constants.ConstantFloat
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test

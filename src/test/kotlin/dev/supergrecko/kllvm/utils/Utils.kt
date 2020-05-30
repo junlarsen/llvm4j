@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.utils
 
-import dev.supergrecko.kllvm.unit.ir.types.IntType
-import dev.supergrecko.kllvm.unit.ir.values.constants.ConstantInt
+import dev.supergrecko.kllvm.ir.types.IntType
+import dev.supergrecko.kllvm.ir.values.constants.ConstantInt
 
 internal fun constIntPairOf(x: Int, y: Int): Pair<ConstantInt, ConstantInt> {
     val ty = IntType(32)

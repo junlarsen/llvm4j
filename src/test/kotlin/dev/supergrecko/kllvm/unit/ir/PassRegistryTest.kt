@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.unit.ir
 
+import dev.supergrecko.kllvm.ir.PassRegistry
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test

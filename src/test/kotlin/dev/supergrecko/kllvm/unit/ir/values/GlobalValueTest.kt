@@ -1,7 +1,7 @@
 package dev.supergrecko.kllvm.unit.ir.values
 
-import dev.supergrecko.kllvm.unit.ir.Module
-import dev.supergrecko.kllvm.unit.ir.types.IntType
+import dev.supergrecko.kllvm.ir.Module
+import dev.supergrecko.kllvm.ir.types.IntType
 import dev.supergrecko.kllvm.utils.KLLVMTestCase
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
