@@ -80,26 +80,26 @@ internal class ModuleTest : KLLVMTestCase() {
 
     @Test
     fun `Write the module byte-code to file`() {
-        val file = File("./out.bc")
+        val file = getTemporaryFile("out.bc")
         val module = Module("utils.ll").also {
             it.writeBitCodeToFile(file)
         }
 
-        assertTrue { file.exists() }
+        assertTrue { file.length() > 0 }
 
-        cleanup(module) { file.delete() }
+        cleanup(module)
     }
 
     @Test
     fun `Write the module byte-code to file path`() {
-        val file = File("./out.bc")
+        val file = getTemporaryFile("out.bc")
         val module = Module("utils.ll").also {
             it.writeBitCodeToFile(file.absolutePath)
         }
 
         assertTrue { file.exists() }
 
-        cleanup(module) { file.delete() }
+        cleanup(module)
     }
 
     @Test

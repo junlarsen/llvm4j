@@ -2,13 +2,16 @@ package dev.supergrecko.kllvm.utils
 
 import dev.supergrecko.kllvm.unit.internal.contracts.Disposable
 import org.junit.jupiter.api.AfterEach
+import java.io.File
 
 internal open class KLLVMTestCase {
     internal val allocator = DisposablePool()
+    internal val files = FilePool()
 
     @AfterEach
     fun onTearDown() {
         allocator.reset()
+        files.reset()
     }
 
     /**
@@ -16,16 +19,23 @@ internal open class KLLVMTestCase {
      *
      * These are put into [allocator] and automatically disposed via
      * [onTearDown]
-     *
-     * You may also pass an [also] callback to do additional cleanup tasks
      */
     internal fun cleanup(
-        vararg disposables: Disposable,
-        also: (() -> Unit)? = null
+        vararg disposables: Disposable
     ) {
         allocator.pool.addAll(disposables)
+    }
 
-        also?.let { also() }
+    /**
+     * Get a file which will only exist for the current test case.
+     *
+     * File is automatically erased and deleted after test case lifecycle is
+     * over
+     */
+    fun getTemporaryFile(name: String): File {
+        return File.createTempFile(name, "").also {
+            files.pool.add(it)
+        }
     }
 
     /**
@@ -43,6 +53,14 @@ internal open class KLLVMTestCase {
         internal fun reset() {
             pool.filter { it.valid }.forEach { it.dispose() }
             pool.removeAll(pool)
+        }
+    }
+
+    internal class FilePool {
+        internal val pool: MutableList<File> = mutableListOf()
+
+        internal fun reset() {
+            pool.filter { it.exists()}.map { it.delete() }
         }
     }
 }

@@ -9,7 +9,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import org.junit.jupiter.api.Test
 
-internal class MemoryBufferTestCase : KLLVMTestCase() {
+internal class MemoryBufferTest : KLLVMTestCase() {
     @Test
     fun `The buffer byte-code starts with B for BC`() {
         val context = Context()
@@ -25,12 +25,12 @@ internal class MemoryBufferTestCase : KLLVMTestCase() {
 
     @Test
     fun `Create MemoryBuffer from byte-code file`() {
-        val target = File("utils.ll.2")
+        val file = getTemporaryFile("out.ll")
         val mod = Module("utils.ll")
 
-        mod.writeBitCodeToFile(target)
+        mod.writeBitCodeToFile(file)
 
-        val buf = MemoryBuffer(target)
+        val buf = MemoryBuffer(file)
 
         assertNotNull(buf)
         cleanup(mod, buf)
