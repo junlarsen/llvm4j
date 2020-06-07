@@ -3,6 +3,7 @@ package dev.supergrecko.kllvm.ir
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
+import dev.supergrecko.kllvm.internal.util.map
 import dev.supergrecko.kllvm.internal.util.wrap
 import dev.supergrecko.kllvm.ir.types.FunctionType
 import dev.supergrecko.kllvm.ir.types.PointerType
@@ -16,6 +17,7 @@ import dev.supergrecko.kllvm.support.VerifierFailureAction
 import java.io.File
 import java.nio.ByteBuffer
 import org.bytedeco.javacpp.BytePointer
+import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
@@ -235,6 +237,95 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     /**
+     * Get the first named metadata node inside this module.
+     *
+     * Use [NamedMetadataNode.getNextNamedMetadata] to advance this iterator on
+     * the returned named metadata instance.
+     *
+     * @see LLVM.LLVMGetFirstNamedMetadata
+     */
+    public fun getFirstNamedMetadata(): NamedMetadataNode? {
+        val md = LLVM.LLVMGetFirstNamedMetadata(ref)
+
+        return wrap(md) { NamedMetadataNode(it) }
+    }
+
+    /**
+     * Get the last basic block inside this function.
+     *
+     * Use [NamedMetadataNode.getPreviousNamedMetadata] to advance this
+     * iterator on the returned named metadata instance.
+     *
+     * @see LLVM.LLVMGetLastNamedMetadata
+     */
+    public fun getLastNamedMetadata(): NamedMetadataNode? {
+        val md = LLVM.LLVMGetLastNamedMetadata(ref)
+
+        return wrap(md) { NamedMetadataNode(it) }
+    }
+
+    /**
+     * Lookup a named metadata node in this module
+     *
+     * @see LLVM.LLVMGetNamedMetadata
+     */
+    public fun getNamedMetadata(name: String): NamedMetadataNode? {
+        val md = LLVM.LLVMGetNamedMetadata(ref, name, name.length.toLong())
+
+        return wrap(md) { NamedMetadataNode(it) }
+    }
+
+    /**
+     * Lookup a named metadata node in this module, if no node is found, a
+     * newly created node is returned.
+     *
+     * @see LLVM.LLVMGetOrInsertNamedMetadata
+     */
+    public fun getOrCreateNamedMetadata(name: String): NamedMetadataNode {
+        val md = LLVM.LLVMGetOrInsertNamedMetadata(
+            ref,
+            name,
+            name.length.toLong()
+        )
+
+        return NamedMetadataNode(md)
+    }
+
+    /**
+     * Get the amount of metadata nodes with name [name]
+     *
+     * @see LLVM.LLVMGetNamedMetadataNumOperands
+     */
+    public fun getOperandCount(name: String): Int {
+        return LLVM.LLVMGetNamedMetadataNumOperands(ref, name)
+    }
+
+    /**
+     * Get the metadata nodes for [name]
+     *
+     * TODO: Find a better return type as LLVM's C API only returns LLVMValueRef
+     *
+     * @see LLVM.LLVMGetNamedMetadataOperands
+     */
+    public fun getNamedMetadataOperands(name: String): List<Value> {
+        val size = getOperandCount(name)
+        val ptr = PointerPointer<LLVMValueRef>(size.toLong())
+
+        LLVM.LLVMGetNamedMetadataOperands(ref, name, ptr)
+
+        return ptr.map { Value(it) }
+    }
+
+    /**
+     * Add an operand to the given metadata node
+     *
+     * @see LLVM.LLVMAddNamedMetadataOperand
+     */
+    public fun addNamedMetadataOperand(name: String, operand: Value) {
+        LLVM.LLVMAddNamedMetadataOperand(ref, name, operand.ref)
+    }
+
+    /**
      * Create a function inside this module with the given [name]
      *
      * @see LLVM.LLVMAddFunction
@@ -260,7 +351,7 @@ public class Module internal constructor() : AutoCloseable,
      * Get the first function inside this module.
      *
      * Use [FunctionValue.getNextFunction] to advance this iterator on the
-     * returned basic block instance.
+     * returned function instance.
      *
      * @see LLVM.LLVMGetFirstFunction
      */
@@ -274,7 +365,7 @@ public class Module internal constructor() : AutoCloseable,
      * Get the last basic block inside this function.
      *
      * Use [FunctionValue.getPreviousFunction] to advance this iterator on the
-     * returned basic block instance.
+     * returned function instance.
      *
      * @see LLVM.LLVMGetLastFunction
      */
