@@ -1,7 +1,7 @@
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.3.70"
     id "com.github.johnrengelman.shadow" version "5.2.0"
     id "org.jetbrains.dokka" version "0.10.1"
+    id "org.jetbrains.kotlin.jvm" version "1.3.70"
 }
 
 repositories {
@@ -17,11 +17,11 @@ repositories {
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.70"
-    compile "org.bytedeco:llvm-platform:9.0.0-1.5.2"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.70"
+    implementation "org.bytedeco:llvm-platform:9.0.0-1.5.2"
 
-    testCompile "org.jetbrains.kotlin:kotlin-test:1.3.70"
-    testCompile "org.junit.jupiter:junit-jupiter-engine:5.2.0"
+    testImplementation "org.jetbrains.kotlin:kotlin-test:1.3.70"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.2.0"
 }
 
 dokka {
@@ -52,11 +52,5 @@ test {
             println()
             logger.quiet "[TESTS] [${result.resultType}] (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
         }
-    }
-}
-
-task classpath {
-    doLast {
-        println sourceSets.main.compileClasspath.asPath
     }
 }
