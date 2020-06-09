@@ -1,5 +1,9 @@
 # Vexe
 
+Vexe is a tiny, yet efficient systems programming language.
+
+Vexe is currently in an early development stage.
+
 ## Sub-projects
 
 - [vexe](vexe) The Vexe Compiler frontend
