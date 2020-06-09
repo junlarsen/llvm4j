@@ -1,0 +1,56 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id "org.jetbrains.dokka" version "0.10.1"
+    id "org.jetbrains.kotlin.jvm" version "1.3.70"
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name "jitpack.io"
+        url "https://jitpack.io"
+    }
+    maven {
+        name "jcenter"
+        url "https://jcenter.bintray.com"
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.70"
+    implementation "org.bytedeco:llvm-platform:9.0.0-1.5.2"
+
+    testImplementation "org.jetbrains.kotlin:kotlin-test:1.3.70"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.2.0"
+}
+
+dokka {
+    outputFormat = 'gfm'
+    outputDirectory = "$buildDir/dokka"
+}
+
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+test {
+    useJUnitPlatform()
+    afterTest { descriptor, result ->
+        logger.quiet "[TEST] [${result.resultType}] ${descriptor.className}::${descriptor.displayName}"
+    }
+
+    afterSuite { descriptor, result ->
+        if (!descriptor.parent) {
+            println()
+            logger.quiet "[TESTS] [${result.resultType}] (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
+        }
+    }
+}
