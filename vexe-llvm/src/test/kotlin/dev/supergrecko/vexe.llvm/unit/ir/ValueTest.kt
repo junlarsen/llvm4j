@@ -3,12 +3,12 @@ package dev.supergrecko.vexe.llvm.unit.ir
 import dev.supergrecko.vexe.llvm.ir.ValueKind
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.KLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class ValueTest : KLLVMTestCase() {
+internal class ValueTest : VexeLLVMTestCase() {
     @Test
     fun `Creation of ConstAllOne type`() {
         val type = IntType(32)

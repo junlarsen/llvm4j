@@ -6,14 +6,14 @@ import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.KLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import org.junit.jupiter.api.Test
 
-internal class BuilderTest : KLLVMTestCase() {
+internal class BuilderTest : VexeLLVMTestCase() {
     @Test
     fun `Should be able to position after basic block`() {
         val builder = Builder()

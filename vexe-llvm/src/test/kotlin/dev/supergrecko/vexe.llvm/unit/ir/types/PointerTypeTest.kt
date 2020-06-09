@@ -3,11 +3,11 @@ package dev.supergrecko.vexe.llvm.unit.ir.types
 import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
-import dev.supergrecko.vexe.llvm.utils.KLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 
-internal class PointerTypeTest : KLLVMTestCase() {
+internal class PointerTypeTest : VexeLLVMTestCase() {
     @Test
     fun `Creation from user-land constructor`() {
         val type = IntType(64)

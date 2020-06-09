@@ -1,11 +1,11 @@
 package dev.supergrecko.vexe.llvm.unit.ir
 
 import dev.supergrecko.vexe.llvm.ir.PassRegistry
-import dev.supergrecko.vexe.llvm.utils.KLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 
-internal class PassRegistryTest : KLLVMTestCase() {
+internal class PassRegistryTest : VexeLLVMTestCase() {
     @Test
     fun `Pass Registry acts as a singleton`() {
         val p1 = PassRegistry()

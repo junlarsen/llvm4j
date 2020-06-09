@@ -2,13 +2,13 @@ package dev.supergrecko.vexe.llvm.unit.ir.values.constants
 
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantArray
-import dev.supergrecko.vexe.llvm.utils.KLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
 import dev.supergrecko.vexe.llvm.utils.constIntPairOf
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class ConstantArrayTest : KLLVMTestCase() {
+internal class ConstantArrayTest : VexeLLVMTestCase() {
     @Test
     fun `Creation via LLVM reference`() {
         val str = ConstantArray("Hello")

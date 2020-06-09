@@ -7,14 +7,14 @@ import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
 import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
-import dev.supergrecko.vexe.llvm.utils.KLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class ModuleTest : KLLVMTestCase() {
+internal class ModuleTest : VexeLLVMTestCase() {
     @Test
     fun `Modules can have identifiers`() {
         val mod = Module("utils.ll").apply {

@@ -4,13 +4,13 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.llvm.utils.KLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
 
-internal class FunctionTypeTest : KLLVMTestCase() {
+internal class FunctionTypeTest : VexeLLVMTestCase() {
     @Test
     fun `Creation of parameter-less function`() {
         val ret = IntType(64)

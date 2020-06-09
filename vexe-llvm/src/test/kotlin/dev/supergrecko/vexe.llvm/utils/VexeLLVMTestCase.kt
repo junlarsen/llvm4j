@@ -4,7 +4,7 @@ import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import java.io.File
 import org.junit.jupiter.api.AfterEach
 
-internal open class KLLVMTestCase {
+internal open class VexeLLVMTestCase {
     internal val allocator = DisposablePool()
     internal val files = FilePool()
 

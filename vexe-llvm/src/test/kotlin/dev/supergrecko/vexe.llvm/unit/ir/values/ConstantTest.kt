@@ -3,11 +3,11 @@ package dev.supergrecko.vexe.llvm.unit.ir.values
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.KLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 
-internal class ConstantTest : KLLVMTestCase() {
+internal class ConstantTest : VexeLLVMTestCase() {
     @Test
     fun `Casting a constant into a pointer`() {
         val type = IntType(32)
