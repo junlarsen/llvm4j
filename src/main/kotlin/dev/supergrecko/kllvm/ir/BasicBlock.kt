@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.wrap
 import dev.supergrecko.kllvm.ir.instructions.Instruction
@@ -7,9 +8,10 @@ import dev.supergrecko.kllvm.ir.values.FunctionValue
 import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.global.LLVM
 
-public class BasicBlock internal constructor() : Validatable {
+public class BasicBlock internal constructor() : Validatable,
+    ContainsReference<LLVMBasicBlockRef> {
     override var valid = true
-    public lateinit var ref: LLVMBasicBlockRef
+    public override lateinit var ref: LLVMBasicBlockRef
 
     /**
      * Construct a new Type from an LLVM pointer reference

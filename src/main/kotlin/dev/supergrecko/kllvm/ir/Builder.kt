@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.ir.instructions.Instruction
@@ -12,8 +13,8 @@ import org.bytedeco.llvm.global.LLVM
 
 public class Builder public constructor(
     context: Context = Context.getGlobalContext()
-) : AutoCloseable, Validatable, Disposable {
-    public var ref: LLVMBuilderRef
+) : AutoCloseable, Validatable, Disposable, ContainsReference<LLVMBuilderRef> {
+    public override lateinit var ref: LLVMBuilderRef
     public override var valid: Boolean = true
 
     init {

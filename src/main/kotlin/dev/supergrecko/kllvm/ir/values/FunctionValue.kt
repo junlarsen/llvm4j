@@ -19,7 +19,8 @@ import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public open class FunctionValue internal constructor() : Value() {
+public open class FunctionValue internal constructor() : Value(),
+    DebugLocationValue {
     // TODO: Test entire unit
     //   It is currently not possible to test this unit as there is currently
     //   no way to create a FunctionValue. - grecko 21.04.2020
@@ -125,6 +126,32 @@ public open class FunctionValue internal constructor() : Value() {
         return ptr.map { BasicBlock(it) }
     }
     //endregion Core::BasicBlock
+
+    //region Core::Modules
+    /**
+     * Get the next function in the iterator
+     *
+     * Use with [FunctionValue.getNextFunction] and
+     * [FunctionValue.getPreviousFunction] to move the iterator
+     */
+    public fun getNextFunction(): FunctionValue? {
+        val next = LLVM.LLVMGetNextFunction(ref)
+
+        return wrap(next) { FunctionValue(it) }
+    }
+
+    /**
+     * Get the previous function in the iterator
+     *
+     * Use with [FunctionValue.getNextFunction] and
+     * [FunctionValue.getPreviousFunction] to move the iterator
+     */
+    public fun getPreviousFunction(): FunctionValue? {
+        val prev = LLVM.LLVMGetPreviousFunction(ref)
+
+        return wrap(prev) { FunctionValue(it) }
+    }
+    //endregion Core::Modules
 
     //region Core::Values::Constants::FunctionValues::FunctionParameters
     /**

@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import org.bytedeco.llvm.LLVM.LLVMPassRegistryRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -11,6 +12,8 @@ import org.bytedeco.llvm.global.LLVM
  *
  * [See](https://llvm.org/doxygen/group__LLVMCCorePassRegistry.html)
  */
-public class PassRegistry public constructor() {
-    internal val ref: LLVMPassRegistryRef = LLVM.LLVMGetGlobalPassRegistry()
+public class PassRegistry public constructor() :
+    ContainsReference<LLVMPassRegistryRef> {
+    public override var ref: LLVMPassRegistryRef =
+        LLVM.LLVMGetGlobalPassRegistry()
 }

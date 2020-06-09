@@ -1,10 +1,11 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import org.bytedeco.llvm.LLVM.LLVMUseRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Use internal constructor() {
-    internal lateinit var ref: LLVMUseRef
+public class Use internal constructor() : ContainsReference<LLVMUseRef> {
+    public override lateinit var ref: LLVMUseRef
 
     /**
      * Construct a new Type from an LLVM pointer reference

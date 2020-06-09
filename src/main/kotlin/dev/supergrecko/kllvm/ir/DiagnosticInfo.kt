@@ -1,10 +1,12 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticInfoRef
 import org.bytedeco.llvm.global.LLVM
 
-public class DiagnosticInfo internal constructor() {
-    internal lateinit var ref: LLVMDiagnosticInfoRef
+public class DiagnosticInfo internal constructor() :
+    ContainsReference<LLVMDiagnosticInfoRef> {
+    public override lateinit var ref: LLVMDiagnosticInfoRef
 
     public constructor(info: LLVMDiagnosticInfoRef) : this() {
         ref = info
