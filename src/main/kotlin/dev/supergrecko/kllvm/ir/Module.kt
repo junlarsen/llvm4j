@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
@@ -14,8 +15,6 @@ import dev.supergrecko.kllvm.ir.values.GlobalVariable
 import dev.supergrecko.kllvm.support.MemoryBuffer
 import dev.supergrecko.kllvm.support.Message
 import dev.supergrecko.kllvm.support.VerifierFailureAction
-import java.io.File
-import java.nio.ByteBuffer
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
@@ -23,10 +22,12 @@ import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
+import java.io.File
+import java.nio.ByteBuffer
 
 public class Module internal constructor() : AutoCloseable,
-    Validatable, Disposable {
-    public lateinit var ref: LLVMModuleRef
+    Validatable, Disposable, ContainsReference<LLVMModuleRef> {
+    public override lateinit var ref: LLVMModuleRef
     public override var valid: Boolean = true
 
     /**
@@ -132,6 +133,46 @@ public class Module internal constructor() : AutoCloseable,
      */
     public fun setTarget(target: String) {
         LLVM.LLVMSetTarget(ref, target)
+    }
+
+    /**
+     * Get a list of all the module flags defined for this module
+     *
+     * The caller is responsible for calling [ModuleFlagEntries.dispose]
+     *
+     * @see LLVM.LLVMCopyModuleFlagsMetadata
+     */
+    public fun getModuleFlags(): ModuleFlagEntries {
+        val size = SizeTPointer(0)
+        val entries = LLVM.LLVMCopyModuleFlagsMetadata(ref, size)
+
+        return ModuleFlagEntries(entries)
+    }
+
+    /**
+     * Get a certain module flag's metadata by its [key]
+     *
+     * @see LLVM.LLVMGetModuleFlag
+     */
+    public fun getModuleFlag(key: String): Metadata? {
+        val md = LLVM.LLVMGetModuleFlag(ref, key, key.length.toLong())
+
+        return wrap(md) { Metadata(it) }
+    }
+
+    /**
+     * Add a new module flag to this module
+     *
+     * @see LLVM.LLVMAddModuleFlag
+     */
+    public fun addModuleFlag(
+        behavior: ModuleFlagBehavior,
+        key: String,
+        metadata: Metadata
+    ) {
+        val length = key.length.toLong()
+
+        LLVM.LLVMAddModuleFlag(ref, behavior.value, key, length, metadata.ref)
     }
 
     /**

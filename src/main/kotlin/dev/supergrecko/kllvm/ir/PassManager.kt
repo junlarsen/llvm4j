@@ -1,13 +1,14 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import org.bytedeco.llvm.LLVM.LLVMPassManagerRef
 import org.bytedeco.llvm.global.LLVM
 
 public class PassManager internal constructor() :
-    AutoCloseable, Validatable, Disposable {
-    internal lateinit var ref: LLVMPassManagerRef
+    AutoCloseable, Validatable, Disposable, ContainsReference<LLVMPassManagerRef> {
+    public override lateinit var ref: LLVMPassManagerRef
     public override var valid: Boolean = true
 
     public constructor(pass: LLVMPassManagerRef) : this() {

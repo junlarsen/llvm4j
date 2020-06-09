@@ -1,12 +1,14 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.global.LLVM
 
-public open class Attribute internal constructor() {
-    internal lateinit var ref: LLVMAttributeRef
+public open class Attribute internal constructor() :
+    ContainsReference<LLVMAttributeRef> {
+    public override lateinit var ref: LLVMAttributeRef
 
     /**
      * TODO: Make these constructors internal (see #63)

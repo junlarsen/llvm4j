@@ -1,5 +1,6 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.contracts.Disposable
 import dev.supergrecko.kllvm.internal.contracts.Validatable
 import dev.supergrecko.kllvm.internal.util.fromLLVMBool
@@ -19,8 +20,8 @@ import org.bytedeco.llvm.global.LLVM
  * create a context. The init block ensures the ref is valid
  */
 public class Context public constructor() : AutoCloseable, Validatable,
-    Disposable {
-    public var ref: LLVMContextRef
+    Disposable, ContainsReference<LLVMContextRef> {
+    public override lateinit var ref: LLVMContextRef
     public override var valid: Boolean = true
 
     init {

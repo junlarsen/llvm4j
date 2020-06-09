@@ -1,12 +1,14 @@
 package dev.supergrecko.kllvm.ir
 
+import dev.supergrecko.kllvm.internal.contracts.ContainsReference
 import dev.supergrecko.kllvm.internal.util.wrap
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMNamedMDNodeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class NamedMetadataNode internal constructor() {
-    internal lateinit var ref: LLVMNamedMDNodeRef
+public class NamedMetadataNode internal constructor() :
+    ContainsReference<LLVMNamedMDNodeRef> {
+    public override lateinit var ref: LLVMNamedMDNodeRef
 
     public constructor(node: LLVMNamedMDNodeRef) : this() {
         ref = node
