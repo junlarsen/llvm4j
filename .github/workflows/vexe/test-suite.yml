@@ -1,8 +1,8 @@
-name: Run KLLVM Test Suite
+name: Run "vexe" Test Suite
 on: [push]
 jobs:
   run:
-    name: Run Tests
+    name: Execute Test Suite
     strategy:
       matrix:
         architecture: [x64, x86]
@@ -20,4 +20,4 @@ jobs:
           gradle build --refresh-dependencies
       - name: Run tests
         run: |
-          gradle clean test
+          gradle vexe:test
