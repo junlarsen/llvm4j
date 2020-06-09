@@ -20,4 +20,4 @@ jobs:
           gradle build --refresh-dependencies
       - name: Run tests
         run: |
-          gradle vexe-llvm:test
+          gradle clean vexe-llvm:test
