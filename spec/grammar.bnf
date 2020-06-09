@@ -11,29 +11,32 @@ program
 
 protocol-decl
     ::= 'protocol' identifier '{'
-        (protocol-member (eos protocol-member))?
+        (protocol-member (terminator protocol-member))?
     '}'
 
 protocol-member
     ::= 'expect' identifier '('
         (protocol-member-parameter (',' protocol-member-parameter)* )?
-    ')' type-qualifier eos
+    ')' type-qualifier terminator
 
 protocol-member-parameter
     ::= identifier ':' type-qualifier
 
 package-decl
-    ::= 'package' identifier ('.' identifier)* eos
+    ::= 'package' identifier ('.' identifier)* terminator
 
 import-decl
-    ::= 'import' identifier ('.' identifier)* eos
+    ::= 'import' identifier ('.' identifier)* import-qualifier terminator
+
+import-qualifier
+    ::= '{' (identifier (',' identifier)* )? '}'
 
 struct-decl
     ::= 'struct' ('(' struct-attribute+ ')')? identifier ('('
         (struct-parameter (',' struct-parameter)* )?
     ')')? '{'
-            (struct-member (eos struct-member)* )?
-    '}' | eos
+            (struct-member (terminator struct-member)* )?
+    '}' | terminator
 
 struct-parameter
     ::= identifier ':' struct-parameter-type
@@ -52,7 +55,7 @@ struct-member
 
 impl-decl
     ::= 'impl' identifier ('for' type-qualifier) '{'
-        (impl-member (eos impl-member)* )?
+        (impl-member (terminator impl-member)* )?
     '}'
 
 impl-member
@@ -73,7 +76,7 @@ func-decl
         (func-parameter (',' func-parameter)* )?
     ')' type-qualifier ':' func-attribute+ '{'
         statement*
-    '}' | eos
+    '}' | terminator
 
 func-parameter
     ::= identifier ':' type-qualifier
@@ -110,7 +113,7 @@ statement
     | mut-statement
 
 return-statement
-    ::= 'return' expression eos
+    ::= 'return' expression terminator
 
 for-statement
     ::= 'for' for-statement-specifier? '{'
@@ -133,7 +136,7 @@ if-statement
 
 when-statement
     ::= 'when' expression-list '{'
-        (when-clause (eos when-clause)* )?
+        (when-clause (terminator when-clause)* )?
     '}' ( 'else' '{'
         statement*
     '}' )?
@@ -142,22 +145,22 @@ when-clause
     ::= expression-list '=>' expression
 
 break-statement
-    ::= 'break' eos
+    ::= 'break' terminator
 
 continue-statement
-    ::= 'continue' eos
+    ::= 'continue' terminator
 
 expression-statement
-    ::= expression eos
+    ::= expression terminator
 
 assign-statement
-    ::= expression '=' expression eos
+    ::= expression '=' expression terminator
 
 let-statement
-    ::= 'let' variable-specifier (':' type-qualifier)? '=' expression eos
+    ::= 'let' variable-specifier (':' type-qualifier)? '=' expression terminator
 
 mut-statement
-    ::= 'mut' variable-specifier (':' type-qualifier)? '=' expression eos
+    ::= 'mut' variable-specifier (':' type-qualifier)? '=' expression terminator
 
 variable-specifier
     ::= identifier
@@ -188,7 +191,26 @@ multiplicative-expression
     ::= prefix-expression (multiplicative-operator prefix-expression)*
 
 prefix-expression
-    ::= prefix-operator constructor-expression
+    ::= prefix-operator suffix-expression
+
+suffix-expression
+    ::= dot-suffix
+    | colon-suffix
+    | call-suffix
+
+dot-suffix
+    ::= constructor-expression '.' identifier
+
+colon-suffix
+    ::= constructor-expression '::' identifier
+
+call-suffix
+    ::= constructor-expression '('
+        (call-argument (',' call-argument)* )?
+    ')'
+
+call-argument
+    ::= (identifier ':')? primary-expression
 
 constructor-expression
     ::= type-qualifier '{'
@@ -197,14 +219,6 @@ constructor-expression
 
 constructor-argument
     ::= identifier ':' literal-expression
-
-call-expression
-    ::= primary-expression '('
-        (call-argument (',' call-argument)* )?
-    ')'
-
-call-argument
-    ::= (identifier ':')? primary-expression
 
 primary-expression
     ::= tuple-expression
@@ -239,7 +253,7 @@ if-expression
 
 when-expression
     ::= 'when' expression-list '{'
-        (when-clause (eos when-clause)* )?
+        (when-clause (terminator when-clause)* )?
     '}' ( 'else' '{'
         statement*
     '}' )?
@@ -336,8 +350,8 @@ char-literal
 single-line-comment
     ::= '//' ~[\r\n]*
 
-eos
+terminator
     ::= ( EOF
-    | '\n'
-    | ';'
+        | '\n'
+        | ';'
     )+
