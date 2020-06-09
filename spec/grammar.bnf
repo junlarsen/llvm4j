@@ -6,6 +6,7 @@ program
     | impl-decl
     | enum-decl
     | func-decl
+    | const-decl
     )*
 
 protocol-decl
@@ -82,15 +83,22 @@ func-attribute
     | 'inline'
     | 'ffi'
 
-enum-decl ::= 'enum' ('(' enum-attribute+ ')')? identifier '{'
+enum-decl
+    ::= 'enum' ('(' enum-attribute+ ')')? identifier '{'
         (enum-member (',' enum-member)* )?
     '}'
 
-enum-attribute ::= 'ffi'
+enum-attribute
+    ::= 'ffi'
 
-enum-member ::= identifier ('=' integer-literal)?
+enum-member
+    ::= identifier ('=' integer-literal)?
 
-statement ::= return-statement
+const-decl
+    ::= 'const' identifier (':' type-qualifier)? '=' expression
+
+statement
+    ::= return-statement
     | for-statement
     | if-statement
     | when-statement
@@ -146,10 +154,10 @@ assign-statement
     ::= expression '=' expression eos
 
 let-statement
-    ::= 'let' variable-specifier '=' expression eos
+    ::= 'let' variable-specifier (':' type-qualifier)? '=' expression eos
 
 mut-statement
-    ::= 'mut' variable-specifier '=' expression eos
+    ::= 'mut' variable-specifier (':' type-qualifier)? '=' expression eos
 
 variable-specifier
     ::= identifier
@@ -282,6 +290,7 @@ type-type-qualifier
 reference-type-qualifier
     ::= type-type-qualifier '&'
 
+// type: Array::<3, Int>
 template-type-qualifier
     ::= type-type-qualifier '::<'
         template-type-item (',' template-type-item'')*
