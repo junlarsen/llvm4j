@@ -5,7 +5,7 @@ import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.ir.Type
 import dev.supergrecko.vexe.llvm.ir.Value
-import dev.supergrecko.vexe.llvm.ir.instructions.Opcode
+import dev.supergrecko.vexe.llvm.ir.Opcode
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 

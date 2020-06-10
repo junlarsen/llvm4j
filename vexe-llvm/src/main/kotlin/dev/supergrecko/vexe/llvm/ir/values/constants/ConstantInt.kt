@@ -3,7 +3,7 @@ package dev.supergrecko.vexe.llvm.ir.values.constants
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.ir.Value
-import dev.supergrecko.vexe.llvm.ir.instructions.IntPredicate
+import dev.supergrecko.vexe.llvm.ir.IntPredicate
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType

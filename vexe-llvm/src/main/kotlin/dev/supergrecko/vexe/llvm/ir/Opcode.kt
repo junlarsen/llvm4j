@@ -1,4 +1,4 @@
-package dev.supergrecko.vexe.llvm.ir.instructions
+package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM

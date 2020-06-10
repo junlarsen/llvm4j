@@ -1,7 +1,7 @@
 package dev.supergrecko.vexe.llvm.unit.ir.values.constants
 
 import dev.supergrecko.vexe.llvm.ir.TypeKind
-import dev.supergrecko.vexe.llvm.ir.instructions.IntPredicate
+import dev.supergrecko.vexe.llvm.ir.IntPredicate
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType

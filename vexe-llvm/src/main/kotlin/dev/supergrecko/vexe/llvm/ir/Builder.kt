@@ -3,9 +3,6 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
-import dev.supergrecko.vexe.llvm.ir.instructions.Instruction
-import dev.supergrecko.vexe.llvm.ir.instructions.IntPredicate
-import dev.supergrecko.vexe.llvm.ir.instructions.Opcode
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef

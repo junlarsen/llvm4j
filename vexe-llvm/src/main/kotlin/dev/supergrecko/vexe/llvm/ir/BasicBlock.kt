@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.internal.util.wrap
-import dev.supergrecko.vexe.llvm.ir.instructions.Instruction
 import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
 import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.global.LLVM

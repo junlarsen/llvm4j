@@ -5,7 +5,6 @@ import dev.supergrecko.vexe.llvm.internal.contracts.OrderedEnum
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.wrap
-import dev.supergrecko.vexe.llvm.ir.instructions.Instruction
 import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
 import dev.supergrecko.vexe.llvm.ir.values.GenericValue
 import dev.supergrecko.vexe.llvm.ir.values.GlobalValue
@@ -263,7 +262,8 @@ public open class Value internal constructor() :
     public fun asFunctionValue() = FunctionValue(ref)
     public fun asGenericValue() = GenericValue(ref)
     public fun asGlobalValue() = GlobalValue(ref)
-    public fun asInstructionValue() = Instruction(ref)
+    public fun asInstructionValue() =
+        Instruction(ref)
     public fun asIntValue() = ConstantInt(ref)
     public fun asMetadataValue() = MetadataValue(ref)
     public fun asPhiValue() = PhiValue(ref)
