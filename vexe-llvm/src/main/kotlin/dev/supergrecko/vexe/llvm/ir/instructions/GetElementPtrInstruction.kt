@@ -6,7 +6,7 @@ import dev.supergrecko.vexe.llvm.ir.Instruction
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class GetElementPointerInstruction internal constructor() :
+public class GetElementPtrInstruction internal constructor() :
     Instruction() {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
