@@ -2,9 +2,14 @@ package dev.supergrecko.vexe.llvm.ir.instructions
 
 import dev.supergrecko.vexe.llvm.ir.Instruction
 import dev.supergrecko.vexe.llvm.ir.Type
+import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class AllocaInstruction : Instruction() {
+public class AllocaInstruction internal constructor(): Instruction() {
+    public constructor(llvmValue: LLVMValueRef) : this() {
+        ref = llvmValue
+    }
+
     //region Core::Instructions::Allocas
     /**
      * Get the type this alloca instruction is allocating
