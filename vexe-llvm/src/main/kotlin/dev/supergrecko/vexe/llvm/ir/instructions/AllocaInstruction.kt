@@ -5,7 +5,7 @@ import dev.supergrecko.vexe.llvm.ir.Type
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class AllocaInstruction internal constructor() : Instruction() {
+public class AllocaInstruction internal constructor(): Instruction() {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }
