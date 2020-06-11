@@ -23,9 +23,8 @@ public class PHIInstruction internal constructor() : Instruction() {
     public fun addIncoming(values: List<Value>, blocks: List<BasicBlock>) {
         require(values.size == blocks.size)
 
-        val size = values.size.toLong()
-        val valuePtr = PointerPointer<LLVMValueRef>(size)
-        val blockPtr = PointerPointer<LLVMBasicBlockRef>(size)
+        val valuePtr = PointerPointer(*values.map { it.ref }.toTypedArray())
+        val blockPtr = PointerPointer(*blocks.map { it.ref }.toTypedArray())
 
         values.mapIndexed { i, v -> valuePtr.put(i.toLong(), v.ref) }
         blocks.mapIndexed { i, v -> blockPtr.put(i.toLong(), v.ref) }
