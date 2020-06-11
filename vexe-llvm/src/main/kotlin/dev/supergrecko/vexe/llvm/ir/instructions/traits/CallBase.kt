@@ -167,7 +167,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
      *
      * @see LLVM.LLVMGetCallSiteStringAttribute
      */
-    public fun getStringAttribute(index: Int, kind: String) : Attribute? {
+    public fun getStringAttribute(index: Int, kind: String): Attribute? {
         val strlen = kind.length
         val attr = LLVM.LLVMGetCallSiteStringAttribute(ref, index, kind, strlen)
 

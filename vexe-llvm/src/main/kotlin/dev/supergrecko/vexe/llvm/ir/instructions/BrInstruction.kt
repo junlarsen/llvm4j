@@ -6,7 +6,7 @@ import dev.supergrecko.vexe.llvm.ir.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class BranchInstruction internal constructor() :
+public class BrInstruction internal constructor() :
     Instruction() {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue

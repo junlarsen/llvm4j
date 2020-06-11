@@ -1,9 +1,7 @@
 package dev.supergrecko.vexe.llvm.ir.instructions
 
-import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
-import dev.supergrecko.vexe.llvm.ir.CallConvention
 import dev.supergrecko.vexe.llvm.ir.Instruction
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.instructions.traits.CallBase

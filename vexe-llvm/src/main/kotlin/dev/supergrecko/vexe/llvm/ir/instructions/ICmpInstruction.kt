@@ -6,7 +6,6 @@ import dev.supergrecko.vexe.llvm.ir.IntPredicate
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-
 public class ICmpInstruction internal constructor() :
     Instruction() {
     public constructor(llvmValue: LLVMValueRef) : this() {
