@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.ir.instructions
 import dev.supergrecko.vexe.llvm.internal.util.map
 import dev.supergrecko.vexe.llvm.ir.BasicBlock
 import dev.supergrecko.vexe.llvm.ir.Instruction
-import dev.supergrecko.vexe.llvm.ir.Value
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
