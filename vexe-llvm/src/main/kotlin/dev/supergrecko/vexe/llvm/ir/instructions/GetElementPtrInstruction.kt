@@ -31,4 +31,15 @@ public class GetElementPtrInstruction internal constructor() :
         LLVM.LLVMSetIsInBounds(ref, inBounds.toLLVMBool())
     }
     //endregion Core::Instructions::GEPs
+
+    //region Core::Instructions::InsertValue
+    /**
+     * Obtain the number of indices
+     *
+     * @see LLVM.LLVMGetNumIndices
+     */
+    public fun getIndicesCount(): Int {
+        return LLVM.LLVMGetNumIndices(ref)
+    }
+    //endregion Core::Instructions::InsertValue
 }
