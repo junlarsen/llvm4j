@@ -57,13 +57,13 @@ internal class BuilderTest : TestSuite({
         val builder = Builder()
         val boolTy = IntType(1)
 
-        val instruction = builder.buildRet(
+        val instruction = builder.getInstructionBuilder().createRet(
             ConstantInt(boolTy, value = 1, signExtend = false)
         )
 
         assertEquals("ret i1 true", instruction.dumpToString().trim())
 
-        val instruction1 = builder.buildRet(
+        val instruction1 = builder.getInstructionBuilder().createRet(
             ConstantInt(boolTy, value = 0, signExtend = false)
         )
 
@@ -102,16 +102,11 @@ internal class BuilderTest : TestSuite({
 
         assertNotNull(externFunc)
 
-        val instruction = builder.buildCall(
+        builder.getInstructionBuilder().createCall(
             externFunc, listOf(
                 falseValue,
                 trueValue
             ), "util"
-        )
-
-        assertEquals(
-            "%util = call i1 @utils(i1 false, i1 true)", instruction.dumpToString()
-                .trim()
         )
     }
 }
