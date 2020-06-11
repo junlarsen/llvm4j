@@ -167,4 +167,42 @@ public open class Instruction internal constructor() : Value(),
         return inst != null
     }
     //endregion Core::Instructions
+
+    //region Core::Instructions::Terminators
+    /**
+     * Get the number of successors that this terminator has
+     *
+     * @see LLVM.LLVMGetNumSuccessors
+     */
+    public fun getSuccessorCount(): Int {
+        require(isTerminator())
+
+        return LLVM.LLVMGetNumSuccessors(ref)
+    }
+
+    /**
+     * Get a successor at [index]
+     *
+     * @see LLVM.LLVMGetSuccessor
+     */
+    public fun getSuccessor(index: Int): BasicBlock? {
+        require(isTerminator())
+        require(index < getSuccessorCount())
+
+        val bb = LLVM.LLVMGetSuccessor(ref, index)
+
+        return wrap(bb) { BasicBlock(it) }
+    }
+
+    /**
+     * Set a successor at [index]
+     *
+     * @see LLVM.LLVMSetSuccessor
+     */
+    public fun setSuccessor(index: Int, block: BasicBlock) {
+        require(isTerminator())
+
+        LLVM.LLVMSetSuccessor(ref, index, block.ref)
+    }
+    //endregion Core::Instructions::Terminators
 }
