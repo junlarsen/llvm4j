@@ -53,25 +53,6 @@ internal class BuilderTest : TestSuite({
         }
     }
 
-    describe("Creation of return instruction") {
-        val builder = Builder()
-        val boolTy = IntType(1)
-
-        val instruction = builder.getInstructionBuilder().createRet(
-            ConstantInt(boolTy, value = 1, signExtend = false)
-        )
-
-        assertEquals("ret i1 true", instruction.dumpToString().trim())
-
-        val instruction1 = builder.getInstructionBuilder().createRet(
-            ConstantInt(boolTy, value = 0, signExtend = false)
-        )
-
-        assertEquals("ret i1 false", instruction1.dumpToString().trim())
-
-        cleanup(builder)
-    }
-
     describe("Creation of call instruction") {
         val boolType = IntType(1)
         val module = Module("utils.ll").apply {
