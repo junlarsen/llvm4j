@@ -153,13 +153,10 @@ public class Builder public constructor(
          * return value one value at a time, and a ret instruction to return
          * the resulting aggregate value.
          *
-<<<<<<< HEAD
          * For this call to work, the builder must be placed inside a
          * function as it verifies the return type with the aggregate values.
          * Failing to fulfill this requirement crashes the JVM
          *
-=======
->>>>>>> [llvm] Create instruction builder
          * @see LLVM.LLVMBuildAggregateRet
          */
         public fun createAggregateRet(
