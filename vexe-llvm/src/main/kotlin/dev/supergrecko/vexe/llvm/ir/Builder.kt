@@ -3,6 +3,7 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
+import dev.supergrecko.vexe.llvm.ir.instructions.AddInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AllocaInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.BrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CallInstruction
@@ -12,14 +13,22 @@ import dev.supergrecko.vexe.llvm.ir.instructions.CatchSwitchInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CleanupPadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CleanupRetInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.ExtractValueInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FAddInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FDivInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FMulInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FSubInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.IndirectBrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.InvokeInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LandingPadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LoadInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.MulInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.ResumeInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.RetInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.SDivInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.StoreInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.SubInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SwitchInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.UDivInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.UnreachableInstruction
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
@@ -470,6 +479,218 @@ public class Builder public constructor(
             )
 
             return CatchSwitchInstruction(inst)
+        }
+
+        /**
+         * Build an add instruction
+         *
+         * Add returns the sum of two integers or vectors of integers, [lhs]
+         * and [rhs]. You can apply the [nuw] and [nsw] flags via the [nuw] and
+         * [nsw] arguments
+         *
+         * The result is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildAdd
+         */
+        public fun createAdd(
+            lhs: Value,
+            rhs: Value,
+            variable: String,
+            nsw: Boolean = false,
+            nuw: Boolean = false
+        ): AddInstruction {
+            require(!(nsw && nuw)) { "Instruction can not declare both NUW & " +
+                    "NSW" }
+
+            val inst = when {
+                nsw -> LLVM.LLVMBuildNSWAdd(ref, lhs.ref, rhs.ref, variable)
+                nuw -> LLVM.LLVMBuildNUWAdd(ref, lhs.ref, rhs.ref, variable)
+                else -> LLVM.LLVMBuildAdd(ref, lhs.ref, rhs.ref, variable)
+            }
+
+            return AddInstruction(inst)
+        }
+
+        /**
+         * Build a fadd instruction
+         *
+         * Fadd returns the sum of two floats or vectors of floats. The
+         * result is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildFAdd
+         */
+        public fun createFAdd(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): FAddInstruction {
+            val inst = LLVM.LLVMBuildFAdd(ref, lhs.ref, rhs.ref, variable)
+
+            return FAddInstruction(inst)
+        }
+
+        /**
+         * Build a sub instruction
+         *
+         * Sub returns the difference between two integers or vectors of
+         * integers, [lhs] and [rhs]. You can apply the [nuw] and [nsw] flags
+         * via the [nuw] and [nsw] arguments
+         *
+         * The result is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildSub
+         */
+        public fun createSub(
+            lhs: Value,
+            rhs: Value,
+            variable: String,
+            nsw: Boolean = false,
+            nuw: Boolean = false
+        ): SubInstruction {
+            require(!(nsw && nuw)) { "Instruction can not declare both NUW & " +
+                    "NSW" }
+
+            val inst = when {
+                nsw -> LLVM.LLVMBuildNSWSub(ref, lhs.ref, rhs.ref, variable)
+                nuw -> LLVM.LLVMBuildNUWSub(ref, lhs.ref, rhs.ref, variable)
+                else -> LLVM.LLVMBuildSub(ref, lhs.ref, rhs.ref, variable)
+            }
+
+            return SubInstruction(inst)
+        }
+
+        /**
+         * Build a fsub instruction
+         *
+         * fsub returns the difference of two floats or vectors of floats. The
+         * result is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildFSub
+         */
+        public fun createFSub(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): FSubInstruction {
+            val inst = LLVM.LLVMBuildFSub(ref, lhs.ref, rhs.ref, variable)
+
+            return FSubInstruction(inst)
+        }
+
+        /**
+         * Build a mul instruction
+         *
+         * Mul returns the product of two integers or vectors of integers,
+         * [lhs] and [rhs]. You can apply the [nuw] and [nsw] flags via the
+         * [nuw] and [nsw] arguments
+         *
+         * The result is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildMul
+         */
+        public fun createMul(
+            lhs: Value,
+            rhs: Value,
+            variable: String,
+            nsw: Boolean = false,
+            nuw: Boolean = false
+        ): MulInstruction {
+            require(!(nsw && nuw)) { "Instruction can not declare both NUW & " +
+                    "NSW" }
+
+            val inst = when {
+                nsw -> LLVM.LLVMBuildNSWMul(ref, lhs.ref, rhs.ref, variable)
+                nuw -> LLVM.LLVMBuildNUWMul(ref, lhs.ref, rhs.ref, variable)
+                else -> LLVM.LLVMBuildMul(ref, lhs.ref, rhs.ref, variable)
+            }
+
+            return MulInstruction(inst)
+        }
+
+        /**
+         * Build a fmul instruction
+         *
+         * FMul returns the product of two floats or vectors of floats. The
+         * result is stored in [variable]
+         */
+        public fun createFMul(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): FMulInstruction {
+            val inst = LLVM.LLVMBuildMul(ref, lhs.ref, rhs.ref, variable)
+
+            return FMulInstruction(inst)
+        }
+
+        /**
+         * Build a sdiv instruction
+         *
+         * Sdiv returns the signed integer quotient of [lhs] and [rhs]. If
+         * [exact] is applied and [lhs] is not an exact multiple of [rhs], a
+         * poison value will be returned.
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildSDiv
+         */
+        public fun createSDiv(
+            lhs: Value,
+            rhs: Value,
+            variable: String,
+            exact: Boolean = false
+        ): SDivInstruction {
+            val inst = if (exact) {
+                LLVM.LLVMBuildExactSDiv(ref, lhs.ref, rhs.ref, variable)
+            } else {
+                LLVM.LLVMBuildSDiv(ref, lhs.ref, rhs.ref, variable)
+            }
+
+            return SDivInstruction(inst)
+        }
+
+        /**
+         * Build an udiv instruction
+         *
+         * Udiv returns the unsigned integer quotient of [lhs] and [rhs]. If
+         * [exact] is applied and [lhs] is not an exact multiple of [rhs], a
+         * poison value will be returned.
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildUDiv
+         */
+        public fun createUDiv(
+            lhs: Value,
+            rhs: Value,
+            variable: String,
+            exact: Boolean = false
+        ): UDivInstruction {
+            val inst = if(exact) {
+                LLVM.LLVMBuildExactUDiv(ref, lhs.ref, rhs.ref, variable)
+            } else {
+                LLVM.LLVMBuildUDiv(ref, lhs.ref, rhs.ref, variable)
+            }
+
+            return UDivInstruction(inst)
+        }
+
+        /**
+         * Build a fdiv instruction
+         *
+         * Fdiv returns the floating point quotient of [lhs] and [rhs]. The
+         * returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildFDiv
+         */
+        public fun createFDiv(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): FDivInstruction {
+            val inst = LLVM.LLVMBuildFDiv(ref, lhs.ref, rhs.ref, variable)
+
+            return FDivInstruction(inst)
         }
 
         /**
