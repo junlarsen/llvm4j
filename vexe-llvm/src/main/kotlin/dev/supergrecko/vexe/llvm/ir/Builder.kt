@@ -6,6 +6,11 @@ import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.ir.instructions.AllocaInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.BrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CallInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.CatchPadInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.CatchRetInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.CatchSwitchInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.CleanupPadInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.CleanupRetInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.ExtractValueInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.IndirectBrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.InvokeInstruction
@@ -305,7 +310,7 @@ public class Builder public constructor(
         }
 
         /**
-         * Create a landing pad instruction
+         * Build a landing pad instruction
          *
          * A landing pad is a catch clause for LLVM's exception handling
          * system. The result of the landingpad is stored in [variable]
@@ -329,6 +334,142 @@ public class Builder public constructor(
             )
 
             return LandingPadInstruction(inst)
+        }
+
+        /**
+         * Build a cleanup return instruction
+         *
+         * A cleanup ret exits an existing cleanup pad instruction, namely
+         * [cleanup]. It also has an optional [successor] which will be the
+         * basic block to move to after. This must begin with either a
+         * cleanuppad or a catchswitch instruction
+         *
+         * @see LLVM.LLVMBuildCleanupRet
+         */
+        public fun createCleanupRet(
+            cleanup: CleanupPadInstruction,
+            successor: BasicBlock? = null
+        ): CleanupRetInstruction {
+            val inst = LLVM.LLVMBuildCleanupRet(
+                ref,
+                cleanup.ref,
+                successor?.ref
+            )
+
+            return CleanupRetInstruction(inst)
+        }
+
+        /**
+         * Build a catch return instruction
+         *
+         * Catch ret ends and existing in-flight exception whose unwinding
+         * was interuppted with a [catchpad] instruction. gets a chance to
+         * execute arbitrary code to, for example, destroy the active
+         * exception. Control then transfers to [successor].
+         *
+         * @see LLVM.LLVMBuildCatchRet
+         */
+        public fun createCatchRet(
+            catchpad: CatchPadInstruction,
+            successor: BasicBlock
+        ): CatchRetInstruction {
+            val inst = LLVM.LLVMBuildCatchRet(ref, catchpad.ref, successor.ref)
+
+            return CatchRetInstruction(inst)
+        }
+
+        /**
+         * Build a catch pad instruction
+         *
+         * The [parent] operand must always be a token produced by a
+         * catchswitch instruction in a predecessor block. This ensures that
+         * each catchpad has exactly one predecessor block, and it always
+         * terminates in a catchswitch.
+         *
+         * The [arguments] correspond to whatever information the personality
+         * routine requires to know if this is an appropriate handler for the
+         * exception. Control will transfer to the catchpad if this is the
+         * first appropriate handler for the exception.
+         *
+         * The [variable] has the type token and is used to match the catchpad
+         * to corresponding catchrets and other nested exception handling pads.
+         *
+         * @see LLVM.LLVMBuildCatchPad
+         */
+        public fun createCatchPad(
+            parent: Value,
+            arguments: List<Value>,
+            variable: String
+        ): CatchPadInstruction {
+            val args = PointerPointer(*arguments.map { it.ref }.toTypedArray())
+            val inst = LLVM.LLVMBuildCatchPad(
+                ref,
+                parent.ref,
+                args,
+                arguments.size,
+                variable
+            )
+
+            return CatchPadInstruction(inst)
+        }
+
+        /**
+         * Build a cleanup pad instruction
+         *
+         * A cleanup pad specifies that a basic block is a cleanup block.
+         *
+         * The [arguments] correspond to whatever additional information the
+         * personality function requires to execute the cleanup.
+         *
+         * The [variable] has the type token and is used to match the cleanuppad
+         * to corresponding cleanuprets.
+         *
+         * @see LLVM.LLVMBuildCleanupPad
+         */
+        public fun createCleanupPad(
+            parent: Value,
+            arguments: List<Value>,
+            variable: String
+        ): CleanupPadInstruction {
+            val args = PointerPointer(*arguments.map { it.ref }.toTypedArray())
+            val inst = LLVM.LLVMBuildCleanupPad(
+                ref,
+                parent.ref,
+                args,
+                arguments.size,
+                variable
+            )
+
+            return CleanupPadInstruction(inst)
+        }
+
+        /**
+         * Build a catch switch instruction
+         *
+         * The catch switch is used to describe a set of exception handlers.
+         * The [unwind] argument is another basic block which begins with
+         * either a cleanuppad or a catchswitch.
+         *
+         * [handlers] is the amount added handlers expected. Handlers
+         * are added on the returned instruction
+         *
+         * @see LLVM.LLVMBuildCatchSwitch
+         */
+        public fun createCatchSwitch(
+            parent: Value,
+            unwind: BasicBlock,
+            handlers: Int = 10,
+            variable: String
+        ): CatchSwitchInstruction {
+            val inst = LLVM.LLVMBuildCatchSwitch(
+                ref,
+                parent.ref,
+                unwind.ref,
+                handlers,
+                variable
+            )
+
+            return CatchSwitchInstruction(inst)
         }
 
         /**
