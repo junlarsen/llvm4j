@@ -7,15 +7,14 @@ import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
-import org.junit.jupiter.api.Test
+import dev.supergrecko.vexe.llvm.utils.cleanup
+import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-internal class RetInstructionTest : VexeLLVMTestCase() {
-    @Test
-    fun `Creation of ret void instruction`() {
+internal class RetInstructionTest : TestSuite({
+    describe("Creation of ret void instruction") {
         val builder = Builder()
         val inst = builder
             .getInstructionBuilder()
@@ -27,8 +26,7 @@ internal class RetInstructionTest : VexeLLVMTestCase() {
         cleanup(builder)
     }
 
-    @Test
-    fun `Creation of ret i32 0 instruction`() {
+    describe("Creation of ret i32 0 instruction") {
         val builder = Builder()
         val value = ConstantInt(IntType(32), 0)
         val inst = builder
@@ -41,8 +39,7 @@ internal class RetInstructionTest : VexeLLVMTestCase() {
         cleanup(builder)
     }
 
-    @Test
-    fun `Creation of aggregate ret`() {
+    describe("Creation of aggregate ret") {
         val module = Module("test.ll")
         val function = module.addFunction("test", FunctionType(
             StructType(listOf(IntType(1), IntType(1)), false),
@@ -65,4 +62,4 @@ internal class RetInstructionTest : VexeLLVMTestCase() {
 
         cleanup(builder, module)
     }
-}
+})
