@@ -258,41 +258,6 @@ public class Builder public constructor(
         }
 
         /**
-         * Build an invoke instruction
-         *
-         * Invoke moves control to the target [function] and continues with
-         * either a [normal] or a [catch] label. If the [function] returns,
-         * then control is moved to [normal]. If the callee, or any indirect
-         * callees returns via resume then control is moved to [catch].
-         *
-         * If the callee did return, it will be moved into [variable]
-         *
-         * @see LLVM.LLVMBuildInvoke2
-         */
-        public fun createInvoke(
-            functionType: FunctionType,
-            function: FunctionValue,
-            arguments: List<Value>,
-            normal: BasicBlock,
-            catch: BasicBlock,
-            variable: String
-        ): InvokeInstruction {
-            val args = PointerPointer(*arguments.map { it.ref }.toTypedArray())
-            val inst = LLVM.LLVMBuildInvoke2(
-                ref,
-                functionType.ref,
-                function.ref,
-                args,
-                arguments.size,
-                normal.ref,
-                catch.ref,
-                variable
-            )
-
-            return InvokeInstruction(inst)
-        }
-
-        /**
          * Build an unreachable instruction
          *
          * Unreachable instructions inform the optimizer that code below the
@@ -724,6 +689,41 @@ public class Builder public constructor(
             )
 
             return CallInstruction(inst)
+        }
+
+        /**
+         * Build an invoke instruction
+         *
+         * Invoke moves control to the target [function] and continues with
+         * either a [normal] or a [catch] label. If the [function] returns,
+         * then control is moved to [normal]. If the callee, or any indirect
+         * callees returns via resume then control is moved to [catch].
+         *
+         * If the callee did return, it will be moved into [variable]
+         *
+         * @see LLVM.LLVMBuildInvoke2
+         */
+        public fun createInvoke(
+            functionType: FunctionType,
+            function: FunctionValue,
+            arguments: List<Value>,
+            normal: BasicBlock,
+            catch: BasicBlock,
+            variable: String
+        ): InvokeInstruction {
+            val args = PointerPointer(*arguments.map { it.ref }.toTypedArray())
+            val inst = LLVM.LLVMBuildInvoke2(
+                ref,
+                functionType.ref,
+                function.ref,
+                args,
+                arguments.size,
+                normal.ref,
+                catch.ref,
+                variable
+            )
+
+            return InvokeInstruction(inst)
         }
 
         /**
