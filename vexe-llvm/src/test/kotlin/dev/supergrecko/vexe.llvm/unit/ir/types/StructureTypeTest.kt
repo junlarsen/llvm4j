@@ -4,12 +4,12 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
-import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class StructureTypeTest : VexeLLVMTestCase() {
+internal class StructureTypeTest : TestSuite() {
     @Test
     fun `Creation from user-land constructor`() {
         val type = StructType(listOf(), false)

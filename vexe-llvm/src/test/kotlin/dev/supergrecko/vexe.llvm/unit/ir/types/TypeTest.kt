@@ -2,12 +2,12 @@ package dev.supergrecko.vexe.llvm.unit.ir.types
 
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import org.junit.jupiter.api.Test
 
-internal class TypeTest : VexeLLVMTestCase() {
+internal class TypeTest : TestSuite() {
     @Test
     fun `Casting into the same type will work`() {
         val type = IntType(32)

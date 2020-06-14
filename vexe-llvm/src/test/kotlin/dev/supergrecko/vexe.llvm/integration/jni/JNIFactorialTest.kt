@@ -1,6 +1,6 @@
 package dev.supergrecko.vexe.llvm.integration.jni
 
-import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.TestSuite
 import kotlin.system.exitProcess
 import kotlin.test.assertEquals
 import org.bytedeco.javacpp.BytePointer
@@ -10,7 +10,7 @@ import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
 
-internal class JNIFactorialTest : VexeLLVMTestCase() {
+internal class JNIFactorialTest : TestSuite() {
     @Test
     fun `Factorial example from bytedeco`() {
         val error = BytePointer(null as Pointer?)

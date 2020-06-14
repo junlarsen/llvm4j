@@ -2,11 +2,11 @@ package dev.supergrecko.vexe.llvm.unit.internal
 
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
-import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.TestSuite
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 
-internal class ConversionsTest : VexeLLVMTestCase() {
+internal class ConversionsTest : TestSuite() {
     @Test
     fun `Conversion from Int to Bool via extension`() {
         assertEquals(true, 1.fromLLVMBool())

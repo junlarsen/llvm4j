@@ -2,11 +2,11 @@ package dev.supergrecko.vexe.llvm.unit.ir.values
 
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.TestSuite
 import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
 
-internal class GlobalValueTest : VexeLLVMTestCase() {
+internal class GlobalValueTest : TestSuite() {
     @Test
     fun `Fetching the module from a global works`() {
         val module = Module("utils.ll").apply {
