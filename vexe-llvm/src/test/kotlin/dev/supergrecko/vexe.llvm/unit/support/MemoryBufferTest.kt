@@ -3,14 +3,14 @@ package dev.supergrecko.vexe.llvm.unit.support
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.support.MemoryBuffer
-import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.TestSuite
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import org.junit.jupiter.api.Test
 
-internal class MemoryBufferTest : VexeLLVMTestCase() {
+internal class MemoryBufferTest : TestSuite() {
     @Test
     fun `The buffer byte-code starts with B for BC`() {
         val context = Context()

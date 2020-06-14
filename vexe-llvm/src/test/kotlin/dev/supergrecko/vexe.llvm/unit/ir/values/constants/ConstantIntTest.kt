@@ -6,7 +6,7 @@ import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.TestSuite
 import dev.supergrecko.vexe.llvm.utils.constIntPairOf
 import dev.supergrecko.vexe.llvm.utils.runAll
 import java.lang.IllegalArgumentException
@@ -16,7 +16,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class ConstantIntTest : VexeLLVMTestCase() {
+internal class ConstantIntTest : TestSuite() {
     @Test
     fun `Creation via user-land words constructor`() {
         val ty = IntType(32)

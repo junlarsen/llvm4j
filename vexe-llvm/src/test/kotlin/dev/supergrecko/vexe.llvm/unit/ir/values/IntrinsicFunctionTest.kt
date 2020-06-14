@@ -6,13 +6,13 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VectorType
 import dev.supergrecko.vexe.llvm.ir.values.IntrinsicFunction
-import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class IntrinsicFunctionTest : VexeLLVMTestCase() {
+internal class IntrinsicFunctionTest : TestSuite() {
     @Test
     fun `Search for intrinsic function`() {
         val intrinsic = IntrinsicFunction("llvm.va_start")

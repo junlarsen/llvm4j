@@ -1,7 +1,7 @@
 package dev.supergrecko.vexe.llvm.unit.ir
 
 import dev.supergrecko.vexe.llvm.ir.Context
-import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.TestSuite
 import dev.supergrecko.vexe.llvm.utils.runAll
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -11,7 +11,7 @@ import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticInfoRef
 import org.junit.jupiter.api.Test
 
-internal class ContextTest : VexeLLVMTestCase() {
+internal class ContextTest : TestSuite() {
     @Test
     fun `Attempting to dispose twice fails`() {
         val ctx = Context()
