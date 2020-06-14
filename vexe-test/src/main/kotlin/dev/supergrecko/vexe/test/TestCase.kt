@@ -1,6 +1,7 @@
 package dev.supergrecko.vexe.test
 
 import java.io.File
+import org.junit.jupiter.api.AfterEach
 
 public class TestCase(
     public val name: String,

@@ -635,7 +635,7 @@ public class Builder public constructor(
             variable: String,
             exact: Boolean = false
         ): UDivInstruction {
-            val inst = if(exact) {
+            val inst = if (exact) {
                 LLVM.LLVMBuildExactUDiv(ref, lhs.ref, rhs.ref, variable)
             } else {
                 LLVM.LLVMBuildUDiv(ref, lhs.ref, rhs.ref, variable)

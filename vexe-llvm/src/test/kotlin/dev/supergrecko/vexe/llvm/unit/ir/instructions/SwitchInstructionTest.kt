@@ -6,10 +6,10 @@ import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.VexeLLVMTestCase
+import dev.supergrecko.vexe.llvm.utils.TestSuite
 import org.junit.jupiter.api.Test
 
-internal class SwitchInstructionTest : VexeLLVMTestCase() {
+internal class SwitchInstructionTest : TestSuite() {
     @Test
     fun `Assigning same block to two conditions`() {
         val module = Module("test.ll")
