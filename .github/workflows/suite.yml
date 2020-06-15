@@ -1,4 +1,4 @@
-name: Run "vexe" Test Suite
+name: All Vexe Test Suites
 on: [push]
 jobs:
   run:
@@ -6,7 +6,7 @@ jobs:
     strategy:
       matrix:
         architecture: [x64, x86]
-        operating-system: [macos-latest, windows-latest, ubuntu-latest, ubuntu-16.04]
+        operating-system: [macos-latest, windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v1
@@ -17,7 +17,7 @@ jobs:
           architecture: ${{ matrix.architecture }}
       - name: Install LLVM
         run: |
-          gradle build --refresh-dependencies
+          gradle clean build --refresh-dependencies
       - name: Run tests
         run: |
           gradle clean vexe:test
