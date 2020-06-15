@@ -6,36 +6,32 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VectorType
 import dev.supergrecko.vexe.llvm.ir.values.IntrinsicFunction
-import dev.supergrecko.vexe.llvm.utils.TestSuite
+import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class IntrinsicFunctionTest : TestSuite() {
-    @Test
-    fun `Search for intrinsic function`() {
+internal class IntrinsicFunctionTest : TestSuite({
+    describe("Search for intrinsic function") {
         val intrinsic = IntrinsicFunction("llvm.va_start")
 
         assertTrue { intrinsic.exists() }
     }
 
-    @Test
-    fun `Invalid intrinsic name fails`() {
+    describe("Invalid intrinsic name fails") {
         assertFailsWith<IllegalArgumentException> {
             IntrinsicFunction("not.a.valid.intrinsic")
         }
     }
 
-    @Test
-    fun `Search for overloaded intrinsic`() {
+    describe("Search for overloaded intrinsic") {
         val intrinsic = IntrinsicFunction("llvm.ctpop")
 
         assertTrue { intrinsic.isOverloaded() }
     }
 
-    @Test
-    fun `Get name by overloaded intrinsic's arguments`() {
+    describe("Get name by overloaded intrinsic's arguments") {
         val ty = VectorType(IntType(8), 4)
         val intrinsic = IntrinsicFunction("llvm.ctpop")
 
@@ -44,15 +40,13 @@ internal class IntrinsicFunctionTest : TestSuite() {
         assertEquals("llvm.ctpop.v4i8", overloaded)
     }
 
-    @Test
-    fun `Intrinsic name matches getter`() {
+    describe("Intrinsic name matches getter") {
         val intrinsic = IntrinsicFunction("llvm.va_start")
 
         assertEquals("llvm.va_start", intrinsic.getName())
     }
 
-    @Test
-    fun `Function declaration can be retrieved from intrinsic`() {
+    describe("Function declaration can be retrieved from intrinsic") {
         val ty = VectorType(IntType(8), 4)
         val intrinsic = IntrinsicFunction("llvm.ctpop")
         val mod = Module("utils.ll")
@@ -61,8 +55,7 @@ internal class IntrinsicFunctionTest : TestSuite() {
         assertTrue { fn.getIntrinsicId() == intrinsic.id }
     }
 
-    @Test
-    fun `Function type can be retrieved from intrinsic`() {
+    describe("Function type can be retrieved from intrinsic") {
         val intrinsic = IntrinsicFunction("llvm.va_start")
         val args = listOf(IntType(8).toPointerType())
         val types = intrinsic.getType(Context.getGlobalContext(), args)
@@ -72,4 +65,4 @@ internal class IntrinsicFunctionTest : TestSuite() {
             TypeKind.Pointer, types.getParameterTypes().first().getTypeKind()
         )
     }
-}
+})

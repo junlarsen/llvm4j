@@ -1,7 +1,9 @@
 package dev.supergrecko.vexe.llvm.utils
 
+import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
+import dev.supergrecko.vexe.test.TestCase
 
 internal fun constIntPairOf(x: Int, y: Int): Pair<ConstantInt, ConstantInt> {
     val ty = IntType(32)
@@ -16,4 +18,8 @@ internal fun <T> runAll(
     for ((k, v) in subjects.withIndex()) {
         handler(v, k)
     }
+}
+
+internal fun TestCase.cleanup(vararg item: Disposable) {
+    item.forEach { it.dispose() }
 }

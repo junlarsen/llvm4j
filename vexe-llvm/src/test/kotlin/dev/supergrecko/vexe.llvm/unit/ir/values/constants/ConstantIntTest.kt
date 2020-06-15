@@ -6,9 +6,9 @@ import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.TestSuite
 import dev.supergrecko.vexe.llvm.utils.constIntPairOf
 import dev.supergrecko.vexe.llvm.utils.runAll
+import dev.supergrecko.vexe.test.TestSuite
 import java.lang.IllegalArgumentException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -16,17 +16,15 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class ConstantIntTest : TestSuite() {
-    @Test
-    fun `Creation via user-land words constructor`() {
+internal class ConstantIntTest : TestSuite({
+    describe("Creation via user-land words constructor") {
         val ty = IntType(32)
         val value = ConstantInt(ty, listOf(100L, 20L))
 
         assertEquals(100, value.getSignedValue())
     }
 
-    @Test
-    fun `Negating the value`() {
+    describe("Negating the value") {
         val ty = IntType(32)
         val v = ConstantInt(ty, 100)
 
@@ -35,8 +33,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(-100L, neg.getSignedValue())
     }
 
-    @Test
-    fun `Inverting of value`() {
+    describe("Inverting of value") {
         val ty = IntType(32)
         val v = ConstantInt(ty, 100)
 
@@ -45,8 +42,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(-101, not.getSignedValue())
     }
 
-    @Test
-    fun `Addition of two values`() {
+    describe("Addition of two values") {
         val ty = IntType(32)
 
         val v1 = ConstantInt(ty, 100)
@@ -58,8 +54,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(400, sum.getUnsignedValue())
     }
 
-    @Test
-    fun `Subtraction of two values`() {
+    describe("Subtraction of two values") {
         val ty = IntType(32)
 
         val v1 = ConstantInt(ty, 400)
@@ -71,8 +66,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(200, diff.getUnsignedValue())
     }
 
-    @Test
-    fun `Multiplication of two values`() {
+    describe("Multiplication of two values") {
         val ty = IntType(32)
 
         val v1 = ConstantInt(ty, 100)
@@ -84,8 +78,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(1000, product.getUnsignedValue())
     }
 
-    @Test
-    fun `Division of two signed and unsigned`() {
+    describe("Division of two signed and unsigned") {
         val ty = IntType(32)
 
         val v1 = ConstantInt(ty, 100, false)
@@ -102,8 +95,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(10, quotient4.getSignedValue())
     }
 
-    @Test
-    fun `Truncation of floating point result division`() {
+    describe("Truncation of floating point result division") {
         val ty = IntType(32)
 
         // 10 div 3 is not an even number
@@ -121,8 +113,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(3, quotient4.getSignedValue())
     }
 
-    @Test
-    fun `Taking remainder of signed and unsigned value`() {
+    describe("Taking remainder of signed and unsigned value") {
         val ty = IntType(32)
 
         val v1 = ConstantInt(ty, 10, false)
@@ -137,8 +128,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(1, rem2.getSignedValue())
     }
 
-    @Test
-    fun `Bitwise logical and`() {
+    describe("Bitwise logical and") {
         val (lhs, rhs) = constIntPairOf(2, 6)
 
         val res = lhs.and(rhs).getSignedValue()
@@ -146,8 +136,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(2 and 6, res)
     }
 
-    @Test
-    fun `Bitwise logical or`() {
+    describe("Bitwise logical or") {
         val (lhs, rhs) = constIntPairOf(16, 92)
 
         val res = lhs.or(rhs).getSignedValue()
@@ -155,8 +144,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(16 or 92, res)
     }
 
-    @Test
-    fun `Bitwise logical xor`() {
+    describe("Bitwise logical xor") {
         val (lhs, rhs) = constIntPairOf(100, 200)
 
         val res = lhs.xor(rhs).getSignedValue()
@@ -164,8 +152,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(100 xor 200, res)
     }
 
-    @Test
-    fun `Comparison of two integers`() {
+    describe("Comparison of two integers") {
         val (lhs, rhs) = constIntPairOf(10, 20)
 
         val expected = arrayOf<Long>(
@@ -185,8 +172,7 @@ internal class ConstantIntTest : TestSuite() {
         }
     }
 
-    @Test
-    fun `Bitwise left shift`() {
+    describe("Bitwise left shift") {
         val (lhs, rhs) = constIntPairOf(10, 20)
 
         val res = lhs.shl(rhs).getSignedValue()
@@ -194,8 +180,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(10 shl 20, res)
     }
 
-    @Test
-    fun `Bitwise right shift`() {
+    describe("Bitwise right shift") {
         val (lhs, rhs) = constIntPairOf(10, 20)
 
         val res = lhs.lshr(rhs).getSignedValue()
@@ -203,8 +188,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(10 shr 20, res)
     }
 
-    @Test
-    fun `Bitwise arithmetic right shift`() {
+    describe("Bitwise arithmetic right shift") {
         val (lhs, rhs) = constIntPairOf(10, 20)
 
         val res = lhs.ashr(rhs).getSignedValue()
@@ -212,8 +196,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(10 shr 20, res)
     }
 
-    @Test
-    fun `Truncation to tinier type`() {
+    describe("Truncation to tinier type") {
         val lhs = ConstantInt(IntType(8), 64)
 
         val trunc = lhs.trunc(IntType(1))
@@ -221,8 +204,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(0, trunc.getUnsignedValue())
     }
 
-    @Test
-    fun `Truncation to larger type fails`() {
+    describe("Truncation to larger type fails") {
         val lhs = ConstantInt(IntType(8), 64)
 
         assertFailsWith<IllegalArgumentException> {
@@ -230,8 +212,7 @@ internal class ConstantIntTest : TestSuite() {
         }
     }
 
-    @Test
-    fun `Zero or sign-extend the type`() {
+    describe("Zero or sign-extend the type") {
         val lhs = ConstantInt(IntType(8), 64)
 
         val sext = lhs.sext(IntType(16))
@@ -241,8 +222,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(64, zext.getUnsignedValue())
     }
 
-    @Test
-    fun `Cast to float type`() {
+    describe("Cast to float type") {
         val lhs = ConstantInt(IntType(64), 64)
 
         val si = lhs.sitofp(FloatType(TypeKind.Float))
@@ -254,8 +234,7 @@ internal class ConstantIntTest : TestSuite() {
         assertFalse { si.getDoubleLosesPrecision() }
     }
 
-    @Test
-    fun `Cast to pointer type`() {
+    describe("Cast to pointer type") {
         val ty = IntType(64)
         val lhs = ConstantInt(ty, 100)
         val ptr = lhs.ptrcast(PointerType(ty))
@@ -267,8 +246,7 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(lhs.getSignedValue(), num.getSignedValue())
     }
 
-    @Test
-    fun `Cast to different int type`() {
+    describe("Cast to different int type") {
         val targetTy = IntType(128)
         val lhs = ConstantInt(IntType(32), 100000)
 
@@ -277,15 +255,13 @@ internal class ConstantIntTest : TestSuite() {
         assertEquals(lhs.getSignedValue(), second.getSignedValue())
     }
 
-    @Test
-    fun `Cast to own type does nothing`() {
+    describe("Cast to own type does nothing") {
         val lhs = ConstantInt(IntType(32), 100000)
 
         lhs.intcast(IntType(32), true)
     }
 
-    @Test
-    fun `Perform conditional select instruction`() {
+    describe("Perform conditional select instruction") {
         // true
         val cond = ConstantInt(IntType(1), 1)
 
@@ -295,4 +271,4 @@ internal class ConstantIntTest : TestSuite() {
 
         assertEquals(10, res.asIntValue().getSignedValue())
     }
-}
+}) 
