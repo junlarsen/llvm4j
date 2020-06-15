@@ -1,8 +1,4 @@
-name: Run "vexe" Test Suite
-on:
-  push:
-    paths:
-      - 'vexe/**'
+name: All Vexe Test Suites
 jobs:
   run:
     name: Execute Test Suite
