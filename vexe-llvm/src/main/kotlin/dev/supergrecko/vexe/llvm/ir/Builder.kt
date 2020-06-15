@@ -3,8 +3,10 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
+import dev.supergrecko.vexe.llvm.ir.instructions.AShrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AddInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AllocaInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.AndInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.BrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CallInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CatchPadInstruction
@@ -16,20 +18,28 @@ import dev.supergrecko.vexe.llvm.ir.instructions.ExtractValueInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FAddInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FDivInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FMulInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FNegInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FRemInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FSubInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.IndirectBrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.InvokeInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.LShrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LandingPadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LoadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.MulInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.OrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.ResumeInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.RetInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SDivInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.SRemInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.ShlInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.StoreInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SubInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SwitchInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.UDivInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.URemInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.UnreachableInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.XorInstruction
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
 import org.bytedeco.javacpp.PointerPointer
@@ -660,6 +670,210 @@ public class Builder public constructor(
             val inst = LLVM.LLVMBuildFDiv(ref, lhs.ref, rhs.ref, variable)
 
             return FDivInstruction(inst)
+        }
+
+        /**
+         * Build a urem instruction
+         *
+         * Urem takes the unsigned value of the remainder of [lhs] and [rhs].
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildURem
+         */
+        public fun createURem(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): URemInstruction {
+            val inst = LLVM.LLVMBuildURem(ref, lhs.ref, rhs.ref, variable)
+
+            return URemInstruction(inst)
+        }
+
+        /**
+         * Build a srem instruction
+         *
+         * Srem takes the signed value of the remainder of [lhs] and [rhs].
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildURem
+         */
+        public fun createSRem(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): SRemInstruction {
+            val inst = LLVM.LLVMBuildSRem(ref, lhs.ref, rhs.ref, variable)
+
+            return SRemInstruction(inst)
+        }
+
+        /**
+         * Build a frem instruction
+         *
+         * Urem takes the floating value of the remainder of [lhs] and [rhs],
+         * both which are floating point values
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildURem
+         */
+        public fun createFRem(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): FRemInstruction {
+            val inst = LLVM.LLVMBuildFRem(ref, lhs.ref, rhs.ref, variable)
+
+            return FRemInstruction(inst)
+        }
+
+        /**
+         * Build a shl instruction
+         *
+         * Shl returns [lhs] shifted [rhs] bits to the left. The returned
+         * value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildShl
+         */
+        public fun createShl(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): ShlInstruction {
+            val inst = LLVM.LLVMBuildShl(ref, lhs.ref, rhs.ref, variable)
+
+            return ShlInstruction(inst)
+        }
+
+        /**
+         * Build a lshr instruction
+         *
+         * Lshr returns [lhs] shifted [rhs] bits to the left with zero fill.
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildLShr
+         */
+        public fun createLShr(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): LShrInstruction {
+            val inst = LLVM.LLVMBuildLShr(ref, rhs.ref, lhs.ref, variable)
+
+            return LShrInstruction(inst)
+        }
+
+        /**
+         * Build an ashr instruction
+         *
+         * Ashr returns [lhs] shifted [rhs] bits to the right. The returned
+         * value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildAShr
+         */
+        public fun createAShr(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): AShrInstruction {
+            val inst = LLVM.LLVMBuildAShr(ref, rhs.ref, lhs.ref, variable)
+
+            return AShrInstruction(inst)
+        }
+
+        /**
+         * Build an and instruction
+         *
+         * And returns the bitwise logical and of [lhs] and [rhs]. The
+         * returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildAnd
+         */
+        public fun createAnd(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): AndInstruction {
+            val inst = LLVM.LLVMBuildAnd(ref, rhs.ref, lhs.ref, variable)
+
+            return AndInstruction(inst)
+        }
+
+        /**
+         * Build an or instruction
+         *
+         * Or returns the bitwise logical or of [lhs] and [rhs]. The returned
+         * value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildOr
+         */
+        public fun createOr(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): OrInstruction {
+            val inst = LLVM.LLVMBuildOr(ref, lhs.ref, rhs.ref, variable)
+
+            return OrInstruction(inst)
+        }
+
+        /**
+         * Build a xor instruction
+         *
+         * Xor returns the bitwise logical exclusive of [lhs] and [rhs]. The
+         * returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildXor
+         */
+        public fun createXor(
+            lhs: Value,
+            rhs: Value,
+            variable: String
+        ): XorInstruction {
+            val inst = LLVM.LLVMBuildXor(ref, lhs.ref, rhs.ref, variable)
+
+            return XorInstruction(inst)
+        }
+
+        /**
+         * Build an emulated neg instruction
+         *
+         * LLVM implements neg with sub. Sub returns the negation of [value].
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildNeg
+         */
+        public fun buildNeg(
+            value: Value,
+            variable: String,
+            nuw: Boolean = false,
+            nsw: Boolean = false
+        ): SubInstruction {
+            require(!(nsw && nuw)) { "Instruction can not declare both NUW & " +
+                    "NSW" }
+
+            val inst = when {
+                nsw -> LLVM.LLVMBuildNSWNeg(ref, value.ref, variable)
+                nuw -> LLVM.LLVMBuildNUWNeg(ref, value.ref, variable)
+                else -> LLVM.LLVMBuildNeg(ref, value.ref, variable)
+            }
+
+            return SubInstruction(inst)
+        }
+
+        /**
+         * Build a fneg instruction
+         *
+         * Fneg returns the negation of [value]. The returned value is stored
+         * in [variable]
+         *
+         * @see LLVM.LLVMBuildFNeg
+         */
+        public fun createFNeg(value: Value, variable: String): FNegInstruction {
+            val inst = LLVM.LLVMBuildFNeg(ref, value.ref, variable)
+
+            return FNegInstruction(inst)
         }
 
         /**
