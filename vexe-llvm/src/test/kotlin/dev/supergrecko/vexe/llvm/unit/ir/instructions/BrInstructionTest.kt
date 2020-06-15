@@ -5,15 +5,14 @@ import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.TestSuite
+import dev.supergrecko.vexe.llvm.utils.cleanup
+import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Test
 
-internal class BrInstructionTest : TestSuite() {
-    @Test
-    fun `Creation of unconditional branch`() {
+internal class BrInstructionTest : TestSuite({
+    describe("Creation of unconditional branch") {
         val builder = Builder()
         val module = Module("test.ll")
         val function = module.addFunction("test", FunctionType(
@@ -30,8 +29,7 @@ internal class BrInstructionTest : TestSuite() {
         cleanup(builder)
     }
 
-    @Test
-    fun `Creation of conditional branch`() {
+    describe("Creation of conditional branch") {
         val builder = Builder()
         val module = Module("test.ll")
         val function = module.addFunction("test", FunctionType(
@@ -51,4 +49,4 @@ internal class BrInstructionTest : TestSuite() {
 
         cleanup(builder)
     }
-}
+})
