@@ -7,16 +7,16 @@ import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
 import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
-import dev.supergrecko.vexe.llvm.utils.TestSuite
+import dev.supergrecko.vexe.llvm.utils.cleanup
+import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class ModuleTest : TestSuite() {
-    @Test
-    fun `Modules can have identifiers`() {
+internal class ModuleTest : TestSuite({
+    describe("Modules can have identifiers") {
         val mod = Module("utils.ll").apply {
             setModuleIdentifier("utils")
         }
@@ -26,8 +26,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(mod)
     }
 
-    @Test
-    fun `Cloning a module clones the identifier`() {
+    describe("Cloning a module clones the identifier") {
         val mod = Module("utils.ll").apply {
             setModuleIdentifier("utils")
         }
@@ -39,8 +38,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(mod, clone)
     }
 
-    @Test
-    fun `Modifying the module's source file name`() {
+    describe("Modifying the module's source file name") {
         val mod = Module("utils.ll").apply {
             assertEquals("utils.ll", getSourceFileName())
 
@@ -52,8 +50,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(mod)
     }
 
-    @Test
-    fun `Fetching a function which does not exist returns null`() {
+    describe("Fetching a function which does not exist returns null") {
         val module = Module("utils.ll")
 
         assertNull(module.getFunction("utils"))
@@ -61,8 +58,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module)
     }
 
-    @Test
-    fun `Fetching an existing function returns said function`() {
+    describe("Fetching an existing function returns said function") {
         val module = Module("utils.ll").apply {
             addFunction(
                 "utils",
@@ -79,8 +75,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module)
     }
 
-    @Test
-    fun `Write the module byte-code to file`() {
+    describe("Write the module byte-code to file") {
         val file = getTemporaryFile("out.bc")
         val module = Module("utils.ll").also {
             it.writeBitCodeToFile(file)
@@ -91,8 +86,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module)
     }
 
-    @Test
-    fun `Write the module byte-code to file path`() {
+    describe("Write the module byte-code to file path") {
         val file = getTemporaryFile("out.bc")
         val module = Module("utils.ll").also {
             it.writeBitCodeToFile(file.absolutePath)
@@ -103,8 +97,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module)
     }
 
-    @Test
-    fun `Writing to MemoryBuffer`() {
+    describe("Writing to MemoryBuffer") {
         val context = Context()
         val module = Module("utils.ll", context)
 
@@ -115,8 +108,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module, context)
     }
 
-    @Test
-    fun `Get module from MemoryBuffer`() {
+    describe("Get module from MemoryBuffer") {
         val context = Context()
         val module = Module("utils.ll", context)
         val buf = module.toMemoryBuffer()
@@ -127,8 +119,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(mod, module, context)
     }
 
-    @Test
-    fun `Verification of a valid module`() {
+    describe("Verification of a valid module") {
         val context = Context()
         val module = Module("utils.ll", context)
         val res = module.verify(VerifierFailureAction.ReturnStatus)
@@ -138,8 +129,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module, context)
     }
 
-    @Test
-    fun `Creation of function inside module`() {
+    describe("Creation of function inside module") {
         val fnTy = FunctionType(IntType(32), listOf(), false)
         val module = Module("utils.ll")
         val fn = module.addFunction("utils", fnTy)
@@ -149,8 +139,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module)
     }
 
-    @Test
-    fun `Assigning a data layout`() {
+    describe("Assigning a data layout") {
         val module = Module("utils.ll").apply {
             setDataLayout("e-m:e-i64:64-f80:128-n8:16:32:64-S128")
         }
@@ -162,8 +151,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module)
     }
 
-    @Test
-    fun `Assigning a target triple`() {
+    describe("Assigning a target triple") {
         val module = Module("utils.ll").apply {
             setTarget("x86_64-pc-linux")
         }
@@ -173,8 +161,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module)
     }
 
-    @Test
-    fun `Retrieving LLVM IR`() {
+    describe("Retrieving LLVM IR") {
         val module = Module("utils.ll")
         val ir = module.toString()
 
@@ -183,8 +170,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module)
     }
 
-    @Test
-    fun `Setting module inline assembly`() {
+    describe("Setting module inline assembly") {
         val module = Module("utils.ll").apply {
             setInlineAssembly(".example")
             appendInlineAssembly("    push 0")
@@ -198,8 +184,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module)
     }
 
-    @Test
-    fun `Retrieving Context from Module`() {
+    describe("Retrieving Context from Module") {
         val ctx = Context()
         val module = Module("utils.ll", ctx)
 
@@ -208,8 +193,7 @@ internal class ModuleTest : TestSuite() {
         cleanup(module, ctx)
     }
 
-    @Test
-    fun `Retrieving a type from a module`() {
+    describe("Retrieving a type from a module") {
         val ctx = Context()
         val type = StructType("TestStruct", ctx)
         val module = Module("utils.ll", ctx)
@@ -220,4 +204,4 @@ internal class ModuleTest : TestSuite() {
 
         cleanup(module, ctx)
     }
-}
+}) 

@@ -4,15 +4,14 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.llvm.utils.TestSuite
+import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
 
-internal class FunctionTypeTest : TestSuite() {
-    @Test
-    fun `Creation of parameter-less function`() {
+internal class FunctionTypeTest : TestSuite({
+    describe("Creation of parameter-less function") {
         val ret = IntType(64)
         val fn = FunctionType(ret, listOf(), true)
 
@@ -20,8 +19,7 @@ internal class FunctionTypeTest : TestSuite() {
         assertTrue { fn.getReturnType().ref == ret.ref }
     }
 
-    @Test
-    fun `Creation of variadic function`() {
+    describe("Creation of variadic function") {
         val ret = IntType(64)
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)
@@ -29,8 +27,7 @@ internal class FunctionTypeTest : TestSuite() {
         assertTrue { fn.isVariadic() }
     }
 
-    @Test
-    fun `Parameter size matches`() {
+    describe("Parameter size matches") {
         val ret = IntType(64)
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)
@@ -38,8 +35,7 @@ internal class FunctionTypeTest : TestSuite() {
         assertEquals(LLVM.LLVMCountParamTypes(fn.ref), fn.getParameterCount())
     }
 
-    @Test
-    fun `List of parameters match`() {
+    describe("List of parameters match") {
         val ret = IntType(64)
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)
@@ -53,8 +49,7 @@ internal class FunctionTypeTest : TestSuite() {
         }
     }
 
-    @Test
-    fun `Return type matches`() {
+    describe("Return type matches") {
         val ret = IntType(64)
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)
@@ -63,4 +58,4 @@ internal class FunctionTypeTest : TestSuite() {
 
         assertEquals(ret.ref, returns.ref)
     }
-}
+})

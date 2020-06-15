@@ -17,7 +17,7 @@ import java.io.File
  * completed.
  */
 public open class TestSuite(exec: TestSuite.() -> Unit) {
-    private val cases: MutableList<DynamicTest> = mutableListOf()
+    private val cases: MutableList<TestCase> = mutableListOf()
     init { exec() }
 
     /**
@@ -25,18 +25,8 @@ public open class TestSuite(exec: TestSuite.() -> Unit) {
      */
     public fun describe(name: String, block: TestCase.() -> Unit) {
         val case = TestCase(name, block)
-        val test = DynamicTest.dynamicTest(case.name) {
-            // BeforeEach
-            case.onSetup?.invoke()
 
-            case.execute(case)
-
-            // AfterEach
-            case.onTearDown?.invoke()
-            case.files.filter { it.exists() }.forEach { it.delete() }
-        }
-
-        cases.add(test)
+        cases.add(case)
     }
 
     /**
@@ -46,6 +36,19 @@ public open class TestSuite(exec: TestSuite.() -> Unit) {
      */
     @TestFactory
     internal fun execute(): List<DynamicTest> {
-        return cases
+        return cases.map {
+            DynamicTest.dynamicTest(it.name) {
+                // BeforeEach
+                it.onSetup?.invoke()
+
+                it.execute(it)
+
+                // AfterEach
+                it.onTearDown?.invoke()
+                it.files
+                    .filter { file -> file.exists() }
+                    .forEach { file -> file.delete() }
+            }
+        }
     }
 }

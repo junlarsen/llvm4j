@@ -3,46 +3,42 @@ package dev.supergrecko.vexe.llvm.unit.support
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.support.MemoryBuffer
-import dev.supergrecko.vexe.llvm.utils.TestSuite
+import dev.supergrecko.vexe.llvm.utils.cleanup
+import dev.supergrecko.vexe.test.TestSuite
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
-import org.junit.jupiter.api.Test
 
-internal class MemoryBufferTest : TestSuite() {
-    @Test
-    fun `The buffer byte-code starts with B for BC`() {
+internal class MemoryBufferTest : TestSuite({
+    describe("Memory Buffers") {
         val context = Context()
-        val module = Module("utils.ll", context)
+        val module = Module("Test", context)
 
-        val buf = module.toMemoryBuffer()
+        describe("A buffer starts with BC") {
+            val buf = module.toMemoryBuffer()
 
-        // module bit code starts with "BC"
-        assertEquals('B', buf.getStart())
+            assertEquals('B', buf.getStart())
+        }
 
-        cleanup(buf, module, context)
+        describe("Creating a buffer") {
+            val file = getTemporaryFile("out.ll")
+            module.writeBitCodeToFile(file)
+            val buf = MemoryBuffer(file)
+
+            assertNotNull(buf)
+
+            cleanup(buf)
+        }
+
+        cleanup(module, context)
     }
 
-    @Test
-    fun `Create MemoryBuffer from byte-code file`() {
-        val file = getTemporaryFile("out.ll")
-        val mod = Module("utils.ll")
-
-        mod.writeBitCodeToFile(file)
-
-        val buf = MemoryBuffer(file)
-
-        assertNotNull(buf)
-        cleanup(mod, buf)
-    }
-
-    @Test
-    fun `Creation from unknown path fails`() {
+    describe("Creating from invalid paths") {
         assertFailsWith<IllegalArgumentException> {
-            val mod = MemoryBuffer(File("unknown file which does not exist"))
+            val mod = MemoryBuffer(File("this path does not exist"))
 
             cleanup(mod)
         }
     }
-}
+})

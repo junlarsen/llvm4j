@@ -2,23 +2,21 @@ package dev.supergrecko.vexe.llvm.unit.ir.values.constants
 
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantArray
-import dev.supergrecko.vexe.llvm.utils.TestSuite
 import dev.supergrecko.vexe.llvm.utils.constIntPairOf
+import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 
-internal class ConstantArrayTest : TestSuite() {
-    @Test
-    fun `Creation via LLVM reference`() {
+internal class ConstantArrayTest : TestSuite({
+    describe("Creation via LLVM reference") {
         val str = ConstantArray("Hello")
         val borrow = ConstantArray(str.ref)
 
         assertEquals(str.ref, borrow.ref)
     }
 
-    @Test
-    fun `Creation of string (i8 array) from user-land`() {
+    describe("Creation of string (i8 array) from user-land") {
         val str = ConstantArray("Hello")
 
         assertTrue { str.isConstantString() }
@@ -27,8 +25,7 @@ internal class ConstantArrayTest : TestSuite() {
         assertEquals("Hello", str.getAsString())
     }
 
-    @Test
-    fun `Creation from user-land constructor`() {
+    describe("Creation from user-land constructor") {
         val ty = IntType(8)
         val (one, two) = constIntPairOf(1, 2)
         val arr = ConstantArray(ty, listOf(one, two))
@@ -37,4 +34,4 @@ internal class ConstantArrayTest : TestSuite() {
 
         assertEquals(one.getSignedValue(), first.asIntValue().getSignedValue())
     }
-}
+}) 

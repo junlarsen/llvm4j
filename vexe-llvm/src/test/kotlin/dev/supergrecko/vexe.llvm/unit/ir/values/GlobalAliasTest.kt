@@ -3,14 +3,14 @@ package dev.supergrecko.vexe.llvm.unit.ir.values
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.TestSuite
+import dev.supergrecko.vexe.llvm.utils.cleanup
+import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import org.junit.jupiter.api.Test
 
-internal class GlobalAliasTest : TestSuite() {
-    @Test
-    fun `A module alias copies any globals`() {
+internal class GlobalAliasTest : TestSuite({
+    describe("A module alias copies any globals") {
         val mod = Module("utils.ll")
         val ty = IntType(32)
         val v = ConstantInt(ty, 32L, true)
@@ -30,8 +30,7 @@ internal class GlobalAliasTest : TestSuite() {
         cleanup(mod)
     }
 
-    @Test
-    fun `A non-existing alias returns null`() {
+    describe("A non-existing alias returns null") {
         val mod = Module("utils.ll")
         val alias = mod.getAlias("unknown_alias")
 
@@ -40,8 +39,7 @@ internal class GlobalAliasTest : TestSuite() {
         cleanup(mod)
     }
 
-    @Test
-    fun `Retrieving aliases works as expected`() {
+    describe("Retrieving aliases works as expected") {
         val mod = Module("utils.ll")
         val ty = IntType(32).toPointerType()
         val global = mod.addGlobal("value_1", ty)
@@ -52,4 +50,4 @@ internal class GlobalAliasTest : TestSuite() {
 
         cleanup(mod)
     }
-}
+}) 

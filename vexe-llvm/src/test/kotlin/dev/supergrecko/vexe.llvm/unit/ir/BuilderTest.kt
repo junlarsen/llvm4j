@@ -6,16 +6,16 @@ import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.TestSuite
+import dev.supergrecko.vexe.llvm.utils.cleanup
+import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import org.junit.jupiter.api.Test
 
-internal class BuilderTest : TestSuite() {
-    @Test
-    fun `Should be able to position after basic block`() {
+internal class BuilderTest : TestSuite({
+    describe("Should be able to position after basic block") {
         val builder = Builder()
         val module = Module("utils.ll")
         val function = module.addFunction(
@@ -44,8 +44,7 @@ internal class BuilderTest : TestSuite() {
         cleanup(builder, module)
     }
 
-    @Test
-    fun `Attempting to dispose twice fails`() {
+    describe("Attempting to dispose twice fails") {
         val builder = Builder()
         builder.dispose()
 
@@ -54,8 +53,7 @@ internal class BuilderTest : TestSuite() {
         }
     }
 
-    @Test
-    fun `Creation of return instruction`() {
+    describe("Creation of return instruction") {
         val builder = Builder()
         val boolTy = IntType(1)
 
@@ -74,8 +72,7 @@ internal class BuilderTest : TestSuite() {
         cleanup(builder)
     }
 
-    @Test
-    fun `Creation of call instruction`() {
+    describe("Creation of call instruction") {
         val boolType = IntType(1)
         val module = Module("utils.ll").apply {
             addFunction(
@@ -118,3 +115,4 @@ internal class BuilderTest : TestSuite() {
         )
     }
 }
+)
