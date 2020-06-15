@@ -1,4 +1,5 @@
 name: All Vexe Test Suites
+on: [push]
 jobs:
   run:
     name: Execute Test Suite
