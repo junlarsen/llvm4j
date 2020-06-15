@@ -7,46 +7,44 @@ import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.utils.cleanup
 import dev.supergrecko.vexe.test.TestSuite
+import org.junit.jupiter.api.Assertions.assertFalse
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Assertions.assertFalse
 
 internal class BrInstructionTest : TestSuite({
-    describe("Creation of unconditional branch") {
+    describe("Br Instruction Suite") {
         val builder = Builder()
         val module = Module("test.ll")
-        val function = module.addFunction("test", FunctionType(
-            IntType(32), listOf(), false
-        ))
-        val destination = function.createBlock("entry")
 
-        val inst = builder
-            .getInstructionBuilder()
-            .createBr(destination)
+        val function = module.addFunction(
+            "test", FunctionType(
+                IntType(32), listOf(), false
+            )
+        )
 
-        assertFalse { inst.isConditional() }
+        describe("Creationg of regular unconditional branch") {
+            val destination = function.createBlock("Entry")
+            val subject = builder.getInstructionBuilder()
+                .createBr(destination)
 
-        cleanup(builder)
-    }
+            assertFalse { subject.isConditional() }
+        }
 
-    describe("Creation of conditional branch") {
-        val builder = Builder()
-        val module = Module("test.ll")
-        val function = module.addFunction("test", FunctionType(
-            IntType(32), listOf(), false
-        ))
-        val then = function.createBlock("then")
-        val otherwise = function.createBlock("otherwise")
-        val condition = ConstantInt(IntType(1), 1)
+        describe("Creation of conditional branch") {
+            val then = function.createBlock("then")
+            val otherwise = function.createBlock("otherwise")
+            // i1 true
+            val condition = ConstantInt(IntType(1), 1)
 
-        val inst = builder
-            .getInstructionBuilder()
-            .createCondBr(condition, then, otherwise)
-        val cond = ConstantInt(inst.getCondition().ref)
+            val subject = builder
+                .getInstructionBuilder()
+                .createCondBr(condition, then, otherwise)
+            val foundCondition = ConstantInt(subject.getCondition().ref)
 
-        assertTrue { inst.isConditional() }
-        assertEquals(1, cond.getUnsignedValue())
+            assertTrue { subject.isConditional() }
+            assertEquals(1, foundCondition.getUnsignedValue())
+        }
 
-        cleanup(builder)
+        cleanup(module, builder)
     }
 })

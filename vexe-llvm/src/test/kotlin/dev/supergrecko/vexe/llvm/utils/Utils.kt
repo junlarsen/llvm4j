@@ -20,6 +20,11 @@ internal fun <T> runAll(
     }
 }
 
+/**
+ * Cleans up a list of disposable LLVM objects, remember that this list
+ * should be in FILO order. The disposable with the oldest lifetime goes last
+ * due to possible dependencies
+ */
 internal fun TestCase.cleanup(vararg item: Disposable) {
     item.forEach { it.dispose() }
 }
