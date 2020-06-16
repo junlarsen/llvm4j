@@ -1,11 +1,7 @@
 package dev.supergrecko.vexe.test
 
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
-import org.junit.jupiter.api.function.Executable
-import java.io.File
 
 /**
  * A test suite is a set of test cases

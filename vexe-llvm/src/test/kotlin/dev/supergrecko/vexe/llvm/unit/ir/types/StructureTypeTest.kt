@@ -7,7 +7,6 @@ import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 internal class StructureTypeTest : TestSuite({
     describe("Creation from user-land constructor") {
@@ -80,4 +79,4 @@ internal class StructureTypeTest : TestSuite({
 
         assertEquals(false, struct.isOpaque())
     }
-}) 
+})

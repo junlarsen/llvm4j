@@ -5,7 +5,6 @@ import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.utils.cleanup
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 
 internal class GlobalValueTest : TestSuite({
     describe("Fetching the module from a global works") {

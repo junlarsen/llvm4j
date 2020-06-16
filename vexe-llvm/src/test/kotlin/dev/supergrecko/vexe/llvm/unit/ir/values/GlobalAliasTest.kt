@@ -7,7 +7,6 @@ import dev.supergrecko.vexe.llvm.utils.cleanup
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
-import org.junit.jupiter.api.Test
 
 internal class GlobalAliasTest : TestSuite({
     describe("A module alias copies any globals") {
@@ -50,4 +49,4 @@ internal class GlobalAliasTest : TestSuite({
 
         cleanup(mod)
     }
-}) 
+})

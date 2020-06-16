@@ -8,7 +8,6 @@ import dev.supergrecko.vexe.test.TestSuite
 import java.lang.IllegalArgumentException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import org.junit.jupiter.api.Test
 
 internal class FloatTypeTest : TestSuite({
     describe("Creation from user-land constructor") {

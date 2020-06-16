@@ -8,9 +8,8 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
 import org.bytedeco.llvm.global.LLVM
-import org.junit.jupiter.api.Test
 
-internal class JNIFactorialTest : TestSuite( {
+internal class JNIFactorialTest : TestSuite({
     describe("Factorial example from bytedeco") {
         val error = BytePointer(null as Pointer?)
 

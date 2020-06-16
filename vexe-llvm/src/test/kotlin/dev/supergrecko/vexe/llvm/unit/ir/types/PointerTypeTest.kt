@@ -5,7 +5,6 @@ import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 
 internal class PointerTypeTest : TestSuite({
     describe("Creation from user-land constructor") {
@@ -48,4 +47,4 @@ internal class PointerTypeTest : TestSuite({
 
         assertEquals(100, ptr.getAddressSpace())
     }
-}) 
+})

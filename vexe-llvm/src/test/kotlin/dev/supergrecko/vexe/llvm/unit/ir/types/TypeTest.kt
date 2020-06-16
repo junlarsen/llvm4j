@@ -5,7 +5,6 @@ import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import org.junit.jupiter.api.Test
 
 internal class TypeTest : TestSuite({
     describe("Casting into the same type will work") {

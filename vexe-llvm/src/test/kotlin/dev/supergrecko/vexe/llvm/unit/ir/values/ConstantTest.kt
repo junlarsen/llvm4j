@@ -5,7 +5,6 @@ import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 
 internal class ConstantTest : TestSuite({
     describe("Casting a constant into a pointer") {

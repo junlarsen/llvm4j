@@ -13,7 +13,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 internal class ModuleTest : TestSuite({
     describe("Modules can have identifiers") {
@@ -204,4 +203,4 @@ internal class ModuleTest : TestSuite({
 
         cleanup(module, ctx)
     }
-}) 
+})

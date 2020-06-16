@@ -4,7 +4,6 @@ import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertTrue
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
-import org.junit.jupiter.api.Test
 
 /**
  * This utils is only here temporarily and is primarily used to
@@ -26,4 +25,4 @@ internal class JNITest : TestSuite({
         LLVM.LLVMDisposeModule(mod)
         LLVM.LLVMDisposeBuilder(builder)
     }
-}) 
+})

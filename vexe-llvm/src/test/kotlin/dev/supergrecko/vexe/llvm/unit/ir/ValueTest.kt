@@ -6,7 +6,6 @@ import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 internal class ValueTest : TestSuite({
     describe("Creation of ConstAllOne type") {

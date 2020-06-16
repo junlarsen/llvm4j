@@ -1140,7 +1140,6 @@ public class Builder public constructor(
             return ConstantPointer(str)
         }
 
-
         /**
          * Build a call instruction
          *

@@ -270,4 +270,4 @@ internal class ConstantIntTest : TestSuite({
 
         assertEquals(10, res.asIntValue().getSignedValue())
     }
-}) 
+})

@@ -7,9 +7,9 @@ import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.utils.cleanup
 import dev.supergrecko.vexe.test.TestSuite
-import org.junit.jupiter.api.Assertions.assertFalse
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Assertions.assertFalse
 
 internal class BrInstructionTest : TestSuite({
     describe("Br Instruction Suite") {

@@ -11,7 +11,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 internal class GlobalVariableTest : TestSuite({
     describe("Creation of global variable") {

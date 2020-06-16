@@ -10,7 +10,6 @@ import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 internal class IntrinsicFunctionTest : TestSuite({
     describe("Search for intrinsic function") {

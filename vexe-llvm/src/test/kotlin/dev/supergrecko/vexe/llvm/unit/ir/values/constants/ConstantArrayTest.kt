@@ -6,7 +6,6 @@ import dev.supergrecko.vexe.llvm.utils.constIntPairOf
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 
 internal class ConstantArrayTest : TestSuite({
     describe("Creation via LLVM reference") {
@@ -34,4 +33,4 @@ internal class ConstantArrayTest : TestSuite({
 
         assertEquals(one.getSignedValue(), first.asIntValue().getSignedValue())
     }
-}) 
+})

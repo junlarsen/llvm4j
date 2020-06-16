@@ -8,7 +8,6 @@ import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.bytedeco.llvm.global.LLVM
-import org.junit.jupiter.api.Test
 
 internal class FunctionTypeTest : TestSuite({
     describe("Creation of parameter-less function") {

@@ -7,7 +7,6 @@ import dev.supergrecko.vexe.llvm.ir.types.VectorType
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import org.junit.jupiter.api.Test
 
 internal class VectorTypeTest : TestSuite({
     describe("Creation from user-land constructor") {

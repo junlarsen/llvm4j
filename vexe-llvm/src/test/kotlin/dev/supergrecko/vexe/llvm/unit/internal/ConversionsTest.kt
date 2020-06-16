@@ -4,7 +4,6 @@ import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
-import org.junit.jupiter.api.Test
 
 internal class ConversionsTest : TestSuite({
     describe("Conversion from Int to Bool via extension") {
@@ -24,4 +23,4 @@ internal class ConversionsTest : TestSuite({
     describe("Any positive number is true") {
         assertEquals(true, 1238182.fromLLVMBool())
     }
-}) 
+})

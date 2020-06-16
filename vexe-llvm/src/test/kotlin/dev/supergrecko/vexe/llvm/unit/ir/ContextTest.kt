@@ -10,7 +10,6 @@ import kotlin.test.assertNotNull
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticInfoRef
-import org.junit.jupiter.api.Test
 
 internal class ContextTest : TestSuite({
     describe("Attempting to dispose twice fails") {
@@ -48,4 +47,4 @@ internal class ContextTest : TestSuite({
 
         cleanup(ctx)
     }
-}) 
+})
