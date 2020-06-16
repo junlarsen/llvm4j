@@ -5,8 +5,10 @@ import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.ir.instructions.AShrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AddInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.AddrSpaceCastInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AllocaInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AndInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.BitCastInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.BrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CallInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CatchPadInstruction
@@ -19,29 +21,43 @@ import dev.supergrecko.vexe.llvm.ir.instructions.FAddInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FDivInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FMulInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FNegInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FPExtInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FPToSIInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FPToUIInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FPTruncInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FRemInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FSubInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.GetElementPtrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.IndirectBrInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.IntToPtrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.InvokeInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LShrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LandingPadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LoadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.MulInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.OrInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.PtrToIntInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.ResumeInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.RetInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SDivInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.SExtInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.SIToFPInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SRemInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.ShlInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.StoreInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SubInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SwitchInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.TruncInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.UDivInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.UIToFPInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.URemInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.UnreachableInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.XorInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.ZExtInstruction
+import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
+import dev.supergrecko.vexe.llvm.ir.types.IntType
+import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantArray
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantPointer
@@ -1109,35 +1125,311 @@ public class Builder public constructor(
         }
 
         /**
-         * Create a global string
+         * Build a trunc instruction
          *
-         * The string will be assigned to the [variable] variable
+         * Trunc takes an integer [value] and truncates it to the [target]
+         * integer type.
          *
-         * @see LLVM.LLVMBuildGlobalString
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildTrunc
          */
-        public fun createGlobalString(
-            string: String,
+        public fun createTrunc(
+            value: Value,
+            target: IntType,
             variable: String
-        ): ConstantArray {
-            val str = LLVM.LLVMBuildGlobalString(ref, string, variable)
+        ): TruncInstruction {
+            val inst = LLVM.LLVMBuildTrunc(ref, value.ref, target.ref, variable)
 
-            return ConstantArray(str)
+            return TruncInstruction(inst)
         }
 
         /**
-         * Create a global string and get its pointer
+         * Build a zext instruction
          *
-         * The string will be assigned to the [variable] variable
+         * Zext takes an integer [value] and zero extends it to the [target]
+         * integer type
          *
-         * @see LLVM.LLVMBuildGlobalStringPtr
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildZExt
          */
-        public fun createGlobalStringPtr(
-            string: String,
+        public fun createZExt(
+            value: Value,
+            target: IntType,
             variable: String
-        ): ConstantPointer {
-            val str = LLVM.LLVMBuildGlobalStringPtr(ref, string, variable)
+        ): ZExtInstruction {
+            val inst = LLVM.LLVMBuildZExt(ref, value.ref, target.ref, variable)
+            
+            return ZExtInstruction(inst)
+        }
 
-            return ConstantPointer(str)
+        /**
+         * Build a sext instruction
+         *
+         * Sext takes an integer [value] and sign extends it to the [target]
+         * integer value
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildSExt
+         */
+        public fun createSExt(
+            value: Value,
+            target: IntType,
+            variable: String
+        ): SExtInstruction {
+            val inst = LLVM.LLVMBuildSExt(ref, value.ref, target.ref, variable)
+
+            return SExtInstruction(inst)
+        }
+
+        /**
+         * Build a fptoui instruction
+         *
+         * FP to UI takes a floating point [value] and casts it to an
+         * unsigned integer [target] type
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildFPToUI
+         */
+        public fun createFPToUI(
+            value: Value,
+            target: IntType,
+            variable: String
+        ): FPToUIInstruction {
+            val inst = LLVM.LLVMBuildFPToUI(
+                ref,
+                value.ref,
+                target.ref,
+                variable
+            )
+
+            return FPToUIInstruction(inst)
+        }
+
+        /**
+         * Build a fptosi instruction
+         *
+         * FP to SI takes a floating point [value] and casts it to a signed
+         * integer [target] type
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildFPToSI
+         */
+        public fun createFPToSI(
+            value: Value,
+            target: IntType,
+            variable: String
+        ): FPToSIInstruction {
+            val inst = LLVM.LLVMBuildFPToSI(
+                ref,
+                value.ref,
+                target.ref,
+                variable
+            )
+
+            return FPToSIInstruction(inst)
+        }
+
+        /**
+         * Build a uitofp instruction
+         *
+         * UI to FP takes an unsigned integer [value] and casts it to the
+         * [target] floating point type
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildUIToFP
+         */
+        public fun createUIToFP(
+            value: Value,
+            target: FloatType,
+            variable: String
+        ): UIToFPInstruction {
+            val inst = LLVM.LLVMBuildUIToFP(
+                ref,
+                value.ref,
+                target.ref,
+                variable
+            )
+
+            return UIToFPInstruction(inst)
+        }
+
+        /**
+         * Build a sitofp instruction
+         *
+         * SI to FP takes a signed integer [value] and casts it to the
+         * [target] floating point type
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildSIToFP
+         */
+        public fun createSIToFP(
+            value: Value,
+            target: IntType,
+            variable: String
+        ): SIToFPInstruction {
+            val inst = LLVM.LLVMBuildSIToFP(
+                ref,
+                value.ref,
+                target.ref,
+                variable
+            )
+
+            return SIToFPInstruction(inst)
+        }
+
+        /**
+         * Build a fptrunc instruction
+         *
+         * FPTrunc takes a floating point [value] and truncates it to the
+         * [target] floating point type
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildFPTrunc
+         */
+        public fun createFPTrunc(
+            value: Value,
+            target: FloatType,
+            variable: String
+        ): FPTruncInstruction {
+            val inst = LLVM.LLVMBuildFPTrunc(
+                ref,
+                value.ref,
+                target.ref,
+                variable
+            )
+
+            return FPTruncInstruction(inst)
+        }
+
+        /**
+         * Build a fpext instruction
+         *
+         * FPExt takes a floating point [value] and truncates it to the
+         * [target] floating point type
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildFPExt
+         */
+        public fun createFPExt(
+            value: Value,
+            target: FloatType,
+            variable: String
+        ): FPExtInstruction {
+            val inst = LLVM.LLVMBuildFPExt(
+                ref,
+                value.ref,
+                target.ref,
+                variable
+            )
+
+            return FPExtInstruction(inst)
+        }
+
+        /**
+         * Build a ptrtoint instruction
+         *
+         * Ptr to Int interprets the pointer [value] as an integer and
+         * truncates/zero-extends the valuer to the [target] type
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildPtrToInt
+         */
+        public fun createPtrToInt(
+            value: Value,
+            target: IntType,
+            variable: String
+        ): PtrToIntInstruction {
+            val inst = LLVM.LLVMBuildPtrToInt(
+                ref,
+                value.ref,
+                target.ref,
+                variable
+            )
+
+            return PtrToIntInstruction(inst)
+        }
+
+        /**
+         * Build an inttoptr instruction
+         *
+         * Int to Ptr takes an integer [value] and converts it to the
+         * [target] pointer type
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildIntToPtr
+         */
+        public fun createIntToPtr(
+            value: Value,
+            target: PointerType,
+            variable: String
+        ): IntToPtrInstruction {
+            val inst = LLVM.LLVMBuildIntToPtr(
+                ref,
+                value.ref,
+                target.ref,
+                variable
+            )
+
+            return IntToPtrInstruction(inst)
+        }
+
+        /**
+         * Build a bitcast instruction
+         *
+         * Bitcast converts the [value] to the non-aggregate [target] type
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildBitCast
+         */
+        public fun createBitCast(
+            value: Value,
+            target: Type,
+            variable: String
+        ): BitCastInstruction {
+            val inst = LLVM.LLVMBuildBitCast(
+                ref,
+                value.ref,
+                target.ref,
+                variable
+            )
+
+            return BitCastInstruction(inst)
+        }
+
+        /**
+         * Build an addrspacecast instruction
+         *
+         * Addrspacecast converts the pointer [value] to the [target] type
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildAddrSpaceCast
+         */
+        public fun createAddrSpaceCast(
+            value: Value,
+            target: IntType,
+            variable: String
+        ): AddrSpaceCastInstruction {
+            val inst = LLVM.LLVMBuildAddrSpaceCast(
+                ref,
+                value.ref,
+                target.ref,
+                variable
+            )
+
+            return AddrSpaceCastInstruction(inst)
         }
 
         /**
