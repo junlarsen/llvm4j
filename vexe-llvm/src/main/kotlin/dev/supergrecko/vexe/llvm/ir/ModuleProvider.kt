@@ -13,7 +13,7 @@ public class ModuleProvider internal constructor() :
     public override lateinit var ref: LLVMModuleProviderRef
     public override var valid: Boolean = true
 
-    public constructor(parent: Module) {
+    public constructor(parent: Module) : this() {
         require(parent.valid) { "Cannot retrieve Module Provider of deleted " +
                 "module" }
         module = parent
