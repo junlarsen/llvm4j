@@ -34,7 +34,7 @@ public class AtomicCmpXchgInstruction internal constructor() : Instruction(),
      * @see LLVM.LLVMSetCmpXchgSuccessOrdering
      */
     public fun setSuccessOrdering(ordering: AtomicOrdering) {
-        LLVM.LLVMSetCmpXchgSuccessOrdering(ref, ordering.ref)
+        LLVM.LLVMSetCmpXchgSuccessOrdering(ref, ordering.value)
     }
 
     /**
