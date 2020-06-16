@@ -21,6 +21,7 @@ import dev.supergrecko.vexe.llvm.ir.instructions.FMulInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FNegInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FRemInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FSubInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.GetElementPtrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.IndirectBrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.InvokeInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LShrInstruction
@@ -42,6 +43,8 @@ import dev.supergrecko.vexe.llvm.ir.instructions.UnreachableInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.XorInstruction
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
+import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantArray
+import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantPointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.global.LLVM
@@ -478,8 +481,10 @@ public class Builder public constructor(
             nsw: Boolean = false,
             nuw: Boolean = false
         ): AddInstruction {
-            require(!(nsw && nuw)) { "Instruction can not declare both NUW & " +
-                    "NSW" }
+            require(!(nsw && nuw)) {
+                "Instruction can not declare both NUW & " +
+                        "NSW"
+            }
 
             val inst = when {
                 nsw -> LLVM.LLVMBuildNSWAdd(ref, lhs.ref, rhs.ref, variable)
@@ -526,8 +531,10 @@ public class Builder public constructor(
             nsw: Boolean = false,
             nuw: Boolean = false
         ): SubInstruction {
-            require(!(nsw && nuw)) { "Instruction can not declare both NUW & " +
-                    "NSW" }
+            require(!(nsw && nuw)) {
+                "Instruction can not declare both NUW & " +
+                        "NSW"
+            }
 
             val inst = when {
                 nsw -> LLVM.LLVMBuildNSWSub(ref, lhs.ref, rhs.ref, variable)
@@ -574,8 +581,10 @@ public class Builder public constructor(
             nsw: Boolean = false,
             nuw: Boolean = false
         ): MulInstruction {
-            require(!(nsw && nuw)) { "Instruction can not declare both NUW & " +
-                    "NSW" }
+            require(!(nsw && nuw)) {
+                "Instruction can not declare both NUW & " +
+                        "NSW"
+            }
 
             val inst = when {
                 nsw -> LLVM.LLVMBuildNSWMul(ref, lhs.ref, rhs.ref, variable)
@@ -837,7 +846,7 @@ public class Builder public constructor(
         }
 
         /**
-         * Build an emulated neg instruction
+         * Build a neg instruction
          *
          * LLVM implements neg with sub. Sub returns the negation of [value].
          * The returned value is stored in [variable]
@@ -850,8 +859,10 @@ public class Builder public constructor(
             nuw: Boolean = false,
             nsw: Boolean = false
         ): SubInstruction {
-            require(!(nsw && nuw)) { "Instruction can not declare both NUW & " +
-                    "NSW" }
+            require(!(nsw && nuw)) {
+                "Instruction can not declare both NUW & " +
+                        "NSW"
+            }
 
             val inst = when {
                 nsw -> LLVM.LLVMBuildNSWNeg(ref, value.ref, variable)
@@ -875,6 +886,260 @@ public class Builder public constructor(
 
             return FNegInstruction(inst)
         }
+
+        /**
+         * Build a not instruction
+         *
+         * LLVM implements not with xor. Xor returns the bitwise logical
+         * exclusive of its two operands
+         *
+         * @see LLVM.LLVMBuildNot
+         */
+        public fun createNot(
+            value: Value,
+            variable: String
+        ): XorInstruction {
+            val inst = LLVM.LLVMBuildNot(ref, value.ref, variable)
+
+            return XorInstruction(inst)
+        }
+
+        /**
+         * Create a call to the built-in malloc function
+         *
+         * If you want to allocate an array/multiple items, pass an
+         * [elementCount] which specifies how many items you want
+         *
+         * @see LLVM.LLVMBuildMalloc
+         */
+        public fun createMalloc(
+            type: Type,
+            name: String,
+            elementCount: Value? = null
+        ): CallInstruction {
+            val inst = if (elementCount != null) {
+                LLVM.LLVMBuildArrayMalloc(ref, type.ref, elementCount.ref, name)
+            } else {
+                LLVM.LLVMBuildMalloc(ref, type.ref, name)
+            }
+
+            return CallInstruction(inst)
+        }
+
+        /**
+         * Create a call to the built-in memset function
+         *
+         * @see LLVM.LLVMBuildMemSet
+         */
+        public fun createMemSet(
+            ptr: Value,
+            value: Value,
+            length: Value,
+            align: Int
+        ): CallInstruction {
+            val inst = LLVM.LLVMBuildMemSet(
+                ref,
+                ptr.ref,
+                value.ref,
+                length.ref,
+                align
+            )
+
+            return CallInstruction(inst)
+        }
+
+        /**
+         * Create a call to the built-in memcpy function
+         *
+         * @see LLVM.LLVMBuildMemCpy
+         */
+        public fun createMemCpy(
+            destination: Value,
+            destinationAlignment: Int,
+            source: Value,
+            sourceAlignment: Int,
+            size: Value
+        ): CallInstruction {
+            val inst = LLVM.LLVMBuildMemCpy(
+                ref,
+                destination.ref,
+                destinationAlignment,
+                source.ref,
+                sourceAlignment,
+                size.ref
+            )
+
+            return CallInstruction(inst)
+        }
+
+        /**
+         * Create a call to the built-in memmove function
+         *
+         * @see LLVM.LLVMBuildMemMove
+         */
+        public fun createMemMove(
+            destination: Value,
+            destinationAlignment: Int,
+            source: Value,
+            sourceAlignment: Int,
+            size: Value
+        ): CallInstruction {
+            val inst = LLVM.LLVMBuildMemMove(
+                ref,
+                destination.ref,
+                destinationAlignment,
+                source.ref,
+                sourceAlignment,
+                size.ref
+            )
+
+            return CallInstruction(inst)
+        }
+
+        /**
+         * Build an alloca instruction
+         *
+         * The passed [type] must be sized. You may specify an amount of
+         * objects to be allocated, default is one. This is done by
+         * specifying the [elementCount] argument.
+         *
+         * @see LLVM.LLVMBuildAlloca
+         */
+        public fun createAlloca(
+            type: Type,
+            name: String,
+            elementCount: Value? = null
+        ): AllocaInstruction {
+            val inst = if (elementCount != null) {
+                LLVM.LLVMBuildArrayAlloca(ref, type.ref, elementCount.ref, name)
+            } else {
+                LLVM.LLVMBuildAlloca(ref, type.ref, name)
+            }
+
+            return AllocaInstruction(inst)
+        }
+
+        /**
+         * Create a call to the built-in free function
+         *
+         * @see LLVM.LLVMBuildFree
+         */
+        public fun createFree(ptr: Value): CallInstruction {
+            val inst = LLVM.LLVMBuildFree(ref, ptr.ref)
+
+            return CallInstruction(inst)
+        }
+
+        /**
+         * Build a load instruction
+         *
+         * Loads [dereference] into memory and assigns it the type [type].
+         * The result is stored in a new variable in the IR named [variable]
+         *
+         * @see LLVM.LLVMBuildLoad2
+         */
+        public fun createLoad(
+            type: Type,
+            dereference: Value,
+            variable: String
+        ): LoadInstruction {
+            val inst = LLVM.LLVMBuildLoad2(
+                ref,
+                type.ref,
+                dereference.ref,
+                variable
+            )
+
+            return LoadInstruction(inst)
+        }
+
+        /**
+         * Build a store instruction
+         *
+         * Writes [value] into memory at [destination]
+         */
+        public fun createStore(
+            value: Value,
+            destination: Value
+        ): StoreInstruction {
+            val inst = LLVM.LLVMBuildStore(ref, value.ref, destination.ref)
+
+            return StoreInstruction(inst)
+        }
+
+        /**
+         * Build a GEP instruction
+         *
+         * A GetElementPtr instruction accesses an element of an aggregate
+         * data structure.
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildGEP
+         */
+        public fun createGEP(
+            ptr: Value,
+            ptrType: Type,
+            indices: List<Value>,
+            inBounds: Boolean,
+            variable: String
+        ): GetElementPtrInstruction {
+            val args = PointerPointer(*indices.map { it.ref }.toTypedArray())
+            val inst = if (inBounds) {
+                LLVM.LLVMBuildInBoundsGEP2(
+                    ref,
+                    ptrType.ref,
+                    ptr.ref,
+                    args,
+                    indices.size,
+                    variable
+                )
+            } else {
+                LLVM.LLVMBuildGEP2(
+                    ref,
+                    ptrType.ref,
+                    ptr.ref,
+                    args,
+                    indices.size,
+                    variable
+                )
+            }
+
+            return GetElementPtrInstruction(inst)
+        }
+
+        /**
+         * Create a global string
+         *
+         * The string will be assigned to the [variable] variable
+         *
+         * @see LLVM.LLVMBuildGlobalString
+         */
+        public fun createGlobalString(
+            string: String,
+            variable: String
+        ): ConstantArray {
+            val str = LLVM.LLVMBuildGlobalString(ref, string, variable)
+
+            return ConstantArray(str)
+        }
+
+        /**
+         * Create a global string and get its pointer
+         *
+         * The string will be assigned to the [variable] variable
+         *
+         * @see LLVM.LLVMBuildGlobalStringPtr
+         */
+        public fun createGlobalStringPtr(
+            string: String,
+            variable: String
+        ): ConstantPointer {
+            val str = LLVM.LLVMBuildGlobalStringPtr(ref, string, variable)
+
+            return ConstantPointer(str)
+        }
+
 
         /**
          * Build a call instruction
@@ -938,66 +1203,6 @@ public class Builder public constructor(
             )
 
             return InvokeInstruction(inst)
-        }
-
-        /**
-         * Build an alloca instruction
-         *
-         * The passed [type] must be sized. You may specify an amount of
-         * objects to be allocated, default is one. This is done by
-         * specifying the [elementCount] argument.
-         *
-         * @see LLVM.LLVMBuildAlloca
-         */
-        public fun createAlloca(
-            type: Type,
-            name: String,
-            elementCount: Value? = null
-        ): AllocaInstruction {
-            val inst = if (elementCount != null) {
-                LLVM.LLVMBuildArrayAlloca(ref, type.ref, elementCount.ref, name)
-            } else {
-                LLVM.LLVMBuildAlloca(ref, type.ref, name)
-            }
-
-            return AllocaInstruction(inst)
-        }
-
-        /**
-         * Build a load instruction
-         *
-         * Loads [dereference] into memory and assigns it the type [type].
-         * The result is stored in a new variable in the IR named [variable]
-         *
-         * @see LLVM.LLVMBuildLoad2
-         */
-        public fun createLoad(
-            type: Type,
-            dereference: Value,
-            variable: String
-        ): LoadInstruction {
-            val inst = LLVM.LLVMBuildLoad2(
-                ref,
-                type.ref,
-                dereference.ref,
-                variable
-            )
-
-            return LoadInstruction(inst)
-        }
-
-        /**
-         * Build a store instruction
-         *
-         * Writes [value] into memory at [destination]
-         */
-        public fun createStore(
-            value: Value,
-            destination: Value
-        ): StoreInstruction {
-            val inst = LLVM.LLVMBuildStore(ref, value.ref, destination.ref)
-
-            return StoreInstruction(inst)
         }
 
         /**

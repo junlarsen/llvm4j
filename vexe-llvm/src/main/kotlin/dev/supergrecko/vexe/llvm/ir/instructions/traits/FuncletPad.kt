@@ -6,7 +6,7 @@ import dev.supergrecko.vexe.llvm.ir.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public interface FuncletPadInstruction : ContainsReference<LLVMValueRef> {
+public interface FuncletPad : ContainsReference<LLVMValueRef> {
     //region Core::Instructions::CallSitesAndInvocations
     /**
      * Get the argument count for the call
