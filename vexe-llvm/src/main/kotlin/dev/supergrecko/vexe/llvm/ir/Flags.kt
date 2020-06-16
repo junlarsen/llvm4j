@@ -113,6 +113,10 @@ public enum class AtomicRMWBinaryOperation(public override val value: Int) :
 /**
  * Used for LLVM AttributeLists
  *
+ * Anything which uses this enum should also provide an overload for either
+ * [Long] or [Int] as this Java enum is hardcoded and may not represent all
+ * possible values.
+ *
  * [See](https://llvm.org/docs/HowToUseAttributes.html#attributelist)
  */
 public enum class AttributeIndex(public override val value: Long) :
