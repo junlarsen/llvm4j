@@ -8,7 +8,7 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class PHIInstruction internal constructor() : Instruction() {
+public class PhiInstruction internal constructor() : Instruction() {
     public constructor(llvmValue: LLVMValueRef) : this() {
         ref = llvmValue
     }

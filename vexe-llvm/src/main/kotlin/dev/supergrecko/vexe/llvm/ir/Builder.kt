@@ -3,11 +3,14 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
+import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.ir.instructions.AShrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AddInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AddrSpaceCastInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AllocaInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AndInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.AtomicCmpXchgInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.AtomicRMWInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.BitCastInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.BrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CallInstruction
@@ -16,8 +19,10 @@ import dev.supergrecko.vexe.llvm.ir.instructions.CatchRetInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CatchSwitchInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CleanupPadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CleanupRetInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.ExtractElementInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.ExtractValueInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FAddInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FCmpInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FDivInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FMulInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FNegInstruction
@@ -27,8 +32,12 @@ import dev.supergrecko.vexe.llvm.ir.instructions.FPToUIInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FPTruncInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FRemInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FSubInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.FenceInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.GetElementPtrInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.ICmpInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.IndirectBrInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.InsertElementInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.InsertValueInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.IntToPtrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.InvokeInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LShrInstruction
@@ -36,6 +45,7 @@ import dev.supergrecko.vexe.llvm.ir.instructions.LandingPadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LoadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.MulInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.OrInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.PhiInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.PtrToIntInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.ResumeInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.RetInstruction
@@ -43,7 +53,9 @@ import dev.supergrecko.vexe.llvm.ir.instructions.SDivInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SExtInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SIToFPInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SRemInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.SelectInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.ShlInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.ShuffleVectorInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.StoreInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SubInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SwitchInstruction
@@ -52,6 +64,7 @@ import dev.supergrecko.vexe.llvm.ir.instructions.UDivInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.UIToFPInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.URemInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.UnreachableInstruction
+import dev.supergrecko.vexe.llvm.ir.instructions.VAArgInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.XorInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.ZExtInstruction
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
@@ -59,8 +72,6 @@ import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantArray
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantPointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.global.LLVM
@@ -284,6 +295,41 @@ public class Builder public constructor(
             )
 
             return IndirectBrInstruction(inst)
+        }
+
+        /**
+         * Build an invoke instruction
+         *
+         * Invoke moves control to the target [function] and continues with
+         * either a [normal] or a [catch] label. If the [function] returns,
+         * then control is moved to [normal]. If the callee, or any indirect
+         * callees returns via resume then control is moved to [catch].
+         *
+         * If the callee did return, it will be moved into [variable]
+         *
+         * @see LLVM.LLVMBuildInvoke2
+         */
+        public fun createInvoke(
+            functionType: FunctionType,
+            function: FunctionValue,
+            arguments: List<Value>,
+            normal: BasicBlock,
+            catch: BasicBlock,
+            variable: String
+        ): InvokeInstruction {
+            val args = PointerPointer(*arguments.map { it.ref }.toTypedArray())
+            val inst = LLVM.LLVMBuildInvoke2(
+                ref,
+                functionType.ref,
+                function.ref,
+                args,
+                arguments.size,
+                normal.ref,
+                catch.ref,
+                variable
+            )
+
+            return InvokeInstruction(inst)
         }
 
         /**
@@ -1433,6 +1479,78 @@ public class Builder public constructor(
         }
 
         /**
+         * Build an icmp instruction
+         *
+         * Compares two integers, [lhs] and [rhs] with the given [predicate]
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildICmp
+         */
+        public fun createICmp(
+            lhs: Value,
+            predicate: IntPredicate,
+            rhs: Value,
+            variable: String
+        ): ICmpInstruction {
+            val inst = LLVM.LLVMBuildICmp(
+                ref,
+                predicate.value,
+                lhs.ref,
+                rhs.ref,
+                variable
+            )
+
+            return ICmpInstruction(inst)
+        }
+
+        /**
+         * Build a fcp instruction
+         *
+         * Compares two floats, [lhs] and [rhs] with the given [predicate]
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildFCmp
+         */
+        public fun createFCmp(
+            lhs: Value,
+            predicate: RealPredicate,
+            rhs: Value,
+            variable: String
+        ): FCmpInstruction {
+            val inst = LLVM.LLVMBuildFCmp(
+                ref,
+                predicate.value,
+                lhs.ref,
+                rhs.ref,
+                variable
+            )
+
+            return FCmpInstruction(inst)
+        }
+
+        /**
+         * Build a phi instruction
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildPhi
+         */
+        public fun createPhi(
+            incoming: Type,
+            variable: String
+        ): PhiInstruction {
+            val inst = LLVM.LLVMBuildPhi(
+                ref,
+                incoming.ref,
+                variable
+            )
+
+            return PhiInstruction(inst)
+        }
+
+        /**
          * Build a call instruction
          *
          * This will call [function] with the supplied [arguments]. The
@@ -1462,45 +1580,140 @@ public class Builder public constructor(
         }
 
         /**
-         * Build an invoke instruction
+         * Build a select instruction
          *
-         * Invoke moves control to the target [function] and continues with
-         * either a [normal] or a [catch] label. If the [function] returns,
-         * then control is moved to [normal]. If the callee, or any indirect
-         * callees returns via resume then control is moved to [catch].
+         * A select instruction picks a value, either [then] else
+         * [otherwise], based on the [condition]
          *
-         * If the callee did return, it will be moved into [variable]
+         * The returned value is stored in [variable]
          *
-         * @see LLVM.LLVMBuildInvoke2
+         * @see LLVM.LLVMBuildSelect
          */
-        public fun createInvoke(
-            functionType: FunctionType,
-            function: FunctionValue,
-            arguments: List<Value>,
-            normal: BasicBlock,
-            catch: BasicBlock,
+        public fun createSelect(
+            condition: Value,
+            then: Value,
+            otherwise: Value,
             variable: String
-        ): InvokeInstruction {
-            val args = PointerPointer(*arguments.map { it.ref }.toTypedArray())
-            val inst = LLVM.LLVMBuildInvoke2(
+        ): SelectInstruction {
+            val inst = LLVM.LLVMBuildSelect(
                 ref,
-                functionType.ref,
-                function.ref,
-                args,
-                arguments.size,
-                normal.ref,
-                catch.ref,
+                condition.ref,
+                then.ref,
+                otherwise.ref,
                 variable
             )
 
-            return InvokeInstruction(inst)
+            return SelectInstruction(inst)
         }
 
         /**
-         * Build a extract-value instruction
+         * Build a va_arg instruction
          *
-         * Extract the element at [index] in the [aggregate] and store it
-         * into a new IR variable named [variable]
+         * va_arg receives the current value in the [list] which is of type
+         * [type] and advances the "iterator"
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildVAArg
+         */
+        public fun createVAArg(
+            list: Value,
+            type: Type,
+            variable: String
+        ): VAArgInstruction {
+            val inst = LLVM.LLVMBuildVAArg(
+                ref,
+                list.ref,
+                type.ref,
+                variable
+            )
+
+            return VAArgInstruction(inst)
+        }
+
+        /**
+         * Build an extractelement instruction
+         *
+         * Extracts the element at [index] in the [vector]
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildExtractElement
+         */
+        public fun createExtractElement(
+            vector: Value,
+            index: Value,
+            variable: String
+        ): ExtractElementInstruction {
+            val inst = LLVM.LLVMBuildExtractElement(
+                ref,
+                vector.ref,
+                index.ref,
+                variable
+            )
+
+            return ExtractElementInstruction(inst)
+        }
+
+        /**
+         * Build an insertelement instruction
+         *
+         * Inserts the [element] into [vector] at [index]. The modified
+         * vector is returned.
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildInsertElement
+         */
+        public fun createInsertElement(
+            vector: Value,
+            index: Value,
+            element: Value,
+            variable: String
+        ): InsertElementInstruction {
+            val inst = LLVM.LLVMBuildInsertElement(
+                ref,
+                vector.ref,
+                element.ref,
+                index.ref,
+                variable
+            )
+
+            return InsertElementInstruction(inst)
+        }
+
+        /**
+         * Build a shufflevector instruction
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildShuffleVector
+         */
+        public fun createShuffleVector(
+            v1: Value,
+            v2: Value,
+            mask: Value,
+            variable: String
+        ): ShuffleVectorInstruction {
+            val inst = LLVM.LLVMBuildShuffleVector(
+                ref,
+                v1.ref,
+                v2.ref,
+                mask.ref,
+                variable
+            )
+
+            return ShuffleVectorInstruction(inst)
+        }
+
+        /**
+         * Build a extractvalue instruction
+         *
+         * Extract the element at [index] in the [aggregate]
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildExtractValue
          */
         public fun createExtractValue(
             aggregate: Value,
@@ -1515,6 +1728,105 @@ public class Builder public constructor(
             )
 
             return ExtractValueInstruction(inst)
+        }
+
+        /**
+         * Build an insertvalue instruction
+         *
+         * Insert [value] into the [aggregate] at [index]. The modified
+         * aggregate is returned.
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildInsertElement
+         */
+        public fun createInsertValue(
+            aggregate: Value,
+            index: Int,
+            value: Value,
+            variable: String
+        ): InsertValueInstruction {
+            val inst = LLVM.LLVMBuildInsertValue(
+                ref,
+                aggregate.ref,
+                value.ref,
+                index,
+                variable
+            )
+
+            return InsertValueInstruction(inst)
+        }
+
+        /**
+         * Build a fence instruction
+         *
+         * The returned value is stored in [variable]
+         *
+         * @see LLVM.LLVMBuildFence
+         */
+        public fun createFence(
+            ordering: AtomicOrdering,
+            singleThread: Boolean,
+            variable: String
+        ): FenceInstruction {
+            val inst = LLVM.LLVMBuildFence(
+                ref,
+                ordering.value,
+                singleThread.toLLVMBool(),
+                variable
+            )
+
+            return FenceInstruction(inst)
+        }
+
+        /**
+         * Build an atomicrmw instruction
+         *
+         * @see LLVM.LLVMBuildAtomicRMW
+         */
+        public fun createAtomicRMW(
+            operator: AtomicRMWBinaryOperation,
+            pointer: Value,
+            value: Value,
+            ordering: AtomicOrdering,
+            singleThread: Boolean
+        ): AtomicRMWInstruction {
+            val inst = LLVM.LLVMBuildAtomicRMW(
+                ref,
+                operator.value,
+                pointer.ref,
+                value.ref,
+                ordering.value,
+                singleThread.toLLVMBool()
+            )
+
+            return AtomicRMWInstruction(inst)
+        }
+
+        /**
+         * Build a cmpxchg instruction
+         *
+         * @see LLVM.LLVMBuildAtomicCmpXchg
+         */
+        public fun createAtomicCmpXchg(
+            pointer: Value,
+            compareTo: Value,
+            replacement: Value,
+            successOrdering: AtomicOrdering,
+            failureOrdering: AtomicOrdering,
+            singleThread: Boolean
+        ): AtomicCmpXchgInstruction {
+            val inst = LLVM.LLVMBuildAtomicCmpXchg(
+                ref,
+                pointer.ref,
+                compareTo.ref,
+                replacement.ref,
+                successOrdering.value,
+                failureOrdering.value,
+                singleThread.toLLVMBool()
+            )
+
+            return AtomicCmpXchgInstruction(inst)
         }
     }
     //endregion InstructionBuilders
