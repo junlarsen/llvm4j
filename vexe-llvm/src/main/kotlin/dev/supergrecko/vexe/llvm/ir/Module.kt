@@ -524,14 +524,6 @@ public class Module internal constructor() : AutoCloseable,
     }
     //endregion BitWriter
 
-    public override fun dispose() {
-        require(valid) { "This module has already been disposed." }
-
-        valid = false
-
-        LLVM.LLVMDisposeModule(ref)
-    }
-
     //region Analysis
     /**
      * Verifies that the module structure is valid
@@ -560,6 +552,27 @@ public class Module internal constructor() : AutoCloseable,
         return !res.fromLLVMBool()
     }
     //endregion Analysis
+
+    //region ModuleProviders
+    /**
+     * Changes the type of this to a ModuleProvider
+     *
+     * According to LLVM this is for historical reasons
+     *
+     * @see LLVM.LLVMCreateModuleProviderForExistingModules
+     */
+    public fun getModuleProvider(): ModuleProvider {
+        return ModuleProvider(this)
+    }
+    //endregion ModuleProviders
+
+    public override fun dispose() {
+        require(valid) { "This module has already been disposed." }
+
+        valid = false
+
+        LLVM.LLVMDisposeModule(ref)
+    }
 
     public override fun close() = dispose()
 }
