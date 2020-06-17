@@ -250,25 +250,4 @@ public open class Value internal constructor() :
         return BasicBlock(bb)
     }
     //endregion Core::BasicBlock
-
-    //region Typecasting
-    /**
-     * Attempts to use the current [ref] for a new value
-     *
-     * TODO: Do something about these
-     */
-    public fun asArrayValue() = ConstantArray(ref)
-    public fun asFloatValue() = ConstantFloat(ref)
-    public fun asFunctionValue() = FunctionValue(ref)
-    public fun asGenericValue() = GenericValue(ref)
-    public fun asGlobalValue() = GlobalValue(ref)
-    public fun asInstructionValue() =
-        Instruction(ref)
-    public fun asIntValue() = ConstantInt(ref)
-    public fun asMetadataValue() = MetadataValue(ref)
-    public fun asPhiValue() = PhiValue(ref)
-    public fun asPointerValue() = ConstantPointer(ref)
-    public fun asStructValue() = ConstantStruct(ref)
-    public fun asVectorValue() = ConstantVector(ref)
-    //endregion Typecasting
 }

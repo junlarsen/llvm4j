@@ -67,8 +67,6 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstFAdd
      */
     public fun add(rhs: ConstantFloat): ConstantFloat {
-        require(getType().getTypeKind() == rhs.getType().getTypeKind())
-
         val ref = LLVM.LLVMConstFAdd(ref, rhs.ref)
 
         return ConstantFloat(ref)
@@ -83,8 +81,6 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstFSub
      */
     public fun sub(rhs: ConstantFloat): ConstantFloat {
-        require(getType().getTypeKind() == rhs.getType().getTypeKind())
-
         val ref = LLVM.LLVMConstFSub(ref, rhs.ref)
 
         return ConstantFloat(ref)
@@ -96,8 +92,6 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstFMul
      */
     public fun mul(rhs: ConstantFloat): ConstantFloat {
-        require(getType().getTypeKind() == rhs.getType().getTypeKind())
-
         val ref = LLVM.LLVMConstFMul(ref, rhs.ref)
 
         return ConstantFloat(ref)
@@ -109,8 +103,6 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstFDiv
      */
     public fun div(rhs: ConstantFloat): ConstantFloat {
-        require(getType().getTypeKind() == rhs.getType().getTypeKind())
-
         val ref = LLVM.LLVMConstFDiv(ref, rhs.ref)
 
         return ConstantFloat(ref)
@@ -122,8 +114,6 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMFRem
      */
     public fun rem(rhs: ConstantFloat): ConstantFloat {
-        require(getType().getTypeKind() == rhs.getType().getTypeKind())
-
         val ref = LLVM.LLVMConstFRem(ref, rhs.ref)
 
         return ConstantFloat(ref)
@@ -141,8 +131,6 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
         predicate: RealPredicate,
         rhs: ConstantFloat
     ): ConstantFloat {
-        require(getType().getTypeKind() == rhs.getType().getTypeKind())
-
         val ref = LLVM.LLVMConstFCmp(predicate.value, ref, rhs.ref)
 
         return ConstantFloat(ref)

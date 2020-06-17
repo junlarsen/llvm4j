@@ -429,11 +429,6 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstTrunc
      */
     public fun trunc(type: IntType): ConstantInt {
-        val selfWidth = getType().asIntType().getTypeWidth()
-        val destWidth = type.getTypeWidth()
-
-        require(selfWidth > destWidth)
-
         val ref = LLVM.LLVMConstTrunc(ref, type.ref)
 
         return ConstantInt(ref)
@@ -449,11 +444,6 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstZExt
      */
     public fun ext(type: IntType, signExtend: Boolean): ConstantInt {
-        val selfWidth = getType().asIntType().getTypeWidth()
-        val destWidth = type.getTypeWidth()
-
-        require(selfWidth < destWidth)
-
         val ref = if (signExtend) {
             LLVM.LLVMConstSExt(ref, type.ref)
         } else {
@@ -545,8 +535,6 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstSelect
      */
     public fun select(ifTrue: Value, ifFalse: Value): Value {
-        require(getType().asIntType().getTypeWidth() == 1)
-
         val ref = LLVM.LLVMConstSelect(ref, ifTrue.ref, ifFalse.ref)
 
         return Value(ref)

@@ -203,14 +203,6 @@ internal class ConstantIntTest : TestSuite({
         assertEquals(0, trunc.getUnsignedValue())
     }
 
-    describe("Truncation to larger type fails") {
-        val lhs = ConstantInt(IntType(8), 64)
-
-        assertFailsWith<IllegalArgumentException> {
-            lhs.trunc(IntType(32))
-        }
-    }
-
     describe("Zero or sign-extend the type") {
         val lhs = ConstantInt(IntType(8), 64)
 
@@ -268,6 +260,6 @@ internal class ConstantIntTest : TestSuite({
 
         val res = cond.select(lhs, rhs)
 
-        assertEquals(10, res.asIntValue().getSignedValue())
+        assertEquals(10, ConstantInt(res.ref).getSignedValue())
     }
 })

@@ -41,7 +41,10 @@ public class ConstantStruct internal constructor() : Value(), ConstantValue,
     public constructor(type: StructType, values: List<Value>) : this() {
         val ptr = ArrayList(values.map { it.ref }).toTypedArray()
 
-        ref =
-            LLVM.LLVMConstNamedStruct(type.ref, PointerPointer(*ptr), ptr.size)
+        ref = LLVM.LLVMConstNamedStruct(
+            type.ref,
+            PointerPointer(*ptr),
+            ptr.size
+        )
     }
 }

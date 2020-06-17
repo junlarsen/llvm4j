@@ -22,8 +22,8 @@ internal class GlobalAliasTest : TestSuite({
         val aliasValue = alias.getAliasOf()
 
         assertEquals(
-            aliasValue.asIntValue().getSignedValue(),
-            global.asIntValue().getSignedValue()
+            ConstantInt(aliasValue.ref).getSignedValue(),
+            ConstantInt(global.ref).getSignedValue()
         )
 
         cleanup(mod)

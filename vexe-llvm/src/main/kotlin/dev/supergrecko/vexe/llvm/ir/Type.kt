@@ -173,18 +173,6 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
      * Get a vector type of [size] elements containing elements of this type
      */
     public fun toVectorType(size: Int) = VectorType(this, size)
-
-    /**
-     * Attempts to use the current [ref] for a new type.
-     */
-    public fun asArrayType(): ArrayType = ArrayType(ref)
-    public fun asFloatType(): FloatType = FloatType(ref)
-    public fun asFunctionType(): FunctionType = FunctionType(ref)
-    public fun asIntType(): IntType = IntType(ref)
-    public fun asPointerType(): PointerType = PointerType(ref)
-    public fun asStructType(): StructType = StructType(ref)
-    public fun asVectorType(): VectorType = VectorType(ref)
-    public fun asVoidType(): VoidType = VoidType(ref)
     //endregion Typecasting
 
     /**

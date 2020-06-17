@@ -46,7 +46,7 @@ internal class ValueTest : TestSuite({
         val valueType = value.getType()
 
         assertEquals(type.getTypeKind(), valueType.getTypeKind())
-        assertEquals(type.getTypeWidth(), valueType.asIntType().getTypeWidth())
+        assertEquals(type.getTypeWidth(), IntType(valueType.ref).getTypeWidth())
         assertTrue { value.isConstant() }
     }
 })

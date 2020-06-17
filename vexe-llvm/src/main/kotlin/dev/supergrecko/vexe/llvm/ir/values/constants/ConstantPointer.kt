@@ -37,15 +37,6 @@ public class ConstantPointer internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstPointerCast
      */
     fun cast(toType: Type): ConstantPointer {
-        val typeKind = toType.getTypeKind()
-
-        require(typeKind == TypeKind.Vector || typeKind == TypeKind.Integer)
-
-        if (typeKind == TypeKind.Vector) {
-            val vecType = toType.asVectorType().getElementType().getTypeKind()
-            require(vecType == TypeKind.Integer || vecType == TypeKind.Pointer)
-        }
-
         val value = LLVM.LLVMConstPointerCast(ref, toType.ref)
 
         return ConstantPointer(value)
@@ -59,11 +50,6 @@ public class ConstantPointer internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstAddrSpaceCast
      */
     public fun addrspacecast(type: PointerType): ConstantPointer {
-        val selfAddr = getType().asPointerType().getAddressSpace()
-        val destAddr = type.getAddressSpace()
-
-        require(selfAddr != destAddr)
-
         val ref = LLVM.LLVMConstAddrSpaceCast(ref, type.ref)
 
         return ConstantPointer(ref)

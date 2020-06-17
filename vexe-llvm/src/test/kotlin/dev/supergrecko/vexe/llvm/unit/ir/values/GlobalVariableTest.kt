@@ -27,9 +27,8 @@ internal class GlobalVariableTest : TestSuite({
             assertFalse { isThreadLocal() }
             assertFalse { isExternallyInitialized() }
 
-            val initializer = value.getInitializer()
-                ?.asIntValue()
-                ?.getSignedValue()
+            val initializer = ConstantInt(value.getInitializer()!!.ref)
+                .getSignedValue()
 
             assertEquals(100L, initializer)
             assertEquals("v", getName())

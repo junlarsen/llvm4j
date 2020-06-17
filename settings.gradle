@@ -1,6 +1,4 @@
 rootProject.name = "vexe"
 
 include "vexe-llvm"
-include "vexe-parser"
 include "vexe-test"
-include "vexe"

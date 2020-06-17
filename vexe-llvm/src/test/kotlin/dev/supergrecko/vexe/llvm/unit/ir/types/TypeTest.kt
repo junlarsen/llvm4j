@@ -1,6 +1,7 @@
 package dev.supergrecko.vexe.llvm.unit.ir.types
 
 import dev.supergrecko.vexe.llvm.ir.Context
+import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
@@ -12,7 +13,7 @@ internal class TypeTest : TestSuite({
         val ptr = type.toPointerType()
         val underlying = ptr.getElementType()
 
-        assertEquals(type.ref, underlying.asIntType().ref)
+        assertEquals(type.ref, IntType(underlying.ref).ref)
     }
 
     describe("Casting to the wrong type will fail at runtime") {
@@ -23,7 +24,7 @@ internal class TypeTest : TestSuite({
         val underlying = ptr.getElementType()
 
         assertFailsWith<IllegalArgumentException> {
-            underlying.asFunctionType().ref
+            FunctionType(underlying.ref).ref
         }
     }
 

@@ -2,6 +2,7 @@ package dev.supergrecko.vexe.llvm.unit.ir.values.constants
 
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantArray
+import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.utils.constIntPairOf
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
@@ -31,6 +32,9 @@ internal class ConstantArrayTest : TestSuite({
 
         val first = arr.getElementAsConstant(0)
 
-        assertEquals(one.getSignedValue(), first.asIntValue().getSignedValue())
+        assertEquals(
+            one.getSignedValue(),
+            ConstantInt(first.ref).getSignedValue()
+        )
     }
 })
