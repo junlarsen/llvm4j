@@ -1,20 +1,15 @@
-# Vexe
-
-Vexe is a tiny, yet efficient systems programming language.
-
-Vexe is currently in an early development stage.
-
-## Sub-projects
-
-- [vexe](vexe) The Vexe Compiler frontend
-- [vexe-llvm](vexe-llvm) Modern Kotlin bindings to the LLVM
+# LLVM4KT
 
 ## Getting Started
 
-Head over to the [wiki](wiki) page to get started.
+There were no decent options to utilize the LLVM from JVM. This subtree contains modern Kotlin bindings to the LLVM.
+
+LLVM4KT aims to cover most of the LLVM-C API. This is made possible using the [generated LLVM bindings for Java](https://github.com/bytedeco/javacpp-presets/tree/master/llvm). 
+
+This project was previously a part of the Vexe project which was rewritten in Rust.
 
 ## License
 
-The entire Vexe project is licensed under the Apache 2.0 license.
+The entire LLVM4KT project is licensed under the Apache 2.0 license.
 
 [Apache 2.0](LICENSE)

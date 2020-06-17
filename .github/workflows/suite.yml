@@ -1,4 +1,4 @@
-name: All Vexe Test Suites
+name: All llvm4kt Test Suites
 on: [push]
 jobs:
   run:
@@ -20,4 +20,4 @@ jobs:
           gradle clean build --refresh-dependencies
       - name: Run tests
         run: |
-          gradle clean vexe:test
+          gradle clean test

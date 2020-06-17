@@ -1,50 +1,64 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.3.70"
-    id "org.jetbrains.dokka" version "0.10.1" apply false
-    id "com.github.johnrengelman.shadow" version "5.2.0" apply false
+    id "org.jetbrains.dokka" version "0.10.1"
+    id "com.github.johnrengelman.shadow" version "5.2.0"
+    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
 }
 
-allprojects {
-    repositories {
-        mavenCentral()
-        maven {
-            name "jitpack.io"
-            url "https://jitpack.io"
-        }
-        maven {
-            name "jcenter"
-            url "https://jcenter.bintray.com"
-        }
+repositories {
+    mavenCentral()
+    maven {
+        name "jitpack.io"
+        url "https://jitpack.io"
+    }
+    maven {
+        name "jcenter"
+        url "https://jcenter.bintray.com"
+    }
+}
+
+tasks.withType(KotlinCompile) {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+
+    afterTest { TestDescriptor descriptor, TestResult result ->
+        def text = "[TEST] ${result.resultType} :: ${descriptor.className} ${descriptor.displayName}"
+
+        logger.quiet text
     }
 
-    tasks.withType(KotlinCompile) {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    afterSuite { TestDescriptor descriptor, TestResult result ->
+        def text = "[SUITE] [${result.resultType}] (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
 
-        kotlinOptions {
-            jvmTarget = "1.8"
-        }
-    }
-
-    tasks.withType(Test).configureEach {
-        useJUnitPlatform()
-
-        afterTest { TestDescriptor descriptor, TestResult result ->
-            def text = "[TEST] ${result.resultType} :: ${descriptor.className} ${descriptor.displayName}"
-
+        if (!descriptor.parent) {
             logger.quiet text
         }
-
-        afterSuite { TestDescriptor descriptor, TestResult result ->
-            def text = "[SUITE] [${result.resultType}] (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
-
-            if (!descriptor.parent) {
-                logger.quiet text
-            }
-        }
     }
 }
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.72"
+    implementation "org.bytedeco:llvm-platform:9.0.0-1.5.2"
 
-
+    testImplementation "org.jetbrains.kotlin:kotlin-test:1.3.70"
+    // We use junit for our Test Suites
+    implementation "org.junit.jupiter:junit-jupiter-engine:5.2.0"
+}
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
