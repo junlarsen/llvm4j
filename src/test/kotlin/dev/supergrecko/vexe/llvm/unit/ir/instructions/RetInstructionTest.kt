@@ -48,7 +48,7 @@ internal class RetInstructionTest : TestSuite({
         ))
         val block = function.createBlock("entry")
         val builder = Builder().apply {
-            positionAtEnd(block)
+            setPositionAtEnd(block)
         }
 
         val left = ConstantInt(IntType(1), 1)

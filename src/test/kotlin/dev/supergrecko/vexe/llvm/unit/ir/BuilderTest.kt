@@ -26,19 +26,19 @@ internal class BuilderTest : TestSuite({
             )
         )
         val basicBlock = function.createBlock("entry")
-        assertNull(builder.getInsertBlock())
+        assertNull(builder.getInsertionBlock())
 
-        builder.positionAtEnd(basicBlock)
+        builder.setPositionAtEnd(basicBlock)
         // A simple comparison won't do because even though the
         // underlying reference is the same, the Builder object
         // that holds the reference is different
         // TODO?: Implement equals/hashCode for Builder by comparing underlying
         //   refs?
-        assertEquals(builder.getInsertBlock()?.ref, basicBlock.ref)
+        assertEquals(builder.getInsertionBlock()?.ref, basicBlock.ref)
 
-        builder.clearInsertPosition()
+        builder.clear()
 
-        assertNull(builder.getInsertBlock())
+        assertNull(builder.getInsertionBlock())
 
         cleanup(builder, module)
     }
@@ -78,7 +78,7 @@ internal class BuilderTest : TestSuite({
         )
         val basicBlock = caller.createBlock("entry")
 
-        builder.positionAtEnd(basicBlock)
+        builder.setPositionAtEnd(basicBlock)
 
         assertNotNull(externFunc)
 
