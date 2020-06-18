@@ -22,7 +22,7 @@ internal class SwitchInstructionTest : TestSuite({
 
         val cond = ConstantInt(IntType(1), 1)
         val inst = builder
-            .getInstructionBuilder()
+            .build()
             .createSwitch(cond, block, 1)
 
         inst.addCase(ConstantInt(IntType(1), 1), block)
@@ -42,7 +42,7 @@ internal class SwitchInstructionTest : TestSuite({
 
         val cond = ConstantInt(IntType(1), 1)
         val inst = builder
-            .getInstructionBuilder()
+            .build()
             .createSwitch(cond, block, 1)
 
         inst.addCase(ConstantInt(IntType(1), 1), block)
