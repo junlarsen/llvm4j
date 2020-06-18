@@ -24,7 +24,7 @@ internal class BrInstructionTest : TestSuite({
 
         describe("Creationg of regular unconditional branch") {
             val destination = function.createBlock("Entry")
-            val subject = builder.getInstructionBuilder()
+            val subject = builder.build()
                 .createBr(destination)
 
             assertFalse { subject.isConditional() }
@@ -37,7 +37,7 @@ internal class BrInstructionTest : TestSuite({
             val condition = ConstantInt(IntType(1), 1)
 
             val subject = builder
-                .getInstructionBuilder()
+                .build()
                 .createCondBr(condition, then, otherwise)
             val foundCondition = ConstantInt(subject.getCondition().ref)
 

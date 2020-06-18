@@ -4,6 +4,7 @@ import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
+import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.instructions.AShrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AddInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AddrSpaceCastInstruction
@@ -82,8 +83,8 @@ public class Builder public constructor(
     public override var ref: LLVMBuilderRef = LLVM.LLVMCreateBuilderInContext(
         context.ref
     )
-
     public override var valid: Boolean = true
+    private val builder: InstructionBuilder = InstructionBuilder()
 
     /**
      * Construct a new Type from an LLVM pointer reference
@@ -92,60 +93,158 @@ public class Builder public constructor(
         ref = builder
     }
 
-    //region InstructionBuilders
+    //region InstructionBuilders\
     /**
-     * LLVMPositionBuilder
+     * Position the builder at the [block]
+     *
+     * By default, this positions the end of the [block]. If [instruction] is
+     * passed and [instruction] is inside the given [block], the builder will
+     * be positioned after this instruction
+     *
+     * @see LLVM.LLVMPositionBuilder
      */
-    public fun positionBefore(instruction: Instruction) {
-        // TODO: Test
+    public fun setPosition(block: BasicBlock, instruction: Instruction) {
+        LLVM.LLVMPositionBuilder(ref, block.ref, instruction.ref)
+    }
+
+    /**
+     * Position the builder before the given [instruction]
+     *
+     * @see LLVM.LLVMPositionBuilderBefore
+     */
+    public fun setPositionBefore(instruction: Instruction) {
         LLVM.LLVMPositionBuilderBefore(ref, instruction.ref)
     }
 
     /**
-     * LLVMPositionBuilderAtEnd
+     * Position the builder at the end of the [block]
+     *
+     * @see LLVM.LLVMPositionBuilderAtEnd
      */
-    public fun positionAtEnd(basicBlock: BasicBlock) {
-        LLVM.LLVMPositionBuilderAtEnd(ref, basicBlock.ref)
+    public fun setPositionAtEnd(block: BasicBlock) {
+        LLVM.LLVMPositionBuilderAtEnd(ref, block.ref)
     }
 
     /**
-     * LLVMGetInsertBlock
+     * Clear the insertion point
+     *
+     * This erases the current point of insertion which means the user has to
+     * set a new insertion point.
+     *
+     * @see LLVM.LLVMClearInsertionPosition
      */
-    public fun getInsertBlock(): BasicBlock? {
-        val ref = LLVM.LLVMGetInsertBlock(ref) ?: return null
-        return BasicBlock(ref)
-    }
-
-    /**
-     * LLVMClearInsertionPosition
-     */
-    public fun clearInsertPosition() {
+    public fun clear() {
         LLVM.LLVMClearInsertionPosition(ref)
     }
 
     /**
-     * LLVMInsertIntoBuilderWithName
+     * Get the block the builder is currently inside
+     *
+     * This returns null if the builder isn't positioned anywhere, for
+     * example cleared by [clear]
+     *
+     * @see LLVM.LLVMGetInsertBlock
      */
-    public fun insert(instruction: Instruction, name: String?) {
-        // TODO: Test
-        LLVM.LLVMInsertIntoBuilderWithName(
-            ref,
-            instruction.ref,
-            name
-        )
+    public fun getInsertionBlock(): BasicBlock? {
+        val bb = LLVM.LLVMGetInsertBlock(ref)
+
+        return wrap(bb) { BasicBlock(it) }
     }
 
     /**
-     * Contains the singleton instance for the instruction builder
+     * Insert an instruction into the current insertion point
+     *
+     * If [name] is passed, [LLVM.LLVMInsertIntoBuilderWithName] is used.
+     *
+     * @see LLVM.LLVMInsertIntoBuilder
      */
-    private val builder: InstructionBuilder = InstructionBuilder()
+    public fun insert(instruction: Instruction, name: String?) {
+        if (name != null) {
+            LLVM.LLVMInsertIntoBuilderWithName(ref, instruction.ref, name)
+        } else {
+            LLVM.LLVMInsertIntoBuilder(ref, instruction.ref)
+        }
+    }
+
+    /**
+     * Get the current debug location for this builder if it exists
+     *
+     * @see LLVM.LLVMGetCurrentDebugLocation2
+     */
+    public fun getCurrentDebugLocation(): Metadata? {
+        val loc = LLVM.LLVMGetCurrentDebugLocation2(ref)
+
+        return wrap(loc) { Metadata(it) }
+    }
+
+    /**
+     * Set the current debug location for this builder
+     *
+     * @see LLVM.LLVMSetCurrentDebugLocation2
+     */
+    public fun setCurrentDebugLocation(location: Metadata) {
+        LLVM.LLVMSetCurrentDebugLocation2(ref, location.ref)
+    }
+
+    /**
+     * Attempt to use the builder's debug location to set the [instruction]'s
+     * debug location
+     *
+     * If the builder doesn't have a debug location, nothing happens.
+     *
+     * @see LLVM.LLVMSetInstDebugLocation
+     */
+    public fun setInstructionDebugLocation(instruction: Instruction) {
+        LLVM.LLVMSetInstDebugLocation(ref, instruction.ref)
+    }
+
+    /**
+     * Get the default fp math metadata for the builder if it exists
+     *
+     * @see LLVM.LLVMBuilderGetDefaultFPMathTag
+     */
+    public fun getDefaultFPMathTag(): Metadata? {
+        val tag = LLVM.LLVMBuilderGetDefaultFPMathTag(ref)
+
+        return wrap(tag) { Metadata(it) }
+    }
+
+    /**
+     * Set the default fp math metadata for the builder
+     *
+     * @see LLVM.LLVMBuilderSetDefaultFPMathTag
+     */
+    public fun setDefaultFPMathTag(tag: Metadata) {
+        LLVM.LLVMBuilderSetDefaultFPMathTag(ref, tag.ref)
+    }
+
+    /**
+     * Create a global string and return its value
+     *
+     * If [asPointer] is true, this will build a pointer to the string.
+     *
+     * @see LLVM.LLVMBuildGlobalString
+     */
+    public fun buildGlobalString(
+        string: String,
+        globalName: String,
+        asPointer: Boolean = false
+    ): Value {
+        val value = if (asPointer) {
+            LLVM.LLVMBuildGlobalStringPtr(ref, string, globalName)
+        } else {
+            LLVM.LLVMBuildGlobalString(ref, string, globalName)
+        }
+
+        return Value(value)
+    }
 
     /**
      * Get the singleton instruction builder
+     *
+     * Returns a per-class singleton instance of [InstructionBuilder]
      */
-    public fun getInstructionBuilder(): InstructionBuilder {
-        return builder
-    }
+    public fun build(): InstructionBuilder = builder
 
     /**
      * An instruction builder is a wrapper class for building instructions
@@ -1206,7 +1305,7 @@ public class Builder public constructor(
             variable: String
         ): ZExtInstruction {
             val inst = LLVM.LLVMBuildZExt(ref, value.ref, target.ref, variable)
-            
+
             return ZExtInstruction(inst)
         }
 

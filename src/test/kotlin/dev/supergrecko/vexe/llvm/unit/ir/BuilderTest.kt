@@ -82,7 +82,7 @@ internal class BuilderTest : TestSuite({
 
         assertNotNull(externFunc)
 
-        builder.getInstructionBuilder().createCall(
+        builder.build().createCall(
             externFunc, listOf(
                 falseValue,
                 trueValue

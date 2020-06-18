@@ -17,7 +17,7 @@ internal class RetInstructionTest : TestSuite({
     describe("Creation of ret void instruction") {
         val builder = Builder()
         val inst = builder
-            .getInstructionBuilder()
+            .build()
             .createRetVoid()
 
         assertTrue { inst.isTerminator() }
@@ -30,7 +30,7 @@ internal class RetInstructionTest : TestSuite({
         val builder = Builder()
         val value = ConstantInt(IntType(32), 0)
         val inst = builder
-            .getInstructionBuilder()
+            .build()
             .createRet(value)
 
         assertTrue { inst.isTerminator() }
@@ -54,7 +54,7 @@ internal class RetInstructionTest : TestSuite({
         val left = ConstantInt(IntType(1), 1)
         val right = ConstantInt(IntType(1), 0)
         val inst = builder
-            .getInstructionBuilder()
+            .build()
             .createAggregateRet(listOf(left, right))
 
         val ir = "  ret { i1, i1 } { i1 true, i1 false }"

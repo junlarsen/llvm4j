@@ -20,7 +20,7 @@ internal class IndirectBrInstructionTest : TestSuite({
         val base = function.createBlock("Entry").toValue()
 
         describe("Creating a basic break") {
-            builder.getInstructionBuilder()
+            builder.build()
                 .createIndirectBr(base)
         }
 
