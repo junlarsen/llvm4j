@@ -16,7 +16,7 @@ public class GenericValue internal constructor() : Validatable, Disposable,
     public override lateinit var ref: LLVMGenericValueRef
     public override var valid: Boolean = true
 
-    public constructor(engine: LLVMGenericValueRef) {
+    public constructor(engine: LLVMGenericValueRef) : this() {
         ref = engine
     }
 
