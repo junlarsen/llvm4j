@@ -7,11 +7,11 @@ import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.support.MemoryBuffer
+import java.io.File
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.LLVM.LLVMTargetMachineRef
 import org.bytedeco.llvm.global.LLVM
-import java.io.File
 
 public class TargetMachine internal constructor() :
     ContainsReference<LLVMTargetMachineRef>, Disposable, Validatable,

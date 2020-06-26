@@ -16,6 +16,8 @@ import dev.supergrecko.vexe.llvm.ir.values.GlobalVariable
 import dev.supergrecko.vexe.llvm.support.MemoryBuffer
 import dev.supergrecko.vexe.llvm.support.Message
 import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
+import java.io.File
+import java.nio.ByteBuffer
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
@@ -23,8 +25,6 @@ import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
-import java.io.File
-import java.nio.ByteBuffer
 
 public class Module internal constructor() : AutoCloseable, Disposable,
     ContainsReference<LLVMModuleRef> {

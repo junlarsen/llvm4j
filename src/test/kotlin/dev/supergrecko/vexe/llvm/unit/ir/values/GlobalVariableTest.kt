@@ -79,4 +79,4 @@ internal class GlobalVariableTest : TestSuite({
         cleanup(mod)
     }
 }
-) 
+)

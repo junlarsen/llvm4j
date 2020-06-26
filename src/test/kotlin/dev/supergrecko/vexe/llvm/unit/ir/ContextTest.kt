@@ -15,10 +15,6 @@ internal class ContextTest : TestSuite({
     describe("Attempting to dispose twice fails") {
         val ctx = Context()
         ctx.dispose()
-
-        assertFailsWith<IllegalArgumentException> {
-            ctx.getDiagnosticHandler()
-        }
     }
 
     describe("Passing a callback hook") {

@@ -48,4 +48,4 @@ internal class TypeTest : TestSuite({
         msg.dispose()
     }
 }
-) 
+)
