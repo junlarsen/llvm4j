@@ -6,6 +6,7 @@ import org.bytedeco.llvm.global.LLVM
 
 public class Use internal constructor() : ContainsReference<LLVMUseRef> {
     public override lateinit var ref: LLVMUseRef
+        internal set
 
     /**
      * Construct a new Type from an LLVM pointer reference
@@ -16,12 +17,11 @@ public class Use internal constructor() : ContainsReference<LLVMUseRef> {
 
     //region Core::Values::Usage
     /**
-     * Get the next usage in the iterator
+     * Get the next [Use] in the iterator
      *
-     * This should be used with [Value.getFirstUse] as this continues the
-     * underlying C++ iterator.
+     * @see LLVM.LLVMGetNextUse
      */
-    public fun nextUse(): Use? {
+    public fun getNextUse(): Use? {
         val use = LLVM.LLVMGetNextUse(ref)
 
         return if (use != null) {

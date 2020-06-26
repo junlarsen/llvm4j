@@ -5,7 +5,6 @@ import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.values.DebugLocationValue
-import dev.supergrecko.vexe.llvm.ir.values.MetadataValue
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -14,11 +13,8 @@ public open class Instruction internal constructor() : Value(),
     DebugLocationValue, Validatable {
     public override var valid = true
 
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::Instructions
@@ -38,21 +34,31 @@ public open class Instruction internal constructor() : Value(),
      *
      * @see LLVM.LLVMGetMetadata
      */
-    public fun getMetadata(kind: Int): MetadataValue {
-        require(hasMetadata())
+    public fun getMetadata(kind: Int): Metadata {
+        require(hasMetadata()) {
+            "This instruction does not have any metadata attached"
+        }
 
-        val md = LLVM.LLVMGetMetadata(ref, kind)
+        val value = LLVM.LLVMGetMetadata(ref, kind)
+        val md = LLVM.LLVMValueAsMetadata(value)
 
-        return MetadataValue(md)
+        return Metadata(md)
     }
 
     /**
      * Set the metadata for this instruction
      *
+     * TODO: Find replacement for the context used in MetadataAsValue
+     *
      * @see LLVM.LLVMSetMetadata
      */
-    public fun setMetadata(kind: Int, metadata: MetadataValue) {
-        LLVM.LLVMSetMetadata(ref, kind, metadata.ref)
+    public fun setMetadata(kind: Int, metadata: Metadata) {
+        val value = LLVM.LLVMMetadataAsValue(
+            getContext().ref,
+            metadata.ref
+        )
+
+        LLVM.LLVMSetMetadata(ref, kind, value)
     }
 
     /**
@@ -175,7 +181,9 @@ public open class Instruction internal constructor() : Value(),
      * @see LLVM.LLVMGetNumSuccessors
      */
     public fun getSuccessorCount(): Int {
-        require(isTerminator())
+        require(isTerminator()) {
+            "This instruction is not a terminator"
+        }
 
         return LLVM.LLVMGetNumSuccessors(ref)
     }
@@ -186,8 +194,12 @@ public open class Instruction internal constructor() : Value(),
      * @see LLVM.LLVMGetSuccessor
      */
     public fun getSuccessor(index: Int): BasicBlock? {
-        require(isTerminator())
-        require(index < getSuccessorCount())
+        require(isTerminator()) {
+            "This instruction is not a terminator"
+        }
+        require(index < getSuccessorCount()) {
+            "Out of bounds index. Index: $index, Count: ${getSuccessorCount()}"
+        }
 
         val bb = LLVM.LLVMGetSuccessor(ref, index)
 
@@ -200,7 +212,9 @@ public open class Instruction internal constructor() : Value(),
      * @see LLVM.LLVMSetSuccessor
      */
     public fun setSuccessor(index: Int, block: BasicBlock) {
-        require(isTerminator())
+        require(isTerminator()) {
+            "This instruction is not a terminator"
+        }
 
         LLVM.LLVMSetSuccessor(ref, index, block.ref)
     }

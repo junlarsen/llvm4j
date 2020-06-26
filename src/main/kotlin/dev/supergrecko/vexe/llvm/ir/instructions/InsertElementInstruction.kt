@@ -4,7 +4,7 @@ import dev.supergrecko.vexe.llvm.ir.Instruction
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 
 public class InsertElementInstruction internal constructor() : Instruction() {
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 }

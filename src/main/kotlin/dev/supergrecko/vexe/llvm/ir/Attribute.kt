@@ -9,21 +9,25 @@ import org.bytedeco.llvm.global.LLVM
 public class Attribute internal constructor() :
     ContainsReference<LLVMAttributeRef> {
     public override lateinit var ref: LLVMAttributeRef
+        internal set
 
-    /**
-     * TODO: Make these constructors internal (see #63)
-     */
-    public constructor(attribute: LLVMAttributeRef) : this() {
-        ref = attribute
+    public constructor(llvmRef: LLVMAttributeRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::Context
     /**
      * Create a string attribute
      *
+     * If no context is provided, the global llvm context will be used
+     *
      * @see LLVM.LLVMCreateStringAttribute
      */
-    public constructor(context: Context, kind: String, value: String) : this() {
+    public constructor(
+        kind: String,
+        value: String,
+        context: Context = Context.getGlobalContext()
+    ) : this() {
         ref = LLVM.LLVMCreateStringAttribute(
             context.ref,
             kind,
@@ -66,7 +70,7 @@ public class Attribute internal constructor() :
      * @see LLVM.LLVMGetStringAttributeKind
      */
     public fun getStringKind(): String {
-        require(isStringAttribute())
+        require(isStringAttribute()) { "This is not a string attribute" }
 
         val ptr = IntPointer(0)
 
@@ -79,7 +83,7 @@ public class Attribute internal constructor() :
      * @see LLVM.LLVMGetStringAttributeValue
      */
     public fun getStringValue(): String {
-        require(isStringAttribute())
+        require(isStringAttribute()) { "This is not a string attribute" }
 
         val ptr = IntPointer(0)
 
@@ -92,7 +96,7 @@ public class Attribute internal constructor() :
      * @see LLVM.LLVMGetEnumAttributeKind
      */
     public fun getEnumKind(): Int {
-        require(isEnumAttribute())
+        require(isEnumAttribute()) { "This is not an enum attribute" }
 
         return LLVM.LLVMGetEnumAttributeKind(ref)
     }
@@ -103,14 +107,12 @@ public class Attribute internal constructor() :
      * @see LLVM.LLVMGetEnumAttributeValue
      */
     public fun getEnumValue(): Long {
-        require(isEnumAttribute())
+        require(isEnumAttribute()) { "This is not an enum attribute" }
 
         return LLVM.LLVMGetEnumAttributeValue(ref)
     }
-    //endregion Core::Context
 
     public companion object {
-        //region Core::Context
         /**
          * Get the id of the last enum attribute kind
          *
@@ -123,6 +125,6 @@ public class Attribute internal constructor() :
         public fun getLastEnumKind(): Int {
             return LLVM.LLVMGetLastEnumAttributeKind()
         }
-        //endregion Core::Context
     }
+    //endregion Core::Context
 }

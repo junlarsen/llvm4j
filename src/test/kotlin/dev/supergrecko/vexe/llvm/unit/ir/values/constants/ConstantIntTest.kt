@@ -9,9 +9,7 @@ import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.utils.constIntPairOf
 import dev.supergrecko.vexe.llvm.utils.runAll
 import dev.supergrecko.vexe.test.TestSuite
-import java.lang.IllegalArgumentException
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 

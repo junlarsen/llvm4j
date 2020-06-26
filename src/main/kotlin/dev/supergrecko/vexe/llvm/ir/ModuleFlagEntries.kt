@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleFlagEntry
 import org.bytedeco.llvm.global.LLVM
@@ -15,13 +14,14 @@ import org.bytedeco.llvm.global.LLVM
  * should be named Entries as that is what it used for.
  */
 public class ModuleFlagEntries internal constructor() :
-    ContainsReference<LLVMModuleFlagEntry>, Validatable, Disposable,
+    ContainsReference<LLVMModuleFlagEntry>, Disposable,
     AutoCloseable {
     public override var valid: Boolean = true
     public override lateinit var ref: LLVMModuleFlagEntry
+        internal set
 
-    public constructor(provider: LLVMModuleFlagEntry) : this() {
-        ref = provider
+    public constructor(llvmRef: LLVMModuleFlagEntry) : this() {
+        ref = llvmRef
     }
 
     //region Core::Modules
@@ -48,6 +48,7 @@ public class ModuleFlagEntries internal constructor() :
      */
     public fun getKey(index: Int): String {
         val length = SizeTPointer(0)
+
         return LLVM.LLVMModuleFlagEntriesGetKey(ref, index, length).string
     }
 
@@ -66,7 +67,7 @@ public class ModuleFlagEntries internal constructor() :
     //endregion Core::Modules
 
     public override fun dispose() {
-        require(valid) { "This builder has already been disposed." }
+        require(valid) { "Cannot dispose object twice" }
 
         valid = false
 

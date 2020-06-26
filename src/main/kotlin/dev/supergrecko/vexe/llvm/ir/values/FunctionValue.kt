@@ -21,14 +21,8 @@ import org.bytedeco.llvm.global.LLVM
 
 public open class FunctionValue internal constructor() : Value(),
     DebugLocationValue {
-    // TODO: Test entire unit
-    //   It is currently not possible to test this unit as there is currently
-    //   no way to create a FunctionValue. - grecko 21.04.2020
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::BasicBlock
@@ -129,10 +123,9 @@ public open class FunctionValue internal constructor() : Value(),
 
     //region Core::Modules
     /**
-     * Get the next function in the iterator
+     * Get the next [FunctionValue] in the iterator
      *
-     * Use with [FunctionValue.getNextFunction] and
-     * [FunctionValue.getPreviousFunction] to move the iterator
+     * @see LLVM.LLVMGetNextFunction
      */
     public fun getNextFunction(): FunctionValue? {
         val next = LLVM.LLVMGetNextFunction(ref)
@@ -141,10 +134,9 @@ public open class FunctionValue internal constructor() : Value(),
     }
 
     /**
-     * Get the previous function in the iterator
+     * Get the previous [FunctionValue] in the iterator
      *
-     * Use with [FunctionValue.getNextFunction] and
-     * [FunctionValue.getPreviousFunction] to move the iterator
+     * @see LLVM.LLVMGetPreviousInstruction
      */
     public fun getPreviousFunction(): FunctionValue? {
         val prev = LLVM.LLVMGetPreviousFunction(ref)
@@ -198,12 +190,22 @@ public open class FunctionValue internal constructor() : Value(),
     //endregion Core::Values::Constants::FunctionValues::FunctionParameters
 
     //region Core::Values::Constants::FunctionValues::IndirectFunctions
+    /**
+     * Get the indirect resolver if it has been set
+     *
+     * @see LLVM.LLVMGetGlobalIFuncResolver
+     */
     public fun getIndirectResolver(): IndirectFunction? {
         val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
 
         return wrap(resolver) { IndirectFunction(it) }
     }
 
+    /**
+     * Set the indirect resolver
+     *
+     * @see LLVM.LLVMSetGlobalIFuncResolver
+     */
     public fun setIndirectResolver(function: IndirectFunction) {
         LLVM.LLVMSetGlobalIFuncResolver(ref, function.ref)
     }
@@ -234,6 +236,11 @@ public open class FunctionValue internal constructor() : Value(),
     //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
     //region Core::Values::Constants::FunctionValues
+    /**
+     * Get the calling convention for this function
+     *
+     * @see LLVM.LLVMGetFunctionCallConv
+     */
     public fun getCallConvention(): CallConvention {
         val cc = LLVM.LLVMGetFunctionCallConv(ref)
 
@@ -242,10 +249,20 @@ public open class FunctionValue internal constructor() : Value(),
             ?: throw Unreachable()
     }
 
+    /**
+     * Set the calling convention for this function
+     *
+     * @see LLVM.LLVMSetFunctionCallConv
+     */
     public fun setCallConvention(convention: CallConvention) {
         LLVM.LLVMSetFunctionCallConv(ref, convention.value)
     }
 
+    /**
+     * Get the personality function for this function
+     *
+     * @see LLVM.LLVMGetPersonalityFn
+     */
     public fun getPersonalityFunction(): FunctionValue {
         require(hasPersonalityFunction()) {
             "This function does not have a personality function"
@@ -256,14 +273,29 @@ public open class FunctionValue internal constructor() : Value(),
         return FunctionValue(fn)
     }
 
+    /**
+     * Set the personality function for this function
+     *
+     * @see LLVM.LLVMSetPersonalityFn
+     */
     public fun setPersonalityFunction(function: FunctionValue) {
         LLVM.LLVMSetPersonalityFn(ref, function.ref)
     }
 
+    /**
+     * Get the GC name for this function
+     *
+     * @see LLVM.LLVMGetGC
+     */
     public fun getGarbageCollector(): String {
         return LLVM.LLVMGetGC(ref).string
     }
 
+    /**
+     * Set the GC name for this function
+     *
+     * @see LLVM.LLVMSetGC
+     */
     public fun setGarbageCollector(collector: String) {
         LLVM.LLVMSetGC(ref, collector)
     }
@@ -414,13 +446,14 @@ public open class FunctionValue internal constructor() : Value(),
      *
      * As opposed to the LLVM implementation, this returns true if the function
      * is valid.
+     *
+     * @see LLVM.LLVMVerifyFunction
      */
     public fun verify(action: VerifierFailureAction): Boolean {
-        // LLVM Source says:
-        // > Note that this function's return value is inverted from what you
-        // > would expect of a function called "verify".
-        // Thus we invert it again ...
-        return !LLVM.LLVMVerifyFunction(ref, action.value).fromLLVMBool()
+        val result = LLVM.LLVMVerifyFunction(ref, action.value)
+
+        // 0 on success, invert
+        return !result.fromLLVMBool()
     }
 
     /**
@@ -437,6 +470,8 @@ public open class FunctionValue internal constructor() : Value(),
      * used instead of [LLVM.LLVMViewFunctionCFG]
      *
      * TODO: Does this even work via JNI??
+     *
+     * @see LLVM.LLVMViewFunctionCFG
      */
     public fun viewConfiguration(hideBasicBlocks: Boolean) {
         if (hideBasicBlocks) {

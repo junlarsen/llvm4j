@@ -14,7 +14,10 @@ import org.junit.jupiter.api.TestFactory
  */
 public open class TestSuite(exec: TestSuite.() -> Unit) {
     private val cases: MutableList<TestCase> = mutableListOf()
-    init { exec() }
+
+    init {
+        exec()
+    }
 
     /**
      * Create a test case

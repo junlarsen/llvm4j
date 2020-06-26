@@ -7,9 +7,10 @@ import org.bytedeco.llvm.global.LLVM
 public class DiagnosticInfo internal constructor() :
     ContainsReference<LLVMDiagnosticInfoRef> {
     public override lateinit var ref: LLVMDiagnosticInfoRef
+        internal set
 
-    public constructor(info: LLVMDiagnosticInfoRef) : this() {
-        ref = info
+    public constructor(llvmRef: LLVMDiagnosticInfoRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::Context

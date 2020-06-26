@@ -2,15 +2,15 @@ package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.target.TargetMachine
 import org.bytedeco.llvm.LLVM.LLVMTargetDataRef
 import org.bytedeco.llvm.global.LLVM
 
 public class TargetData internal constructor() :
-    ContainsReference<LLVMTargetDataRef>, Disposable, Validatable,
+    ContainsReference<LLVMTargetDataRef>, Disposable,
     AutoCloseable {
     public override lateinit var ref: LLVMTargetDataRef
+        internal set
     public override var valid: Boolean = true
 
     public constructor(llvmRef: LLVMTargetDataRef) : this() {
@@ -35,7 +35,7 @@ public class TargetData internal constructor() :
     //endregion Target
 
     public override fun dispose() {
-        require(valid) { "This target data has already been disposed." }
+        require(valid) { "Cannot dispose object twice" }
 
         valid = false
 

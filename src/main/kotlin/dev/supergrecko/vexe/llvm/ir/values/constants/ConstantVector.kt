@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.ir.values.constants
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.ir.IntPredicate
-import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
@@ -15,11 +14,14 @@ import org.bytedeco.llvm.global.LLVM
 
 public class ConstantVector internal constructor() : Value(), ConstantValue,
     CompositeValue {
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
+    //region Core::Values::Constants::ConstantExpressions
     /**
+     * Create a new vector of a list of values
+     *
      * @see LLVM.LLVMConstVector
      */
     public constructor(values: List<Value>) : this() {
@@ -28,7 +30,6 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
         ref = LLVM.LLVMConstVector(PointerPointer(*ptr), ptr.size)
     }
 
-    //region Core::Values::Constants::ConstantExpressions
     /**
      * Negate the constant value
      *

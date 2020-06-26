@@ -16,18 +16,6 @@ internal class TypeTest : TestSuite({
         assertEquals(type.ref, IntType(underlying.ref).ref)
     }
 
-    describe("Casting to the wrong type will fail at runtime") {
-        // it is impossible to guarantee that the underlying types is valid or
-        // invalid
-        val type = IntType(32)
-        val ptr = type.toPointerType()
-        val underlying = ptr.getElementType()
-
-        assertFailsWith<IllegalArgumentException> {
-            FunctionType(underlying.ref).ref
-        }
-    }
-
     describe("The context the type was made in is retrievable") {
         val ctx = Context()
         val type = IntType(32, ctx)
@@ -48,4 +36,4 @@ internal class TypeTest : TestSuite({
         msg.dispose()
     }
 }
-) 
+)

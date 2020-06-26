@@ -2,22 +2,21 @@ package dev.supergrecko.vexe.llvm.executionengine
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMGenericValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class GenericValue internal constructor() : Validatable, Disposable,
+public class GenericValue internal constructor() : Disposable, AutoCloseable,
     ContainsReference<LLVMGenericValueRef> {
     public override lateinit var ref: LLVMGenericValueRef
+        internal set
     public override var valid: Boolean = true
 
-    public constructor(engine: LLVMGenericValueRef) : this() {
-        ref = engine
+    public constructor(llvmRef: LLVMGenericValueRef) : this() {
+        ref = llvmRef
     }
 
     //region ExecutionEngine
@@ -94,8 +93,12 @@ public class GenericValue internal constructor() : Validatable, Disposable,
     //endregion ExecutionEngine
 
     override fun dispose() {
-        require(valid) { "This execution engine has already been disposed" }
+        require(valid) { "Cannot dispose object twice" }
+
+        valid = false
 
         LLVM.LLVMDisposeGenericValue(ref)
     }
+
+    public override fun close() = dispose()
 }

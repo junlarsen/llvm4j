@@ -23,7 +23,9 @@ public interface ConstantValue : ContainsReference<LLVMValueRef> {
      */
     public fun getOpcode(): Opcode {
         val isConst = LLVM.LLVMIsConstant(ref).fromLLVMBool()
-        require(isConst)
+        require(isConst) {
+            "Value must be constant to retrieve opcode"
+        }
 
         val int = LLVM.LLVMGetConstOpcode(ref)
 
@@ -38,9 +40,9 @@ public interface ConstantValue : ContainsReference<LLVMValueRef> {
      * This requires both this and the destination type to be non-aggregate,
      * first-class types.
      *
-     * @see LLVM.LLVMConstBitCast
-     *
      * TODO: Determine that this is not an aggregate type
+     *
+     * @see LLVM.LLVMConstBitCast
      */
     public fun bitcast(type: Type): Value {
         val ref = LLVM.LLVMConstBitCast(ref, type.ref)
@@ -54,10 +56,10 @@ public interface ConstantValue : ContainsReference<LLVMValueRef> {
      * This is an LLVM-C/C++ specific API. It is not a part of the
      * instruction set.
      *
+     * TODO: Find out which types are compatible here, int?
+     *
      * @see LLVM.LLVMConstSExtOrBitCast
      * @see LLVM.LLVMConstZExtOrBitCast
-     *
-     * TODO: Find out which types are compatible here, int?
      */
     public fun extOrBitcast(type: Type, signExtend: Boolean): Value {
         val ref = if (signExtend) {
@@ -90,9 +92,9 @@ public interface ConstantValue : ContainsReference<LLVMValueRef> {
     /**
      * Attempt to truncate, default to bitcast
      *
-     * @see LLVM.LLVMConstTruncOrBitCast
-     *
      * TODO: Find out which types are compatible here, int?
+     *
+     * @see LLVM.LLVMConstTruncOrBitCast
      */
     public fun truncOrBitcast(type: Type): Value {
         val ref = LLVM.LLVMConstTruncOrBitCast(ref, type.ref)

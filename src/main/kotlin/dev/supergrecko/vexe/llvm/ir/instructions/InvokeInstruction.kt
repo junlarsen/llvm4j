@@ -9,8 +9,8 @@ import org.bytedeco.llvm.global.LLVM
 
 public class InvokeInstruction internal constructor() : Instruction(),
     CallBase {
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::Instructions::CallSitesAndInvocations

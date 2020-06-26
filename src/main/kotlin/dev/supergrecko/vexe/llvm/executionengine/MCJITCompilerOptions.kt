@@ -7,6 +7,11 @@ import org.bytedeco.llvm.global.LLVM
 public class MCJITCompilerOptions internal constructor() :
     ContainsReference<LLVMMCJITCompilerOptions> {
     public override lateinit var ref: LLVMMCJITCompilerOptions
+        internal set
+
+    public constructor(llvmRef: LLVMMCJITCompilerOptions) : this() {
+        ref = llvmRef
+    }
 
     //region ExecutionEngine
     // TODO: Find a way to create

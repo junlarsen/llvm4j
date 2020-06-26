@@ -11,12 +11,10 @@ public class BasicBlock internal constructor() : Validatable,
     ContainsReference<LLVMBasicBlockRef> {
     override var valid = true
     public override lateinit var ref: LLVMBasicBlockRef
+        internal set
 
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(block: LLVMBasicBlockRef) : this() {
-        ref = block
+    public constructor(llvmRef: LLVMBasicBlockRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::BasicBlock
@@ -39,7 +37,7 @@ public class BasicBlock internal constructor() : Validatable,
      * @see LLVM.LLVMBasicBlockAsValue
      */
     public fun toValue(): Value {
-        require(valid)
+        require(valid) { "Cannot use deleted block" }
 
         val v = LLVM.LLVMBasicBlockAsValue(ref)
 
@@ -52,7 +50,7 @@ public class BasicBlock internal constructor() : Validatable,
      * @see LLVM.LLVMGetBasicBlockName
      */
     public fun getName(): String {
-        require(valid)
+        require(valid) { "Cannot use deleted block" }
 
         return LLVM.LLVMGetBasicBlockName(ref).string
     }
@@ -63,7 +61,7 @@ public class BasicBlock internal constructor() : Validatable,
      * @see LLVM.LLVMGetBasicBlockParent
      */
     public fun getFunction(): FunctionValue {
-        require(valid)
+        require(valid) { "Cannot use deleted block" }
 
         val fn = LLVM.LLVMGetBasicBlockParent(ref)
 
@@ -76,7 +74,7 @@ public class BasicBlock internal constructor() : Validatable,
      * @see LLVM.LLVMGetBasicBlockTerminator
      */
     public fun getTerminator(): Instruction? {
-        require(valid)
+        require(valid) { "Cannot use deleted block" }
 
         val instr = LLVM.LLVMGetBasicBlockTerminator(ref)
 
@@ -90,7 +88,7 @@ public class BasicBlock internal constructor() : Validatable,
      * to move the iterator
      */
     public fun getNextBlock(): BasicBlock? {
-        require(valid)
+        require(valid) { "Cannot use deleted block" }
 
         val bb = LLVM.LLVMGetNextBasicBlock(ref)
 
@@ -104,7 +102,7 @@ public class BasicBlock internal constructor() : Validatable,
      * to move the iterator
      */
     public fun getPreviousBlock(): BasicBlock? {
-        require(valid)
+        require(valid) { "Cannot use deleted block" }
 
         val bb = LLVM.LLVMGetPreviousBasicBlock(ref)
 
@@ -121,7 +119,7 @@ public class BasicBlock internal constructor() : Validatable,
         name: String,
         context: Context = Context.getGlobalContext()
     ): BasicBlock {
-        require(valid)
+        require(valid) { "Cannot use deleted block" }
 
         val bb = LLVM.LLVMInsertBasicBlockInContext(context.ref, ref, name)
 
@@ -134,7 +132,7 @@ public class BasicBlock internal constructor() : Validatable,
      * @see LLVM.LLVMDeleteBasicBlock
      */
     public fun delete() {
-        require(valid)
+        require(valid) { "Cannot use deleted block" }
 
         LLVM.LLVMDeleteBasicBlock(ref)
 
@@ -156,7 +154,7 @@ public class BasicBlock internal constructor() : Validatable,
      * @see LLVM.LLVMMoveBasicBlockBefore
      */
     public fun moveBefore(other: BasicBlock) {
-        require(valid && other.valid)
+        require(valid && other.valid) { "Cannot use deleted block" }
 
         LLVM.LLVMMoveBasicBlockBefore(ref, other.ref)
     }
@@ -167,28 +165,38 @@ public class BasicBlock internal constructor() : Validatable,
      * @see LLVM.LLVMMoveBasicBlockAfter
      */
     public fun moveAfter(other: BasicBlock) {
-        require(valid && other.valid)
+        require(valid && other.valid) { "Cannot use deleted block" }
 
         LLVM.LLVMMoveBasicBlockAfter(ref, other.ref)
     }
 
     /**
-     * Get the first instruction in this block if it exists
+     * Get the first [Instruction] in the iterator
+     *
+     * Move the iterator with [Instruction.getNextInstruction] and
+     * [Instruction.getPreviousInstruction]
      *
      * @see LLVM.LLVMGetFirstInstruction
      */
     public fun getFirstInstruction(): Instruction? {
+        require(valid) { "Cannot use deleted block" }
+
         val instr = LLVM.LLVMGetFirstInstruction(ref)
 
         return wrap(instr) { Instruction(it) }
     }
 
     /**
-     * Get the last instruction in this block if it exists
+     * Get the last [Instruction] in the iterator
+     *
+     * Move the iterator with [Instruction.getNextInstruction] and
+     * [Instruction.getPreviousInstruction]
      *
      * @see LLVM.LLVMGetLastInstruction
      */
     public fun getLastInstruction(): Instruction? {
+        require(valid) { "Cannot use deleted block" }
+
         val instr = LLVM.LLVMGetLastInstruction(ref)
 
         return wrap(instr) { Instruction(it) }

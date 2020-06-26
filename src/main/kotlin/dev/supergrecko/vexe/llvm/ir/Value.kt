@@ -1,52 +1,13 @@
 package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
-import dev.supergrecko.vexe.llvm.internal.contracts.OrderedEnum
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.wrap
-import dev.supergrecko.vexe.llvm.ir.values.GlobalValue
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantVector
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-/**
- * Support types matching LLVMValueKind
- *
- * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
- */
-public enum class ValueKind(public override val value: Int) : OrderedEnum<Int> {
-    Argument(LLVM.LLVMArgumentValueKind),
-    BasicBlock(LLVM.LLVMBasicBlockValueKind),
-    MemoryUse(LLVM.LLVMMemoryUseValueKind),
-    MemoryDef(LLVM.LLVMMemoryDefValueKind),
-    MemoryPhi(LLVM.LLVMMemoryPhiValueKind),
-    Function(LLVM.LLVMFunctionValueKind),
-    GlobalAlias(LLVM.LLVMGlobalAliasValueKind),
-    GlobalIFunc(LLVM.LLVMGlobalIFuncValueKind),
-    GlobalVariable(LLVM.LLVMGlobalVariableValueKind),
-    BlockAddress(LLVM.LLVMBlockAddressValueKind),
-    ConstantExpr(LLVM.LLVMConstantExprValueKind),
-    ConstantArray(LLVM.LLVMConstantArrayValueKind),
-    ConstantStruct(LLVM.LLVMConstantStructValueKind),
-    ConstantVector(LLVM.LLVMConstantVectorValueKind),
-    UndefValue(LLVM.LLVMUndefValueValueKind),
-    ConstantAggregateZero(LLVM.LLVMConstantAggregateZeroValueKind),
-    ConstantDataArray(LLVM.LLVMConstantDataArrayValueKind),
-    ConstantDataVector(LLVM.LLVMConstantDataVectorValueKind),
-    ConstantInt(LLVM.LLVMConstantIntValueKind),
-    ConstantFP(LLVM.LLVMConstantFPValueKind),
-    ConstantPointerNull(LLVM.LLVMConstantPointerNullValueKind),
-    ConstantTokenNone(LLVM.LLVMConstantTokenNoneValueKind),
-    MetadataAsValue(LLVM.LLVMMetadataAsValueValueKind),
-    InlineAsm(LLVM.LLVMInlineAsmValueKind),
-    Instruction(LLVM.LLVMInstructionValueKind)
-}
-
-/**
- * Base class mirroring llvm::Value
- */
 public open class Value internal constructor() :
     ContainsReference<LLVMValueRef> {
     public final override lateinit var ref: LLVMValueRef
@@ -55,8 +16,8 @@ public open class Value internal constructor() :
     /**
      * Construct a new Type from an LLVM pointer reference
      */
-    public constructor(value: LLVMValueRef) : this() {
-        ref = value
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::Values::GeneralAPIs
@@ -74,21 +35,9 @@ public open class Value internal constructor() :
     /**
      * Set the IR name for this value
      *
-     * If this yields unexpected results, see the source code for this file
-     *
-     * LLVM-C does not provide a way for us to check if a value has a
-     * name or not and thus we cannot implement all the checks LLVM-C++
-     * does in their source file which means this may yield unwanted or
-     * unexpected results.
-     *
-     * https://llvm.org/doxygen/Value_8cpp_source.html#l00223
-     *
-     * TODO: Research if there is any other way we can determine the above
-     * TODO: Test when viable solution has been found
+     * @see LLVM.LLVMSetValueName2
      */
     public fun setName(name: String) {
-        require(!(getContext().isDiscardingValueNames() && this !is GlobalValue))
-
         LLVM.LLVMSetValueName2(ref, name, name.length.toLong())
     }
 
@@ -138,8 +87,12 @@ public open class Value internal constructor() :
      * All values hold a context through their type
      *
      * Fetches the context this value was created in.
+     *
+     * @see LLVM.LLVMGetTypeContext
      */
-    public fun getContext(): Context = getType().getContext()
+    public fun getContext(): Context {
+        return getType().getContext()
+    }
 
     /**
      * Dump the string representation of this value to stderr
@@ -193,8 +146,9 @@ public open class Value internal constructor() :
 
     //region Core::Values::Usage
     /**
-     * Get the first use for this value, the next value can be retrieved by
-     * calling [Use.nextUse] on the returned value.
+     * Get the first [Use] for this value
+     *
+     * Move the iterator with [Use.getNextUse]
      *
      * @see LLVM.LLVMGetFirstUse
      */

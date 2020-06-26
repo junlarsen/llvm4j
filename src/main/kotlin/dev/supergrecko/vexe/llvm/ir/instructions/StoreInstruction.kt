@@ -6,7 +6,7 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 
 public class StoreInstruction internal constructor() : Instruction(),
     MemoryAccessor {
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 }

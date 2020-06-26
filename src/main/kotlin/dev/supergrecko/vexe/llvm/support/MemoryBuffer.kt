@@ -1,7 +1,6 @@
 package dev.supergrecko.vexe.llvm.support
 
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Module
 import java.io.File
@@ -12,18 +11,21 @@ import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
 public class MemoryBuffer internal constructor() :
-    AutoCloseable, Validatable, Disposable {
-    internal lateinit var ref: LLVMMemoryBufferRef
+    AutoCloseable, Disposable {
+    public lateinit var ref: LLVMMemoryBufferRef
+        internal set
     public override var valid: Boolean = true
 
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(buffer: LLVMMemoryBufferRef) : this() {
-        ref = buffer
+    public constructor(llvmRef: LLVMMemoryBufferRef) : this() {
+        ref = llvmRef
     }
 
     //region BitReader
+    /**
+     * Parse bitecode memory buffer into a LLVM module
+     *
+     * @see LLVM.LLVMParseBitcodeInContext2
+     */
     public fun parse(context: Context = Context.getGlobalContext()): Module {
         val ptr = LLVMModuleRef()
 
@@ -32,6 +34,13 @@ public class MemoryBuffer internal constructor() :
         return Module(ptr)
     }
 
+    /**
+     * Parse bitcode in memory buffer into a LLVM module
+     *
+     * TODO: What differentiates this from [parse]
+     *
+     * @see LLVM.LLVMGetBitcodeModuleInContext2
+     */
     public fun getModule(
         context: Context = Context.getGlobalContext()
     ): Module {
@@ -62,8 +71,10 @@ public class MemoryBuffer internal constructor() :
         )
 
         if (res != 0) {
-            throw RuntimeException("Error occurred while creating buffer from" +
-                    " file. Provided LLVM Error: $outMessage")
+            throw RuntimeException(
+                "Error occurred while creating buffer from" +
+                        " file. Provided LLVM Error: $outMessage"
+            )
         }
 
         ref = ptr.get(LLVMMemoryBufferRef::class.java, 0)
@@ -72,9 +83,9 @@ public class MemoryBuffer internal constructor() :
     /**
      * Get the first char in the buffer
      *
-     * @see LLVM.LLVMGetBufferStart
-     *
      * TODO: How to advance and get the next characters?
+     *
+     * @see LLVM.LLVMGetBufferStart
      */
     public fun getStart(): Char {
         val s = LLVM.LLVMGetBufferStart(ref)
@@ -85,10 +96,10 @@ public class MemoryBuffer internal constructor() :
     /**
      * Get the size of the buffer
      *
-     * @see LLVM.LLVMGetBufferSize
-     *
      * TODO: Find a reliable, x-platform way to test this as different
      *   platforms return different sizes for values
+     *
+     * @see LLVM.LLVMGetBufferSize
      */
     public fun getSize(): Long {
         return LLVM.LLVMGetBufferSize(ref)
@@ -96,7 +107,7 @@ public class MemoryBuffer internal constructor() :
     //endregion MemoryBuffers
 
     override fun dispose() {
-        require(valid) { "This buffer has already been disposed." }
+        require(valid) { "Cannot dispose object twice" }
 
         valid = false
 

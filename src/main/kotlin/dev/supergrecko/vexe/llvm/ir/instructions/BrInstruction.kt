@@ -8,8 +8,8 @@ import org.bytedeco.llvm.global.LLVM
 
 public class BrInstruction internal constructor() :
     Instruction() {
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::Instructions::Terminators

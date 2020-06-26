@@ -4,20 +4,16 @@ import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.map
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.ir.Type
-import dev.supergrecko.vexe.llvm.ir.TypeKind
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class FunctionType internal constructor() : Type() {
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(llvmType: LLVMTypeRef) : this() {
-        ref = llvmType
-        requireKind(TypeKind.Function)
+    public constructor(llvmRef: LLVMTypeRef) : this() {
+        ref = llvmRef
     }
 
+    //region Core::Types::FunctionTypes
     /**
      * Create a function types
      *
@@ -41,21 +37,40 @@ public class FunctionType internal constructor() : Type() {
         )
     }
 
-    //region Core::Types::FunctionTypes
+    /**
+     * Is this function type variadic?
+     *
+     * @see LLVM.LLVMIsFunctionVarArg
+     */
     public fun isVariadic(): Boolean {
         return LLVM.LLVMIsFunctionVarArg(ref).fromLLVMBool()
     }
 
+    /**
+     * Get the parameter count
+     *
+     * @see LLVM.LLVMCountParamTypes
+     */
     public fun getParameterCount(): Int {
         return LLVM.LLVMCountParamTypes(ref)
     }
 
+    /**
+     * Get the return type
+     *
+     * @see LLVM.LLVMGetReturnType
+     */
     public fun getReturnType(): Type {
         val type = LLVM.LLVMGetReturnType(ref)
 
         return Type(type)
     }
 
+    /**
+     * Get the parameter types
+     *
+     * @see LLVM.LLVMGetParamTypes
+     */
     public fun getParameterTypes(): List<Type> {
         val dest = PointerPointer<LLVMTypeRef>(getParameterCount().toLong())
         LLVM.LLVMGetParamTypes(ref, dest)

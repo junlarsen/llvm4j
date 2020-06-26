@@ -18,4 +18,4 @@ internal class ConstantTest : TestSuite({
         assertEquals(1L, ConstantInt(res.ref).getSignedValue())
     }
 }
-) 
+)

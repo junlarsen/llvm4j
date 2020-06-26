@@ -38,58 +38,105 @@ public enum class Linkage(public override val value: Int) : OrderedEnum<Int> {
 }
 
 public open class GlobalValue internal constructor() : Value(), ConstantValue {
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(value: LLVMValueRef) : this() {
-        ref = value
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::Values::Constants::GlobalValues
+    /**
+     * Get the linkage type
+     *
+     * @see LLVM.LLVMGetLinkage
+     */
     public fun getLinkage(): Linkage {
         val ln = LLVM.LLVMGetLinkage(ref)
 
         return Linkage.values().first { it.value == ln }
     }
 
+    /**
+     * Set the linkage type
+     *
+     * @see LLVM.LLVMSetLinkage
+     */
     public fun setLinkage(linkage: Linkage) {
         LLVM.LLVMSetLinkage(ref, linkage.value)
     }
 
+    /**
+     * Get the section
+     *
+     * @see LLVM.LLVMGetSection
+     */
     public fun getSection(): String {
         return LLVM.LLVMGetSection(ref).string
     }
 
+    /**
+     * Set the section
+     *
+     * @see LLVM.LLVMSetSection
+     */
     public fun setSection(data: String) {
         LLVM.LLVMSetSection(ref, data)
     }
 
+    /**
+     * Get the visibility
+     *
+     * @see LLVM.LLVMGetVisibility
+     */
     public fun getVisibility(): Visibility {
         val visibility = LLVM.LLVMGetVisibility(ref)
 
         return Visibility.values().first { it.value == visibility }
     }
 
+    /**
+     * Set the visibility
+     *
+     * @see LLVM.LLVMSetVisibility
+     */
     public fun setVisibility(visibility: Visibility) {
         LLVM.LLVMSetVisibility(ref, visibility.value)
     }
 
+    /**
+     * Get the storage class
+     *
+     * @see LLVM.LLVMGetDLLStorageClass
+     */
     public fun getStorageClass(): DLLStorageClass {
         val storage = LLVM.LLVMGetDLLStorageClass(ref)
 
         return DLLStorageClass.values().first { it.value == storage }
     }
 
+    /**
+     * Set the storage calss
+     *
+     * @see LLVM.LLVMSetDLLStorageClass
+     */
     public fun setStorageClass(storageClass: DLLStorageClass) {
         LLVM.LLVMSetDLLStorageClass(ref, storageClass.value)
     }
 
+    /**
+     * Get unnamed address importance
+     *
+     * @see LLVM.LLVMGetUnnamedAddress
+     */
     public fun getUnnamedAddress(): UnnamedAddress {
         val addr = LLVM.LLVMGetUnnamedAddress(ref)
 
         return UnnamedAddress.values().first { it.value == addr }
     }
 
+    /**
+     * Set unnamed address importance
+     *
+     * @see LLVM.LLVMSetUnnamedAddress
+     */
     public fun setUnnamedAddress(address: UnnamedAddress) {
         LLVM.LLVMSetUnnamedAddress(ref, address.value)
     }
