@@ -1,14 +1,18 @@
 package dev.supergrecko.vexe.llvm.executionengine
 
+import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerAllocateCodeSectionBase
+import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerAllocateCodeSectionCallback
+import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerAllocateDataSectionBase
+import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerAllocateDataSectionCallback
+import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerDestroyBase
+import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerDestroyCallback
+import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerFinalizeMemoryBase
+import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerFinalizeMemoryCallback
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMCJITMemoryManagerRef
-import org.bytedeco.llvm.LLVM.LLVMMemoryManagerAllocateCodeSectionCallback
-import org.bytedeco.llvm.LLVM.LLVMMemoryManagerAllocateDataSectionCallback
-import org.bytedeco.llvm.LLVM.LLVMMemoryManagerDestroyCallback
-import org.bytedeco.llvm.LLVM.LLVMMemoryManagerFinalizeMemoryCallback
 import org.bytedeco.llvm.global.LLVM
 
 public class MCJITMemoryManager internal constructor() :
@@ -30,23 +34,21 @@ public class MCJITMemoryManager internal constructor() :
      * callbacks. You may pass a [client] which will be passed into each
      * callback upon call.
      *
-     * TODO: Replace callbacks with Kotlin Lambda
-     *
      * @see LLVM.LLVMCreateSimpleMCJITMemoryManager
      */
     public constructor(
         client: Pointer,
-        onAllocateCode: LLVMMemoryManagerAllocateCodeSectionCallback,
-        onAllocateData: LLVMMemoryManagerAllocateDataSectionCallback,
-        onFinalizeMemory: LLVMMemoryManagerFinalizeMemoryCallback,
-        onManagerDestroy: LLVMMemoryManagerDestroyCallback
+        onAllocateCode: MemoryManagerAllocateCodeSectionCallback,
+        onAllocateData: MemoryManagerAllocateDataSectionCallback,
+        onFinalizeMemory: MemoryManagerFinalizeMemoryCallback,
+        onManagerDestroy: MemoryManagerDestroyCallback
     ) : this() {
         ref = LLVM.LLVMCreateSimpleMCJITMemoryManager(
             client,
-            onAllocateCode,
-            onAllocateData,
-            onFinalizeMemory,
-            onManagerDestroy
+            MemoryManagerAllocateCodeSectionBase(onAllocateCode),
+            MemoryManagerAllocateDataSectionBase(onAllocateData),
+            MemoryManagerFinalizeMemoryBase(onFinalizeMemory),
+            MemoryManagerDestroyBase(onManagerDestroy)
         )
     }
     //endregion ExecutionEngine

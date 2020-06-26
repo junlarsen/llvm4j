@@ -4,20 +4,15 @@ import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
+import dev.supergrecko.vexe.llvm.ir.callbacks.DiagnosticHandlerBase
+import dev.supergrecko.vexe.llvm.ir.callbacks.DiagnosticHandlerCallback
+import dev.supergrecko.vexe.llvm.ir.callbacks.YieldCallback
+import dev.supergrecko.vexe.llvm.ir.callbacks.YieldCallbackBase
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
-import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
 import org.bytedeco.llvm.LLVM.LLVMYieldCallback
 import org.bytedeco.llvm.global.LLVM
 
-/**
- * Higher level wrapper around llvm::LLVMContext
- *
- * - [Documentation](https://llvm.org/doxygen/classllvm_1_1LLVMContext.html)
- *
- * This primary constructor is public because anyone should be able to
- * create a context. The init block ensures the ref is valid
- */
 public class Context public constructor(
     llvmRef: LLVMContextRef = LLVM.LLVMContextCreate()
 ) : AutoCloseable, Disposable,
@@ -47,36 +42,22 @@ public class Context public constructor(
     /**
      * Set the DiagnosticHandler for this context
      *
-     * TODO: Find out pointer type of [diagnosticContext]
+     * Optionally, pass a [payload] which will be passed as the second
+     * argument to the callback type
      *
      * @see LLVM.LLVMContextSetDiagnosticHandler
      */
     public fun setDiagnosticHandler(
-        handler: LLVMDiagnosticHandler,
-        diagnosticContext: Pointer
+        handler: DiagnosticHandlerCallback,
+        payload: Pointer? = null
     ) {
-        LLVM.LLVMContextSetDiagnosticHandler(ref, handler, diagnosticContext)
-    }
+        val handlePtr = DiagnosticHandlerBase(handler)
 
-    /**
-     * Sets the diagnostic handler without a specified context.
-     *
-     * TODO: Do something about Pointer() because right now it's just a nullptr
-     *   which is not what we want.
-     *
-     * @throws IllegalArgumentException If internal instance has been dropped.
-     */
-    public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler) {
-        setDiagnosticHandler(handler, Pointer())
-    }
-
-    /**
-     * Get the diagnostic handler for this context.
-     *
-     * @see LLVM.LLVMContextGetDiagnosticHandler
-     */
-    public fun getDiagnosticHandler(): LLVMDiagnosticHandler {
-        return LLVM.LLVMContextGetDiagnosticHandler(ref)
+        LLVM.LLVMContextSetDiagnosticHandler(
+            ref,
+            handlePtr,
+            payload
+        )
     }
 
     /**
@@ -94,17 +75,20 @@ public class Context public constructor(
     }
 
     /**
-     * Register a yield callback with the given context.
+     * Register a yield callback with the given context
      *
-     * TODO: Find out how to actually call this thing from Kotlin/Java
+     * Optionally, pass a [payload] which will be passed as the second
+     * argument to the callback type
      *
      * @see LLVM.LLVMContextSetYieldCallback
      */
     public fun setYieldCallback(
-        callback: LLVMYieldCallback,
-        opaqueHandle: Pointer
+        callback: YieldCallback,
+        payload: Pointer? = null
     ) {
-        LLVM.LLVMContextSetYieldCallback(ref, callback, opaqueHandle)
+        val handlePtr = YieldCallbackBase(callback)
+
+        LLVM.LLVMContextSetYieldCallback(ref, handlePtr, payload)
     }
 
     /**
