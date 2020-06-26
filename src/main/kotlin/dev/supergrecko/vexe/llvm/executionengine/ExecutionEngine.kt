@@ -5,8 +5,10 @@ import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.TargetData
+import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
 import dev.supergrecko.vexe.llvm.target.TargetMachine
+import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
 import org.bytedeco.llvm.global.LLVM
@@ -145,6 +147,33 @@ public class ExecutionEngine public constructor() :
         val tm = LLVM.LLVMGetExecutionEngineTargetMachine(ref)
 
         return wrap(tm) { TargetMachine(it) }
+    }
+
+    /**
+     * Create a global mapping to a value
+     *
+     * @see LLVM.LLVMAddGlobalMapping
+     */
+    public fun addGlobalMapping(value: Value, address: Pointer) {
+        LLVM.LLVMAddGlobalMapping(ref, value.ref, address)
+    }
+
+    /**
+     * Get a pointer to a global value
+     *
+     * @see LLVM.LLVMGetPointerToGlobal
+     */
+    public fun getPointerToGlobal(value: Value): Pointer {
+        return LLVM.LLVMGetPointerToGlobal(ref, value.ref)
+    }
+
+    /**
+     * Get the address of a function
+     *
+     * @see LLVM.LLVMGetFunctionAddress
+     */
+    public fun getFunctionAddress(function: String): Long {
+        return LLVM.LLVMGetFunctionAddress(ref, function)
     }
     //endregion ExecutionEngine
 }
