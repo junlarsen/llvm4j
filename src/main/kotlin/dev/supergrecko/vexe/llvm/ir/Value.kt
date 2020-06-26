@@ -5,16 +5,7 @@ import dev.supergrecko.vexe.llvm.internal.contracts.OrderedEnum
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.wrap
-import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
-import dev.supergrecko.vexe.llvm.ir.values.GenericValue
 import dev.supergrecko.vexe.llvm.ir.values.GlobalValue
-import dev.supergrecko.vexe.llvm.ir.values.MetadataValue
-import dev.supergrecko.vexe.llvm.ir.values.PhiValue
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantArray
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantFloat
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantPointer
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantStruct
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantVector
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef

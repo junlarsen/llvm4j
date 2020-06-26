@@ -1,5 +1,7 @@
 package dev.supergrecko.vexe.llvm.ir
 
+import dev.supergrecko.vexe.llvm.executionengine.ExecutionEngine
+import dev.supergrecko.vexe.llvm.executionengine.MCJITCompilerOptions
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
@@ -559,12 +561,98 @@ public class Module internal constructor() : AutoCloseable,
      *
      * According to LLVM this is for historical reasons
      *
-     * @see LLVM.LLVMCreateModuleProviderForExistingModules
+     * @see LLVM.LLVMCreateModuleProviderForExistingModule
      */
     public fun getModuleProvider(): ModuleProvider {
         return ModuleProvider(this)
     }
     //endregion ModuleProviders
+
+    //region ExecutionEngine
+    /**
+     * Create a generic execution engine for this module
+     *
+     * @see LLVM.LLVMCreateExecutionEngineForModule
+     */
+    public fun createExecutionEngine(): ExecutionEngine {
+        val error = ByteArray(0)
+        val ee = ExecutionEngine()
+        val success = LLVM.LLVMCreateExecutionEngineForModule(
+            ee.ref, ref, error
+        )
+
+        return if (success.fromLLVMBool()) {
+            ee
+        } else {
+            throw RuntimeException(error.contentToString())
+        }
+    }
+
+    /**
+     * Create an interpreter for this module
+     *
+     * @see LLVM.LLVMCreateInterpreterForModule
+     */
+    public fun createInterpreter(): ExecutionEngine {
+        val error = ByteArray(0)
+        val ee = ExecutionEngine()
+        val success = LLVM.LLVMCreateInterpreterForModule(
+            ee.ref, ref, error
+        )
+
+        return if (success.fromLLVMBool()) {
+            ee
+        } else {
+            throw RuntimeException(error.contentToString())
+        }
+    }
+
+    /**
+     * Create a jit compiler for this module with the provided
+     * [optimizationLevel]
+     *
+     * @see LLVM.LLVMCreateJITCompilerForModule
+     */
+    public fun createJITCompiler(optimizationLevel: Int): ExecutionEngine {
+        val error = ByteArray(0)
+        val ee = ExecutionEngine()
+        val success = LLVM.LLVMCreateJITCompilerForModule(
+            ee.ref, ref, optimizationLevel, error
+        )
+
+        return if (success.fromLLVMBool()) {
+            ee
+        } else {
+            throw RuntimeException(error.contentToString())
+        }
+    }
+
+    /**
+     * Create a mcjit compiler for this module
+     *
+     * This function is currently unusable, see to do
+     *
+     * TODO: Find a way to create [MCJITCompilerOptions] from the C api
+     *   There is no obvious way to create this object from the C API
+     *
+     * @see LLVM.LLVMCreateMCJITCompilerForModule
+     */
+    public fun createMCJITCompiler(
+        options: MCJITCompilerOptions
+    ): ExecutionEngine {
+        val error = ByteArray(0)
+        val ee = ExecutionEngine()
+        val success = LLVM.LLVMCreateMCJITCompilerForModule(
+            ee.ref, ref, options.ref, options.ref.sizeof().toLong(), error
+        )
+
+        return if (success.fromLLVMBool()) {
+            ee
+        } else {
+            throw RuntimeException(error.contentToString())
+        }
+    }
+    //endregion ExecutionEngine
 
     public override fun dispose() {
         require(valid) { "This module has already been disposed." }
