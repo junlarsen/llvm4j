@@ -5,21 +5,17 @@ import dev.supergrecko.vexe.llvm.internal.util.map
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Type
-import dev.supergrecko.vexe.llvm.ir.TypeKind
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class StructType internal constructor() : Type(),
     CompositeType {
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(llvmType: LLVMTypeRef) : this() {
-        ref = llvmType
-        requireKind(TypeKind.Struct)
+    public constructor(llvmRef: LLVMTypeRef) : this() {
+        ref = llvmRef
     }
 
+    //region Core::Types::StructureTypes
     /**
      * Create a structure types
      *
@@ -55,21 +51,40 @@ public class StructType internal constructor() : Type(),
         ref = LLVM.LLVMStructCreateNamed(ctx.ref, name)
     }
 
-    //region Core::Types::StructureTypes
+    /**
+     * Is this struct type packed?
+     *
+     * @see LLVM.LLVMIsPackedStruct
+     */
     public fun isPacked(): Boolean {
         return LLVM.LLVMIsPackedStruct(ref).fromLLVMBool()
     }
 
+    /**
+     * Is this struct opaque?
+     *
+     * @see LLVM.LLVMIsOpaqueStruct
+     */
     public fun isOpaque(): Boolean {
         return LLVM.LLVMIsOpaqueStruct(ref).fromLLVMBool()
     }
 
+    /**
+     * Is this struct literal?
+     *
+     * @see LLVM.LLVMIsLiteralStruct
+     */
     public fun isLiteral(): Boolean {
         return LLVM.LLVMIsLiteralStruct(ref).fromLLVMBool()
     }
 
+    /**
+     * Set the element types of an opaque struct
+     *
+     * @see LLVM.LLVMStructSetBody
+     */
     public fun setBody(elementTypes: List<Type>, packed: Boolean) {
-        require(isOpaque())
+        require(isOpaque()) { "Cannot set body of non-opaque struct" }
 
         val types = elementTypes.map { it.ref }
         val array = ArrayList(types).toTypedArray()
@@ -78,8 +93,12 @@ public class StructType internal constructor() : Type(),
         LLVM.LLVMStructSetBody(ref, ptr, array.size, packed.toLLVMBool())
     }
 
+    /**
+     * Get the element type at the given [index]
+     *
+     * @see LLVM.LLVMGetElementType
+     */
     public fun getElementTypeAt(index: Int): Type {
-        // Refactor when moved
         require(index <= getElementCount()) {
             "Requested index $index is out of bounds for this struct"
         }
@@ -89,6 +108,11 @@ public class StructType internal constructor() : Type(),
         return Type(type)
     }
 
+    /**
+     * Get the name of this non-literal struct
+     *
+     * @see LLVM.LLVMGetStructName
+     */
     public fun getName(): String {
         require(!isLiteral()) { "Literal structures are never named" }
 
@@ -97,6 +121,11 @@ public class StructType internal constructor() : Type(),
         return name.string
     }
 
+    /**
+     * Get the element types of this struct
+     *
+     * @see LLVM.LLVMGetStructElementTypes
+     */
     public fun getElementTypes(): List<Type> {
         val dest = PointerPointer<LLVMTypeRef>(getElementCount().toLong())
         LLVM.LLVMGetStructElementTypes(ref, dest)

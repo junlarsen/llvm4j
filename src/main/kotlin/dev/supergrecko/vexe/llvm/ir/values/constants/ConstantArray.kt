@@ -15,13 +15,16 @@ import org.bytedeco.llvm.global.LLVM
 
 public class ConstantArray internal constructor() : Value(), ConstantValue,
     AggregateValue, CompositeValue {
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
+    //region Core::Values::Constants::CompositeConstants
+    /**
+     * Create an array of values of a given [type]
+     *
+     * @see LLVM.LLVMConstArray
+     */
     public constructor(type: Type, values: List<Value>) : this() {
         val ptr = values.map { it.ref }.toTypedArray()
 
@@ -47,7 +50,6 @@ public class ConstantArray internal constructor() : Value(), ConstantValue,
         )
     }
 
-    //region Core::Values::Constants::CompositeConstants
     /**
      * Determine whether this is an array of i8's
      *

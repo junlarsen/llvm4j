@@ -6,8 +6,8 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class AllocaInstruction internal constructor() : Instruction() {
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::Instructions::Allocas

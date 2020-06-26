@@ -5,13 +5,11 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class GlobalAlias internal constructor() : GlobalValue() {
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(value: LLVMValueRef) : this() {
-        ref = value
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
+    //region Core::Values::Constants::GlobalAliases
     /**
      * Get the value this alias is an alias for
      *
@@ -31,4 +29,5 @@ public class GlobalAlias internal constructor() : GlobalValue() {
     public fun setAliasOf(value: Value) {
         LLVM.LLVMAliasSetAliasee(ref, value.ref)
     }
+    //endregion Core::Values::Constants::GlobalAliases
 }

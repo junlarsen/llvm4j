@@ -1,50 +1,17 @@
 package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
-import dev.supergrecko.vexe.llvm.internal.contracts.OrderedEnum
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.ir.types.ArrayType
-import dev.supergrecko.vexe.llvm.ir.types.FloatType
-import dev.supergrecko.vexe.llvm.ir.types.FunctionType
-import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.ir.types.VectorType
-import dev.supergrecko.vexe.llvm.ir.types.VoidType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.support.Message
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-/**
- * Support types matching LLVMTypeKind
- *
- * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
- */
-public enum class TypeKind(public override val value: Int) : OrderedEnum<Int> {
-    Void(LLVM.LLVMVoidTypeKind),
-    Half(LLVM.LLVMHalfTypeKind),
-    Float(LLVM.LLVMFloatTypeKind),
-    Double(LLVM.LLVMDoubleTypeKind),
-    X86_FP80(LLVM.LLVMX86_FP80TypeKind),
-    FP128(LLVM.LLVMFP128TypeKind),
-    PPC_FP128(LLVM.LLVMPPC_FP128TypeKind),
-    Label(LLVM.LLVMLabelTypeKind),
-    Integer(LLVM.LLVMIntegerTypeKind),
-    Function(LLVM.LLVMFunctionTypeKind),
-    Struct(LLVM.LLVMStructTypeKind),
-    Array(LLVM.LLVMArrayTypeKind),
-    Pointer(LLVM.LLVMPointerTypeKind),
-    Vector(LLVM.LLVMVectorTypeKind),
-    Metadata(LLVM.LLVMMetadataTypeKind),
-    X86_MMX(LLVM.LLVMX86_MMXTypeKind),
-    Token(LLVM.LLVMTokenTypeKind)
-}
-
-/**
- * Base class mirroring llvm::Type
- */
 public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     public final override lateinit var ref: LLVMTypeRef
         internal set
@@ -52,12 +19,14 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     /**
      * Construct a new Type from an LLVM pointer reference
      */
-    public constructor(ty: LLVMTypeRef) : this() {
-        ref = ty
+    public constructor(llvmRef: LLVMTypeRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::Types
     /**
+     * Get the type kind for this type
+     *
      * @see LLVM.LLVMGetTypeKind
      */
     public fun getTypeKind(): TypeKind = getTypeKind(ref)
@@ -99,6 +68,8 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
 
     //region Core::Values::Constants
     /**
+     * Get a constant null of this type
+     *
      * @see LLVM.LLVMConstNull
      */
     public fun getConstantNull(): Value {
@@ -113,6 +84,8 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     }
 
     /**
+     * Get a constant undefined of this type
+     *
      * @see LLVM.LLVMGetUndef
      */
     public fun getConstantUndef(): Value {
@@ -122,6 +95,8 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     }
 
     /**
+     * Get a constant nullptr of this type
+     *
      * @see LLVM.LLVMConstPointerNull
      */
     public fun getConstantNullPointer(): Value {
@@ -175,25 +150,14 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     public fun toVectorType(size: Int) = VectorType(this, size)
     //endregion Typecasting
 
-    /**
-     * Assert that the type kind of this is [kind]
-     */
-    internal fun requireKind(kind: TypeKind) {
-        require(getTypeKind() == kind) {
-            "TypeKind.${getTypeKind()} is not a valid kind for " +
-                    "${this::class.simpleName}.It is required to be $kind"
-        }
-    }
-
     companion object {
         /**
-         * @see LLVM.LLVMGetTypeKind
+         * Get the type kind of a type
          *
-         * @throws IllegalArgumentException If the types kind enum returns an
-         * invalid value
+         * @see LLVM.LLVMGetTypeKind
          */
         @JvmStatic
-        public fun getTypeKind(type: LLVMTypeRef): TypeKind {
+        internal fun getTypeKind(type: LLVMTypeRef): TypeKind {
             val kind = LLVM.LLVMGetTypeKind(type)
 
             return TypeKind.values()

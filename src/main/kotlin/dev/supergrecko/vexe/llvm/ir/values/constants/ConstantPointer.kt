@@ -1,7 +1,6 @@
 package dev.supergrecko.vexe.llvm.ir.values.constants
 
 import dev.supergrecko.vexe.llvm.ir.Type
-import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
@@ -10,17 +9,17 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class ConstantPointer internal constructor() : Value(), ConstantValue {
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
     // core Core::Values::Constants::ConstantExpressions
     /**
      * Conversion to integer
      *
-     * @see LLVM.LLVMConstPtrToInt
-     *
      * TODO: Assert that this points to an int
+     *
+     * @see LLVM.LLVMConstPtrToInt
      */
     public fun intcast(type: IntType): ConstantInt {
         val ref = LLVM.LLVMConstPtrToInt(ref, type.ref)

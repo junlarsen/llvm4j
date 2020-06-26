@@ -1,6 +1,7 @@
 package dev.supergrecko.vexe.llvm.executionengine
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
+import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.Module
@@ -14,8 +15,9 @@ import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
 import org.bytedeco.llvm.global.LLVM
 
 public class ExecutionEngine public constructor() :
-    ContainsReference<LLVMExecutionEngineRef> {
+    ContainsReference<LLVMExecutionEngineRef>, Disposable, AutoCloseable {
     public override val ref: LLVMExecutionEngineRef = LLVMExecutionEngineRef()
+    public override var valid: Boolean = true
 
     //region ExecutionEngine
     /**
@@ -176,4 +178,14 @@ public class ExecutionEngine public constructor() :
         return LLVM.LLVMGetFunctionAddress(ref, function)
     }
     //endregion ExecutionEngine
+
+    override fun dispose() {
+        require(valid) { "Cannot dispose object twice" }
+
+        valid = false
+
+        LLVM.LLVMDisposeExecutionEngine(ref)
+    }
+
+    public override fun close() = dispose()
 }

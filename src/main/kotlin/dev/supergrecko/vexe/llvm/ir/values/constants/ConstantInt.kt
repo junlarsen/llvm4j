@@ -12,8 +12,8 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class ConstantInt internal constructor() : Value(), ConstantValue {
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
     /**
@@ -41,9 +41,9 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
     /**
      * Create a constant integer of arbitrary precision
      *
-     * @see LLVM.LLVMConstIntOfArbitraryPrecision
-     *
      * TODO: Find out how the words constructor actually works
+     *
+     * @see LLVM.LLVMConstIntOfArbitraryPrecision
      */
     public constructor(type: IntType, words: List<Long>) : this() {
         ref = LLVM.LLVMConstIntOfArbitraryPrecision(

@@ -2,7 +2,6 @@ package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import org.bytedeco.llvm.LLVM.LLVMMetadataRef
 import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.global.LLVM
@@ -14,32 +13,45 @@ import org.bytedeco.llvm.global.LLVM
  * should be named Entries as that is what it used for.
  */
 public class MetadataEntries internal constructor() :
-    ContainsReference<LLVMValueMetadataEntry>, Validatable, Disposable,
-    AutoCloseable {
+    ContainsReference<LLVMValueMetadataEntry>, Disposable, AutoCloseable {
     public override var valid: Boolean = true
     public override lateinit var ref: LLVMValueMetadataEntry
+        internal set
 
-    public constructor(entry: LLVMValueMetadataEntry) : this() {
-        ref = entry
+    public constructor(llvmRef: LLVMValueMetadataEntry) : this() {
+        ref = llvmRef
     }
 
-    override fun dispose() {
-        require(valid) { "This builder has already been disposed." }
-
-        valid = false
-
-        LLVM.LLVMDisposeValueMetadataEntries(ref)
-    }
-
+    //region Core::Metadata
+    /**
+     * Get the metadata kind at [index]
+     *
+     * @see LLVM.LLVMValueMetadataEntriesGetKind
+     */
     public fun getKind(index: Int): Int {
         return LLVM.LLVMValueMetadataEntriesGetKind(ref, index)
     }
 
+    /**
+     * Get the metadata at [index]
+     *
+     * @see LLVM.LLVMValueMetadataEntriesGetMetadata
+     */
     public fun getMetadata(index: Int): Metadata {
-        // TODO: prevent segfault by out of bounds index via size_t ptr?
+        // TODO: longterm: prevent segfault by out of bounds index via size_t
+        //  ptr?
         val metadata = LLVM.LLVMValueMetadataEntriesGetMetadata(ref, index)
 
         return Metadata(metadata)
+    }
+    //endregion Core::Metadata
+
+    override fun dispose() {
+        require(valid) { "Cannot dispose object twice" }
+
+        valid = false
+
+        LLVM.LLVMDisposeValueMetadataEntries(ref)
     }
 
     override fun close() = dispose()

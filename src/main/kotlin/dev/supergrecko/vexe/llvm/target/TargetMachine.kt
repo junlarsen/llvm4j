@@ -17,6 +17,7 @@ public class TargetMachine internal constructor() :
     ContainsReference<LLVMTargetMachineRef>, Disposable, Validatable,
     AutoCloseable {
     public override lateinit var ref: LLVMTargetMachineRef
+        internal set
     public override var valid: Boolean = true
 
     public constructor(llvmRef: LLVMTargetMachineRef) : this() {
@@ -50,9 +51,9 @@ public class TargetMachine internal constructor() :
     }
 
     /**
-     * Get the first target in the iterator for this target machine
+     * Get the first [Target] in the iterator
      *
-     * Navigate iterator with [Target.getNextTarget]
+     * Move the iterator with [Target.getNextTarget]
      *
      * @see LLVM.LLVMGetNextTarget
      */

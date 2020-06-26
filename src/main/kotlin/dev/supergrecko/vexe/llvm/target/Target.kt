@@ -6,22 +6,19 @@ import dev.supergrecko.vexe.llvm.internal.util.wrap
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMTargetRef
 import org.bytedeco.llvm.global.LLVM
-import java.lang.IllegalArgumentException
-import java.lang.RuntimeException
 
 public class Target internal constructor() :
     ContainsReference<LLVMTargetRef> {
     public override lateinit var ref: LLVMTargetRef
+        internal set
 
     public constructor(llvmRef: LLVMTargetRef) : this() {
         ref = llvmRef
     }
 
-    //region C++ Target
+    //region Target
     /**
-     * Get the next target in the iterator
-     *
-     * Use with [Target.getNextTarget] to move the iterator
+     * Get the next [Target] in the iterator
      *
      * @see LLVM.LLVMGetNextTarget
      */
@@ -96,8 +93,10 @@ public class Target internal constructor() :
             return if (target != null) {
                 Target(target)
             } else {
-                throw IllegalArgumentException("The specified target could " +
-                        "not be found")
+                throw IllegalArgumentException(
+                    "The specified target could " +
+                            "not be found"
+                )
             }
         }
 
@@ -119,5 +118,5 @@ public class Target internal constructor() :
             }
         }
     }
-    //endregion C++ Target
+    //endregion Target
 }

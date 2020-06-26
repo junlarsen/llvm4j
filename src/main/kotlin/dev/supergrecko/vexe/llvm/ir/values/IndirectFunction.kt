@@ -4,17 +4,12 @@ import dev.supergrecko.vexe.llvm.ir.Module
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-/**
- * Class corresponding to llvm::GlobalIFunc
- */
 public class IndirectFunction internal constructor() : FunctionValue() {
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }
 
+    //region Core::Values::Constants::FunctionValues::IndirectFunctions
     /**
      * Convert a regular function to an indirect one
      *
@@ -24,7 +19,6 @@ public class IndirectFunction internal constructor() : FunctionValue() {
         ref = function.ref
     }
 
-    //region Core::Values::Constants::FunctionValues::IndirectFunctions
     /**
      * Remove a global indirect function from its parent module and delete it.
      *
@@ -45,10 +39,8 @@ public class IndirectFunction internal constructor() : FunctionValue() {
     public fun remove() {
         LLVM.LLVMRemoveGlobalIFunc(ref)
     }
-    //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
     public companion object {
-        //region Core::Values::Constants::FunctionValues::IndirectFunctions
         @JvmStatic
         public fun fromModule(module: Module, name: String): IndirectFunction {
             val fn = LLVM.LLVMGetNamedGlobalIFunc(
@@ -65,6 +57,6 @@ public class IndirectFunction internal constructor() : FunctionValue() {
                 IndirectFunction(fn)
             }
         }
-        //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
     }
+    //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 }

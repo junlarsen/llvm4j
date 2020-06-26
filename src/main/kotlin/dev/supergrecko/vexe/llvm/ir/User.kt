@@ -4,11 +4,8 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class User internal constructor() : Value() {
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(user: LLVMValueRef) : this() {
-        ref = user
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::Values::UserValue
@@ -18,7 +15,9 @@ public class User internal constructor() : Value() {
      * @see LLVM.LLVMGetOperand
      */
     public fun getOperand(index: Int): Value {
-        require(index < getOperandCount())
+        require(index < getOperandCount()) {
+            "Index cannot be larger than operand count"
+        }
 
         val value = LLVM.LLVMGetOperand(ref, index)
 
@@ -31,7 +30,9 @@ public class User internal constructor() : Value() {
      * @see LLVM.LLVMGetOperand
      */
     public fun setOperand(index: Int, value: Value) {
-        require(index < getOperandCount())
+        require(index < getOperandCount()) {
+            "Index cannot be larger than operand count"
+        }
 
         LLVM.LLVMSetOperand(ref, index, value.ref)
     }
@@ -42,7 +43,9 @@ public class User internal constructor() : Value() {
      * @see LLVM.LLVMGetOperandUse
      */
     public fun getOperandUse(index: Int): Use {
-        require(index < getOperandCount())
+        require(index < getOperandCount()) {
+            "Index cannot be larger than operand count"
+        }
 
         val use = LLVM.LLVMGetOperandUse(ref, index)
 

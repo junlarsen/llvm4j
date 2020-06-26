@@ -10,15 +10,20 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class ConstantFloat internal constructor() : Value(), ConstantValue {
-    public constructor(llvmValue: LLVMValueRef) : this() {
-        ref = llvmValue
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
     }
 
+    //region Core::Values::Constants::ScalarConstants
+    /**
+     * Create a new constant float of a [type] with the provided [value]
+     *
+     * @see LLVM.LLVMConstReal
+     */
     public constructor(type: FloatType, value: Double) : this() {
         ref = LLVM.LLVMConstReal(type.ref, value)
     }
 
-    //region Core::Values::Constants::ScalarConstants
     /**
      * Obtains the double value for a floating point const value
      *

@@ -2,7 +2,6 @@ package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.instructions.AShrInstruction
@@ -79,21 +78,19 @@ import org.bytedeco.llvm.global.LLVM
 
 public class Builder public constructor(
     context: Context = Context.getGlobalContext()
-) : AutoCloseable, Validatable, Disposable, ContainsReference<LLVMBuilderRef> {
+) : AutoCloseable, Disposable, ContainsReference<LLVMBuilderRef> {
     public override var ref: LLVMBuilderRef = LLVM.LLVMCreateBuilderInContext(
         context.ref
     )
+        internal set
     public override var valid: Boolean = true
     private val builder: InstructionBuilder = InstructionBuilder()
 
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(builder: LLVMBuilderRef) : this() {
-        ref = builder
+    public constructor(llvmRef: LLVMBuilderRef) : this() {
+        ref = llvmRef
     }
 
-    //region InstructionBuilders\
+    //region InstructionBuilders
     /**
      * Position the builder at the [block]
      *
@@ -253,7 +250,7 @@ public class Builder public constructor(
      * To prevent polluting autocomplete for the [Builder] all the
      * instruction creation functions are declared in here.
      *
-     * Each [Builder] has one of these, retrievable by [getBuilder]
+     * Each [Builder] has one of these, retrievable by [build]
      */
     public inner class InstructionBuilder {
         /**
@@ -1931,7 +1928,7 @@ public class Builder public constructor(
     //endregion InstructionBuilders
 
     override fun dispose() {
-        require(valid) { "This builder has already been disposed." }
+        require(valid) { "Cannot dispose object twice" }
 
         valid = false
 

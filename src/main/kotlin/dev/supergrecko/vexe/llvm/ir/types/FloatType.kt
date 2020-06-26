@@ -8,15 +8,11 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class FloatType internal constructor() : Type() {
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(llvmType: LLVMTypeRef) : this() {
-        ref = llvmType
-
-        require(getTypeKind() in kinds)
+    public constructor(llvmRef: LLVMTypeRef) : this() {
+        ref = llvmRef
     }
 
+    //region Core::Types::FloatingPointTypes
     /**
      * Create a floating point types
      *
@@ -39,7 +35,7 @@ public class FloatType internal constructor() : Type() {
 
     public companion object {
         /**
-         * List of all floating point types
+         * List of all the LLVM floating point types
          */
         public val kinds = listOf(
             TypeKind.Half,
@@ -50,4 +46,5 @@ public class FloatType internal constructor() : Type() {
             TypeKind.PPC_FP128
         )
     }
+    //endregion Core::Types::FloatingPointTypes
 }

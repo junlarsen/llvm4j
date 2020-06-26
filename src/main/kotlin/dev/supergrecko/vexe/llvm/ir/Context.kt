@@ -2,7 +2,6 @@ package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import org.bytedeco.javacpp.Pointer
@@ -19,18 +18,12 @@ import org.bytedeco.llvm.global.LLVM
  * This primary constructor is public because anyone should be able to
  * create a context. The init block ensures the ref is valid
  */
-public class Context public constructor() : AutoCloseable, Validatable,
-    Disposable, ContainsReference<LLVMContextRef> {
-    public override lateinit var ref: LLVMContextRef
+public class Context public constructor(
+    llvmRef: LLVMContextRef = LLVM.LLVMContextCreate()
+) : AutoCloseable, Disposable,
+    ContainsReference<LLVMContextRef> {
+    public override val ref = llvmRef
     public override var valid: Boolean = true
-
-    init {
-        ref = LLVM.LLVMContextCreate()
-    }
-
-    public constructor(ctx: LLVMContextRef) : this() {
-        ref = ctx
-    }
 
     //region Core::Context
     /**
@@ -39,8 +32,6 @@ public class Context public constructor() : AutoCloseable, Validatable,
      * @see LLVM.LLVMContextShouldDiscardValueNames
      */
     public fun isDiscardingValueNames(): Boolean {
-        require(valid)
-
         return LLVM.LLVMContextShouldDiscardValueNames(ref).fromLLVMBool()
     }
 
@@ -56,25 +47,24 @@ public class Context public constructor() : AutoCloseable, Validatable,
     /**
      * Set the DiagnosticHandler for this context
      *
-     * @see LLVM.LLVMContextSetDiagnosticHandler
-     *
      * TODO: Find out pointer type of [diagnosticContext]
+     *
+     * @see LLVM.LLVMContextSetDiagnosticHandler
      */
     public fun setDiagnosticHandler(
         handler: LLVMDiagnosticHandler,
         diagnosticContext: Pointer
     ) {
-        require(valid) { "This module has already been disposed." }
-
         LLVM.LLVMContextSetDiagnosticHandler(ref, handler, diagnosticContext)
     }
 
     /**
      * Sets the diagnostic handler without a specified context.
      *
-     * @throws IllegalArgumentException If internal instance has been dropped.
-     *
      * TODO: Do something about Pointer() because right now it's just a nullptr
+     *   which is not what we want.
+     *
+     * @throws IllegalArgumentException If internal instance has been dropped.
      */
     public fun setDiagnosticHandler(handler: LLVMDiagnosticHandler) {
         setDiagnosticHandler(handler, Pointer())
@@ -84,53 +74,41 @@ public class Context public constructor() : AutoCloseable, Validatable,
      * Get the diagnostic handler for this context.
      *
      * @see LLVM.LLVMContextGetDiagnosticHandler
-     *
-     * TODO: Find out how to actually call this thing from Kotlin/Java
      */
     public fun getDiagnosticHandler(): LLVMDiagnosticHandler {
-        require(valid) { "This module has already been disposed." }
-
         return LLVM.LLVMContextGetDiagnosticHandler(ref)
     }
 
     /**
      * Get the llvm::DiagnosticContext for this context
      *
-     * @see LLVM.LLVMContextGetDiagnosticContext
-     *
      * TODO: Find out if there is any reasonable way to work with this thing
+     *
+     * @see LLVM.LLVMContextGetDiagnosticContext
      */
     public fun getDiagnosticContext(): Nothing {
-        TODO("The LLVM function returns a shared_ptr which is unusable in " +
-                "Kotlin and thus this doesn't actually do anything for now")
+        TODO(
+            "The LLVM function returns a shared_ptr which is unusable in " +
+                    "Kotlin and thus this doesn't actually do anything for now"
+        )
     }
 
     /**
      * Register a yield callback with the given context.
      *
-     * @see LLVM.LLVMContextSetYieldCallback
-     *
      * TODO: Find out how to actually call this thing from Kotlin/Java
+     *
+     * @see LLVM.LLVMContextSetYieldCallback
      */
     public fun setYieldCallback(
         callback: LLVMYieldCallback,
         opaqueHandle: Pointer
     ) {
-        require(valid) { "This module has already been disposed." }
-
         LLVM.LLVMContextSetYieldCallback(ref, callback, opaqueHandle)
     }
 
     /**
      * Get the metadata kind id [name]
-     *
-     * You should pull metadata kind ids from a context as
-     * [LLVM.LLVMGetMDKindID] just calls it from the global context. You can
-     * do something like this:
-     *
-     * ```kotlin
-     * Context.getGlobalContext().getMetadataKindId(...)
-     * ```
      *
      * @see LLVM.LLVMGetMDKindID
      * @see LLVM.LLVMGetMDKindIDInContext
@@ -138,41 +116,12 @@ public class Context public constructor() : AutoCloseable, Validatable,
     public fun getMetadataKindId(name: String): Int {
         return LLVM.LLVMGetMDKindIDInContext(ref, name, name.length)
     }
-    //endregion Core::Context
-
-    /**
-     * Dispose the current context reference.
-     *
-     * Note that after using this, the [Context] should not be used again as
-     * its LLVM reference has been disposed.
-     *
-     * Any calls referencing this context after it has been dropped will most
-     * likely fail as the inner LLVM Context will be set to a null pointer after
-     * this is called.
-     *
-     * @throws IllegalArgumentException If internal instance has been dropped.
-     */
-    public override fun dispose() {
-        require(valid) { "This module has already been disposed." }
-
-        valid = false
-
-        LLVM.LLVMContextDispose(ref)
-    }
-
-    /**
-     * Implementation for AutoCloseable for Context
-     *
-     * If the JVM ever does decide to auto-close this then
-     * the module will be dropped to prevent memory leaks.
-     *
-     * @throws IllegalArgumentException If internal instance has been dropped.
-     */
-    public override fun close() = dispose()
 
     public companion object {
         /**
          * Obtain the global LLVM context
+         *
+         * @see LLVM.LLVMGetGlobalContext
          */
         @JvmStatic
         public fun getGlobalContext(): Context {
@@ -181,4 +130,15 @@ public class Context public constructor() : AutoCloseable, Validatable,
             return Context(ctx)
         }
     }
+    //endregion Core::Context
+
+    public override fun dispose() {
+        require(valid) { "Cannot dispose object twice" }
+
+        valid = false
+
+        LLVM.LLVMContextDispose(ref)
+    }
+
+    public override fun close() = dispose()
 }

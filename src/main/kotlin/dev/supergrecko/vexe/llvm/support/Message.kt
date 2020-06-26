@@ -1,8 +1,8 @@
 package dev.supergrecko.vexe.llvm.support
 
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import java.nio.ByteBuffer
 import org.bytedeco.llvm.global.LLVM
+import java.nio.ByteBuffer
 
 /**
  * A glorified char*
@@ -14,7 +14,7 @@ import org.bytedeco.llvm.global.LLVM
  * they provide the [dispose] method. Failing to call this method will leak
  * memory.
  *
- * TODO: Test whether this works with ByteBuffers which are not coming from LLVM
+ * Do not use this class for byte buffers which do not come from the LLVM
  */
 public class Message(private val buffer: ByteBuffer) : Disposable,
     AutoCloseable {
@@ -27,7 +27,7 @@ public class Message(private val buffer: ByteBuffer) : Disposable,
      * If this was called on a de-allocated object, the JVM would crash.
      */
     public fun getString(): String {
-        require(valid)
+        require(valid) { "Cannot use disposed memory" }
 
         val res = StringBuilder()
 
@@ -39,7 +39,7 @@ public class Message(private val buffer: ByteBuffer) : Disposable,
     }
 
     public override fun dispose() {
-        require(valid)
+        require(valid) { "Cannot dispose object twice" }
 
         valid = false
 

@@ -9,17 +9,15 @@ import org.bytedeco.llvm.global.LLVM
 public class NamedMetadataNode internal constructor() :
     ContainsReference<LLVMNamedMDNodeRef> {
     public override lateinit var ref: LLVMNamedMDNodeRef
+        internal set
 
-    public constructor(node: LLVMNamedMDNodeRef) : this() {
-        ref = node
+    public constructor(llvmRef: LLVMNamedMDNodeRef) : this() {
+        ref = llvmRef
     }
 
     //region Core::Modules
     /**
-     * Get the next named metadata node in the iterator if it exists
-     *
-     * This is used with [Module.getFirstNamedMetadata] and
-     * [Module.getLastNamedMetadata]
+     * Get the next [NamedMetadataNode] in the iterator
      *
      * @see LLVM.LLVMGetNextNamedMetadata
      */
@@ -30,10 +28,7 @@ public class NamedMetadataNode internal constructor() :
     }
 
     /**
-     * Get the previous named metadata node in the iterator if it exists
-     *
-     * This is used with [Module.getFirstNamedMetadata] and
-     * [Module.getLastNamedMetadata]
+     * Get the previous [NamedMetadataNode] in the iterator
      *
      * @see LLVM.LLVMGetPreviousNamedMetadata
      */
@@ -43,6 +38,11 @@ public class NamedMetadataNode internal constructor() :
         return wrap(md) { NamedMetadataNode(it) }
     }
 
+    /**
+     * Get the name of this metadata node
+     *
+     * @see LLVM.LLVMGetNamedMetadataName
+     */
     public fun getName(): String {
         val length = SizeTPointer(0)
 

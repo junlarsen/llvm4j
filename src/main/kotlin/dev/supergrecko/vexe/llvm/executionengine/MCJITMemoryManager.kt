@@ -15,7 +15,12 @@ public class MCJITMemoryManager internal constructor() :
     ContainsReference<LLVMMCJITMemoryManagerRef>, Validatable, Disposable,
     AutoCloseable {
     public override lateinit var ref: LLVMMCJITMemoryManagerRef
+        internal set
     public override var valid: Boolean = true
+
+    public constructor(llvmRef: LLVMMCJITMemoryManagerRef) : this() {
+        ref = llvmRef
+    }
 
     //region ExecutionEngine
     /**
@@ -24,6 +29,8 @@ public class MCJITMemoryManager internal constructor() :
      * This is a memory manager for an MCJIT compiler which operators on
      * callbacks. You may pass a [client] which will be passed into each
      * callback upon call.
+     *
+     * TODO: Replace callbacks with Kotlin Lambda
      *
      * @see LLVM.LLVMCreateSimpleMCJITMemoryManager
      */
@@ -45,7 +52,7 @@ public class MCJITMemoryManager internal constructor() :
     //endregion ExecutionEngine
 
     override fun dispose() {
-        require(valid) { "Cannot free object which as already been disposed" }
+        require(valid) { "Cannot dispose object twice" }
 
         valid = false
 

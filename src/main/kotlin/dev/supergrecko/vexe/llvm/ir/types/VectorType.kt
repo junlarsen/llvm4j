@@ -1,21 +1,16 @@
 package dev.supergrecko.vexe.llvm.ir.types
 
 import dev.supergrecko.vexe.llvm.ir.Type
-import dev.supergrecko.vexe.llvm.ir.TypeKind
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class VectorType internal constructor() : Type(),
-    CompositeType,
-    SequentialType {
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
+    CompositeType, SequentialType {
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType
-        requireKind(TypeKind.Vector)
     }
 
+    //region Core::Types::SequentialTypes
     /**
      * Create a vector types
      *
@@ -27,7 +22,13 @@ public class VectorType internal constructor() : Type(),
         ref = LLVM.LLVMVectorType(type.ref, size)
     }
 
+    /**
+     * Get the amount of elements this vector supports
+     *
+     * @see LLVM.LLVMGetVectorSize
+     */
     public override fun getElementCount(): Int {
         return LLVM.LLVMGetVectorSize(ref)
     }
+    //endregion Core::Types::SequentialTypes
 }

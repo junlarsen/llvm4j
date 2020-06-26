@@ -4,7 +4,6 @@ import dev.supergrecko.vexe.llvm.executionengine.ExecutionEngine
 import dev.supergrecko.vexe.llvm.executionengine.MCJITCompilerOptions
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.map
 import dev.supergrecko.vexe.llvm.internal.util.wrap
@@ -17,8 +16,6 @@ import dev.supergrecko.vexe.llvm.ir.values.GlobalVariable
 import dev.supergrecko.vexe.llvm.support.MemoryBuffer
 import dev.supergrecko.vexe.llvm.support.Message
 import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
-import java.io.File
-import java.nio.ByteBuffer
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
@@ -26,19 +23,28 @@ import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
+import java.io.File
+import java.nio.ByteBuffer
 
-public class Module internal constructor() : AutoCloseable,
-    Validatable, Disposable, ContainsReference<LLVMModuleRef> {
+public class Module internal constructor() : AutoCloseable, Disposable,
+    ContainsReference<LLVMModuleRef> {
     public override lateinit var ref: LLVMModuleRef
+        internal set
     public override var valid: Boolean = true
 
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
-    public constructor(module: LLVMModuleRef) : this() {
-        ref = module
+    public constructor(llvmRef: LLVMModuleRef) : this() {
+        ref = llvmRef
     }
 
+    //region Core::Modules
+    /**
+     * Create a new module with a file name
+     *
+     * Optionally pass a [context] which this module will reside in. If no
+     * context is passed, the global llvm context is used.
+     *
+     * @see LLVM.LLVMModuleCreateWithNameInContext
+     */
     public constructor(
         sourceFileName: String,
         context: Context = Context.getGlobalContext()
@@ -49,7 +55,6 @@ public class Module internal constructor() : AutoCloseable,
         )
     }
 
-    //region Core::Modules
     /**
      * Get the name for this module
      *
@@ -195,10 +200,9 @@ public class Module internal constructor() : AutoCloseable,
     public fun toFile(fileName: String): Message? {
         val message = BytePointer()
 
-        val failed = LLVM.LLVMPrintModuleToFile(ref, fileName, message)
-            .fromLLVMBool()
+        val result = LLVM.LLVMPrintModuleToFile(ref, fileName, message)
 
-        return if (failed) {
+        return if (result == 0) {
             Message(message.asByteBuffer())
         } else {
             null
@@ -219,9 +223,9 @@ public class Module internal constructor() : AutoCloseable,
     /**
      * Get the inline asm for this module
      *
-     * @see LLVM.LLVMGetModuleInlineAsm
-     *
      * TODO: Do something with the length?
+     *
+     * @see LLVM.LLVMGetModuleInlineAsm
      */
     public fun getInlineAssembly(): String {
         val length = SizeTPointer(0)
@@ -280,10 +284,10 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     /**
-     * Get the first named metadata node inside this module.
+     * Get the first [NamedMetadataNode] in the iterator
      *
-     * Use [NamedMetadataNode.getNextNamedMetadata] to advance this iterator on
-     * the returned named metadata instance.
+     * Move the iterator with [NamedMetadataNode.getNextNamedMetadata] and
+     * [NamedMetadataNode.getPreviousNamedMetadata]
      *
      * @see LLVM.LLVMGetFirstNamedMetadata
      */
@@ -294,10 +298,10 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     /**
-     * Get the last basic block inside this function.
+     * Get the last [NamedMetadataNode] in the iterator
      *
-     * Use [NamedMetadataNode.getPreviousNamedMetadata] to advance this
-     * iterator on the returned named metadata instance.
+     * Move the iterator with [NamedMetadataNode.getNextNamedMetadata] and
+     * [NamedMetadataNode.getPreviousNamedMetadata]
      *
      * @see LLVM.LLVMGetLastNamedMetadata
      */
@@ -391,10 +395,10 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     /**
-     * Get the first function inside this module.
+     * Get the first [FunctionValue] in the iterator
      *
-     * Use [FunctionValue.getNextFunction] to advance this iterator on the
-     * returned function instance.
+     * Move the iterator with [FunctionValue.getNextFunction] and
+     * [FunctionValue.getPreviousFunction]
      *
      * @see LLVM.LLVMGetFirstFunction
      */
@@ -405,10 +409,10 @@ public class Module internal constructor() : AutoCloseable,
     }
 
     /**
-     * Get the last basic block inside this function.
+     * Get the last [FunctionValue] in the iterator
      *
-     * Use [FunctionValue.getPreviousFunction] to advance this iterator on the
-     * returned function instance.
+     * Move the iterator with [FunctionValue.getNextFunction] and
+     * [FunctionValue.getPreviousFunction]
      *
      * @see LLVM.LLVMGetLastFunction
      */
@@ -541,6 +545,8 @@ public class Module internal constructor() : AutoCloseable,
      *   the underlying bytes in the ptr are really strange (see #67)
      *
      * TODO: Test invalid module
+     *
+     * @see LLVM.LLVMVerifyModule
      */
     public fun verify(action: VerifierFailureAction): Boolean {
         val ptr = BytePointer(ByteBuffer.allocate(0))
@@ -655,7 +661,7 @@ public class Module internal constructor() : AutoCloseable,
     //endregion ExecutionEngine
 
     public override fun dispose() {
-        require(valid) { "This module has already been disposed." }
+        require(valid) { "Cannot dispose object twice" }
 
         valid = false
 
