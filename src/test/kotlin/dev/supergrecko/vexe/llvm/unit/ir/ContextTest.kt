@@ -17,22 +17,6 @@ internal class ContextTest : TestSuite({
         ctx.dispose()
     }
 
-    describe("Passing a callback hook") {
-        // TODO: Rewrite these with kt lambdas
-        val handler = object : LLVMDiagnosticHandler() {
-            override fun call(p0: LLVMDiagnosticInfoRef?, p1: Pointer?) {
-            }
-        }
-        val ctx = Context().apply {
-            setDiagnosticHandler(handler)
-        }
-        val res: LLVMDiagnosticHandler? = ctx.getDiagnosticHandler()
-
-        assertNotNull(res)
-
-        cleanup(ctx)
-    }
-
     describe("Mutating discard value names") {
         val ctx = Context()
 
