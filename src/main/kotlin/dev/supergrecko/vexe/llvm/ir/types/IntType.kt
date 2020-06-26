@@ -2,6 +2,7 @@ package dev.supergrecko.vexe.llvm.ir.types
 
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Type
+import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -48,4 +49,17 @@ public class IntType internal constructor() : Type() {
         return LLVM.LLVMGetIntTypeWidth(ref)
     }
     //endregion Core::Types::Int
+
+    //region Core::Values::Constants
+    /**
+     * Get a constant all 1's for this integer type
+     *
+     * @see LLVM.LLVMConstAllOnes
+     */
+    public fun getConstantAllOnes(): ConstantInt {
+        val v = LLVM.LLVMConstAllOnes(ref)
+
+        return ConstantInt(v)
+    }
+    //endregion Core::Values::Constants
 }
