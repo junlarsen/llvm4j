@@ -1,6 +1,6 @@
 out
 build
-target
+./target/
 .idea
 .gradle
 *.iml
