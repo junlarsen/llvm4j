@@ -24,12 +24,4 @@ internal class FloatTypeTest : TestSuite({
 
         assertEquals(TypeKind.Float, second.getTypeKind())
     }
-
-    describe("Attempting to use reference constructor with wrong type fails") {
-        val ref = IntType(32)
-
-        assertFailsWith<IllegalArgumentException> {
-            FloatType(ref.ref)
-        }
-    }
 })
