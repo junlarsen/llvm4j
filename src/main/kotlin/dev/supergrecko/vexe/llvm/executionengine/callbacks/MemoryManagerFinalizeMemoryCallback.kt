@@ -6,16 +6,23 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryManagerFinalizeMemoryCallback
 
 public typealias MemoryManagerFinalizeMemoryCallback = (
-    Pointer?,
-    String?
+    MemoryManagerFinalizeMemoryCallbackContext
 ) -> Int
+
+public data class MemoryManagerFinalizeMemoryCallbackContext(
+    public val payload: Pointer?,
+    public val error: String
+)
 
 public class MemoryManagerFinalizeMemoryBase(
     private val callback: MemoryManagerFinalizeMemoryCallback
 ) : LLVMMemoryManagerFinalizeMemoryCallback(), Callback {
     public override fun call(arg0: Pointer?, arg1: BytePointer?): Int {
-        val msg = arg1?.string
+        val data = MemoryManagerFinalizeMemoryCallbackContext(
+            payload = arg0,
+            error = arg1?.string ?: ""
+        )
 
-        return callback.invoke(arg0, msg)
+        return callback.invoke(data)
     }
 }

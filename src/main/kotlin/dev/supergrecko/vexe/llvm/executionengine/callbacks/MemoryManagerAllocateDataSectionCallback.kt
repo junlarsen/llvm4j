@@ -7,13 +7,17 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryManagerAllocateDataSectionCallback
 
 public typealias MemoryManagerAllocateDataSectionCallback = (
-    Pointer?,
-    Long,
-    Int,
-    Int,
-    BytePointer?,
-    Boolean
+    MemoryManagerAllocateDataSectionCallbackContext
 ) -> BytePointer
+
+public data class MemoryManagerAllocateDataSectionCallbackContext(
+    public val payload: Pointer?,
+    public val size: Long,
+    public val alignment: Int,
+    public val sectionId: Int,
+    public val sectionName: String,
+    public val isReadOnly: Boolean
+)
 
 public class MemoryManagerAllocateDataSectionBase(
     private val callback: MemoryManagerAllocateDataSectionCallback
@@ -26,8 +30,15 @@ public class MemoryManagerAllocateDataSectionBase(
         arg4: BytePointer?,
         arg5: Int
     ): BytePointer {
-        val bool = arg5.fromLLVMBool()
+        val data = MemoryManagerAllocateDataSectionCallbackContext(
+            payload = arg0,
+            size = arg1,
+            alignment = arg2,
+            sectionId = arg3,
+            sectionName = arg4?.string ?: "",
+            isReadOnly = arg5.fromLLVMBool()
+        )
 
-        return callback.invoke(arg0, arg1, arg2, arg3, arg4, bool)
+        return callback.invoke(data)
     }
 }

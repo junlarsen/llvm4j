@@ -5,13 +5,21 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryManagerDestroyCallback
 
 public typealias MemoryManagerDestroyCallback = (
-    Pointer?
+    MemoryManagerDestroyCallbackContext
 ) -> Unit
+
+public data class MemoryManagerDestroyCallbackContext(
+    public val payload: Pointer?
+)
 
 public class MemoryManagerDestroyBase(
     private val callback: MemoryManagerDestroyCallback
 ) : LLVMMemoryManagerDestroyCallback(), Callback {
     public override fun call(arg0: Pointer?) {
-        callback.invoke(arg0)
+        val data = MemoryManagerDestroyCallbackContext(
+            payload = arg0
+        )
+
+        callback.invoke(data)
     }
 }
