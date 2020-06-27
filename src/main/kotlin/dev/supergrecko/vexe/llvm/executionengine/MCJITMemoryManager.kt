@@ -10,7 +10,6 @@ import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerFinalize
 import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerFinalizeMemoryCallback
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMCJITMemoryManagerRef
 import org.bytedeco.llvm.global.LLVM

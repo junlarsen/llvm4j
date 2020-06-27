@@ -6,7 +6,8 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryManagerFinalizeMemoryCallback
 
 public typealias MemoryManagerFinalizeMemoryCallback = (
-    Pointer?, String?
+    Pointer?,
+    String?
 ) -> Int
 
 public class MemoryManagerFinalizeMemoryBase(

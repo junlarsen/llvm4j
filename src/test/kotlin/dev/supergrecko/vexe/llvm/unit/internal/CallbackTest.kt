@@ -9,7 +9,6 @@ internal class CallbackTest : TestSuite({
         val ctx = Context().apply {
             // Kotlin lambdas!
             setDiagnosticHandler({ _, _ ->
-
             })
         }
 
