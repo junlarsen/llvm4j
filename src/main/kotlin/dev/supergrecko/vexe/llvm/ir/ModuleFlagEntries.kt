@@ -14,8 +14,7 @@ import org.bytedeco.llvm.global.LLVM
  * should be named Entries as that is what it used for.
  */
 public class ModuleFlagEntries internal constructor() :
-    ContainsReference<LLVMModuleFlagEntry>, Disposable,
-    AutoCloseable {
+    ContainsReference<LLVMModuleFlagEntry>, Disposable {
     public override var valid: Boolean = true
     public override lateinit var ref: LLVMModuleFlagEntry
         internal set
@@ -73,6 +72,4 @@ public class ModuleFlagEntries internal constructor() :
 
         LLVM.LLVMDisposeModuleFlagsMetadata(ref)
     }
-
-    public override fun close() = dispose()
 }

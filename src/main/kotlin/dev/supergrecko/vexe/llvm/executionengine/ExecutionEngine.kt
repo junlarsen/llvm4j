@@ -15,7 +15,7 @@ import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
 import org.bytedeco.llvm.global.LLVM
 
 public class ExecutionEngine public constructor() :
-    ContainsReference<LLVMExecutionEngineRef>, Disposable, AutoCloseable {
+    ContainsReference<LLVMExecutionEngineRef>, Disposable {
     public override val ref: LLVMExecutionEngineRef = LLVMExecutionEngineRef()
     public override var valid: Boolean = true
 
@@ -186,6 +186,4 @@ public class ExecutionEngine public constructor() :
 
         LLVM.LLVMDisposeExecutionEngine(ref)
     }
-
-    public override fun close() = dispose()
 }

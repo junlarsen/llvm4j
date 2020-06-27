@@ -16,8 +16,7 @@ import org.bytedeco.llvm.global.LLVM
  *
  * Do not use this class for byte buffers which do not come from the LLVM
  */
-public class Message(private val buffer: ByteBuffer) : Disposable,
-    AutoCloseable {
+public class Message(private val buffer: ByteBuffer) : Disposable {
     public override var valid: Boolean = true
 
     /**
@@ -45,6 +44,4 @@ public class Message(private val buffer: ByteBuffer) : Disposable,
 
         LLVM.LLVMDisposeMessage(buffer)
     }
-
-    public override fun close() = dispose()
 }

@@ -4,7 +4,7 @@ import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import org.bytedeco.llvm.LLVM.LLVMBinaryRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Binary internal constructor() : AutoCloseable, Disposable {
+public class Binary internal constructor() : Disposable {
     public lateinit var ref: LLVMBinaryRef
         internal set
     public override var valid: Boolean = true
@@ -20,6 +20,4 @@ public class Binary internal constructor() : AutoCloseable, Disposable {
 
         LLVM.LLVMDisposeBinary(ref)
     }
-
-    override fun close() = dispose()
 }

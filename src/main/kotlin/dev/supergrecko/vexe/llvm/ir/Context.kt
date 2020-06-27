@@ -15,7 +15,7 @@ import org.bytedeco.llvm.global.LLVM
 
 public class Context public constructor(
     llvmRef: LLVMContextRef = LLVM.LLVMContextCreate()
-) : AutoCloseable, Disposable,
+) : Disposable,
     ContainsReference<LLVMContextRef> {
     public override val ref = llvmRef
     public override var valid: Boolean = true
@@ -123,6 +123,4 @@ public class Context public constructor(
 
         LLVM.LLVMContextDispose(ref)
     }
-
-    public override fun close() = dispose()
 }

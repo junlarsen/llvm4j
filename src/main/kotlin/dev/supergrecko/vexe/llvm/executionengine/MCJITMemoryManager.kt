@@ -16,8 +16,7 @@ import org.bytedeco.llvm.LLVM.LLVMMCJITMemoryManagerRef
 import org.bytedeco.llvm.global.LLVM
 
 public class MCJITMemoryManager internal constructor() :
-    ContainsReference<LLVMMCJITMemoryManagerRef>, Validatable, Disposable,
-    AutoCloseable {
+    ContainsReference<LLVMMCJITMemoryManagerRef>, Disposable {
     public override lateinit var ref: LLVMMCJITMemoryManagerRef
         internal set
     public override var valid: Boolean = true
@@ -60,6 +59,4 @@ public class MCJITMemoryManager internal constructor() :
 
         LLVM.LLVMDisposeMCJITMemoryManager(ref)
     }
-
-    override fun close() = dispose()
 }

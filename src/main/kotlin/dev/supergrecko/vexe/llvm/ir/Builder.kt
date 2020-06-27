@@ -78,7 +78,7 @@ import org.bytedeco.llvm.global.LLVM
 
 public class Builder public constructor(
     context: Context = Context.getGlobalContext()
-) : AutoCloseable, Disposable, ContainsReference<LLVMBuilderRef> {
+) : Disposable, ContainsReference<LLVMBuilderRef> {
     public override var ref: LLVMBuilderRef = LLVM.LLVMCreateBuilderInContext(
         context.ref
     )
@@ -1934,6 +1934,4 @@ public class Builder public constructor(
 
         LLVM.LLVMDisposeBuilder(ref)
     }
-
-    override fun close() = dispose()
 }

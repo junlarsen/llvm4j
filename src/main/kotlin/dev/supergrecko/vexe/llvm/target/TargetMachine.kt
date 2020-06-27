@@ -14,8 +14,7 @@ import org.bytedeco.llvm.LLVM.LLVMTargetMachineRef
 import org.bytedeco.llvm.global.LLVM
 
 public class TargetMachine internal constructor() :
-    ContainsReference<LLVMTargetMachineRef>, Disposable, Validatable,
-    AutoCloseable {
+    ContainsReference<LLVMTargetMachineRef>, Disposable {
     public override lateinit var ref: LLVMTargetMachineRef
         internal set
     public override var valid: Boolean = true
@@ -168,6 +167,4 @@ public class TargetMachine internal constructor() :
 
         LLVM.LLVMDisposeTargetMachine(ref)
     }
-
-    public override fun close() = dispose()
 }
