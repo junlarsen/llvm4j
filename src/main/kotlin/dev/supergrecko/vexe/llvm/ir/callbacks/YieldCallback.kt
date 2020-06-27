@@ -15,14 +15,22 @@ import org.bytedeco.llvm.LLVM.LLVMYieldCallback
  * [Context] The context this was set to
  * [Pointer] The payload which was sent with the setter for this callback
  */
-public typealias YieldCallback = (Context?, Pointer?) -> Unit
+public typealias YieldCallback = (YieldCallbackContext) -> Unit
+
+public data class YieldCallbackContext(
+    public val context: Context,
+    public val payload: Pointer?
+)
 
 public class YieldCallbackBase(
     private val callback: YieldCallback
 ) : LLVMYieldCallback(), Callback {
-    public override fun call(arg0: LLVMContextRef?, arg1: Pointer?) {
-        val ctx = wrap(arg0) { Context(it) }
+    public override fun call(arg0: LLVMContextRef, arg1: Pointer?) {
+        val data = YieldCallbackContext(
+            context = Context(arg0),
+            payload = arg1
+        )
 
-        callback.invoke(ctx, arg1)
+        callback.invoke(data)
     }
 }

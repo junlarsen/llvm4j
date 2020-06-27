@@ -47,8 +47,8 @@ public class Context public constructor(
      * @see LLVM.LLVMContextSetDiagnosticHandler
      */
     public fun setDiagnosticHandler(
-        handler: DiagnosticHandlerCallback,
-        payload: Pointer? = null
+        payload: Pointer? = null,
+        handler: DiagnosticHandlerCallback
     ) {
         val handlePtr = DiagnosticHandlerBase(handler)
 
@@ -82,8 +82,8 @@ public class Context public constructor(
      * @see LLVM.LLVMContextSetYieldCallback
      */
     public fun setYieldCallback(
-        callback: YieldCallback,
-        payload: Pointer? = null
+        payload: Pointer? = null,
+        callback: YieldCallback
     ) {
         val handlePtr = YieldCallbackBase(callback)
 
