@@ -5,6 +5,7 @@ import dev.supergrecko.vexe.llvm.internal.util.map
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Type
+import dev.supergrecko.vexe.llvm.ir.types.traits.CompositeType
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM

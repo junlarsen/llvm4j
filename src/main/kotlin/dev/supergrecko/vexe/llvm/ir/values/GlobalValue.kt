@@ -10,6 +10,7 @@ import dev.supergrecko.vexe.llvm.ir.Type
 import dev.supergrecko.vexe.llvm.ir.UnnamedAddress
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.Visibility
+import dev.supergrecko.vexe.llvm.ir.values.traits.ConstantValue
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -37,7 +38,8 @@ public enum class Linkage(public override val value: Int) : OrderedEnum<Int> {
     PrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage),
 }
 
-public open class GlobalValue internal constructor() : Value(), ConstantValue {
+public open class GlobalValue internal constructor() : Value(),
+    ConstantValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }

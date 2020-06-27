@@ -1,4 +1,4 @@
-package dev.supergrecko.vexe.llvm.ir.values
+package dev.supergrecko.vexe.llvm.ir.values.traits
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
@@ -44,7 +44,7 @@ public interface ConstantValue : ContainsReference<LLVMValueRef> {
      *
      * @see LLVM.LLVMConstBitCast
      */
-    public fun bitcast(type: Type): Value {
+    public fun getBitCast(type: Type): Value {
         val ref = LLVM.LLVMConstBitCast(ref, type.ref)
 
         return Value(ref)
@@ -61,7 +61,7 @@ public interface ConstantValue : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMConstSExtOrBitCast
      * @see LLVM.LLVMConstZExtOrBitCast
      */
-    public fun extOrBitcast(type: Type, signExtend: Boolean): Value {
+    public fun getExtOrBitCast(type: Type, signExtend: Boolean): Value {
         val ref = if (signExtend) {
             LLVM.LLVMConstSExtOrBitCast(ref, type.ref)
         } else {
@@ -76,8 +76,8 @@ public interface ConstantValue : ContainsReference<LLVMValueRef> {
      *
      * @see LLVM.LLVMConstZExtOrBitCast
      */
-    public fun zextOrBitcast(type: Type): Value {
-        return extOrBitcast(type, false)
+    public fun getZExtOrBitCast(type: Type): Value {
+        return getExtOrBitCast(type, false)
     }
 
     /**
@@ -85,8 +85,8 @@ public interface ConstantValue : ContainsReference<LLVMValueRef> {
      *
      * @see LLVM.LLVMConstSExtOrBitCast
      */
-    public fun sextOrBitcast(type: Type): Value {
-        return extOrBitcast(type, true)
+    public fun getSExtOrBitCast(type: Type): Value {
+        return getExtOrBitCast(type, true)
     }
 
     /**
@@ -96,7 +96,7 @@ public interface ConstantValue : ContainsReference<LLVMValueRef> {
      *
      * @see LLVM.LLVMConstTruncOrBitCast
      */
-    public fun truncOrBitcast(type: Type): Value {
+    public fun getTruncOrBitCast(type: Type): Value {
         val ref = LLVM.LLVMConstTruncOrBitCast(ref, type.ref)
 
         return Value(ref)

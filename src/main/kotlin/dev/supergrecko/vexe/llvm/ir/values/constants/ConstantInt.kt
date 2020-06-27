@@ -7,11 +7,12 @@ import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
-import dev.supergrecko.vexe.llvm.ir.values.ConstantValue
+import dev.supergrecko.vexe.llvm.ir.values.traits.ConstantValue
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantInt internal constructor() : Value(), ConstantValue {
+public class ConstantInt internal constructor() : Value(),
+    ConstantValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }
@@ -88,7 +89,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstNeg
      */
-    public fun neg(
+    public fun getNeg(
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
     ): ConstantInt {
@@ -108,7 +109,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstNot
      */
-    public fun not(): ConstantInt {
+    public fun getNot(): ConstantInt {
         val ref = LLVM.LLVMConstNot(ref)
 
         return ConstantInt(ref)
@@ -127,7 +128,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstAdd
      */
-    public fun add(
+    public fun getAdd(
         rhs: ConstantInt,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
@@ -156,7 +157,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstSub
      */
-    public fun sub(
+    public fun getSub(
         rhs: ConstantInt,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
@@ -185,7 +186,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstMul
      */
-    public fun mul(
+    public fun getMul(
         rhs: ConstantInt,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
@@ -219,7 +220,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstUDiv
      * @see LLVM.LLVMConstSDiv
      */
-    public fun div(
+    public fun getDiv(
         rhs: ConstantInt,
         exact: Boolean,
         unsigned: Boolean
@@ -247,10 +248,10 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstUDiv
      */
-    public fun udiv(
+    public fun getUDiv(
         rhs: ConstantInt,
         exact: Boolean
-    ): ConstantInt = div(rhs, exact, true)
+    ): ConstantInt = getDiv(rhs, exact, true)
 
     /**
      * Perform division with another signed integer vector
@@ -265,10 +266,10 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstSDiv
      */
-    public fun sdiv(
+    public fun getSDiv(
         rhs: ConstantInt,
         exact: Boolean
-    ): ConstantInt = div(rhs, exact, false)
+    ): ConstantInt = getDiv(rhs, exact, false)
 
     /**
      * Get the remainder from the division of the two operands
@@ -280,7 +281,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMSRem
      * @see LLVM.LLVMURem
      */
-    public fun rem(rhs: ConstantInt, unsigned: Boolean): ConstantInt {
+    public fun getRem(rhs: ConstantInt, unsigned: Boolean): ConstantInt {
         val ref = if (unsigned) {
             LLVM.LLVMConstURem(ref, rhs.ref)
         } else {
@@ -297,7 +298,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMURem
      */
-    public fun urem(rhs: ConstantInt): ConstantInt = rem(rhs, true)
+    public fun getURem(rhs: ConstantInt): ConstantInt = getRem(rhs, true)
 
     /**
      * Get the remainder from the division of the two operands
@@ -306,7 +307,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMSRem
      */
-    public fun srem(rhs: ConstantInt): ConstantInt = rem(rhs, false)
+    public fun getSRem(rhs: ConstantInt): ConstantInt = getRem(rhs, false)
 
     /**
      * Perform bitwise logical and for the two operands
@@ -321,7 +322,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstAdd
      */
-    public fun and(rhs: ConstantInt): ConstantInt {
+    public fun getAnd(rhs: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstAnd(ref, rhs.ref)
 
         return ConstantInt(ref)
@@ -340,7 +341,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstOr
      */
-    public fun or(rhs: ConstantInt): ConstantInt {
+    public fun getOr(rhs: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstOr(ref, rhs.ref)
 
         return ConstantInt(ref)
@@ -359,7 +360,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstXor
      */
-    public fun xor(rhs: ConstantInt): ConstantInt {
+    public fun getXor(rhs: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstXor(ref, rhs.ref)
 
         return ConstantInt(ref)
@@ -373,7 +374,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstICmp
      */
-    public fun cmp(predicate: IntPredicate, rhs: ConstantInt): ConstantInt {
+    public fun getICmp(predicate: IntPredicate, rhs: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstICmp(predicate.value, ref, rhs.ref)
 
         return ConstantInt(ref)
@@ -386,7 +387,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstShl
      */
-    public fun shl(bits: ConstantInt): ConstantInt {
+    public fun getShl(bits: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstShl(ref, bits.ref)
 
         return ConstantInt(ref)
@@ -400,7 +401,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstLShr
      */
-    public fun lshr(bits: ConstantInt): ConstantInt {
+    public fun getLShr(bits: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstLShr(ref, bits.ref)
 
         return ConstantInt(ref)
@@ -414,7 +415,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstAShr
      */
-    public fun ashr(bits: ConstantInt): ConstantInt {
+    public fun getAShr(bits: ConstantInt): ConstantInt {
         val ref = LLVM.LLVMConstAShr(ref, bits.ref)
 
         return ConstantInt(ref)
@@ -428,7 +429,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstTrunc
      */
-    public fun trunc(type: IntType): ConstantInt {
+    public fun getTrunc(type: IntType): ConstantInt {
         val ref = LLVM.LLVMConstTrunc(ref, type.ref)
 
         return ConstantInt(ref)
@@ -443,7 +444,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstSExt
      * @see LLVM.LLVMConstZExt
      */
-    public fun ext(type: IntType, signExtend: Boolean): ConstantInt {
+    public fun getExt(type: IntType, signExtend: Boolean): ConstantInt {
         val ref = if (signExtend) {
             LLVM.LLVMConstSExt(ref, type.ref)
         } else {
@@ -461,7 +462,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstSExt
      */
-    public fun sext(type: IntType): ConstantInt = ext(type, true)
+    public fun getSExt(type: IntType): ConstantInt = getExt(type, true)
 
     /**
      * Zero extend this value to type [type]
@@ -471,7 +472,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstZExt
      */
-    public fun zext(type: IntType): ConstantInt = ext(type, false)
+    public fun getZExt(type: IntType): ConstantInt = getExt(type, false)
 
     /**
      * Converstion to float type
@@ -479,7 +480,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      * @see LLVM.LLVMConstSIToFP
      * @see LLVM.LLVMConstUIToFP
      */
-    public fun tofp(type: FloatType, signExtend: Boolean): ConstantFloat {
+    public fun getToFP(type: FloatType, signExtend: Boolean): ConstantFloat {
         val ref = if (signExtend) {
             LLVM.LLVMConstSIToFP(ref, type.ref)
         } else {
@@ -494,21 +495,21 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstUIToFP
      */
-    public fun uitofp(type: FloatType): ConstantFloat = tofp(type, false)
+    public fun getUIToFP(type: FloatType): ConstantFloat = getToFP(type, false)
 
     /**
      * Conversion to float type using this as signed
      *
      * @see LLVM.LLVMConstSIToFP
      */
-    public fun sitofp(type: FloatType): ConstantFloat = tofp(type, false)
+    public fun getSIToFP(type: FloatType): ConstantFloat = getToFP(type, false)
 
     /**
      * Conversion to integer pointer
      *
      * @see LLVM.LLVMConstIntToPtr
      */
-    public fun ptrcast(type: PointerType): ConstantPointer {
+    public fun getIntToPtr(type: PointerType): ConstantPointer {
         val ref = LLVM.LLVMConstIntToPtr(ref, type.ref)
 
         return ConstantPointer(ref)
@@ -521,7 +522,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstIntCast
      */
-    public fun intcast(type: IntType, signExtend: Boolean): ConstantInt {
+    public fun getIntCast(type: IntType, signExtend: Boolean): ConstantInt {
         val ref = LLVM.LLVMConstIntCast(ref, type.ref, signExtend.toLLVMBool())
 
         return ConstantInt(ref)
@@ -534,7 +535,7 @@ public class ConstantInt internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstSelect
      */
-    public fun select(ifTrue: Value, ifFalse: Value): Value {
+    public fun getSelect(ifTrue: Value, ifFalse: Value): Value {
         val ref = LLVM.LLVMConstSelect(ref, ifTrue.ref, ifFalse.ref)
 
         return Value(ref)

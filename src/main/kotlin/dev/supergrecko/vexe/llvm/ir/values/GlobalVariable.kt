@@ -5,6 +5,7 @@ import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.ThreadLocalMode
 import dev.supergrecko.vexe.llvm.ir.Value
+import dev.supergrecko.vexe.llvm.ir.values.traits.DebugLocationValue
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 

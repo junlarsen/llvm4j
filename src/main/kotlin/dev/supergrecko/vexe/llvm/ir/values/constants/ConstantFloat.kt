@@ -5,11 +5,12 @@ import dev.supergrecko.vexe.llvm.ir.RealPredicate
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.llvm.ir.values.ConstantValue
+import dev.supergrecko.vexe.llvm.ir.values.traits.ConstantValue
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantFloat internal constructor() : Value(), ConstantValue {
+public class ConstantFloat internal constructor() : Value(),
+    ConstantValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }
@@ -57,7 +58,7 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstFNeg
      */
-    public fun neg(): ConstantFloat {
+    public fun getNeg(): ConstantFloat {
         val ref = LLVM.LLVMConstFNeg(ref)
 
         return ConstantFloat(ref)
@@ -71,7 +72,7 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstFAdd
      */
-    public fun add(rhs: ConstantFloat): ConstantFloat {
+    public fun getAdd(rhs: ConstantFloat): ConstantFloat {
         val ref = LLVM.LLVMConstFAdd(ref, rhs.ref)
 
         return ConstantFloat(ref)
@@ -85,7 +86,7 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstFSub
      */
-    public fun sub(rhs: ConstantFloat): ConstantFloat {
+    public fun getSub(rhs: ConstantFloat): ConstantFloat {
         val ref = LLVM.LLVMConstFSub(ref, rhs.ref)
 
         return ConstantFloat(ref)
@@ -96,7 +97,7 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstFMul
      */
-    public fun mul(rhs: ConstantFloat): ConstantFloat {
+    public fun getMul(rhs: ConstantFloat): ConstantFloat {
         val ref = LLVM.LLVMConstFMul(ref, rhs.ref)
 
         return ConstantFloat(ref)
@@ -107,7 +108,7 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstFDiv
      */
-    public fun div(rhs: ConstantFloat): ConstantFloat {
+    public fun getDiv(rhs: ConstantFloat): ConstantFloat {
         val ref = LLVM.LLVMConstFDiv(ref, rhs.ref)
 
         return ConstantFloat(ref)
@@ -118,7 +119,7 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMFRem
      */
-    public fun rem(rhs: ConstantFloat): ConstantFloat {
+    public fun getRem(rhs: ConstantFloat): ConstantFloat {
         val ref = LLVM.LLVMConstFRem(ref, rhs.ref)
 
         return ConstantFloat(ref)
@@ -132,7 +133,7 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstFCmp
      */
-    public fun cmp(
+    public fun getFCmp(
         predicate: RealPredicate,
         rhs: ConstantFloat
     ): ConstantFloat {
@@ -148,10 +149,8 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      * sizes are not allowed
      *
      * @see LLVM.LLVMConstFPTrunc
-     *
-     * TODO: Find a way to check type sizes
      */
-    public fun trunc(type: FloatType): ConstantFloat {
+    public fun getTrunc(type: FloatType): ConstantFloat {
         val ref = LLVM.LLVMConstFPTrunc(ref, type.ref)
 
         return ConstantFloat(ref)
@@ -164,10 +163,8 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      * destination type
      *
      * @see LLVM.LLVMConstFPExt
-     *
-     * TODO: Find a way to check type sizes
      */
-    public fun ext(type: FloatType): ConstantFloat {
+    public fun getExt(type: FloatType): ConstantFloat {
         val ref = LLVM.LLVMConstFPExt(ref, type.ref)
 
         return ConstantFloat(ref)
@@ -177,10 +174,8 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      * Conversion to signed integer type
      *
      * @see LLVM.LLVMConstFPToSI
-     *
-     * TODO: Find a way to check if type is signed
      */
-    public fun fptosi(type: IntType): ConstantInt {
+    public fun getFPToSI(type: IntType): ConstantInt {
         val ref = LLVM.LLVMConstFPToSI(ref, type.ref)
 
         return ConstantInt(ref)
@@ -190,10 +185,8 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      * Conversion to unsigned integer type
      *
      * @see LLVM.LLVMConstFPToUI
-     *
-     * TODO: Find a way to check if type is signed
      */
-    public fun fptoui(type: IntType): ConstantInt {
+    public fun getFPToUI(type: IntType): ConstantInt {
         val ref = LLVM.LLVMConstFPToUI(ref, type.ref)
 
         return ConstantInt(ref)
@@ -204,7 +197,7 @@ public class ConstantFloat internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstFPCast
      */
-    public fun fpcast(type: FloatType): ConstantFloat {
+    public fun getFPCast(type: FloatType): ConstantFloat {
         val ref = LLVM.LLVMConstFPCast(ref, type.ref)
 
         return ConstantFloat(ref)

@@ -1,11 +1,14 @@
 package dev.supergrecko.vexe.llvm.ir.types
 
 import dev.supergrecko.vexe.llvm.ir.Type
+import dev.supergrecko.vexe.llvm.ir.types.traits.CompositeType
+import dev.supergrecko.vexe.llvm.ir.types.traits.SequentialType
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
 public class ArrayType internal constructor() : Type(),
-    CompositeType, SequentialType {
+    CompositeType,
+    SequentialType {
     public constructor(llvmRef: LLVMTypeRef) : this() {
         ref = llvmRef
     }
