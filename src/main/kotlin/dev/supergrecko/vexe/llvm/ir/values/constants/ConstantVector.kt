@@ -6,14 +6,14 @@ import dev.supergrecko.vexe.llvm.ir.IntPredicate
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.llvm.ir.values.CompositeValue
-import dev.supergrecko.vexe.llvm.ir.values.ConstantValue
+import dev.supergrecko.vexe.llvm.ir.values.traits.CompositeValue
+import dev.supergrecko.vexe.llvm.ir.values.traits.ConstantValue
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantVector internal constructor() : Value(), ConstantValue,
-    CompositeValue {
+public class ConstantVector internal constructor() : Value(),
+    ConstantValue, CompositeValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }
@@ -44,7 +44,7 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * @see LLVM.LLVMConstNeg
      */
-    public fun neg(
+    public fun getNeg(
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
     ): ConstantVector {
@@ -62,12 +62,12 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
     /**
      * Invert each integer value using XOR
      *
-     * This in short performs the same action as [neg] but instead of using
+     * This in short performs the same action as [getNeg] but instead of using
      * subtraction it uses a bitwise XOR where B is always true.
      *
      * @see LLVM.LLVMConstNot
      */
-    public fun not(): ConstantVector {
+    public fun getNot(): ConstantVector {
         val ref = LLVM.LLVMConstNot(ref)
 
         return ConstantVector(ref)
@@ -86,7 +86,7 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * @see LLVM.LLVMConstAdd
      */
-    public fun add(
+    public fun getAdd(
         rhs: ConstantVector,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
@@ -112,8 +112,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * respectively. If [hasNUW] [hasNSW] are present, the result
      * value of the add is a poison value if unsigned and/or signed overflow,
      * respectively, occurs.
+     *
+     * @see LLVM.LLVMConstSub
      */
-    public fun sub(
+    public fun getSub(
         rhs: ConstantVector,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
@@ -139,8 +141,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * respectively. If [hasNUW] [hasNSW] are present, the result
      * value of the add is a poison value if unsigned and/or signed overflow,
      * respectively, occurs.
+     *
+     * @see LLVM.LLVMConstMul
      */
-    public fun mul(
+    public fun getMul(
         rhs: ConstantVector,
         hasNUW: Boolean = false,
         hasNSW: Boolean = false
@@ -169,9 +173,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * If the [exact] arg is present, the result value of the sdiv/udiv is a
      * poison value if the result would be rounded.
      *
-     * TODO: Find a way to determine if types is unsigned
+     * @see LLVM.LLVMConstUDiv
+     * @see LLVM.LLVMConstSDiv
      */
-    public fun div(
+    public fun getDiv(
         rhs: ConstantVector,
         exact: Boolean,
         unsigned: Boolean
@@ -197,11 +202,13 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * If the [exact] arg is present, the result value of the sdiv is a poison
      * value if the result would be rounded.
+     *
+     * @see LLVM.LLVMConstSDiv
      */
-    public fun sdiv(
+    public fun getSDiv(
         rhs: ConstantVector,
         exact: Boolean
-    ): ConstantVector = div(rhs, exact, false)
+    ): ConstantVector = getDiv(rhs, exact, false)
 
     /**
      * Perform division with another unsigned integer vector
@@ -212,11 +219,13 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * If the [exact] arg is present, the result value of the udiv is a poison
      * value if %op1 is not a multiple of %op2.
      * eg "((a udiv exact b) mul b) == a".
+     *
+     * @see LLVM.LLVMConstUDiv
      */
-    public fun udiv(
+    public fun getUDiv(
         rhs: ConstantVector,
         exact: Boolean
-    ): ConstantVector = div(rhs, exact, true)
+    ): ConstantVector = getDiv(rhs, exact, true)
 
     /**
      * Get the remainder from the unsigned division for the two operands
@@ -224,8 +233,11 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * Taking the remainder of a division by zero is undefined behavior.
      *
      * If [unsigned] is present, URem will be used
+     *
+     * @see LLVM.LLVMConstSRem
+     * @see LLVM.LLVMConstURem
      */
-    public fun rem(rhs: ConstantVector, unsigned: Boolean): ConstantVector {
+    public fun getRem(rhs: ConstantVector, unsigned: Boolean): ConstantVector {
         val ref = if (unsigned) {
             LLVM.LLVMConstURem(ref, rhs.ref)
         } else {
@@ -245,8 +257,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * 0	1	0
      * 1	0	0
      * 1	1	1
+     *
+     * @see LLVM.LLVMConstAnd
      */
-    public fun and(rhs: ConstantVector): ConstantVector {
+    public fun getAnd(rhs: ConstantVector): ConstantVector {
         val ref = LLVM.LLVMConstAnd(ref, rhs.ref)
 
         return ConstantVector(ref)
@@ -262,8 +276,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * 0	1	1
      * 1	0	1
      * 1	1	1
+     *
+     * @see LLVM.LLVMConstOr
      */
-    public fun or(rhs: ConstantVector): ConstantVector {
+    public fun getOr(rhs: ConstantVector): ConstantVector {
         val ref = LLVM.LLVMConstOr(ref, rhs.ref)
 
         return ConstantVector(ref)
@@ -279,8 +295,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * 0	1	1
      * 1	0	1
      * 1	1	0
+     *
+     * @see LLVM.LLVMConstXor
      */
-    public fun xor(rhs: ConstantVector): ConstantVector {
+    public fun getXor(rhs: ConstantVector): ConstantVector {
         val ref = LLVM.LLVMConstXor(ref, rhs.ref)
 
         return ConstantVector(ref)
@@ -291,8 +309,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * This method receives a [predicate] which determines which logical
      * comparison method shall be used for the comparison.
+     *
+     * @see LLVM.LLVMConstICmp
      */
-    public fun cmp(
+    public fun getICmp(
         predicate: IntPredicate,
         rhs: ConstantVector
     ): ConstantVector {
@@ -305,8 +325,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * Shift the operand to the left [rhs] number of bits
      *
      * LLVM-C does not support NUW/NSW attributes for this operation
+     *
+     * @see LLVM.LLVMConstShl
      */
-    public fun shl(rhs: ConstantVector): ConstantVector {
+    public fun getShl(rhs: ConstantVector): ConstantVector {
         val ref = LLVM.LLVMConstShl(ref, rhs.ref)
 
         return ConstantVector(ref)
@@ -317,8 +339,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * zero fill
      *
      * LLVM-C does not support NUW/NSW attributes for this operation
+     *
+     * @see LLVM.LLVMConstLShr
      */
-    public fun lshr(bits: ConstantVector): ConstantVector {
+    public fun getLShr(bits: ConstantVector): ConstantVector {
         val ref = LLVM.LLVMConstLShr(ref, bits.ref)
 
         return ConstantVector(ref)
@@ -329,8 +353,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * extension
      *
      * LLVM-C does nt support the 'exact' attribute for this operation
+     *
+     * @see LLVM.LLVMConstAShr
      */
-    public fun ashr(bits: ConstantVector): ConstantVector {
+    public fun getAShr(bits: ConstantVector): ConstantVector {
         val ref = LLVM.LLVMConstAShr(ref, bits.ref)
 
         return ConstantVector(ref)
@@ -341,8 +367,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * The bit size of this must be larger than the bit size of [type]. Equal
      * sizes are not allowed
+     *
+     * @see LLVM.LLVMConstTrunc
      */
-    public fun trunc(type: IntType): ConstantVector {
+    public fun getTrunc(type: IntType): ConstantVector {
         val ref = LLVM.LLVMConstTrunc(ref, type.ref)
 
         return ConstantVector(ref)
@@ -353,8 +381,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * The bit size of this must be tinier than the bit size of the
      * destination type
+     *
+     * @see LLVM.LLVMConstSExt
      */
-    public fun sext(type: IntType): ConstantVector {
+    public fun getSExt(type: IntType): ConstantVector {
         val ref = LLVM.LLVMConstSExt(ref, type.ref)
 
         return ConstantVector(ref)
@@ -365,8 +395,10 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * The bit size of this must be tinier than the bit size of the
      * destination type
+     *
+     * @see LLVM.LLVMConstZExt
      */
-    public fun zext(type: IntType): ConstantVector {
+    public fun getZExt(type: IntType): ConstantVector {
         val ref = LLVM.LLVMConstZExt(ref, type.ref)
 
         return ConstantVector(ref)
@@ -377,7 +409,7 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * @see LLVM.LLVMConstIntCast
      */
-    public fun intcast(type: IntType, signExtend: Boolean): ConstantVector {
+    public fun getIntCast(type: IntType, signExtend: Boolean): ConstantVector {
         val ref = LLVM.LLVMConstIntCast(ref, type.ref, signExtend.toLLVMBool())
 
         return ConstantVector(ref)
@@ -388,7 +420,7 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * @see LLVM.LLVMConstFPCast
      */
-    public fun fpcast(type: FloatType): ConstantVector {
+    public fun getFPCast(type: FloatType): ConstantVector {
         val ref = LLVM.LLVMConstFPCast(ref, type.ref)
 
         return ConstantVector(ref)
@@ -401,7 +433,7 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * @see LLVM.LLVMConstSelect
      */
-    public fun select(ifTrue: Value, ifFalse: Value): ConstantVector {
+    public fun getSelect(ifTrue: Value, ifFalse: Value): ConstantVector {
         val ref = LLVM.LLVMConstSelect(ref, ifTrue.ref, ifFalse.ref)
 
         return ConstantVector(ref)
@@ -412,7 +444,7 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * @see LLVM.LLVMConstExtractElement
      */
-    public fun extract(index: ConstantInt): Value {
+    public fun getExtractElement(index: ConstantInt): Value {
         val ref = LLVM.LLVMConstExtractElement(ref, index.ref)
 
         return Value(ref)
@@ -423,7 +455,7 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      *
      * The [value] must be of the same type as what this vector holds.
      */
-    public fun insert(index: ConstantInt, value: Value): ConstantVector {
+    public fun getInsertElement(index: ConstantInt, value: Value): ConstantVector {
         // LLVM has InsertElement(this, value, index) which is why args are
         // swapped
         val ref = LLVM.LLVMConstInsertElement(ref, value.ref, index.ref)
@@ -437,7 +469,7 @@ public class ConstantVector internal constructor() : Value(), ConstantValue,
      * This returns a vector with the same element type as the input length
      * that is the same as the shuffle mask.
      */
-    public fun shuffle(
+    public fun getShuffleVector(
         other: ConstantVector,
         mask: ConstantVector
     ): ConstantVector {

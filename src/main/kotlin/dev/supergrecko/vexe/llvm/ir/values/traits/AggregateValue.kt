@@ -1,4 +1,4 @@
-package dev.supergrecko.vexe.llvm.ir.values
+package dev.supergrecko.vexe.llvm.ir.values.traits
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.ir.Value
@@ -18,7 +18,7 @@ public interface AggregateValue : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMConstGEP
      * @see LLVM.LLVMConstInBoundsGEP
      */
-    public fun gep(inbounds: Boolean, indices: List<ConstantInt>): Value {
+    public fun getGEP(inbounds: Boolean, indices: List<ConstantInt>): Value {
         val ptr = indices.map { it.ref }.toTypedArray()
 
         val ref = if (inbounds) {
@@ -44,7 +44,7 @@ public interface AggregateValue : ContainsReference<LLVMValueRef> {
      *
      * @see LLVM.LLVMConstExtractValue
      */
-    public fun extract(indices: List<Int>): Value {
+    public fun getExtractValue(indices: List<Int>): Value {
         val arr = indices.toTypedArray().toIntArray()
         val ref = LLVM.LLVMConstExtractValue(ref, arr, arr.size)
 
@@ -54,11 +54,11 @@ public interface AggregateValue : ContainsReference<LLVMValueRef> {
     /**
      * Insert the value into an aggregate value
      *
-     * This instruction uses the same navigation system as [extract]
+     * This instruction uses the same navigation system as [getExtractValue]
      *
      * @see LLVM.LLVMConstInsertValue
      */
-    public fun insert(value: Value, indices: List<Int>): Value {
+    public fun getInsertValue(value: Value, indices: List<Int>): Value {
         val arr = indices.toTypedArray().toIntArray()
         val ref = LLVM.LLVMConstInsertValue(ref, value.ref, arr, arr.size)
 

@@ -1,4 +1,4 @@
-package dev.supergrecko.vexe.llvm.ir.values
+package dev.supergrecko.vexe.llvm.ir.values.traits
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import org.bytedeco.javacpp.IntPointer

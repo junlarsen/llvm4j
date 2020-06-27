@@ -4,11 +4,12 @@ import dev.supergrecko.vexe.llvm.ir.Type
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
-import dev.supergrecko.vexe.llvm.ir.values.ConstantValue
+import dev.supergrecko.vexe.llvm.ir.values.traits.ConstantValue
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantPointer internal constructor() : Value(), ConstantValue {
+public class ConstantPointer internal constructor() : Value(),
+    ConstantValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }
@@ -17,11 +18,9 @@ public class ConstantPointer internal constructor() : Value(), ConstantValue {
     /**
      * Conversion to integer
      *
-     * TODO: Assert that this points to an int
-     *
      * @see LLVM.LLVMConstPtrToInt
      */
-    public fun intcast(type: IntType): ConstantInt {
+    public fun getIntCast(type: IntType): ConstantInt {
         val ref = LLVM.LLVMConstPtrToInt(ref, type.ref)
 
         return ConstantInt(ref)
@@ -35,7 +34,7 @@ public class ConstantPointer internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstPointerCast
      */
-    fun cast(toType: Type): ConstantPointer {
+    fun getPointerCast(toType: Type): ConstantPointer {
         val value = LLVM.LLVMConstPointerCast(ref, toType.ref)
 
         return ConstantPointer(value)
@@ -48,7 +47,7 @@ public class ConstantPointer internal constructor() : Value(), ConstantValue {
      *
      * @see LLVM.LLVMConstAddrSpaceCast
      */
-    public fun addrspacecast(type: PointerType): ConstantPointer {
+    public fun getAddrSpaceCast(type: PointerType): ConstantPointer {
         val ref = LLVM.LLVMConstAddrSpaceCast(ref, type.ref)
 
         return ConstantPointer(ref)

@@ -12,8 +12,8 @@ internal class ConstantTest : TestSuite({
         val ptrTy = PointerType(type)
         val value = ConstantInt(type, 1L, true)
 
-        val ptr = value.ptrcast(ptrTy.toPointerType())
-        val res = ptr.cast(type)
+        val ptr = value.getIntToPtr(ptrTy.toPointerType())
+        val res = ptr.getPointerCast(type)
 
         assertEquals(1L, ConstantInt(res.ref).getSignedValue())
     }

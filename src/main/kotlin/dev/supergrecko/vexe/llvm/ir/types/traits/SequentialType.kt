@@ -1,4 +1,4 @@
-package dev.supergrecko.vexe.llvm.ir.types
+package dev.supergrecko.vexe.llvm.ir.types.traits
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.ir.Type
