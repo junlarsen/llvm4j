@@ -10,8 +10,7 @@ import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
-public class MemoryBuffer internal constructor() :
-    AutoCloseable, Disposable {
+public class MemoryBuffer internal constructor() : Disposable {
     public lateinit var ref: LLVMMemoryBufferRef
         internal set
     public override var valid: Boolean = true
@@ -113,6 +112,4 @@ public class MemoryBuffer internal constructor() :
 
         LLVM.LLVMDisposeMemoryBuffer(ref)
     }
-
-    override fun close() = dispose()
 }

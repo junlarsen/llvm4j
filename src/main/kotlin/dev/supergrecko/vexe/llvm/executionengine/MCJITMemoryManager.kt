@@ -10,14 +10,12 @@ import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerFinalize
 import dev.supergrecko.vexe.llvm.executionengine.callbacks.MemoryManagerFinalizeMemoryCallback
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMCJITMemoryManagerRef
 import org.bytedeco.llvm.global.LLVM
 
 public class MCJITMemoryManager internal constructor() :
-    ContainsReference<LLVMMCJITMemoryManagerRef>, Validatable, Disposable,
-    AutoCloseable {
+    ContainsReference<LLVMMCJITMemoryManagerRef>, Disposable {
     public override lateinit var ref: LLVMMCJITMemoryManagerRef
         internal set
     public override var valid: Boolean = true
@@ -60,6 +58,4 @@ public class MCJITMemoryManager internal constructor() :
 
         LLVM.LLVMDisposeMCJITMemoryManager(ref)
     }
-
-    override fun close() = dispose()
 }

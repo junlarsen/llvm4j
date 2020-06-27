@@ -2,13 +2,11 @@ package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.target.TargetMachine
 import org.bytedeco.llvm.LLVM.LLVMPassManagerRef
 import org.bytedeco.llvm.global.LLVM
 
-public class PassManager internal constructor() :
-    AutoCloseable, Validatable, Disposable,
+public class PassManager internal constructor() : Disposable,
     ContainsReference<LLVMPassManagerRef> {
     public override lateinit var ref: LLVMPassManagerRef
     public override var valid: Boolean = true
@@ -35,6 +33,4 @@ public class PassManager internal constructor() :
 
         LLVM.LLVMDisposePassManager(ref)
     }
-
-    override fun close() = dispose()
 }

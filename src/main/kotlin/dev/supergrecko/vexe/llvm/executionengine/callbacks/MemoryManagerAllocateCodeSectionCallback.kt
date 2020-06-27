@@ -6,7 +6,11 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryManagerAllocateCodeSectionCallback
 
 public typealias MemoryManagerAllocateCodeSectionCallback = (
-    Pointer?, Long, Int, Int, BytePointer?
+    Pointer?,
+    Long,
+    Int,
+    Int,
+    BytePointer?
 ) -> BytePointer
 
 public class MemoryManagerAllocateCodeSectionBase(

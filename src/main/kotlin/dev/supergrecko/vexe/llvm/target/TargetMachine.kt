@@ -2,7 +2,6 @@ package dev.supergrecko.vexe.llvm.target
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.Module
@@ -14,8 +13,7 @@ import org.bytedeco.llvm.LLVM.LLVMTargetMachineRef
 import org.bytedeco.llvm.global.LLVM
 
 public class TargetMachine internal constructor() :
-    ContainsReference<LLVMTargetMachineRef>, Disposable, Validatable,
-    AutoCloseable {
+    ContainsReference<LLVMTargetMachineRef>, Disposable {
     public override lateinit var ref: LLVMTargetMachineRef
         internal set
     public override var valid: Boolean = true
@@ -168,6 +166,4 @@ public class TargetMachine internal constructor() :
 
         LLVM.LLVMDisposeTargetMachine(ref)
     }
-
-    public override fun close() = dispose()
 }

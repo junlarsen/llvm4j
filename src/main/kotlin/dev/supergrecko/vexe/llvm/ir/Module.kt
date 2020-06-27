@@ -26,7 +26,7 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class Module internal constructor() : AutoCloseable, Disposable,
+public class Module internal constructor() : Disposable,
     ContainsReference<LLVMModuleRef> {
     public override lateinit var ref: LLVMModuleRef
         internal set
@@ -667,6 +667,4 @@ public class Module internal constructor() : AutoCloseable, Disposable,
 
         LLVM.LLVMDisposeModule(ref)
     }
-
-    public override fun close() = dispose()
 }

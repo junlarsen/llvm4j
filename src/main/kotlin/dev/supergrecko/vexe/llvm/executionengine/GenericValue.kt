@@ -9,7 +9,7 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMGenericValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class GenericValue internal constructor() : Disposable, AutoCloseable,
+public class GenericValue internal constructor() : Disposable,
     ContainsReference<LLVMGenericValueRef> {
     public override lateinit var ref: LLVMGenericValueRef
         internal set
@@ -99,6 +99,4 @@ public class GenericValue internal constructor() : Disposable, AutoCloseable,
 
         LLVM.LLVMDisposeGenericValue(ref)
     }
-
-    public override fun close() = dispose()
 }

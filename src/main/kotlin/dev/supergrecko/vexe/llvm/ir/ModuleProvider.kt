@@ -5,8 +5,7 @@ import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import org.bytedeco.llvm.LLVM.LLVMModuleProviderRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ModuleProvider internal constructor() :
-    AutoCloseable, Disposable,
+public class ModuleProvider internal constructor() : Disposable,
     ContainsReference<LLVMModuleProviderRef> {
     private lateinit var module: Module
     public override lateinit var ref: LLVMModuleProviderRef
@@ -29,6 +28,4 @@ public class ModuleProvider internal constructor() :
 
         LLVM.LLVMDisposeModuleProvider(ref)
     }
-
-    override fun close() = dispose()
 }

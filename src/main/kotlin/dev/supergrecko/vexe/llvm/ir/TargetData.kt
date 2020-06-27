@@ -7,8 +7,7 @@ import org.bytedeco.llvm.LLVM.LLVMTargetDataRef
 import org.bytedeco.llvm.global.LLVM
 
 public class TargetData internal constructor() :
-    ContainsReference<LLVMTargetDataRef>, Disposable,
-    AutoCloseable {
+    ContainsReference<LLVMTargetDataRef>, Disposable {
     public override lateinit var ref: LLVMTargetDataRef
         internal set
     public override var valid: Boolean = true
@@ -41,6 +40,4 @@ public class TargetData internal constructor() :
 
         LLVM.LLVMDisposeTargetData(ref)
     }
-
-    public override fun close() = dispose()
 }

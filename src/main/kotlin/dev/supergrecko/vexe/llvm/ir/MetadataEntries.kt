@@ -13,7 +13,7 @@ import org.bytedeco.llvm.global.LLVM
  * should be named Entries as that is what it used for.
  */
 public class MetadataEntries internal constructor() :
-    ContainsReference<LLVMValueMetadataEntry>, Disposable, AutoCloseable {
+    ContainsReference<LLVMValueMetadataEntry>, Disposable {
     public override var valid: Boolean = true
     public override lateinit var ref: LLVMValueMetadataEntry
         internal set
@@ -53,6 +53,4 @@ public class MetadataEntries internal constructor() :
 
         LLVM.LLVMDisposeValueMetadataEntries(ref)
     }
-
-    override fun close() = dispose()
 }

@@ -10,12 +10,11 @@ import dev.supergrecko.vexe.llvm.ir.callbacks.YieldCallback
 import dev.supergrecko.vexe.llvm.ir.callbacks.YieldCallbackBase
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
-import org.bytedeco.llvm.LLVM.LLVMYieldCallback
 import org.bytedeco.llvm.global.LLVM
 
 public class Context public constructor(
     llvmRef: LLVMContextRef = LLVM.LLVMContextCreate()
-) : AutoCloseable, Disposable,
+) : Disposable,
     ContainsReference<LLVMContextRef> {
     public override val ref = llvmRef
     public override var valid: Boolean = true
@@ -123,6 +122,4 @@ public class Context public constructor(
 
         LLVM.LLVMContextDispose(ref)
     }
-
-    public override fun close() = dispose()
 }

@@ -1,11 +1,9 @@
 package dev.supergrecko.vexe.llvm.unit.ir.types
 
 import dev.supergrecko.vexe.llvm.ir.Context
-import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 internal class TypeTest : TestSuite({
     describe("Casting into the same type will work") {

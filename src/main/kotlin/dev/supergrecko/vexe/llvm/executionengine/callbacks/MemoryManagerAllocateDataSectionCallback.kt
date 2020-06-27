@@ -7,7 +7,12 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryManagerAllocateDataSectionCallback
 
 public typealias MemoryManagerAllocateDataSectionCallback = (
-    Pointer?, Long, Int, Int, BytePointer?, Boolean
+    Pointer?,
+    Long,
+    Int,
+    Int,
+    BytePointer?,
+    Boolean
 ) -> BytePointer
 
 public class MemoryManagerAllocateDataSectionBase(
