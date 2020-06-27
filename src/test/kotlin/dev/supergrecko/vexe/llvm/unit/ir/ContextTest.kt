@@ -14,7 +14,7 @@ internal class ContextTest : Spek({
 
     test("setting a diagnostic handler with a payload") {
         val payload = IntPointer(100)
-        context.setDiagnosticHandler({ _, _ -> }, payload)
+        context.setDiagnosticHandler(payload) { }
 
         val ptr = context.getDiagnosticContext()
 
@@ -23,13 +23,13 @@ internal class ContextTest : Spek({
 
     group("setting a yield callback does not unexpectedly fail") {
         test("without a payload") {
-            context.setYieldCallback({ _, _ -> }, null)
+            context.setYieldCallback { }
         }
 
         test("with a payload") {
             val payload = IntPointer(99)
 
-            context.setYieldCallback({ _, _ -> }, payload)
+            context.setYieldCallback(payload) { }
         }
     }
 
