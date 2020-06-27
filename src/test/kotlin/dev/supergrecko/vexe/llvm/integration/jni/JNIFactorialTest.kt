@@ -1,6 +1,5 @@
 package dev.supergrecko.vexe.llvm.integration.jni
 
-import dev.supergrecko.vexe.test.TestSuite
 import kotlin.system.exitProcess
 import kotlin.test.assertEquals
 import org.bytedeco.javacpp.BytePointer
@@ -8,8 +7,13 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
 import org.bytedeco.llvm.global.LLVM
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 
-internal class JNIFactorialTest : TestSuite({
+internal class JNIFactorialTest : Spek({
+    // This exists solely for the purpose of ensuring that the LLVM bindings
+    // themselves work properly
+    // TODO: Remove this
     describe("Factorial example from bytedeco") {
         val error = BytePointer(null as Pointer?)
 
@@ -83,7 +87,9 @@ internal class JNIFactorialTest : TestSuite({
 
         val result = LLVM.LLVMGenericValueToInt(exec_res, 0)
 
-        assertEquals(3628800, result)
+        it("Should have a result equal to 3628800") {
+            assertEquals(3628800, result)
+        }
 
         LLVM.LLVMDisposePassManager(pass)
         LLVM.LLVMDisposeBuilder(builder)

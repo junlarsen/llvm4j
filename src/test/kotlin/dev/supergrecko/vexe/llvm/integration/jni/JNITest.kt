@@ -5,7 +5,9 @@ import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.specification.describe
 
 internal object JNITest : Spek({
-    describe("Using the raw LLVM bindigs") {
-        LLVM.LLVMShutdown()
+    describe("using the raw LLVM bindings") {
+        it("shuts down without any problems") {
+            LLVM.LLVMShutdown()
+        }
     }
 })

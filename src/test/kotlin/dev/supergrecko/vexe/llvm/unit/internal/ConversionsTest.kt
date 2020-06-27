@@ -3,24 +3,28 @@ package dev.supergrecko.vexe.llvm.unit.internal
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.test.TestSuite
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
-internal class ConversionsTest : TestSuite({
-    describe("Conversion from Int to Bool via extension") {
-        assertEquals(true, 1.fromLLVMBool())
-        assertEquals(false, 0.fromLLVMBool())
+internal class ConversionsTest : Spek({
+    group("int to boolean conversion") {
+        test("0 and 1 match false and true") {
+            assertTrue { 1.fromLLVMBool() }
+            assertFalse { 0.fromLLVMBool() }
+        }
+
+        test("any positive and negative values also convert") {
+            assertTrue { 100.fromLLVMBool() }
+            assertFalse { (-200123).fromLLVMBool() }
+        }
     }
 
-    describe("Conversion from Bool to Int via extension") {
-        assertEquals(1, true.toLLVMBool())
-        assertEquals(0, false.toLLVMBool())
-    }
-
-    describe("Negative number is false") {
-        assertEquals(false, (-100).fromLLVMBool())
-    }
-
-    describe("Any positive number is true") {
-        assertEquals(true, 1238182.fromLLVMBool())
+    group("boolean to int conversion") {
+        test("true and false match 1 and 0") {
+            assertEquals(1, true.toLLVMBool())
+            assertEquals(0, false.toLLVMBool())
+        }
     }
 })
