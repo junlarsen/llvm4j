@@ -20,8 +20,6 @@ public class MetadataEntries internal constructor() :
     ) : this() {
         ref = llvmRef
         sizePtr = size
-
-        assert(sizePtr.capacity() > 0)
     }
 
     public fun size(): Long {

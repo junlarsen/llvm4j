@@ -17,7 +17,6 @@ import dev.supergrecko.vexe.llvm.support.MemoryBuffer
 import dev.supergrecko.vexe.llvm.support.Message
 import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
 import java.io.File
-import java.nio.ByteBuffer
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
@@ -343,28 +342,28 @@ public class Module internal constructor() : Disposable,
      *
      * @see LLVM.LLVMGetNamedMetadataNumOperands
      */
-    public fun getOperandCount(name: String): Int {
+    public fun getNamedMetadataOperandCount(name: String): Int {
         return LLVM.LLVMGetNamedMetadataNumOperands(ref, name)
     }
 
     /**
      * Get the metadata nodes for [name]
      *
-     * TODO: Find a better return type as LLVM's C API only returns LLVMValueRef
-     *
      * @see LLVM.LLVMGetNamedMetadataOperands
      */
-    public fun getNamedMetadataOperands(name: String): List<Value> {
-        val size = getOperandCount(name)
+    public fun getNamedMetadataOperands(name: String): List<Metadata> {
+        val size = getNamedMetadataOperandCount(name)
         val ptr = PointerPointer<LLVMValueRef>(size.toLong())
 
         LLVM.LLVMGetNamedMetadataOperands(ref, name, ptr)
 
-        return ptr.map { Value(it) }
+        return ptr.map { Metadata.fromValue(Value(it)) }
     }
 
     /**
      * Add an operand to the given metadata node
+     *
+     * This expects the [operand] to be a Metadata node, disguised in a Value
      *
      * @see LLVM.LLVMAddNamedMetadataOperand
      */
