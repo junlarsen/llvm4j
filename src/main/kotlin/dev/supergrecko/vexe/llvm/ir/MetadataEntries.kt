@@ -35,6 +35,12 @@ public class MetadataEntries internal constructor() :
      * @see LLVM.LLVMValueMetadataEntriesGetKind
      */
     public fun getKind(index: Int): Int {
+        if (index >= size()) {
+            throw IndexOutOfBoundsException(
+                "Index $index out of bounds for size of ${size()}"
+            )
+        }
+
         return LLVM.LLVMValueMetadataEntriesGetKind(ref, index)
     }
 
@@ -44,8 +50,12 @@ public class MetadataEntries internal constructor() :
      * @see LLVM.LLVMValueMetadataEntriesGetMetadata
      */
     public fun getMetadata(index: Int): Metadata {
-        // TODO: longterm: prevent segfault by out of bounds index via size_t
-        //  ptr?
+        if (index >= size()) {
+            throw IndexOutOfBoundsException(
+                "Index $index out of bounds for size of ${size()}"
+            )
+        }
+
         val metadata = LLVM.LLVMValueMetadataEntriesGetMetadata(ref, index)
 
         return Metadata(metadata)

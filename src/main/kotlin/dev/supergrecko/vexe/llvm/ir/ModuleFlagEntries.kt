@@ -38,11 +38,15 @@ public class ModuleFlagEntries internal constructor() :
     /**
      * Get the [ModuleFlagBehavior] for the entry at [index]
      *
-     * TODO: What happens with out of bounds index?
-     *
      * @see LLVM.LLVMModuleFlagEntriesGetFlagBehavior
      */
     public fun getBehavior(index: Int): ModuleFlagBehavior {
+        if (index >= size()) {
+            throw IndexOutOfBoundsException(
+                "Index $index out of bounds for size of ${size()}"
+            )
+        }
+
         val behavior = LLVM.LLVMModuleFlagEntriesGetFlagBehavior(ref, index)
 
         return ModuleFlagBehavior.values()
@@ -52,11 +56,15 @@ public class ModuleFlagEntries internal constructor() :
     /**
      * Get the key for the entry at [index]
      *
-     * TODO: What happens with out of bounds index?
-     *
      * @see LLVM.LLVMModuleFlagEntriesGetKey
      */
     public fun getKey(index: Int): String {
+        if (index >= size()) {
+            throw IndexOutOfBoundsException(
+                "Index $index out of bounds for size of ${size()}"
+            )
+        }
+
         val length = SizeTPointer(0)
 
         return LLVM.LLVMModuleFlagEntriesGetKey(ref, index, length).string
@@ -65,11 +73,15 @@ public class ModuleFlagEntries internal constructor() :
     /**
      * Get the [Metadata] for the entry at [index]
      *
-     * TODO: What happens with out of bounds index?
-     *
      * @see LLVM.LLVMModuleFlagEntriesGetMetadata
      */
     public fun getMetadata(index: Int): Metadata {
+        if (index >= size()) {
+            throw IndexOutOfBoundsException(
+                "Index $index out of bounds for size of ${size()}"
+            )
+        }
+
         val md = LLVM.LLVMModuleFlagEntriesGetMetadata(ref, index)
 
         return Metadata(md)
