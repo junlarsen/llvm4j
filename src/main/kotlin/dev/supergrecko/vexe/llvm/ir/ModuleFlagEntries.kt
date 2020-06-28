@@ -26,8 +26,6 @@ public class ModuleFlagEntries internal constructor() :
     ) : this() {
         ref = llvmRef
         sizePtr = size
-
-        assert(sizePtr.capacity() > 0)
     }
 
     fun size(): Long {
