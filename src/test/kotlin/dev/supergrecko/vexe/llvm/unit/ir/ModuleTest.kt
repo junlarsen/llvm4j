@@ -1,54 +1,114 @@
 package dev.supergrecko.vexe.llvm.unit.ir
 
 import dev.supergrecko.vexe.llvm.ir.Context
+import dev.supergrecko.vexe.llvm.ir.Metadata
 import dev.supergrecko.vexe.llvm.ir.Module
+import dev.supergrecko.vexe.llvm.ir.ModuleFlagBehavior
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
+import dev.supergrecko.vexe.llvm.setup
 import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
 import dev.supergrecko.vexe.llvm.utils.cleanup
 import dev.supergrecko.vexe.test.TestSuite
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-internal class ModuleTest : TestSuite({
-    describe("Modules can have identifiers") {
-        val mod = Module("utils.ll").apply {
-            setModuleIdentifier("utils")
+internal object ModuleTest : Spek({
+    setup()
+
+    val module: Module by memoized()
+
+    group("module source file names") {
+        test("assigning a module identifier") {
+            module.setSourceFileName("test.tmp")
+
+            assertEquals("test.tmp", module.getSourceFileName())
         }
 
-        assertEquals("utils", mod.getModuleIdentifier())
+        test("names are preserved after module cloning") {
+            module.setSourceFileName("test.tmp")
 
-        cleanup(mod)
+            val subject = module.clone()
+
+            assertEquals("test.tmp", subject.getSourceFileName())
+        }
     }
 
-    describe("Cloning a module clones the identifier") {
-        val mod = Module("utils.ll").apply {
-            setModuleIdentifier("utils")
+    group("module identifier names") {
+        test("assigning a module identifier") {
+            module.setModuleIdentifier("id")
+
+            assertEquals("id", module.getModuleIdentifier())
         }
 
-        val clone = mod.clone()
+        test("ids are preserved after module cloning") {
+            module.setModuleIdentifier("id")
 
-        assertEquals(mod.getModuleIdentifier(), clone.getModuleIdentifier())
+            val subject = module.clone()
 
-        cleanup(mod, clone)
+            assertEquals("id", subject.getModuleIdentifier())
+        }
     }
 
-    describe("Modifying the module's source file name") {
-        val mod = Module("utils.ll").apply {
-            assertEquals("utils.ll", getSourceFileName())
+    group("module data layouts") {
+        test("assigning a data layout") {
+            module.setDataLayout("p:64:64:64")
 
-            setSourceFileName("test2.ll")
-
-            assertEquals("test2.ll", getSourceFileName())
+            assertEquals("p:64:64:64", module.getDataLayout())
         }
 
-        cleanup(mod)
+        test("layouts are preserved after module cloning") {
+            module.setDataLayout("p:64:64:64")
+
+            val subject = module.clone()
+
+            assertEquals("p:64:64:64", subject.getDataLayout())
+        }
     }
 
+    group("module target triples") {
+        test("assigning a target triple") {
+            module.setTarget("x86_64-apple-macosx10.7.0")
+
+            assertEquals("x86_64-apple-macosx10.7.0", module.getTarget())
+        }
+
+        test("targets are preserved after module cloning") {
+            module.setTarget("x86_64-apple-macosx10.7.0")
+
+            val subject = module.clone()
+
+            assertEquals("x86_64-apple-macosx10.7.0", subject.getTarget())
+        }
+    }
+
+    group("module flag entries") {
+        test("setting a metadata flag and finding it") {
+            val md = Metadata("example")
+            module.addModuleFlag(ModuleFlagBehavior.Override, "example", md)
+
+            val subject = module.getModuleFlag("example")
+
+            assertNotNull(subject)
+        }
+
+        test("retrieving all the module flags") {
+            val md = Metadata("example")
+            module.addModuleFlag(ModuleFlagBehavior.Override, "example", md)
+
+            val subject = module.getModuleFlags()
+
+            assertEquals(ModuleFlagBehavior.Override, subject.getBehavior(0))
+        }
+    }
+})
+
+internal class ModuleTest2 : TestSuite({
     describe("Fetching a function which does not exist returns null") {
         val module = Module("utils.ll")
 
