@@ -20,7 +20,7 @@ internal object MemoryBufferTest : Spek({
         test("the buffer starts with BC") {
             val buffer = module.toMemoryBuffer()
             val ptr = buffer.getStart()
-            val start = "${ptr.char}${ptr.getChar(1)}"
+            val start = "${ptr.get(0).toChar()}${ptr.get(1).toChar()}"
 
             assertEquals("BC", start)
         }
