@@ -106,31 +106,6 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     }
     //endregion Core::Values::Constants
 
-    //region Core::Values::Constants::ConstantExpressions
-    /**
-     * Get the alignment of this type in bytes as a [Value] in [ConstantInt]
-     * format
-     *
-     * @see LLVM.LLVMAlignOf
-     */
-    public fun alignOf(): ConstantInt {
-        val ref = LLVM.LLVMAlignOf(ref)
-
-        return ConstantInt(ref)
-    }
-
-    /**
-     * Get the size of this type in bytes as a [Value] in [ConstantInt] format
-     *
-     * @see LLVM.LLVMSizeOf
-     */
-    public fun sizeOf(): ConstantInt {
-        val ref = LLVM.LLVMSizeOf(ref)
-
-        return ConstantInt(ref)
-    }
-    //endregion Core::Values::Constants::ConstantExpressions
-
     //region Typecasting
     /**
      * Get a pointer type which points to this type
