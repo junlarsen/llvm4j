@@ -80,16 +80,12 @@ public class MemoryBuffer internal constructor() : Disposable {
     }
 
     /**
-     * Get the first char in the buffer
-     *
-     * TODO: How to advance and get the next characters?
+     * Get a pointer to the first char in the buffer
      *
      * @see LLVM.LLVMGetBufferStart
      */
-    public fun getStart(): Char {
-        val s = LLVM.LLVMGetBufferStart(ref)
-
-        return s.get(0).toChar()
+    public fun getStart(): BytePointer {
+        return LLVM.LLVMGetBufferStart(ref)
     }
 
     /**

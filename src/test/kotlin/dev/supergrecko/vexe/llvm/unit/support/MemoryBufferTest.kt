@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 
-internal object MemoryBufferTest1 : Spek({
+internal object MemoryBufferTest : Spek({
     setup()
 
     val module: Module by memoized()

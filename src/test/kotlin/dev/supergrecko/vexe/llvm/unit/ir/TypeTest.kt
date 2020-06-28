@@ -44,8 +44,11 @@ internal object TypeTest : Spek({
     }
 
     group("printing the string representation of a type") {
-        test("integer type ...") {
+        test("integer types are prefixed with i") {
             val type = IntType(32)
+            val subject = type.getStringRepresentation().getString()
+
+            assertEquals("i32", subject)
         }
 
         test("structures print their body") {
@@ -54,8 +57,9 @@ internal object TypeTest : Spek({
                 true,
                 context
             )
+            val subject = struct.getStringRepresentation().getString()
 
-            println(struct.getStringRepresentation().getString())
+            assertEquals("<{ i32 }>", subject)
         }
     }
 })

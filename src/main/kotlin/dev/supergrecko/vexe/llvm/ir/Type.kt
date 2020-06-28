@@ -63,7 +63,7 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     public fun getStringRepresentation(): Message {
         val ptr = LLVM.LLVMPrintTypeToString(ref)
 
-        return Message(ptr.asBuffer())
+        return Message(ptr)
     }
     //endregion Core::Types
 
