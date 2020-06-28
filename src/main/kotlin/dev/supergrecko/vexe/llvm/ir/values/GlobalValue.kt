@@ -233,7 +233,7 @@ public open class GlobalValue internal constructor() : Value(),
 
         val entries = LLVM.LLVMGlobalCopyAllMetadata(ref, ptr)
 
-        return MetadataEntries(entries)
+        return MetadataEntries(entries, ptr)
     }
     //endregion Core::Values::Constants::GlobalValues
 }

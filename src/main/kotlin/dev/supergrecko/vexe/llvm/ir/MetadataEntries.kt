@@ -2,24 +2,30 @@ package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
+import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMMetadataRef
 import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.global.LLVM
 
-/**
- * Class wrapping [LLVMValueMetadataEntry]
- *
- * LLVM uses this as an array of [LLVMMetadataRef]s and thus I feel like it
- * should be named Entries as that is what it used for.
- */
 public class MetadataEntries internal constructor() :
     ContainsReference<LLVMValueMetadataEntry>, Disposable {
+    internal lateinit var sizePtr: SizeTPointer
     public override var valid: Boolean = true
     public override lateinit var ref: LLVMValueMetadataEntry
         internal set
 
-    public constructor(llvmRef: LLVMValueMetadataEntry) : this() {
+    public constructor(
+        llvmRef: LLVMValueMetadataEntry,
+        size: SizeTPointer
+    ) : this() {
         ref = llvmRef
+        sizePtr = size
+
+        assert(sizePtr.capacity() > 0)
+    }
+
+    public fun size(): Long {
+        return sizePtr.get()
     }
 
     //region Core::Metadata

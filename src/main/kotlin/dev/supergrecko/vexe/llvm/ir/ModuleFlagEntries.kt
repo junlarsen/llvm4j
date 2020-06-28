@@ -15,12 +15,23 @@ import org.bytedeco.llvm.global.LLVM
  */
 public class ModuleFlagEntries internal constructor() :
     ContainsReference<LLVMModuleFlagEntry>, Disposable {
+    internal lateinit var sizePtr: SizeTPointer
     public override var valid: Boolean = true
     public override lateinit var ref: LLVMModuleFlagEntry
         internal set
 
-    public constructor(llvmRef: LLVMModuleFlagEntry) : this() {
+    public constructor(
+        llvmRef: LLVMModuleFlagEntry,
+        size: SizeTPointer
+    ) : this() {
         ref = llvmRef
+        sizePtr = size
+
+        assert(sizePtr.capacity() > 0)
+    }
+
+    fun size(): Long {
+        return sizePtr.get()
     }
 
     //region Core::Modules

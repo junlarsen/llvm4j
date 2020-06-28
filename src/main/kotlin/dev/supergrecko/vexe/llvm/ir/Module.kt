@@ -153,7 +153,7 @@ public class Module internal constructor() : Disposable,
         val size = SizeTPointer(0)
         val entries = LLVM.LLVMCopyModuleFlagsMetadata(ref, size)
 
-        return ModuleFlagEntries(entries)
+        return ModuleFlagEntries(entries, size)
     }
 
     /**
