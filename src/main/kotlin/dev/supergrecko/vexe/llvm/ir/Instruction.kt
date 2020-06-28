@@ -74,7 +74,7 @@ public open class Instruction internal constructor() : Value(),
             size
         )
 
-        return MetadataEntries(entries)
+        return MetadataEntries(entries, size)
     }
 
     /**
