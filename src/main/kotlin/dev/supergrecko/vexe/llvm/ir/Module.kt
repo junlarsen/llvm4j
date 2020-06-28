@@ -202,7 +202,7 @@ public class Module internal constructor() : Disposable,
 
         val result = LLVM.LLVMPrintModuleToFile(ref, fileName, message)
 
-        return if (result == 0) {
+        return if (result != 0) {
             Message(message)
         } else {
             null
@@ -549,7 +549,7 @@ public class Module internal constructor() : Disposable,
      * @see LLVM.LLVMVerifyModule
      */
     public fun verify(action: VerifierFailureAction): Boolean {
-        val ptr = BytePointer(ByteBuffer.allocate(0))
+        val ptr = BytePointer(0L)
 
         val res = LLVM.LLVMVerifyModule(ref, action.value, ptr)
 
