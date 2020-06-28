@@ -467,11 +467,7 @@ public class Module internal constructor() : Disposable,
             name.length.toLong()
         )
 
-        return if (alias == null) {
-            null
-        } else {
-            GlobalAlias(alias)
-        }
+        return wrap(alias) { GlobalAlias(it) }
     }
     //endregion Core::Values::Constants::GlobalAliases
 
