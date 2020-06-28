@@ -1,5 +1,5 @@
 name: All llvm4kt Test Suites
-on: [push]
+on: [push, pull_request]
 jobs:
   run:
     name: Execute Test Suite
@@ -11,6 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-java@v1
+        env:
+          GRADLE_OPTS: -Dorg.gradle.daemon=false
         with:
           java-version: 8
           java-package: jdk
