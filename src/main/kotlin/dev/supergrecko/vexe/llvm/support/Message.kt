@@ -1,22 +1,13 @@
 package dev.supergrecko.vexe.llvm.support
 
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
+import org.bytedeco.javacpp.BytePointer
 import java.nio.ByteBuffer
 import org.bytedeco.llvm.global.LLVM
 
-/**
- * A glorified char*
- *
- * A [Message] is a wrapper around Java's ByteBuffer and Bytedeco's BytePointers
- * It contains a char buffer which will be decoded into a Kotlin [String].
- *
- * Because these are obtained from C++ they need to be de-allocated which is why
- * they provide the [dispose] method. Failing to call this method will leak
- * memory.
- *
- * Do not use this class for byte buffers which do not come from the LLVM
- */
-public class Message(private val buffer: ByteBuffer) : Disposable {
+public class Message(
+    private val pointer: BytePointer
+) : Disposable {
     public override var valid: Boolean = true
 
     /**
@@ -28,13 +19,7 @@ public class Message(private val buffer: ByteBuffer) : Disposable {
     public fun getString(): String {
         require(valid) { "Cannot use disposed memory" }
 
-        val res = StringBuilder()
-
-        for (i in 0 until buffer.capacity()) {
-            res.append(buffer.get(i).toChar())
-        }
-
-        return res.toString()
+        return pointer.string
     }
 
     public override fun dispose() {
@@ -42,6 +27,6 @@ public class Message(private val buffer: ByteBuffer) : Disposable {
 
         valid = false
 
-        LLVM.LLVMDisposeMessage(buffer)
+        LLVM.LLVMDisposeMessage(pointer)
     }
 }

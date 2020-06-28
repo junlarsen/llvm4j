@@ -4,6 +4,7 @@ import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
+import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.callbacks.DiagnosticHandlerBase
 import dev.supergrecko.vexe.llvm.ir.callbacks.DiagnosticHandlerCallback
 import dev.supergrecko.vexe.llvm.ir.callbacks.YieldCallback
@@ -62,15 +63,14 @@ public class Context public constructor(
     /**
      * Get the llvm::DiagnosticContext for this context
      *
-     * TODO: Find out if there is any reasonable way to work with this thing
+     * Get the payload which was set with the diagnostic handler
      *
      * @see LLVM.LLVMContextGetDiagnosticContext
      */
-    public fun getDiagnosticContext(): Nothing {
-        TODO(
-            "The LLVM function returns a shared_ptr which is unusable in " +
-                    "Kotlin and thus this doesn't actually do anything for now"
-        )
+    public fun getDiagnosticContext(): Pointer? {
+        val ctx = LLVM.LLVMContextGetDiagnosticContext(ref)
+
+        return wrap(ctx) { it }
     }
 
     /**

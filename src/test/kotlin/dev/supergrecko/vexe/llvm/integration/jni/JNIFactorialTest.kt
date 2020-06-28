@@ -1,16 +1,19 @@
 package dev.supergrecko.vexe.llvm.integration.jni
 
-import dev.supergrecko.vexe.test.TestSuite
-import kotlin.system.exitProcess
-import kotlin.test.assertEquals
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
 import org.bytedeco.llvm.global.LLVM
+import org.spekframework.spek2.Spek
+import kotlin.system.exitProcess
+import kotlin.test.assertEquals
 
-internal class JNIFactorialTest : TestSuite({
-    describe("Factorial example from bytedeco") {
+internal object JNIFactorialTest : Spek({
+    // This exists solely for the purpose of ensuring that the LLVM bindings
+    // themselves work properly
+    // TODO: Remove this
+    test("Factorial example from bytedeco") {
         val error = BytePointer(null as Pointer?)
 
         LLVM.LLVMLinkInMCJIT()
@@ -21,7 +24,8 @@ internal class JNIFactorialTest : TestSuite({
 
         val mod = LLVM.LLVMModuleCreateWithName("fac_module")
         val facArgs = arrayOf(LLVM.LLVMInt32Type())
-        val fac = LLVM.LLVMAddFunction(mod, "fac", LLVM.LLVMFunctionType(LLVM.LLVMInt32Type(), facArgs[0], 1, 0))
+        val fac =
+            LLVM.LLVMAddFunction(mod, "fac", LLVM.LLVMFunctionType(LLVM.LLVMInt32Type(), facArgs[0], 1, 0))
 
         LLVM.LLVMSetFunctionCallConv(fac, LLVM.LLVMCCallConv)
 
@@ -34,7 +38,8 @@ internal class JNIFactorialTest : TestSuite({
 
         LLVM.LLVMPositionBuilderAtEnd(builder, entry)
 
-        val If = LLVM.LLVMBuildICmp(builder, LLVM.LLVMIntEQ, n, LLVM.LLVMConstInt(LLVM.LLVMInt32Type(), 0, 0), "n == 0")
+        val If =
+            LLVM.LLVMBuildICmp(builder, LLVM.LLVMIntEQ, n, LLVM.LLVMConstInt(LLVM.LLVMInt32Type(), 0, 0), "n == 0")
 
         LLVM.LLVMBuildCondBr(builder, If, iftrue, iffalse)
         LLVM.LLVMPositionBuilderAtEnd(builder, iftrue)
@@ -44,10 +49,13 @@ internal class JNIFactorialTest : TestSuite({
         LLVM.LLVMBuildBr(builder, end)
         LLVM.LLVMPositionBuilderAtEnd(builder, iffalse)
 
-        val n_minus = LLVM.LLVMBuildSub(builder, n, LLVM.LLVMConstInt(LLVM.LLVMInt32Type(), 1, 0), "n - 1")
+        val n_minus =
+            LLVM.LLVMBuildSub(builder, n, LLVM.LLVMConstInt(LLVM.LLVMInt32Type(), 1, 0), "n - 1")
         val call_fac_args = arrayOf(n_minus)
-        val call_fac = LLVM.LLVMBuildCall(builder, fac, PointerPointer(*call_fac_args), 1, "fac(n - 1)")
-        val res_iffalse = LLVM.LLVMBuildMul(builder, n, call_fac, "n * fac(n - 1)")
+        val call_fac =
+            LLVM.LLVMBuildCall(builder, fac, PointerPointer(*call_fac_args), 1, "fac(n - 1)")
+        val res_iffalse =
+            LLVM.LLVMBuildMul(builder, n, call_fac, "n * fac(n - 1)")
 
         LLVM.LLVMBuildBr(builder, end)
         LLVM.LLVMPositionBuilderAtEnd(builder, end)
@@ -78,7 +86,8 @@ internal class JNIFactorialTest : TestSuite({
         LLVM.LLVMAddCFGSimplificationPass(pass)
         LLVM.LLVMRunPassManager(pass, mod)
 
-        val exec_args = LLVM.LLVMCreateGenericValueOfInt(LLVM.LLVMInt32Type(), 10, 0)
+        val exec_args =
+            LLVM.LLVMCreateGenericValueOfInt(LLVM.LLVMInt32Type(), 10, 0)
         val exec_res = LLVM.LLVMRunFunction(engine, fac, 1, exec_args)
 
         val result = LLVM.LLVMGenericValueToInt(exec_res, 0)

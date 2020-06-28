@@ -1,44 +1,53 @@
 package dev.supergrecko.vexe.llvm.unit.support
 
-import dev.supergrecko.vexe.llvm.ir.Context
+import dev.supergrecko.vexe.llvm.TestUtils
 import dev.supergrecko.vexe.llvm.ir.Module
+import dev.supergrecko.vexe.llvm.setup
 import dev.supergrecko.vexe.llvm.support.MemoryBuffer
-import dev.supergrecko.vexe.llvm.utils.cleanup
-import dev.supergrecko.vexe.test.TestSuite
+import org.spekframework.spek2.Spek
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertNotNull
+import kotlin.test.assertFalse
 
-internal class MemoryBufferTest : TestSuite({
-    describe("Memory Buffers") {
-        val context = Context()
-        val module = Module("Test", context)
+internal object MemoryBufferTest : Spek({
+    setup()
 
-        describe("A buffer starts with BC") {
-            val buf = module.toMemoryBuffer()
+    val module: Module by memoized()
+    val utils: TestUtils by memoized()
 
-            assertEquals('B', buf.getStart())
+    group("using a memory buffer") {
+        test("the buffer starts with BC") {
+            val buffer = module.toMemoryBuffer()
+            val ptr = buffer.getStart()
+            val start = "${ptr.get(0).toChar()}${ptr.get(1).toChar()}"
+
+            assertEquals("BC", start)
         }
 
-        describe("Creating a buffer") {
-            val file = getTemporaryFile("out.ll")
-            module.writeBitCodeToFile(file)
-            val buf = MemoryBuffer(file)
+        group("storing a memory buffer to file system") {
+            test("stores to an existing file") {
+                val file = utils.getTemporaryFile()
 
-            assertNotNull(buf)
+                module.writeBitCodeToFile(file)
+                val buffer = MemoryBuffer(file)
 
-            cleanup(buf)
+                assertFalse { buffer.ref.isNull }
+            }
+
+            test("does not care if the file does not exist") {
+                val file = utils.getTemporaryFile()
+
+                file.delete()
+
+                module.writeBitCodeToFile(file)
+            }
         }
 
-        cleanup(module, context)
-    }
-
-    describe("Creating from invalid paths") {
-        assertFailsWith<IllegalArgumentException> {
-            val mod = MemoryBuffer(File("this path does not exist"))
-
-            cleanup(mod)
+        test("creation from file paths fails when the path does not exist") {
+            assertFailsWith<IllegalArgumentException> {
+                MemoryBuffer(File("this file does not exist"))
+            }
         }
     }
 })

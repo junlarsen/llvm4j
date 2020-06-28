@@ -27,13 +27,17 @@ public open class Value internal constructor() :
      * @see LLVM.LLVMGetValueName2
      */
     public fun getName(): String {
-        val ptr = LLVM.LLVMGetValueName2(ref, SizeTPointer(0))
+        val len = SizeTPointer(0)
+        val ptr = LLVM.LLVMGetValueName2(ref, len)
 
         return ptr.string
     }
 
     /**
      * Set the IR name for this value
+     *
+     * This does not work on constants. Ensure the context of this value does
+     * not discard value names.
      *
      * @see LLVM.LLVMSetValueName2
      */

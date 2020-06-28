@@ -5,7 +5,9 @@ import dev.supergrecko.vexe.llvm.internal.util.map
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Type
+import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.traits.CompositeType
+import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
@@ -134,4 +136,29 @@ public class StructType internal constructor() : Type(),
         return dest.map { Type(it) }
     }
     //endregion Core::Types::StructureTypes
+
+    //region Core::Values::Constants::ConstantExpressions
+    /**
+     * Get the size of this struct in bytes as an i64 ConstantInt
+     *
+     * @see LLVM.LLVMSizeOf
+     */
+    public fun getSizeOf(): ConstantInt {
+        val ref = LLVM.LLVMSizeOf(ref)
+
+        return ConstantInt(ref)
+    }
+
+    /**
+     * Get the alignment of this type in bytes as a [Value] in [ConstantInt]
+     * format
+     *
+     * @see LLVM.LLVMAlignOf
+     */
+    public fun alignOf(): ConstantInt {
+        val ref = LLVM.LLVMAlignOf(ref)
+
+        return ConstantInt(ref)
+    }
+    //endregion Core::Values::Constants::ConstantExpressions
 }

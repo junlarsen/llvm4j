@@ -9,6 +9,7 @@ import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.ir.types.VectorType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.support.Message
+import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -62,7 +63,7 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     public fun getStringRepresentation(): Message {
         val ptr = LLVM.LLVMPrintTypeToString(ref)
 
-        return Message(ptr.asBuffer())
+        return Message(ptr)
     }
     //endregion Core::Types
 
@@ -105,31 +106,6 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
         return Value(v)
     }
     //endregion Core::Values::Constants
-
-    //region Core::Values::Constants::ConstantExpressions
-    /**
-     * Get the alignment of this type in bytes as a [Value] in [ConstantInt]
-     * format
-     *
-     * @see LLVM.LLVMAlignOf
-     */
-    public fun alignOf(): ConstantInt {
-        val ref = LLVM.LLVMAlignOf(ref)
-
-        return ConstantInt(ref)
-    }
-
-    /**
-     * Get the size of this type in bytes as a [Value] in [ConstantInt] format
-     *
-     * @see LLVM.LLVMSizeOf
-     */
-    public fun sizeOf(): ConstantInt {
-        val ref = LLVM.LLVMSizeOf(ref)
-
-        return ConstantInt(ref)
-    }
-    //endregion Core::Values::Constants::ConstantExpressions
 
     //region Typecasting
     /**

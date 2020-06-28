@@ -2,10 +2,11 @@ package dev.supergrecko.vexe.llvm.unit.ir
 
 import dev.supergrecko.vexe.llvm.ir.PassRegistry
 import dev.supergrecko.vexe.test.TestSuite
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 
-internal class PassRegistryTest : TestSuite({
-    describe("Pass Registry acts as a singleton") {
+internal object PassRegistryTest : Spek({
+    test("the pass registry is a singleton") {
         val p1 = PassRegistry()
         val p2 = PassRegistry()
 

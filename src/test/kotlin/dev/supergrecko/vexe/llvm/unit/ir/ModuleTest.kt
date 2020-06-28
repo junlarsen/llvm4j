@@ -102,7 +102,7 @@ internal class ModuleTest : TestSuite({
 
         val buf = module.toMemoryBuffer()
 
-        assertEquals('B', buf.getStart())
+        assertNotNull(buf.ref)
 
         cleanup(module, context)
     }

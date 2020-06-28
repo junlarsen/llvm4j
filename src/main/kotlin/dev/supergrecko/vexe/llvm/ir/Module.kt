@@ -203,7 +203,7 @@ public class Module internal constructor() : Disposable,
         val result = LLVM.LLVMPrintModuleToFile(ref, fileName, message)
 
         return if (result == 0) {
-            Message(message.asByteBuffer())
+            Message(message)
         } else {
             null
         }
