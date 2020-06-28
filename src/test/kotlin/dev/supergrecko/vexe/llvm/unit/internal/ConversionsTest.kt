@@ -2,7 +2,6 @@ package dev.supergrecko.vexe.llvm.unit.internal
 
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
-import dev.supergrecko.vexe.test.TestSuite
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

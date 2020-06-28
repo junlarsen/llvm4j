@@ -9,7 +9,6 @@ import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 internal object MemoryBufferTest1 : Spek({
     setup()
