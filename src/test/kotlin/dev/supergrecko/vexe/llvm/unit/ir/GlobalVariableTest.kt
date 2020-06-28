@@ -49,11 +49,11 @@ internal object GlobalVariableTest : Spek({
 
         test("is global constant") {
             module.addGlobal("global", IntType(32)).apply {
-                assertTrue { isGlobalConstant() }
-
-                setGlobalConstant(false)
-
                 assertFalse { isGlobalConstant() }
+
+                setGlobalConstant(true)
+
+                assertTrue { isGlobalConstant() }
             }
         }
 
