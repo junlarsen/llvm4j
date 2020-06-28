@@ -1,52 +1,99 @@
 package dev.supergrecko.vexe.llvm.unit.ir
 
+import dev.supergrecko.vexe.llvm.ir.Context
+import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.ValueKind
+import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
+import dev.supergrecko.vexe.llvm.ir.types.VoidType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
+import dev.supergrecko.vexe.llvm.setup
 import dev.supergrecko.vexe.test.TestSuite
+import org.bytedeco.llvm.global.LLVM
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-internal class ValueTest : TestSuite({
-    describe("Creation of ConstAllOne type") {
-        val type = IntType(32)
-        val value = type.getConstantAllOnes()
+internal object ValueTest : Spek({
+    setup()
 
-        assertEquals(ValueKind.ConstantInt, value.getValueKind())
+    val context: Context by memoized()
+    val module: Module by memoized()
+
+    group("assigning a name to the value") {
+        test("getting a manually set name") {
+            assertFalse { context.isDiscardingValueNames() }
+
+            val value = module.addFunction("NotTrue", FunctionType(
+                VoidType(),
+                listOf(),
+                variadic = false
+            )).apply {
+                setName("True")
+            }
+
+            assertEquals("True", value.getName())
+        }
+
+        test("default name is empty string") {
+            val value = ConstantInt(IntType(1), 0)
+
+            assertEquals("", value.getName())
+        }
     }
 
-    describe("Creation of ConstNull type") {
+    test("finding the type of the value") {
         val type = IntType(32)
-        val value = type.getConstantNull()
+        val value = ConstantInt(type, 100)
+        val subject = value.getType()
 
-        assertEquals(ValueKind.ConstantInt, value.getValueKind())
-        assertTrue { value.isNull() }
+        assertEquals(type.ref, subject.ref)
     }
 
-    describe("Creation of nullptr type") {
-        val type = IntType(32)
-        val nullptr = type.getConstantNullPointer()
+    group("usage of singleton values") {
+        test("constant undefined") {
+            val undef = IntType(1).getConstantUndef()
 
-        assertEquals(ValueKind.ConstantPointerNull, nullptr.getValueKind())
-        assertTrue { nullptr.isNull() }
+            assertTrue { undef.isConstant() }
+            assertTrue { undef.isUndef() }
+        }
+
+        test("constant null pointer") {
+            val value = IntType(32).getConstantNullPointer()
+
+            assertEquals(ValueKind.ConstantPointerNull, value.getValueKind())
+            assertTrue { value.isConstant() }
+            assertTrue { value.isNull() }
+        }
+
+        test("constant null") {
+            val value = IntType(32).getConstantNull()
+
+            assertTrue { value.isConstant() }
+            assertTrue { value.isNull() }
+        }
     }
 
-    describe("Creation of undefined type") {
-        val type = IntType(1032)
-        val undef = type.getConstantUndef()
+    test("usage of ConstAllOne") {
+        val value = IntType(1).getConstantAllOnes()
+        val subject = value.getUnsignedValue()
 
-        assertEquals(ValueKind.UndefValue, undef.getValueKind())
-        assertTrue { undef.isUndef() }
-    }
-
-    describe("Value's pulled type matches input type") {
-        val type = IntType(32)
-        val value = ConstantInt(type, 1L, true)
-
-        val valueType = value.getType()
-
-        assertEquals(type.getTypeKind(), valueType.getTypeKind())
-        assertEquals(type.getTypeWidth(), IntType(valueType.ref).getTypeWidth())
         assertTrue { value.isConstant() }
+        assertEquals(1, subject)
+    }
+
+    test("context is equal to its type's context") {
+        val type = IntType(32)
+        val value = ConstantInt(type, 1)
+        val subject = value.getContext()
+
+        assertEquals(type.getContext().ref, subject.ref)
+    }
+
+    test("pulling a value in textual format") {
+        val value = ConstantInt(IntType(32), 100)
+
+        assertEquals("i32 100", value.dumpToString())
     }
 })

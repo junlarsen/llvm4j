@@ -17,9 +17,12 @@ internal object MemoryBufferTest : Spek({
     val utils: TestUtils by memoized()
 
     group("using a memory buffer") {
-        test("getting the first character") {
+        test("the buffer starts with BC") {
             val buffer = module.toMemoryBuffer()
-            assertEquals('B', buffer.getStart())
+            val ptr = buffer.getStart()
+            val start = "${ptr.char}${ptr.getChar(1)}"
+
+            assertEquals("BC", start)
         }
 
         group("storing a memory buffer to file system") {

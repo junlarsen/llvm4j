@@ -9,7 +9,7 @@ import org.spekframework.spek2.Spek
 import kotlin.system.exitProcess
 import kotlin.test.assertEquals
 
-internal class JNIFactorialTest : Spek({
+internal object JNIFactorialTest : Spek({
     // This exists solely for the purpose of ensuring that the LLVM bindings
     // themselves work properly
     // TODO: Remove this
