@@ -4,6 +4,7 @@ import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.wrap
+import dev.supergrecko.vexe.llvm.support.Message
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -108,14 +109,17 @@ public open class Value internal constructor() :
     }
 
     /**
-     * Get the value in a string format
+     * Get the LLVM IR for this value
+     *
+     * This IR must be disposed via [IR.dispose] otherwise memory will
+     * be leaked.
      *
      * @see LLVM.LLVMPrintValueToString
      */
-    public fun dumpToString(): String {
+    public fun getIR(): IR {
         val ptr = LLVM.LLVMPrintValueToString(ref)
 
-        return ptr.string
+        return IR(ptr)
     }
 
     /**

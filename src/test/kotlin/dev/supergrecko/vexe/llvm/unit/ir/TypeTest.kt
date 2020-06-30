@@ -7,6 +7,7 @@ import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 internal object TypeTest : Spek({
     setup()
@@ -46,9 +47,9 @@ internal object TypeTest : Spek({
     group("printing the string representation of a type") {
         test("integer types are prefixed with i") {
             val type = IntType(32)
-            val subject = type.getStringRepresentation().getString()
+            val ir = "i32"
 
-            assertEquals("i32", subject)
+            assertEquals(ir, type.getIR().toString())
         }
 
         test("structures print their body") {
@@ -57,9 +58,9 @@ internal object TypeTest : Spek({
                 true,
                 context
             )
-            val subject = struct.getStringRepresentation().getString()
+            val ir = "<{ i32 }>"
 
-            assertEquals("<{ i32 }>", subject)
+            assertEquals(ir, struct.getIR().toString())
         }
     }
 })

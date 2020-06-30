@@ -53,17 +53,17 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     }
 
     /**
-     * Moves the string representation into a Message
+     * Get the LLVM IR for this type
      *
-     * This message must be disposed via [Message.dispose] otherwise memory will
+     * This IR must be disposed via [IR.dispose] otherwise memory will
      * be leaked.
      *
      * @see LLVM.LLVMPrintTypeToString
      */
-    public fun getStringRepresentation(): Message {
+    public fun getIR(): IR {
         val ptr = LLVM.LLVMPrintTypeToString(ref)
 
-        return Message(ptr)
+        return IR(ptr)
     }
     //endregion Core::Types
 

@@ -8,8 +8,6 @@ import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
-import dev.supergrecko.vexe.test.TestSuite
-import org.bytedeco.llvm.global.LLVM
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -93,7 +91,8 @@ internal object ValueTest : Spek({
 
     test("pulling a value in textual format") {
         val value = ConstantInt(IntType(32), 100)
+        val ir = "i32 100"
 
-        assertEquals("i32 100", value.dumpToString())
+        assertEquals(ir, value.getIR().toString())
     }
 })

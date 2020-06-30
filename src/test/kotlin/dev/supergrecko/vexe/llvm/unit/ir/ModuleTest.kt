@@ -17,7 +17,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 internal object ModuleTest : Spek({
@@ -122,18 +121,19 @@ internal object ModuleTest : Spek({
 
     group("dumping the ir representation of the module") {
         test("printing to string") {
-            val str = module.toString()
+            val str = module.getIR().toString()
 
             assertTrue { str.isNotEmpty() }
         }
 
         test("printing to file") {
             val file = utils.getTemporaryFile()
-            val message = module.toFile(file.absolutePath)
+
+            module.saveIRToFile(file)
+
             val content = Files.readAllLines(file.toPath())
                 .joinToString("")
 
-            assertNull(message)
             assertTrue { content.isNotEmpty() }
         }
     }
