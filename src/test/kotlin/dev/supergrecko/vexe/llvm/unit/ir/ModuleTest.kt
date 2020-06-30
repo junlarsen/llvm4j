@@ -11,6 +11,7 @@ import dev.supergrecko.vexe.llvm.ir.types.VoidType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
 import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.spekframework.spek2.Spek
 import java.nio.file.Files
 import kotlin.test.assertEquals
@@ -129,11 +130,14 @@ internal object ModuleTest : Spek({
 
         test("printing to file") {
             val file = utils.getTemporaryFile()
-            val message = module.saveIRToFile(file)
+
+            assertDoesNotThrow {
+                module.saveIRToFile(file)
+            }
+
             val content = Files.readAllLines(file.toPath())
                 .joinToString("")
 
-            assertNull(message)
             assertTrue { content.isNotEmpty() }
         }
     }
