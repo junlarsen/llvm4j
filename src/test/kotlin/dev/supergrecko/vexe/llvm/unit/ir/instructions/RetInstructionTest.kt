@@ -58,7 +58,8 @@ internal class RetInstructionTest : TestSuite({
             .createAggregateRet(listOf(left, right))
 
         val ir = "  ret { i1, i1 } { i1 true, i1 false }"
-        assertEquals(ir, inst.dumpToString())
+
+        assertEquals(ir, inst.getIR().toString())
 
         cleanup(builder, module)
     }

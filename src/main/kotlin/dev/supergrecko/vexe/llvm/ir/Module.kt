@@ -196,10 +196,11 @@ public class Module internal constructor() : Disposable,
      *
      * @see LLVM.LLVMPrintModuleToFile
      */
-    public fun toFile(fileName: String): Message? {
-        val message = BytePointer()
+    public fun toFile(path: File): Message? {
+        require(path.exists()) { "Cannot print to file which does not exist." }
 
-        val result = LLVM.LLVMPrintModuleToFile(ref, fileName, message)
+        val message = BytePointer(0L)
+        val result = LLVM.LLVMPrintModuleToFile(ref, path.absolutePath, message)
 
         return if (result != 0) {
             Message(message)
@@ -209,14 +210,17 @@ public class Module internal constructor() : Disposable,
     }
 
     /**
-     * Get the IR as a string.
+     * Get the LLVM IR for this module
+     *
+     * This IR must be disposed via [IR.dispose] otherwise memory will
+     * be leaked.
      *
      * @see LLVM.LLVMPrintModuleToString
      */
-    public override fun toString(): String {
+    public fun getIR(): IR {
         val ir = LLVM.LLVMPrintModuleToString(ref)
 
-        return ir.string
+        return IR(ir)
     }
 
     /**

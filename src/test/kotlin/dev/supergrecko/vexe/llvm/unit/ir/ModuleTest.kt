@@ -129,7 +129,7 @@ internal object ModuleTest : Spek({
 
         test("printing to file") {
             val file = utils.getTemporaryFile()
-            val message = module.toFile(file.absolutePath)
+            val message = module.toFile(file)
             val content = Files.readAllLines(file.toPath())
                 .joinToString("")
 

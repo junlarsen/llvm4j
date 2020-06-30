@@ -5,8 +5,14 @@ import org.bytedeco.javacpp.BytePointer
 import java.nio.ByteBuffer
 import org.bytedeco.llvm.global.LLVM
 
-public class Message(
-    private val pointer: BytePointer
+/**
+ * Class representing a byte pointer which must be de-allocated manually
+ *
+ * These byte pointers are retrieved via JNI. Failing to de-allocate them will
+ * leak memory.
+ */
+public open class Message(
+    protected open val pointer: BytePointer
 ) : Disposable {
     public override var valid: Boolean = true
 
