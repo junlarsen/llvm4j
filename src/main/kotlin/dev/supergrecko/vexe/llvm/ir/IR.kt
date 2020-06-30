@@ -14,7 +14,7 @@ public class IR(override val pointer: BytePointer) : Message(pointer) {
     /**
      * Writes this IR to a file at the given [path]
      */
-    public fun saveToFile(path: File) {
+    public fun writeToFile(path: File) {
         val content = toString()
 
         if (!path.exists()) {

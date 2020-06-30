@@ -122,14 +122,14 @@ internal object ModuleTest : Spek({
 
     group("dumping the ir representation of the module") {
         test("printing to string") {
-            val str = module.toString()
+            val str = module.getIR().toString()
 
             assertTrue { str.isNotEmpty() }
         }
 
         test("printing to file") {
             val file = utils.getTemporaryFile()
-            val message = module.toFile(file)
+            val message = module.saveIRToFile(file)
             val content = Files.readAllLines(file.toPath())
                 .joinToString("")
 

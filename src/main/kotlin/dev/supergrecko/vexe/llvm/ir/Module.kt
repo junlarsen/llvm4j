@@ -191,21 +191,16 @@ public class Module internal constructor() : Disposable,
     /**
      * Print the module's IR to a file
      *
-     * This method returns a [Message] if there was an error while printing
-     * to file.
-     *
      * @see LLVM.LLVMPrintModuleToFile
      */
-    public fun toFile(path: File): Message? {
+    public fun saveIRToFile(path: File) {
         require(path.exists()) { "Cannot print to file which does not exist." }
 
         val message = BytePointer(0L)
         val result = LLVM.LLVMPrintModuleToFile(ref, path.absolutePath, message)
 
-        return if (result != 0) {
-            Message(message)
-        } else {
-            null
+        if (result != 0) {
+            throw RuntimeException(message.string)
         }
     }
 

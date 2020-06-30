@@ -31,7 +31,7 @@ internal object IRTest : Spek({
         val file = utils.getTemporaryFile()
         val ir = IntType(128).getIR()
 
-        ir.saveToFile(file)
+        ir.writeToFile(file)
 
         val contents = file.readLines().joinToString("\n")
 
