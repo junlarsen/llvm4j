@@ -65,12 +65,7 @@ internal object ValueTest : Spek({
             assertTrue { value.isNull() }
         }
 
-        test("constant null") {
-            val value = IntType(32).getConstantNull()
-
-            assertTrue { value.isConstant() }
-            assertTrue { value.isNull() }
-        }
+        // todo: getConstantNull test
     }
 
     test("usage of ConstAllOne") {

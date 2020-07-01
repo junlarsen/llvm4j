@@ -34,31 +34,62 @@ public open class Instruction internal constructor() : Value(),
      *
      * @see LLVM.LLVMGetMetadata
      */
-    public fun getMetadata(kind: Int): Metadata {
-        require(hasMetadata()) {
-            "This instruction does not have any metadata attached"
-        }
-
+    public fun getMetadata(kind: Int): Value? {
         val value = LLVM.LLVMGetMetadata(ref, kind)
-        val md = LLVM.LLVMValueAsMetadata(value)
 
-        return Metadata(md)
+        return value?.let { Value(it) }
+    }
+
+    /**
+     * Get the metadata for this instruction
+     *
+     * This function converts the [kind] to the integer kind. This requires a
+     * context. You can pass a custom context via the [context] argument. By
+     * default, the context the instruction was created in will be used.
+     *
+     * @see LLVM.LLVMGetMetadata
+     */
+    public fun getMetadata(
+        kind: String,
+        context: Context = getContext()
+    ): Value? {
+        val kindId = context.getMetadataKindId(kind)
+
+        return getMetadata(kindId)
     }
 
     /**
      * Set the metadata for this instruction
      *
+     * This function uses numeric metadata ids. If you prefer to use string
+     * ids, use the overload for [String]
+     *
      * TODO: Find replacement for the context used in MetadataAsValue
      *
      * @see LLVM.LLVMSetMetadata
      */
-    public fun setMetadata(kind: Int, metadata: Metadata) {
-        val value = LLVM.LLVMMetadataAsValue(
-            getContext().ref,
-            metadata.ref
-        )
+    public fun setMetadata(kind: Int, metadata: Value) {
+        LLVM.LLVMSetMetadata(ref, kind, metadata.ref)
+    }
 
-        LLVM.LLVMSetMetadata(ref, kind, value)
+    /**
+     * Set the metadata for this instruction
+     *
+     * This function converts the [kind] to the integer kind. This requires a
+     * context. You can pass a custom context via the [context] argument. By
+     * default, the context the instruction was created in will be used.
+     *
+     * @see LLVM.LLVMGetMDKindIDInContext
+     * @see LLVM.LLVMSetMetadata
+     */
+    public fun setMetadata(
+        kind: String,
+        metadata: Value,
+        context: Context = getContext()
+    ) {
+        val kindId = context.getMetadataKindId(kind)
+
+        setMetadata(kindId, metadata)
     }
 
     /**
@@ -120,6 +151,8 @@ public open class Instruction internal constructor() : Value(),
      * @see LLVM.LLVMInstructionRemoveFromParent
      */
     public fun remove() {
+        require(getInstructionBlock() != null) { "This block has no parent" }
+
         LLVM.LLVMInstructionRemoveFromParent(ref)
     }
 
@@ -130,6 +163,8 @@ public open class Instruction internal constructor() : Value(),
      * @see LLVM.LLVMInstructionEraseFromParent
      */
     public fun delete() {
+        require(getInstructionBlock() != null) { "This block has no parent" }
+
         valid = false
 
         LLVM.LLVMInstructionEraseFromParent(ref)
@@ -193,7 +228,7 @@ public open class Instruction internal constructor() : Value(),
      *
      * @see LLVM.LLVMGetSuccessor
      */
-    public fun getSuccessor(index: Int): BasicBlock? {
+    public fun getSuccessor(index: Int): BasicBlock {
         require(isTerminator()) {
             "This instruction is not a terminator"
         }
@@ -203,7 +238,7 @@ public open class Instruction internal constructor() : Value(),
 
         val bb = LLVM.LLVMGetSuccessor(ref, index)
 
-        return wrap(bb) { BasicBlock(it) }
+        return BasicBlock(bb)
     }
 
     /**
