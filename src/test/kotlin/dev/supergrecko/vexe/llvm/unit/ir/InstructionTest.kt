@@ -5,8 +5,12 @@ import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.Metadata
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
+import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
+import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.assertThrows
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -97,6 +101,46 @@ internal object InstructionTest : Spek({
             assertNotNull(second)
             assertNotNull(subject)
             assertEquals(first.ref, subject.ref)
+        }
+    }
+
+    group("successors of terminating basic blocks") {
+        test("a loose terminator does not have a successor") {
+            val inst = builder.build().createRetVoid()
+
+            assertThrows<IllegalArgumentException> {
+                inst.getSuccessor(0)
+            }
+        }
+
+        test("non terminators do not have a successor") {
+            val inst = builder.build().createAnd(
+                ConstantInt(IntType(32), 1),
+                ConstantInt(IntType(32), 0),
+                "and"
+            )
+            builder.insert(inst)
+
+            assertThrows<IllegalArgumentException> {
+                assertEquals(0, inst.getSuccessorCount())
+            }
+        }
+
+        test("non terminators may not have a successor assigned") {
+            val function = module.addFunction("test", FunctionType(
+                VoidType(), listOf(), false
+            ))
+            val block = function.createBlock("entry")
+            val inst = builder.build().createAnd(
+                ConstantInt(IntType(32), 1),
+                ConstantInt(IntType(32), 0),
+                "and"
+            )
+            builder.insert(inst, "and")
+
+            assertThrows<IllegalArgumentException> {
+                inst.setSuccessor(0, block)
+            }
         }
     }
 })
