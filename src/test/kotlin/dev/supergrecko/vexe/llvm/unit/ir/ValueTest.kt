@@ -69,7 +69,7 @@ internal object ValueTest : Spek({
             val value = IntType(32).getConstantNull()
 
             assertTrue { value.isConstant() }
-            assertTrue { value.isNull() }
+            assertEquals(0, ConstantInt(value.ref).getUnsignedValue())
         }
     }
 
