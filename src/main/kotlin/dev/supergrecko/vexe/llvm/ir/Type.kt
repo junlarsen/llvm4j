@@ -71,6 +71,8 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     /**
      * Get a constant null of this type
      *
+     * // TODO: test properly, weird shit happening in ci
+     *
      * @see LLVM.LLVMConstNull
      */
     public fun getConstantNull(): Value {

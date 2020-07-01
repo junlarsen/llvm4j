@@ -19,7 +19,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-internal class InstructionTest : Spek({
+internal object InstructionTest : Spek({
     setup()
 
     val builder: Builder by memoized()
