@@ -5,9 +5,7 @@ import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.Metadata
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
-import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
@@ -82,18 +80,13 @@ internal object InstructionTest : Spek({
         }
 
         test("iterating over instructions in a block") {
-            val function = module.addFunction("test", FunctionType(
+            val function = module.addFunction("testfn", FunctionType(
                 VoidType(), listOf(), false
             ))
             val block = function.createBlock("entry")
 
             builder.setPositionAtEnd(block)
-            val and = builder.build().createAnd(
-                ConstantInt(IntType(32), 1),
-                ConstantInt(IntType(32), 0),
-                "and"
-            )
-            builder.insert(and, "and")
+            builder.build().createBr(block)
             builder.build().createRetVoid()
 
             val first = block.getFirstInstruction()
