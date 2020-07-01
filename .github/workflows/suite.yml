@@ -17,6 +17,6 @@ jobs:
           architecture: ${{ matrix.architecture }}
       - name: Run Tests
         run: |
-          gradle clean build test --refresh-dependencies --debug --scan --stacktrace
+          gradle clean build test --refresh-dependencies
         env:
           GRADLE_OPTS: -Dorg.gradle.daemon=false
