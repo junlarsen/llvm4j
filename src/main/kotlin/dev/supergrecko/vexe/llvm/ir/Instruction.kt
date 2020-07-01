@@ -151,6 +151,8 @@ public open class Instruction internal constructor() : Value(),
      * @see LLVM.LLVMInstructionRemoveFromParent
      */
     public fun remove() {
+        require(getInstructionBlock() != null) { "This block has no parent" }
+
         LLVM.LLVMInstructionRemoveFromParent(ref)
     }
 
@@ -161,6 +163,8 @@ public open class Instruction internal constructor() : Value(),
      * @see LLVM.LLVMInstructionEraseFromParent
      */
     public fun delete() {
+        require(getInstructionBlock() != null) { "This block has no parent" }
+
         valid = false
 
         LLVM.LLVMInstructionEraseFromParent(ref)

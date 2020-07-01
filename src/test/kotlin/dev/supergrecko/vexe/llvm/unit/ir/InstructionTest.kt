@@ -4,6 +4,7 @@ import dev.supergrecko.vexe.llvm.ir.Builder
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Metadata
 import dev.supergrecko.vexe.llvm.ir.Module
+import dev.supergrecko.vexe.llvm.ir.Opcode
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
@@ -12,6 +13,7 @@ import dev.supergrecko.vexe.llvm.setup
 import org.junit.jupiter.api.assertThrows
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -97,6 +99,7 @@ internal class InstructionTest : Spek({
                 ConstantInt(IntType(32), 0),
                 "and"
             )
+            builder.insert(inst, "and")
 
             assertThrows<IllegalArgumentException> {
                 assertEquals(0, inst.getSuccessorCount())
@@ -113,10 +116,78 @@ internal class InstructionTest : Spek({
                 ConstantInt(IntType(32), 0),
                 "and"
             )
+            builder.insert(inst, "and")
 
             assertThrows<IllegalArgumentException> {
                 inst.setSuccessor(0, block)
             }
+        }
+    }
+
+    test("iterating over instructions in a block") {
+        val function = module.addFunction("test", FunctionType(
+            VoidType(), listOf(), false
+        ))
+        val block = function.createBlock("entry")
+
+        builder.setPositionAtEnd(block)
+        val and = builder.build().createAnd(
+            ConstantInt(IntType(32), 1),
+            ConstantInt(IntType(32), 0),
+            "and"
+        )
+        builder.insert(and, "and")
+        builder.build().createRetVoid()
+
+        val first = block.getFirstInstruction()
+        val second = first?.getNextInstruction()
+        val subject = second?.getPreviousInstruction()
+
+        assertNotNull(first)
+        assertNotNull(second)
+        assertNotNull(subject)
+        assertEquals(first.ref, subject.ref)
+    }
+
+    group("removal and deletion") {
+        test("removal of loose instruction doesn't crash the jvm") {
+            val inst = builder.build().createRetVoid()
+
+            assertFailsWith<IllegalArgumentException> {
+                inst.remove()
+            }
+        }
+
+        test("deletion of loose instruction doesn't crash the jvm") {
+            val inst = builder.build().createRetVoid()
+
+            assertFailsWith<IllegalArgumentException> {
+                inst.delete()
+            }
+        }
+    }
+
+    test("the opcode of an instruction matches") {
+        val inst = builder.build().createRetVoid()
+
+        assertEquals(Opcode.Ret, inst.getOpcode())
+    }
+
+    group("cloning an instruction") {
+        test("cloning creates an instruction without a parent") {
+            val function = module.addFunction("test", FunctionType(
+                VoidType(), listOf(), false
+            ))
+            val block = function.createBlock("entry")
+
+            builder.setPositionAtEnd(block)
+            val inst = builder.build().createRetVoid()
+
+            assertNotNull(inst.getInstructionBlock())
+
+            val subject = inst.clone()
+
+            assertNull(subject.getInstructionBlock())
         }
     }
 })
