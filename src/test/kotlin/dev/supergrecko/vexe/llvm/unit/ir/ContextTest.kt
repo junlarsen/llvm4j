@@ -7,7 +7,7 @@ import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-internal class ContextTest : Spek({
+internal object ContextTest : Spek({
     setup()
 
     val context: Context by memoized()
