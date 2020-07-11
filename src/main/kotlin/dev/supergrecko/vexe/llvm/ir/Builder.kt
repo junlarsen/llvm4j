@@ -1663,9 +1663,8 @@ public class Builder public constructor(
             variable: String = ""
         ): CallInstruction {
             val args = PointerPointer(*arguments.map { it.ref }.toTypedArray())
-            val inst = LLVM.LLVMBuildCall2(
+            val inst = LLVM.LLVMBuildCall(
                 ref,
-                function.getType().ref,
                 function.ref,
                 args,
                 arguments.size,
