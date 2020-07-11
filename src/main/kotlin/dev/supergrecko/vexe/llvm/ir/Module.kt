@@ -577,11 +577,11 @@ public class Module internal constructor() : Disposable,
     public fun createExecutionEngine(): ExecutionEngine {
         val error = ByteArray(0)
         val ee = ExecutionEngine()
-        val success = LLVM.LLVMCreateExecutionEngineForModule(
+        val result = LLVM.LLVMCreateExecutionEngineForModule(
             ee.ref, ref, error
         )
 
-        return if (success.fromLLVMBool()) {
+        return if (result == 0) {
             ee
         } else {
             throw RuntimeException(error.contentToString())
@@ -596,11 +596,11 @@ public class Module internal constructor() : Disposable,
     public fun createInterpreter(): ExecutionEngine {
         val error = ByteArray(0)
         val ee = ExecutionEngine()
-        val success = LLVM.LLVMCreateInterpreterForModule(
+        val result = LLVM.LLVMCreateInterpreterForModule(
             ee.ref, ref, error
         )
 
-        return if (success.fromLLVMBool()) {
+        return if (result == 0) {
             ee
         } else {
             throw RuntimeException(error.contentToString())
@@ -616,11 +616,11 @@ public class Module internal constructor() : Disposable,
     public fun createJITCompiler(optimizationLevel: Int): ExecutionEngine {
         val error = ByteArray(0)
         val ee = ExecutionEngine()
-        val success = LLVM.LLVMCreateJITCompilerForModule(
+        val result = LLVM.LLVMCreateJITCompilerForModule(
             ee.ref, ref, optimizationLevel, error
         )
 
-        return if (success.fromLLVMBool()) {
+        return if (result == 0) {
             ee
         } else {
             throw RuntimeException(error.contentToString())
@@ -642,11 +642,11 @@ public class Module internal constructor() : Disposable,
     ): ExecutionEngine {
         val error = ByteArray(0)
         val ee = ExecutionEngine()
-        val success = LLVM.LLVMCreateMCJITCompilerForModule(
+        val result = LLVM.LLVMCreateMCJITCompilerForModule(
             ee.ref, ref, options.ref, options.ref.sizeof().toLong(), error
         )
 
-        return if (success.fromLLVMBool()) {
+        return if (result == 0) {
             ee
         } else {
             throw RuntimeException(error.contentToString())
