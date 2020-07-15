@@ -23,7 +23,7 @@ internal object ValueTest : Spek({
         test("getting a manually set name") {
             assertFalse { context.isDiscardingValueNames() }
 
-            val value = module.addFunction("NotTrue", FunctionType(
+            val value = module.createFunction("NotTrue", FunctionType(
                 VoidType(),
                 listOf(),
                 variadic = false

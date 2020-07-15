@@ -14,7 +14,6 @@ import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
 import dev.supergrecko.vexe.llvm.ir.values.GlobalAlias
 import dev.supergrecko.vexe.llvm.ir.values.GlobalVariable
 import dev.supergrecko.vexe.llvm.support.MemoryBuffer
-import dev.supergrecko.vexe.llvm.support.Message
 import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
 import java.io.File
 import org.bytedeco.javacpp.BytePointer
@@ -375,7 +374,7 @@ public class Module internal constructor() : Disposable,
      *
      * @see LLVM.LLVMAddFunction
      */
-    public fun addFunction(name: String, type: FunctionType): FunctionValue {
+    public fun createFunction(name: String, type: FunctionType): FunctionValue {
         val value = LLVM.LLVMAddFunction(ref, name, type.ref)
 
         return FunctionValue(value)
@@ -474,7 +473,7 @@ public class Module internal constructor() : Disposable,
     /**
      * Add a global variable to this module
      *
-     * To add functions, use [addFunction]
+     * To add functions, use [createFunction]
      *
      * @see LLVM.LLVMAddGlobal
      */

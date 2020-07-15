@@ -17,7 +17,7 @@ internal class BuilderTest : TestSuite({
     describe("Should be able to position after basic block") {
         val builder = Builder()
         val module = Module("utils.ll")
-        val function = module.addFunction(
+        val function = module.createFunction(
             "utils",
             FunctionType(
                 VoidType(),
@@ -55,7 +55,7 @@ internal class BuilderTest : TestSuite({
     describe("Creation of call instruction") {
         val boolType = IntType(1)
         val module = Module("utils.ll").apply {
-            addFunction(
+            createFunction(
                 "utils",
                 FunctionType(
                     boolType,
@@ -68,7 +68,7 @@ internal class BuilderTest : TestSuite({
         val builder = Builder()
         val falseValue = ConstantInt(boolType, 0, false)
         val trueValue = ConstantInt(boolType, 1, false)
-        val caller = module.addFunction(
+        val caller = module.createFunction(
             "caller",
             FunctionType(
                 boolType,

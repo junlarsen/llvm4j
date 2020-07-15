@@ -10,7 +10,6 @@ import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
-import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.assertThrows
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
@@ -71,7 +70,7 @@ internal object InstructionTest : Spek({
         }
 
         test("retrieving the residing block") {
-            val function = module.addFunction("test", FunctionType(
+            val function = module.createFunction("test", FunctionType(
                 VoidType(), listOf(), false
             )
             )
@@ -86,7 +85,7 @@ internal object InstructionTest : Spek({
         }
 
         test("iterating over instructions in a block") {
-            val function = module.addFunction("testfn", FunctionType(
+            val function = module.createFunction("testfn", FunctionType(
                 VoidType(), listOf(), false
             ))
             val block = function.createBlock("entry")
@@ -129,7 +128,7 @@ internal object InstructionTest : Spek({
         }
 
         test("non terminators may not have a successor assigned") {
-            val function = module.addFunction("test", FunctionType(
+            val function = module.createFunction("test", FunctionType(
                 VoidType(), listOf(), false
             ))
             val block = function.createBlock("entry")
@@ -172,7 +171,7 @@ internal object InstructionTest : Spek({
 
     group("cloning an instruction") {
         test("cloning creates an instruction without a parent") {
-            val function = module.addFunction("test", FunctionType(
+            val function = module.createFunction("test", FunctionType(
                 VoidType(), listOf(), false
             ))
             val block = function.createBlock("entry")
