@@ -4,6 +4,7 @@ import dev.supergrecko.vexe.llvm.ir.Builder
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.Metadata
+import dev.supergrecko.vexe.llvm.ir.Opcode
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.assertThrows
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -141,6 +143,48 @@ internal object InstructionTest : Spek({
             assertThrows<IllegalArgumentException> {
                 inst.setSuccessor(0, block)
             }
+        }
+    }
+
+    group("removal and deletion of nodes") {
+        test("removal of loose instruction fails due to missing parent") {
+            val inst = builder.build().createRetVoid()
+
+            assertFailsWith<IllegalArgumentException> {
+                inst.remove()
+            }
+        }
+
+        test("deletion of loose instruction fails due to missing parent") {
+            val inst = builder.build().createRetVoid()
+
+            assertFailsWith<IllegalArgumentException> {
+                inst.delete()
+            }
+        }
+    }
+
+    test("the opcode of an instruction matches") {
+        val inst = builder.build().createRetVoid()
+
+        assertEquals(Opcode.Ret, inst.getOpcode())
+    }
+
+    group("cloning an instruction") {
+        test("cloning creates an instruction without a parent") {
+            val function = module.addFunction("test", FunctionType(
+                VoidType(), listOf(), false
+            ))
+            val block = function.createBlock("entry")
+
+            builder.setPositionAtEnd(block)
+            val inst = builder.build().createRetVoid()
+
+            assertNotNull(inst.getInstructionBlock())
+
+            val subject = inst.clone()
+
+            assertNull(subject.getInstructionBlock())
         }
     }
 })

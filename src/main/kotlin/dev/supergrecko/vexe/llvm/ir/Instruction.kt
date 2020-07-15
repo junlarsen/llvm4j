@@ -209,6 +209,7 @@ public open class Instruction internal constructor() : Value(),
     //endregion Core::Instructions
 
     //region Core::Instructions::Terminators
+    // TODO: Move into Terminator interface
     /**
      * Get the number of successors that this terminator has
      *
