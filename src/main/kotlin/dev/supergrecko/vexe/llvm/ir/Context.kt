@@ -93,6 +93,9 @@ public class Context public constructor(
     /**
      * Get the metadata kind id [name]
      *
+     * This is used for [Instruction.setMetadata] to convert string metadata
+     * keys to integer ones.
+     *
      * @see LLVM.LLVMGetMDKindID
      * @see LLVM.LLVMGetMDKindIDInContext
      */

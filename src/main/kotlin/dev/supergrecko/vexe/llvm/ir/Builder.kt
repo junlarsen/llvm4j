@@ -151,11 +151,12 @@ public class Builder public constructor(
     /**
      * Insert an instruction into the current insertion point
      *
-     * If [name] is passed, [LLVM.LLVMInsertIntoBuilderWithName] is used.
+     * If [name] is passed, then the receiving [instruction] should not have
+     * a name.
      *
      * @see LLVM.LLVMInsertIntoBuilder
      */
-    public fun insert(instruction: Instruction, name: String?) {
+    public fun insert(instruction: Instruction, name: String? = null) {
         if (name != null) {
             LLVM.LLVMInsertIntoBuilderWithName(ref, instruction.ref, name)
         } else {
