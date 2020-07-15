@@ -1,7 +1,6 @@
 package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMNamedMDNodeRef
 import org.bytedeco.llvm.global.LLVM
@@ -24,7 +23,7 @@ public class NamedMetadataNode internal constructor() :
     public fun getNextNamedMetadata(): NamedMetadataNode? {
         val md = LLVM.LLVMGetNextNamedMetadata(ref)
 
-        return wrap(md) { NamedMetadataNode(it) }
+        return md?.let { NamedMetadataNode(it) }
     }
 
     /**
@@ -35,7 +34,7 @@ public class NamedMetadataNode internal constructor() :
     public fun getPreviousNamedMetadata(): NamedMetadataNode? {
         val md = LLVM.LLVMGetPreviousNamedMetadata(ref)
 
-        return wrap(md) { NamedMetadataNode(it) }
+        return md?.let { NamedMetadataNode(it) }
     }
 
     /**

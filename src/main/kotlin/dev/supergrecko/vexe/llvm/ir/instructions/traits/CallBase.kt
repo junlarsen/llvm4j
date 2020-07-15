@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.ir.instructions.traits
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.map
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.Attribute
 import dev.supergrecko.vexe.llvm.ir.AttributeIndex
 import dev.supergrecko.vexe.llvm.ir.CallConvention
@@ -147,7 +146,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
     public fun getEnumAttribute(index: Int, kind: Int): Attribute? {
         val attr = LLVM.LLVMGetCallSiteEnumAttribute(ref, index, kind)
 
-        return wrap(attr) { Attribute(it) }
+        return attr?.let { Attribute(it) }
     }
 
     /**
@@ -171,7 +170,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
         val strlen = kind.length
         val attr = LLVM.LLVMGetCallSiteStringAttribute(ref, index, kind, strlen)
 
-        return wrap(attr) { Attribute(it) }
+        return attr?.let { Attribute(it) }
     }
 
     /**

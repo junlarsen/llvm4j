@@ -4,7 +4,6 @@ import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.callbacks.DiagnosticHandlerBase
 import dev.supergrecko.vexe.llvm.ir.callbacks.DiagnosticHandlerCallback
 import dev.supergrecko.vexe.llvm.ir.callbacks.YieldCallback
@@ -70,7 +69,7 @@ public class Context public constructor(
     public fun getDiagnosticContext(): Pointer? {
         val ctx = LLVM.LLVMContextGetDiagnosticContext(ref)
 
-        return wrap(ctx) { it }
+        return ctx?.let { Pointer(it) }
     }
 
     /**

@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.target
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.support.MemoryBuffer
 import java.io.File
@@ -58,7 +57,7 @@ public class TargetMachine internal constructor() :
     public fun getFirstTarget(): Target? {
         val target = LLVM.LLVMGetFirstTarget()
 
-        return wrap(target) { Target(target) }
+        return target?.let { Target(it) }
     }
 
     /**

@@ -2,7 +2,6 @@ package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
 import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.global.LLVM
@@ -78,7 +77,7 @@ public class BasicBlock internal constructor() : Validatable,
 
         val instr = LLVM.LLVMGetBasicBlockTerminator(ref)
 
-        return wrap(instr) { Instruction(it) }
+        return instr?.let { Instruction(it) }
     }
 
     /**
@@ -92,7 +91,7 @@ public class BasicBlock internal constructor() : Validatable,
 
         val bb = LLVM.LLVMGetNextBasicBlock(ref)
 
-        return wrap(bb) { BasicBlock(it) }
+        return bb?.let { BasicBlock(it) }
     }
 
     /**
@@ -106,7 +105,7 @@ public class BasicBlock internal constructor() : Validatable,
 
         val bb = LLVM.LLVMGetPreviousBasicBlock(ref)
 
-        return wrap(bb) { BasicBlock(it) }
+        return bb?.let { BasicBlock(it) }
     }
 
     /**
@@ -183,7 +182,7 @@ public class BasicBlock internal constructor() : Validatable,
 
         val instr = LLVM.LLVMGetFirstInstruction(ref)
 
-        return wrap(instr) { Instruction(it) }
+        return instr?.let { Instruction(it) }
     }
 
     /**
@@ -199,7 +198,7 @@ public class BasicBlock internal constructor() : Validatable,
 
         val instr = LLVM.LLVMGetLastInstruction(ref)
 
-        return wrap(instr) { Instruction(it) }
+        return instr?.let { Instruction(it) }
     }
     //endregion Core::BasicBlock
 }

@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.values.traits.DebugLocationValue
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
@@ -114,7 +113,7 @@ public open class Instruction internal constructor() : Value(),
     public fun getInstructionBlock(): BasicBlock? {
         val bb = LLVM.LLVMGetInstructionParent(ref)
 
-        return wrap(bb) { BasicBlock(it) }
+        return bb?.let { BasicBlock(it) }
     }
 
     /**
@@ -127,7 +126,7 @@ public open class Instruction internal constructor() : Value(),
     public fun getNextInstruction(): Instruction? {
         val inst = LLVM.LLVMGetNextInstruction(ref)
 
-        return wrap(inst) { Instruction(it) }
+        return inst?.let { Instruction(it) }
     }
 
     /**
@@ -140,7 +139,7 @@ public open class Instruction internal constructor() : Value(),
     public fun getPreviousInstruction(): Instruction? {
         val inst = LLVM.LLVMGetPreviousInstruction(ref)
 
-        return wrap(inst) { Instruction(it) }
+        return inst?.let { Instruction(it) }
     }
 
     /**

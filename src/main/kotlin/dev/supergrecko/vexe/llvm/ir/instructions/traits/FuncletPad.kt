@@ -1,7 +1,6 @@
 package dev.supergrecko.vexe.llvm.ir.instructions.traits
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -25,7 +24,7 @@ public interface FuncletPad : ContainsReference<LLVMValueRef> {
     public fun getOperand(index: Int): Value? {
         val op = LLVM.LLVMGetArgOperand(ref, index)
 
-        return wrap(op) { Value(it) }
+        return op?.let { Value(it) }
     }
 
     public fun setOperand(index: Int, value: Value) {

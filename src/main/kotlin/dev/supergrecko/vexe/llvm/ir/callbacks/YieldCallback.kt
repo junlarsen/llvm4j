@@ -1,7 +1,6 @@
 package dev.supergrecko.vexe.llvm.ir.callbacks
 
 import dev.supergrecko.vexe.llvm.internal.contracts.Callback
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.Context
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
