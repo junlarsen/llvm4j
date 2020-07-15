@@ -2,7 +2,6 @@ package dev.supergrecko.vexe.llvm.ir.instructions
 
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.Instruction
 import dev.supergrecko.vexe.llvm.ir.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
@@ -31,7 +30,7 @@ public class LandingPadInstruction internal constructor() : Instruction() {
     public fun getClause(index: Int): Value? {
         val clause = LLVM.LLVMGetClause(ref, index)
 
-        return wrap(clause) { Value(it) }
+        return clause?.let { Value(it) }
     }
 
     /**

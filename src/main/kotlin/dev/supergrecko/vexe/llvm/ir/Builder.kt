@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.instructions.AShrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AddInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AddrSpaceCastInstruction
@@ -145,7 +144,7 @@ public class Builder public constructor(
     public fun getInsertionBlock(): BasicBlock? {
         val bb = LLVM.LLVMGetInsertBlock(ref)
 
-        return wrap(bb) { BasicBlock(it) }
+        return bb?.let { BasicBlock(it) }
     }
 
     /**
@@ -172,7 +171,7 @@ public class Builder public constructor(
     public fun getCurrentDebugLocation(): Metadata? {
         val loc = LLVM.LLVMGetCurrentDebugLocation2(ref)
 
-        return wrap(loc) { Metadata(it) }
+        return loc?.let { Metadata(it) }
     }
 
     /**
@@ -204,7 +203,7 @@ public class Builder public constructor(
     public fun getDefaultFPMathTag(): Metadata? {
         val tag = LLVM.LLVMBuilderGetDefaultFPMathTag(ref)
 
-        return wrap(tag) { Metadata(it) }
+        return tag?.let { Metadata(it) }
     }
 
     /**

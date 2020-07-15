@@ -2,7 +2,6 @@ package dev.supergrecko.vexe.llvm.ir.values
 
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.ThreadLocalMode
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.values.traits.DebugLocationValue
@@ -42,7 +41,7 @@ public class GlobalVariable internal constructor() : Value(),
     public fun getInitializer(): Value? {
         val value = LLVM.LLVMGetInitializer(ref)
 
-        return wrap(value) { Value(it) }
+        return value?.let { Value(it) }
     }
 
     /**

@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.ir.values
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.map
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.Attribute
 import dev.supergrecko.vexe.llvm.ir.AttributeIndex
 import dev.supergrecko.vexe.llvm.ir.BasicBlock
@@ -67,7 +66,7 @@ public open class FunctionValue internal constructor() : Value(),
     public fun getEntryBlock(): BasicBlock? {
         val bb = LLVM.LLVMGetEntryBasicBlock(ref)
 
-        return wrap(bb) { BasicBlock(it) }
+        return bb?.let { BasicBlock(it) }
     }
 
     /**
@@ -81,7 +80,7 @@ public open class FunctionValue internal constructor() : Value(),
     public fun getFirstBlock(): BasicBlock? {
         val bb = LLVM.LLVMGetFirstBasicBlock(ref)
 
-        return wrap(bb) { BasicBlock(it) }
+        return bb?.let { BasicBlock(it) }
     }
 
     /**
@@ -95,7 +94,7 @@ public open class FunctionValue internal constructor() : Value(),
     public fun getLastBlock(): BasicBlock? {
         val bb = LLVM.LLVMGetLastBasicBlock(ref)
 
-        return wrap(bb) { BasicBlock(it) }
+        return bb?.let { BasicBlock(it) }
     }
 
     /**
@@ -131,7 +130,7 @@ public open class FunctionValue internal constructor() : Value(),
     public fun getNextFunction(): FunctionValue? {
         val next = LLVM.LLVMGetNextFunction(ref)
 
-        return wrap(next) { FunctionValue(it) }
+        return next?.let { FunctionValue(it) }
     }
 
     /**
@@ -142,7 +141,7 @@ public open class FunctionValue internal constructor() : Value(),
     public fun getPreviousFunction(): FunctionValue? {
         val prev = LLVM.LLVMGetPreviousFunction(ref)
 
-        return wrap(prev) { FunctionValue(it) }
+        return prev?.let { FunctionValue(it) }
     }
     //endregion Core::Modules
 
@@ -199,7 +198,7 @@ public open class FunctionValue internal constructor() : Value(),
     public fun getIndirectResolver(): IndirectFunction? {
         val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
 
-        return wrap(resolver) { IndirectFunction(it) }
+        return resolver?.let { IndirectFunction(it) }
     }
 
     /**

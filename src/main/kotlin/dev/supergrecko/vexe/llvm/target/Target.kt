@@ -2,7 +2,6 @@ package dev.supergrecko.vexe.llvm.target
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMTargetRef
 import org.bytedeco.llvm.global.LLVM
@@ -25,7 +24,7 @@ public class Target internal constructor() :
     public fun getNextTarget(): Target? {
         val next = LLVM.LLVMGetNextTarget(ref)
 
-        return wrap(next) { Target(it) }
+        return next?.let { Target(it) }
     }
 
     /**

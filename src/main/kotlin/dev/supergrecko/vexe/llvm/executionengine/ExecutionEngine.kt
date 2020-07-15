@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.executionengine
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.TargetData
 import dev.supergrecko.vexe.llvm.ir.Value
@@ -137,7 +136,7 @@ public class ExecutionEngine public constructor() :
     public fun getTargetData(): TargetData? {
         val td = LLVM.LLVMGetExecutionEngineTargetData(ref)
 
-        return wrap(td) { TargetData(it) }
+        return td?.let { TargetData(it) }
     }
 
     /**
@@ -148,7 +147,7 @@ public class ExecutionEngine public constructor() :
     public fun getTargetMachine(): TargetMachine? {
         val tm = LLVM.LLVMGetExecutionEngineTargetMachine(ref)
 
-        return wrap(tm) { TargetMachine(it) }
+        return tm?.let { TargetMachine(it) }
     }
 
     /**

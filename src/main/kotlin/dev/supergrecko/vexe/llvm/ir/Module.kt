@@ -6,7 +6,6 @@ import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.map
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
@@ -162,7 +161,7 @@ public class Module internal constructor() : Disposable,
     public fun getModuleFlag(key: String): Metadata? {
         val md = LLVM.LLVMGetModuleFlag(ref, key, key.length.toLong())
 
-        return wrap(md) { Metadata(it) }
+        return md?.let { Metadata(it) }
     }
 
     /**
@@ -275,9 +274,9 @@ public class Module internal constructor() : Disposable,
      * @see LLVM.LLVMGetTypeByName
      */
     public fun getTypeByName(name: String): StructType? {
-        val type: LLVMTypeRef = LLVM.LLVMGetTypeByName(ref, name)
+        val type = LLVM.LLVMGetTypeByName(ref, name)
 
-        return wrap(type) { StructType(it) }
+        return type?.let { StructType(it) }
     }
 
     /**
@@ -291,7 +290,7 @@ public class Module internal constructor() : Disposable,
     public fun getFirstNamedMetadata(): NamedMetadataNode? {
         val md = LLVM.LLVMGetFirstNamedMetadata(ref)
 
-        return wrap(md) { NamedMetadataNode(it) }
+        return md?.let { NamedMetadataNode(it) }
     }
 
     /**
@@ -305,7 +304,7 @@ public class Module internal constructor() : Disposable,
     public fun getLastNamedMetadata(): NamedMetadataNode? {
         val md = LLVM.LLVMGetLastNamedMetadata(ref)
 
-        return wrap(md) { NamedMetadataNode(it) }
+        return md?.let { NamedMetadataNode(it) }
     }
 
     /**
@@ -316,7 +315,7 @@ public class Module internal constructor() : Disposable,
     public fun getNamedMetadata(name: String): NamedMetadataNode? {
         val md = LLVM.LLVMGetNamedMetadata(ref, name, name.length.toLong())
 
-        return wrap(md) { NamedMetadataNode(it) }
+        return md?.let { NamedMetadataNode(it) }
     }
 
     /**
@@ -388,7 +387,7 @@ public class Module internal constructor() : Disposable,
     public fun getFunction(name: String): FunctionValue? {
         val ref = LLVM.LLVMGetNamedFunction(ref, name)
 
-        return wrap(ref) { FunctionValue(it) }
+        return ref?.let { FunctionValue(it) }
     }
 
     /**
@@ -402,7 +401,7 @@ public class Module internal constructor() : Disposable,
     public fun getFirstFunction(): FunctionValue? {
         val fn = LLVM.LLVMGetFirstFunction(ref)
 
-        return wrap(fn) { FunctionValue(it) }
+        return fn?.let { FunctionValue(it) }
     }
 
     /**
@@ -416,7 +415,7 @@ public class Module internal constructor() : Disposable,
     public fun getLastFunction(): FunctionValue? {
         val fn = LLVM.LLVMGetLastFunction(ref)
 
-        return wrap(fn) { FunctionValue(it) }
+        return fn?.let { FunctionValue(it) }
     }
 
     /**
@@ -465,7 +464,7 @@ public class Module internal constructor() : Disposable,
             name.length.toLong()
         )
 
-        return wrap(alias) { GlobalAlias(it) }
+        return alias?.let { GlobalAlias(it) }
     }
     //endregion Core::Values::Constants::GlobalAliases
 

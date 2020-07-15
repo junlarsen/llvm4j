@@ -1,6 +1,5 @@
 package dev.supergrecko.vexe.llvm.ir.instructions
 
-import dev.supergrecko.vexe.llvm.internal.util.wrap
 import dev.supergrecko.vexe.llvm.ir.BasicBlock
 import dev.supergrecko.vexe.llvm.ir.Instruction
 import dev.supergrecko.vexe.llvm.ir.Value
@@ -50,7 +49,7 @@ public class PhiInstruction internal constructor() : Instruction() {
     public fun getIncomingValue(index: Int): Value? {
         val value = LLVM.LLVMGetIncomingValue(ref, index)
 
-        return wrap(value) { Value(it) }
+        return value?.let { Value(it) }
     }
 
     /**
@@ -61,7 +60,7 @@ public class PhiInstruction internal constructor() : Instruction() {
     public fun getIncomingBlock(index: Int): BasicBlock? {
         val block = LLVM.LLVMGetIncomingBlock(ref, index)
 
-        return wrap(block) { BasicBlock(it) }
+        return block?.let { BasicBlock(it) }
     }
     //endregion Core::Instructions::PHINodes
 }
