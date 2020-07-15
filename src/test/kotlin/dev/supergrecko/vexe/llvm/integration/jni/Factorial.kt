@@ -30,7 +30,7 @@ internal object Factorial : Spek({
             types = listOf(IntType(32)),
             variadic = false
         )
-        val factorial = module.addFunction("factorial", factorialType).apply {
+        val factorial = module.createFunction("factorial", factorialType).apply {
             setCallConvention(CallConvention.CCall)
         }
 

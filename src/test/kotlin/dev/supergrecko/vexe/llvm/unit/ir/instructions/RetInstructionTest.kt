@@ -41,7 +41,7 @@ internal class RetInstructionTest : TestSuite({
 
     describe("Creation of aggregate ret") {
         val module = Module("test.ll")
-        val function = module.addFunction("test", FunctionType(
+        val function = module.createFunction("test", FunctionType(
             StructType(listOf(IntType(1), IntType(1)), false),
             listOf(),
             false

@@ -16,7 +16,7 @@ internal class BrInstructionTest : TestSuite({
         val builder = Builder()
         val module = Module("test.ll")
 
-        val function = module.addFunction(
+        val function = module.createFunction(
             "test", FunctionType(
                 IntType(32), listOf(), false
             )

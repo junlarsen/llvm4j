@@ -12,7 +12,7 @@ import dev.supergrecko.vexe.test.TestSuite
 internal class SwitchInstructionTest : TestSuite({
     describe("Assigning same block to two conditions") {
         val module = Module("test.ll")
-        val function = module.addFunction("test", FunctionType(
+        val function = module.createFunction("test", FunctionType(
             StructType(listOf(IntType(1), IntType(1)), false),
             listOf(),
             false
@@ -32,7 +32,7 @@ internal class SwitchInstructionTest : TestSuite({
 
     describe("The expected cases can be passed") {
         val module = Module("test.ll")
-        val function = module.addFunction("test", FunctionType(
+        val function = module.createFunction("test", FunctionType(
             StructType(listOf(IntType(1), IntType(1)), false),
             listOf(),
             false
