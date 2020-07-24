@@ -145,25 +145,12 @@ public class BasicBlock internal constructor() : Validatable,
     /**
      * Get the start of the instruction iterator
      *
-     * @see LLVM.LLVMGetFirstInstruction
+     * @see PointerIterator
      */
-    public fun getFirstInstruction(): Instruction.Iterator? {
+    public fun getInstructionIterator(): Instruction.Iterator? {
         require(valid) { "Cannot use deleted block" }
 
         val instr = LLVM.LLVMGetFirstInstruction(ref)
-
-        return instr?.let { Instruction.Iterator(it) }
-    }
-
-    /**
-     * Get the end of the instruction iterator
-     *
-     * @see LLVM.LLVMGetLastInstruction
-     */
-    public fun getLastInstruction(): Instruction.Iterator? {
-        require(valid) { "Cannot use deleted block" }
-
-        val instr = LLVM.LLVMGetLastInstruction(ref)
 
         return instr?.let { Instruction.Iterator(it) }
     }

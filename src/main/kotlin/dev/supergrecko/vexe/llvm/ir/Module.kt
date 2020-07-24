@@ -1,5 +1,6 @@
 package dev.supergrecko.vexe.llvm.ir
 
+import dev.supergrecko.vexe.llvm.internal.contracts.PointerIterator
 import dev.supergrecko.vexe.llvm.executionengine.ExecutionEngine
 import dev.supergrecko.vexe.llvm.executionengine.MCJITCompilerOptions
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
@@ -282,21 +283,10 @@ public class Module internal constructor() : Disposable,
     /**
      * Get the start of the named metadata iterator
      *
-     * @see LLVM.LLVMGetFirstNamedMetadata
+     * @see PointerIterator
      */
-    public fun getFirstNamedMetadata(): NamedMetadataNode.Iterator? {
+    public fun getNamedMetadataIterator(): NamedMetadataNode.Iterator? {
         val md = LLVM.LLVMGetFirstNamedMetadata(ref)
-
-        return md?.let { NamedMetadataNode.Iterator(it) }
-    }
-
-    /**
-     * Get the end of the named metadata iterator
-     *
-     * @see LLVM.LLVMGetLastNamedMetadata
-     */
-    public fun getLastNamedMetadata(): NamedMetadataNode.Iterator? {
-        val md = LLVM.LLVMGetLastNamedMetadata(ref)
 
         return md?.let { NamedMetadataNode.Iterator(it) }
     }
@@ -387,21 +377,10 @@ public class Module internal constructor() : Disposable,
     /**
      * Get the start of the function iterator
      *
-     * @see LLVM.LLVMGetFirstFunction
+     * @see PointerIterator
      */
-    public fun getFirstFunction(): FunctionValue.Iterator? {
+    public fun getFunctionIterator(): FunctionValue.Iterator? {
         val fn = LLVM.LLVMGetFirstFunction(ref)
-
-        return fn?.let { FunctionValue.Iterator(it) }
-    }
-
-    /**
-     * Get the end of the function iterator
-     *
-     * @see LLVM.LLVMGetLastFunction
-     */
-    public fun getLastFunction(): FunctionValue.Iterator? {
-        val fn = LLVM.LLVMGetLastFunction(ref)
 
         return fn?.let { FunctionValue.Iterator(it) }
     }

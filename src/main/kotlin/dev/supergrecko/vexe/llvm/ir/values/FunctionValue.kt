@@ -74,21 +74,10 @@ public open class FunctionValue internal constructor() : Value(),
     /**
      * Get the start of the basic block iterator
      *
-     * @see LLVM.LLVMGetFirstBasicBlock
+     * @see PointerIterator
      */
-    public fun getFirstBlock(): BasicBlock.Iterator? {
+    public fun getBlockIterator(): BasicBlock.Iterator? {
         val bb = LLVM.LLVMGetFirstBasicBlock(ref)
-
-        return bb?.let { BasicBlock.Iterator(it) }
-    }
-
-    /**
-     * Get the end of the basic block iterator
-     *
-     * @see LLVM.LLVMGetLastBasicBlock
-     */
-    public fun getLastBlock(): BasicBlock.Iterator? {
-        val bb = LLVM.LLVMGetLastBasicBlock(ref)
 
         return bb?.let { BasicBlock.Iterator(it) }
     }
