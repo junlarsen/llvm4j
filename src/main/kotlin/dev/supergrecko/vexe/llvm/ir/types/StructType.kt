@@ -33,10 +33,14 @@ public class StructType internal constructor() : Type(),
         packed: Boolean,
         ctx: Context = Context.getGlobalContext()
     ) : this() {
-        val arr = ArrayList(types.map { it.ref }).toTypedArray()
+        val ptr = PointerPointer(*types.map { it.ref }.toTypedArray())
 
-        ref =
-            LLVM.LLVMStructTypeInContext(ctx.ref, PointerPointer(*arr), arr.size, packed.toLLVMBool())
+        ref = LLVM.LLVMStructTypeInContext(
+            ctx.ref,
+            ptr,
+            types.size,
+            packed.toLLVMBool()
+        )
     }
 
     /**
@@ -86,14 +90,12 @@ public class StructType internal constructor() : Type(),
      *
      * @see LLVM.LLVMStructSetBody
      */
-    public fun setBody(elementTypes: List<Type>, packed: Boolean) {
+    public fun setBody(types: List<Type>, packed: Boolean) {
         require(isOpaque()) { "Cannot set body of non-opaque struct" }
 
-        val types = elementTypes.map { it.ref }
-        val array = ArrayList(types).toTypedArray()
-        val ptr = PointerPointer(*array)
+        val ptr = PointerPointer(*types.map { it.ref }.toTypedArray())
 
-        LLVM.LLVMStructSetBody(ref, ptr, array.size, packed.toLLVMBool())
+        LLVM.LLVMStructSetBody(ref, ptr, types.size, packed.toLLVMBool())
     }
 
     /**

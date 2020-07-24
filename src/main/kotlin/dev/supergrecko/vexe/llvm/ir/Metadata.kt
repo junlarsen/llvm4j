@@ -82,8 +82,11 @@ public class Metadata internal constructor() :
         context: Context = Context.getGlobalContext()
     ): String {
         val len = IntPointer(0)
+        val ptr = LLVM.LLVMGetMDString(asValue(context).ref, len)
 
-        return LLVM.LLVMGetMDString(asValue(context).ref, len).string
+        len.deallocate()
+
+        return ptr.string
     }
 
     /**

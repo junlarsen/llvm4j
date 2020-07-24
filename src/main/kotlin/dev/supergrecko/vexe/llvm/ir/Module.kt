@@ -20,12 +20,11 @@ import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
-import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public class Module internal constructor() : Disposable,
-    ContainsReference<LLVMModuleRef> {
+    ContainsReference<LLVMModuleRef>, Cloneable {
     public override lateinit var ref: LLVMModuleRef
         internal set
     public override var valid: Boolean = true
@@ -59,7 +58,10 @@ public class Module internal constructor() : Disposable,
      * @see LLVM.LLVMGetModuleIdentifier
      */
     public fun getModuleIdentifier(): String {
-        val ptr = LLVM.LLVMGetModuleIdentifier(ref, SizeTPointer(0))
+        val len = SizeTPointer(0)
+        val ptr = LLVM.LLVMGetModuleIdentifier(ref, len)
+
+        len.deallocate()
 
         return ptr.string
     }
@@ -82,7 +84,10 @@ public class Module internal constructor() : Disposable,
      * @see LLVM.LLVMGetSourceFileName
      */
     public fun getSourceFileName(): String {
-        val ptr = LLVM.LLVMGetSourceFileName(ref, SizeTPointer(0))
+        val len = SizeTPointer(0)
+        val ptr = LLVM.LLVMGetSourceFileName(ref, len)
+
+        len.deallocate()
 
         return ptr.string
     }
@@ -225,8 +230,10 @@ public class Module internal constructor() : Disposable,
      * @see LLVM.LLVMGetModuleInlineAsm
      */
     public fun getInlineAssembly(): String {
-        val length = SizeTPointer(0)
-        val asm = LLVM.LLVMGetModuleInlineAsm(ref, length)
+        val len = SizeTPointer(0)
+        val asm = LLVM.LLVMGetModuleInlineAsm(ref, len)
+
+        len.deallocate()
 
         return asm.string
     }
@@ -390,7 +397,7 @@ public class Module internal constructor() : Disposable,
      *
      * @see LLVM.LLVMCloneModule
      */
-    public fun clone(): Module {
+    public override fun clone(): Module {
         val mod = LLVM.LLVMCloneModule(ref)
 
         return Module(mod)

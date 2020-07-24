@@ -27,12 +27,12 @@ public class ConstantStruct internal constructor() : Value(),
         packed: Boolean,
         context: Context = Context.getGlobalContext()
     ) : this() {
-        val ptr = ArrayList(values.map { it.ref }).toTypedArray()
+        val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
 
         ref = LLVM.LLVMConstStructInContext(
             context.ref,
-            PointerPointer(*ptr),
-            ptr.size,
+            ptr,
+            values.size,
             packed.toLLVMBool()
         )
     }
@@ -43,12 +43,8 @@ public class ConstantStruct internal constructor() : Value(),
      * @see LLVM.LLVMConstNamedStruct
      */
     public constructor(type: StructType, values: List<Value>) : this() {
-        val ptr = ArrayList(values.map { it.ref }).toTypedArray()
+        val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
 
-        ref = LLVM.LLVMConstNamedStruct(
-            type.ref,
-            PointerPointer(*ptr),
-            ptr.size
-        )
+        ref = LLVM.LLVMConstNamedStruct(type.ref, ptr, values.size)
     }
 }

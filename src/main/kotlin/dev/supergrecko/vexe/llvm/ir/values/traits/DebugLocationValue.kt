@@ -17,9 +17,12 @@ public interface DebugLocationValue : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMGetDebugLocDirectory
      */
     public fun getDebugLocationDirectory(): String? {
-        val length = IntPointer(0)
+        val len = IntPointer(0)
+        val ptr = LLVM.LLVMGetDebugLocDirectory(ref, len)
 
-        return LLVM.LLVMGetDebugLocDirectory(ref, length)?.string
+        len.deallocate()
+
+        return ptr?.string
     }
 
     /**
@@ -28,9 +31,12 @@ public interface DebugLocationValue : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMGetDebugLocFilename
      */
     public fun getDebugLocationFilename(): String? {
-        val length = IntPointer(0)
+        val len = IntPointer(0)
+        val ptr = LLVM.LLVMGetDebugLocFilename(ref, len)
 
-        return LLVM.LLVMGetDebugLocFilename(ref, length)?.string
+        len.deallocate()
+
+        return ptr?.string
     }
 
     /**
