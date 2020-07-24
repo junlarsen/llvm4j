@@ -1,6 +1,7 @@
 package dev.supergrecko.vexe.llvm.target
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
+import dev.supergrecko.vexe.llvm.internal.contracts.PointerIterator
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMTargetRef
@@ -118,4 +119,16 @@ public class Target internal constructor() :
         }
     }
     //endregion Target
+
+    /**
+     * Class to perform iteration over targets
+     *
+     * @see [PointerIterator]
+     */
+    public class Iterator(ref: LLVMTargetRef) :
+        PointerIterator<Target, LLVMTargetRef>(
+            start = ref,
+            yieldNext = { LLVM.LLVMGetNextTarget(it) },
+            apply = { Target(it) }
+        )
 }

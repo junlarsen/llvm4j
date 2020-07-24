@@ -1,6 +1,7 @@
 package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
+import dev.supergrecko.vexe.llvm.internal.contracts.PointerIterator
 import org.bytedeco.llvm.LLVM.LLVMUseRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -53,4 +54,16 @@ public class Use internal constructor() : ContainsReference<LLVMUseRef> {
         return Value(value)
     }
     //endregion Core::Values::Usage
+
+    /**
+     * Class to perform iteration over targets
+     *
+     * @see [PointerIterator]
+     */
+    public class Iterator(ref: LLVMUseRef) :
+        PointerIterator<Use, LLVMUseRef>(
+            start = ref,
+            yieldNext = { LLVM.LLVMGetNextUse(it) },
+            apply = { Use(it) }
+        )
 }

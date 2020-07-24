@@ -7,8 +7,10 @@ import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 internal object NamedMetadataTest : Spek({
     setup()
@@ -17,22 +19,28 @@ internal object NamedMetadataTest : Spek({
 
     group("getting metadata from a module") {
         test("a module without metadata does not have a first or last") {
-            val first = module.getFirstNamedMetadata()
-            val last = module.getLastNamedMetadata()
+            val iter = module.getNamedMetadataIterator()
 
-            assertNull(first)
-            assertNull(last)
+            assertNull(iter)
         }
 
         test("a module with metadata can use the iterator") {
             module.getOrCreateNamedMetadata("one")
             module.getOrCreateNamedMetadata("two")
 
-            val first = module.getFirstNamedMetadata()
-            val second = first?.getNextNamedMetadata()
+            val iter = module.getNamedMetadataIterator()
 
-            assertEquals("one", first?.getName())
-            assertEquals("two", second?.getName())
+            assertNotNull(iter)
+            assertTrue { iter.hasNext() }
+
+            val first = iter.next()
+
+            assertTrue { iter.hasNext() }
+
+            val second = iter.next()
+
+            assertEquals("one", first.getName())
+            assertEquals("two", second.getName())
         }
 
         test("finding a metadata node by name") {

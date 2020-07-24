@@ -6,7 +6,7 @@ import org.bytedeco.llvm.global.LLVM
 import org.spekframework.spek2.Spek
 import kotlin.test.assertNotNull
 
-internal class CallbackTest : Spek({
+internal object CallbackTest : Spek({
     setup()
 
     val context: Context by memoized()

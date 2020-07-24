@@ -1,6 +1,7 @@
 package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
+import dev.supergrecko.vexe.llvm.internal.contracts.PointerIterator
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
 import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
@@ -81,34 +82,6 @@ public class BasicBlock internal constructor() : Validatable,
     }
 
     /**
-     * Get the next block in the iterator
-     *
-     * Use with [BasicBlock.getNextBlock] and [BasicBlock.getPreviousBlock]
-     * to move the iterator
-     */
-    public fun getNextBlock(): BasicBlock? {
-        require(valid) { "Cannot use deleted block" }
-
-        val bb = LLVM.LLVMGetNextBasicBlock(ref)
-
-        return bb?.let { BasicBlock(it) }
-    }
-
-    /**
-     * Get the previous block in the iterator
-     *
-     * Use with [BasicBlock.getNextBlock] and [BasicBlock.getPreviousBlock]
-     * to move the iterator
-     */
-    public fun getPreviousBlock(): BasicBlock? {
-        require(valid) { "Cannot use deleted block" }
-
-        val bb = LLVM.LLVMGetPreviousBasicBlock(ref)
-
-        return bb?.let { BasicBlock(it) }
-    }
-
-    /**
      * Insert a basic block in front of this one in the function this block
      * resides in.
      *
@@ -170,35 +143,28 @@ public class BasicBlock internal constructor() : Validatable,
     }
 
     /**
-     * Get the first [Instruction] in the iterator
+     * Get the start of the instruction iterator
      *
-     * Move the iterator with [Instruction.getNextInstruction] and
-     * [Instruction.getPreviousInstruction]
-     *
-     * @see LLVM.LLVMGetFirstInstruction
+     * @see PointerIterator
      */
-    public fun getFirstInstruction(): Instruction? {
+    public fun getInstructionIterator(): Instruction.Iterator? {
         require(valid) { "Cannot use deleted block" }
 
         val instr = LLVM.LLVMGetFirstInstruction(ref)
 
-        return instr?.let { Instruction(it) }
-    }
-
-    /**
-     * Get the last [Instruction] in the iterator
-     *
-     * Move the iterator with [Instruction.getNextInstruction] and
-     * [Instruction.getPreviousInstruction]
-     *
-     * @see LLVM.LLVMGetLastInstruction
-     */
-    public fun getLastInstruction(): Instruction? {
-        require(valid) { "Cannot use deleted block" }
-
-        val instr = LLVM.LLVMGetLastInstruction(ref)
-
-        return instr?.let { Instruction(it) }
+        return instr?.let { Instruction.Iterator(it) }
     }
     //endregion Core::BasicBlock
+
+    /**
+     * Class to perform iteration over basic blocks
+     *
+     * @see [PointerIterator]
+     */
+    public class Iterator(ref: LLVMBasicBlockRef) :
+        PointerIterator<BasicBlock, LLVMBasicBlockRef>(
+            start = ref,
+            yieldNext = { LLVM.LLVMGetNextBasicBlock(it) },
+            apply = { BasicBlock(it) }
+        )
 }

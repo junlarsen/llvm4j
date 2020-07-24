@@ -83,26 +83,6 @@ internal object InstructionTest : Spek({
             assertNotNull(subject)
             assertEquals(block.ref, subject.ref)
         }
-
-        test("iterating over instructions in a block") {
-            val function = module.createFunction("testfn", FunctionType(
-                VoidType(), listOf(), false
-            ))
-            val block = function.createBlock("entry")
-
-            builder.setPositionAtEnd(block)
-            builder.build().createBr(block)
-            builder.build().createRetVoid()
-
-            val first = block.getFirstInstruction()
-            val second = first?.getNextInstruction()
-            val subject = second?.getPreviousInstruction()
-
-            assertNotNull(first)
-            assertNotNull(second)
-            assertNotNull(subject)
-            assertEquals(first.ref, subject.ref)
-        }
     }
 
     group("successors of terminating basic blocks") {

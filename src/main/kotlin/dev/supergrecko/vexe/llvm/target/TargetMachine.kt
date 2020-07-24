@@ -48,16 +48,14 @@ public class TargetMachine internal constructor() :
     }
 
     /**
-     * Get the first [Target] in the iterator
-     *
-     * Move the iterator with [Target.getNextTarget]
+     * Get the start of the target iterator
      *
      * @see LLVM.LLVMGetNextTarget
      */
-    public fun getFirstTarget(): Target? {
+    public fun getFirstTarget(): Target.Iterator? {
         val target = LLVM.LLVMGetFirstTarget()
 
-        return target?.let { Target(it) }
+        return target?.let { Target.Iterator(it) }
     }
 
     /**

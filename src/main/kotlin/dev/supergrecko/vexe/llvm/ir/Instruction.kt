@@ -1,5 +1,6 @@
 package dev.supergrecko.vexe.llvm.ir
 
+import dev.supergrecko.vexe.llvm.internal.contracts.PointerIterator
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.contracts.Validatable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
@@ -117,32 +118,6 @@ public open class Instruction internal constructor() : Value(),
     }
 
     /**
-     * Get the next instruction inside of the basic block this resides in
-     *
-     * If this is the last instruction in the block, then null is returned
-     *
-     * @see LLVM.LLVMGetNextInstruction
-     */
-    public fun getNextInstruction(): Instruction? {
-        val inst = LLVM.LLVMGetNextInstruction(ref)
-
-        return inst?.let { Instruction(it) }
-    }
-
-    /**
-     * Get the first instruction inside of the basic block this resides in
-     *
-     * If this is the first instruction in the block, then null is returned
-     *
-     * @see LLVM.LLVMGetPreviousInstruction
-     */
-    public fun getPreviousInstruction(): Instruction? {
-        val inst = LLVM.LLVMGetPreviousInstruction(ref)
-
-        return inst?.let { Instruction(it) }
-    }
-
-    /**
      * Removes the instruction from the basic block it resides in
      *
      * @see LLVM.LLVMInstructionRemoveFromParent
@@ -253,4 +228,16 @@ public open class Instruction internal constructor() : Value(),
         LLVM.LLVMSetSuccessor(ref, index, block.ref)
     }
     //endregion Core::Instructions::Terminators
+
+    /**
+     * Class to perform iteration over instructions
+     *
+     * @see [PointerIterator]
+     */
+    public class Iterator(ref: LLVMValueRef) :
+        PointerIterator<Instruction, LLVMValueRef>(
+            start = ref,
+            yieldNext = { LLVM.LLVMGetNextInstruction(it) },
+            apply = { Instruction(it) }
+        )
 }
