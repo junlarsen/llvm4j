@@ -28,13 +28,14 @@ public open class PointerIterator<T, P : Pointer>(
      * This should only be called if the caller is certain the next item
      * exists. Existence of the next item can be done with [hasNext]
      */
-    public override fun next(): T {
+    public override operator fun next(): T {
         // This iterator is yet to be used, return the starting node
         val node = if (head == null) {
             start
         } else {
-            val node = yieldNext.invoke(start) ?: throw RuntimeException(
-                "Attempted to access non-existent next node of $start"
+            // Otherwise, grab the next node
+            val node = yieldNext.invoke(head!!) ?: throw RuntimeException(
+                "Attempted to access non-existent next node of $head"
             )
 
             node
@@ -52,12 +53,13 @@ public open class PointerIterator<T, P : Pointer>(
      *
      * This should always be called before [next]
      */
-    public override fun hasNext(): Boolean {
+    public override operator fun hasNext(): Boolean {
         // A fresh iterator always has a next, the first item
         return if (head == null) {
             true
         } else {
-            yieldNext.invoke(start) != null
+            // Otherwise, we check if the next element is null
+            yieldNext.invoke(head!!) != null
         }
     }
 }

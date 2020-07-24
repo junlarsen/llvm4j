@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-internal class ConversionsTest : Spek({
+internal object ConversionsTest : Spek({
     group("int to boolean conversion") {
         test("0 and 1 match false and true") {
             assertTrue { 1.fromLLVMBool() }
