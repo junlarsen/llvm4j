@@ -10,7 +10,7 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public open class Instruction internal constructor() : Value(),
-    DebugLocationValue, Validatable {
+    DebugLocationValue, Validatable, Cloneable {
     public override var valid = true
 
     public constructor(llvmRef: LLVMValueRef) : this() {
@@ -164,7 +164,7 @@ public open class Instruction internal constructor() : Value(),
      *
      * @see LLVM.LLVMInstructionClone
      */
-    public fun clone(): Instruction {
+    public override fun clone(): Instruction {
         val clone = LLVM.LLVMInstructionClone(ref)
 
         return Instruction(clone)

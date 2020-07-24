@@ -30,6 +30,8 @@ public open class Value internal constructor() :
         val len = SizeTPointer(0)
         val ptr = LLVM.LLVMGetValueName2(ref, len)
 
+        len.deallocate()
+
         return ptr.string
     }
 

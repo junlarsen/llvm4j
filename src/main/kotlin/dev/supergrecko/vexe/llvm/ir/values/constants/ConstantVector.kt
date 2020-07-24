@@ -25,9 +25,9 @@ public class ConstantVector internal constructor() : Value(),
      * @see LLVM.LLVMConstVector
      */
     public constructor(values: List<Value>) : this() {
-        val ptr = ArrayList(values.map { it.ref }).toTypedArray()
+        val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
 
-        ref = LLVM.LLVMConstVector(PointerPointer(*ptr), ptr.size)
+        ref = LLVM.LLVMConstVector(ptr, values.size)
     }
 
     /**

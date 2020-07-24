@@ -19,12 +19,11 @@ public interface AggregateValue : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMConstInBoundsGEP
      */
     public fun getGEP(inbounds: Boolean, indices: List<ConstantInt>): Value {
-        val ptr = indices.map { it.ref }.toTypedArray()
-
+        val ptr = PointerPointer(*indices.map { it.ref }.toTypedArray())
         val ref = if (inbounds) {
-            LLVM.LLVMConstInBoundsGEP(ref, PointerPointer(*ptr), indices.size)
+            LLVM.LLVMConstInBoundsGEP(ref, ptr, indices.size)
         } else {
-            LLVM.LLVMConstGEP(ref, PointerPointer(*ptr), indices.size)
+            LLVM.LLVMConstGEP(ref, ptr, indices.size)
         }
 
         return Value(ref)

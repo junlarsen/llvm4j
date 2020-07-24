@@ -27,12 +27,12 @@ public class FunctionType internal constructor() : Type() {
         types: List<Type>,
         variadic: Boolean
     ) : this() {
-        val arr = ArrayList(types.map { it.ref }).toTypedArray()
+        val ptr = PointerPointer(*types.map { it.ref }.toTypedArray())
 
         ref = LLVM.LLVMFunctionType(
             returns.ref,
-            PointerPointer(*arr),
-            arr.size,
+            ptr,
+            types.size,
             variadic.toLLVMBool()
         )
     }

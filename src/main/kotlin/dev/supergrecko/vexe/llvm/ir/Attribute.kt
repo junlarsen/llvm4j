@@ -72,9 +72,12 @@ public class Attribute internal constructor() :
     public fun getStringKind(): String {
         require(isStringAttribute()) { "This is not a string attribute" }
 
-        val ptr = IntPointer(0)
+        val len = IntPointer(0)
+        val ptr = LLVM.LLVMGetStringAttributeKind(ref, len)
 
-        return LLVM.LLVMGetStringAttributeKind(ref, ptr).string
+        len.deallocate()
+
+        return ptr.string
     }
 
     /**
@@ -85,9 +88,12 @@ public class Attribute internal constructor() :
     public fun getStringValue(): String {
         require(isStringAttribute()) { "This is not a string attribute" }
 
-        val ptr = IntPointer(0)
+        val len = IntPointer(0)
+        val ptr = LLVM.LLVMGetStringAttributeValue(ref, len)
 
-        return LLVM.LLVMGetStringAttributeValue(ref, ptr).string
+        len.deallocate()
+
+        return ptr.string
     }
 
     /**

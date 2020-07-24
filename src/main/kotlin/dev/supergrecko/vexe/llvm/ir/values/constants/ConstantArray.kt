@@ -28,9 +28,9 @@ public class ConstantArray internal constructor() : Value(),
      * @see LLVM.LLVMConstArray
      */
     public constructor(type: Type, values: List<Value>) : this() {
-        val ptr = values.map { it.ref }.toTypedArray()
+        val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
 
-        ref = LLVM.LLVMConstArray(type.ref, PointerPointer(*ptr), ptr.size)
+        ref = LLVM.LLVMConstArray(type.ref, ptr, values.size)
     }
 
     /**
@@ -69,7 +69,10 @@ public class ConstantArray internal constructor() : Value(),
     public fun getAsString(): String {
         require(isConstantString())
 
-        val ptr = LLVM.LLVMGetAsString(ref, SizeTPointer(0))
+        val len = SizeTPointer(0)
+        val ptr = LLVM.LLVMGetAsString(ref, len)
+
+        len.deallocate()
 
         return ptr.string
     }

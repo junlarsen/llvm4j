@@ -60,15 +60,14 @@ public class IntrinsicFunction internal constructor() {
     public fun getOverloadedName(parameters: List<Type>): String {
         require(isOverloaded()) { "This intrinsic is not overloaded." }
 
-        val ptr = SizeTPointer(0)
-        val arr = ArrayList(parameters.map { it.ref })
-            .toTypedArray()
+        val len = SizeTPointer(0)
+        val ptr = PointerPointer(*parameters.map { it.ref }.toTypedArray())
 
         return LLVM.LLVMIntrinsicCopyOverloadedName(
             id,
-            PointerPointer(*arr),
+            ptr,
             parameters.size.toLong(),
-            ptr
+            len
         )
     }
 
@@ -78,9 +77,12 @@ public class IntrinsicFunction internal constructor() {
      * @see LLVM.LLVMIntrinsicGetName
      */
     public fun getName(): String {
-        val ptr = SizeTPointer(0)
+        val len = SizeTPointer(0)
+        val ptr = LLVM.LLVMIntrinsicGetName(id, len)
 
-        return LLVM.LLVMIntrinsicGetName(id, ptr).string
+        len.deallocate()
+
+        return ptr.string
     }
 
     /**
@@ -92,13 +94,11 @@ public class IntrinsicFunction internal constructor() {
         module: Module,
         parameters: List<Type>
     ): FunctionValue {
-        val arr = ArrayList(parameters.map { it.ref })
-            .toTypedArray()
-
+        val ptr = PointerPointer(*parameters.map { it.ref }.toTypedArray())
         val decl = LLVM.LLVMGetIntrinsicDeclaration(
             module.ref,
             id,
-            PointerPointer(*arr),
+            ptr,
             parameters.size.toLong()
         )
 
@@ -111,13 +111,11 @@ public class IntrinsicFunction internal constructor() {
      * @see LLVM.LLVMIntrinsicGetType
      */
     public fun getType(context: Context, parameters: List<Type>): FunctionType {
-        val arr = ArrayList(parameters.map { it.ref })
-            .toTypedArray()
-
+        val ptr = PointerPointer(*parameters.map { it.ref }.toTypedArray())
         val type = LLVM.LLVMIntrinsicGetType(
             context.ref,
             id,
-            PointerPointer(*arr),
+            ptr,
             parameters.size.toLong()
         )
 

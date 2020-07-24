@@ -63,9 +63,12 @@ public class ModuleFlagEntries internal constructor() :
             )
         }
 
-        val length = SizeTPointer(0)
+        val len = SizeTPointer(0)
+        val ptr = LLVM.LLVMModuleFlagEntriesGetKey(ref, index, len)
 
-        return LLVM.LLVMModuleFlagEntriesGetKey(ref, index, length).string
+        len.deallocate()
+
+        return ptr.string
     }
 
     /**

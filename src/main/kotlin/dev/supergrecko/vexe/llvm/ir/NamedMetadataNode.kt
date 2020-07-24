@@ -22,9 +22,12 @@ public class NamedMetadataNode internal constructor() :
      * @see LLVM.LLVMGetNamedMetadataName
      */
     public fun getName(): String {
-        val length = SizeTPointer(0)
+        val len = SizeTPointer(0)
+        val ptr = LLVM.LLVMGetNamedMetadataName(ref, len)
 
-        return LLVM.LLVMGetNamedMetadataName(ref, length).string
+        len.deallocate()
+
+        return ptr.string
     }
     //endregion Core::Modules
 
