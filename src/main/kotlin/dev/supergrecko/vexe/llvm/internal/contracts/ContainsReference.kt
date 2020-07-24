@@ -7,6 +7,11 @@ import org.bytedeco.javacpp.Pointer
  *
  * This enables code sharing using interfaces
  */
-public interface ContainsReference<T : Pointer> {
-    val ref: T
+public interface ContainsReference<P : Pointer> {
+    /**
+     * Get a raw pointer to an LLVM FFI Object
+     *
+     * @see Pointer
+     */
+    public val ref: P
 }

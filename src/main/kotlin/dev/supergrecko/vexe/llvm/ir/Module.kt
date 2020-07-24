@@ -280,31 +280,25 @@ public class Module internal constructor() : Disposable,
     }
 
     /**
-     * Get the first [NamedMetadataNode] in the iterator
-     *
-     * Move the iterator with [NamedMetadataNode.getNextNamedMetadata] and
-     * [NamedMetadataNode.getPreviousNamedMetadata]
+     * Get the start of the named metadata iterator
      *
      * @see LLVM.LLVMGetFirstNamedMetadata
      */
-    public fun getFirstNamedMetadata(): NamedMetadataNode? {
+    public fun getFirstNamedMetadata(): NamedMetadataNode.Iterator? {
         val md = LLVM.LLVMGetFirstNamedMetadata(ref)
 
-        return md?.let { NamedMetadataNode(it) }
+        return md?.let { NamedMetadataNode.Iterator(it) }
     }
 
     /**
-     * Get the last [NamedMetadataNode] in the iterator
-     *
-     * Move the iterator with [NamedMetadataNode.getNextNamedMetadata] and
-     * [NamedMetadataNode.getPreviousNamedMetadata]
+     * Get the end of the named metadata iterator
      *
      * @see LLVM.LLVMGetLastNamedMetadata
      */
-    public fun getLastNamedMetadata(): NamedMetadataNode? {
+    public fun getLastNamedMetadata(): NamedMetadataNode.Iterator? {
         val md = LLVM.LLVMGetLastNamedMetadata(ref)
 
-        return md?.let { NamedMetadataNode(it) }
+        return md?.let { NamedMetadataNode.Iterator(it) }
     }
 
     /**
@@ -391,31 +385,25 @@ public class Module internal constructor() : Disposable,
     }
 
     /**
-     * Get the first [FunctionValue] in the iterator
-     *
-     * Move the iterator with [FunctionValue.getNextFunction] and
-     * [FunctionValue.getPreviousFunction]
+     * Get the start of the function iterator
      *
      * @see LLVM.LLVMGetFirstFunction
      */
-    public fun getFirstFunction(): FunctionValue? {
+    public fun getFirstFunction(): FunctionValue.Iterator? {
         val fn = LLVM.LLVMGetFirstFunction(ref)
 
-        return fn?.let { FunctionValue(it) }
+        return fn?.let { FunctionValue.Iterator(it) }
     }
 
     /**
-     * Get the last [FunctionValue] in the iterator
-     *
-     * Move the iterator with [FunctionValue.getNextFunction] and
-     * [FunctionValue.getPreviousFunction]
+     * Get the end of the function iterator
      *
      * @see LLVM.LLVMGetLastFunction
      */
-    public fun getLastFunction(): FunctionValue? {
+    public fun getLastFunction(): FunctionValue.Iterator? {
         val fn = LLVM.LLVMGetLastFunction(ref)
 
-        return fn?.let { FunctionValue(it) }
+        return fn?.let { FunctionValue.Iterator(it) }
     }
 
     /**

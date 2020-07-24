@@ -1,6 +1,7 @@
 package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
+import dev.supergrecko.vexe.llvm.internal.contracts.PointerIterator
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMNamedMDNodeRef
 import org.bytedeco.llvm.global.LLVM
@@ -16,28 +17,6 @@ public class NamedMetadataNode internal constructor() :
 
     //region Core::Modules
     /**
-     * Get the next [NamedMetadataNode] in the iterator
-     *
-     * @see LLVM.LLVMGetNextNamedMetadata
-     */
-    public fun getNextNamedMetadata(): NamedMetadataNode? {
-        val md = LLVM.LLVMGetNextNamedMetadata(ref)
-
-        return md?.let { NamedMetadataNode(it) }
-    }
-
-    /**
-     * Get the previous [NamedMetadataNode] in the iterator
-     *
-     * @see LLVM.LLVMGetPreviousNamedMetadata
-     */
-    public fun getPreviousNamedMetadata(): NamedMetadataNode? {
-        val md = LLVM.LLVMGetPreviousNamedMetadata(ref)
-
-        return md?.let { NamedMetadataNode(it) }
-    }
-
-    /**
      * Get the name of this metadata node
      *
      * @see LLVM.LLVMGetNamedMetadataName
@@ -48,4 +27,16 @@ public class NamedMetadataNode internal constructor() :
         return LLVM.LLVMGetNamedMetadataName(ref, length).string
     }
     //endregion Core::Modules
+
+    /**
+     * Class to perform iteration over named metadata nodes
+     *
+     * @see [PointerIterator]
+     */
+    public class Iterator(ref: LLVMNamedMDNodeRef) :
+        PointerIterator<NamedMetadataNode, LLVMNamedMDNodeRef>(
+            start = ref,
+            yieldNext = { LLVM.LLVMGetNextNamedMetadata(it) },
+            apply = { NamedMetadataNode(it) }
+        )
 }

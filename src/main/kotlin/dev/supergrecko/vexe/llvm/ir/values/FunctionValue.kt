@@ -1,5 +1,6 @@
 package dev.supergrecko.vexe.llvm.ir.values
 
+import dev.supergrecko.vexe.llvm.internal.contracts.PointerIterator
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.map
@@ -9,6 +10,7 @@ import dev.supergrecko.vexe.llvm.ir.BasicBlock
 import dev.supergrecko.vexe.llvm.ir.CallConvention
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Module
+import dev.supergrecko.vexe.llvm.ir.NamedMetadataNode
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.values.traits.DebugLocationValue
@@ -70,31 +72,25 @@ public open class FunctionValue internal constructor() : Value(),
     }
 
     /**
-     * Get the first basic block inside this function.
-     *
-     * Use [BasicBlock.getNextBlock] to advance this iterator on the returned
-     * basic block instance.
+     * Get the start of the basic block iterator
      *
      * @see LLVM.LLVMGetFirstBasicBlock
      */
-    public fun getFirstBlock(): BasicBlock? {
+    public fun getFirstBlock(): BasicBlock.Iterator? {
         val bb = LLVM.LLVMGetFirstBasicBlock(ref)
 
-        return bb?.let { BasicBlock(it) }
+        return bb?.let { BasicBlock.Iterator(it) }
     }
 
     /**
-     * Get the last basic block inside this function.
-     *
-     * Use [BasicBlock.getPreviousBlock] to advance this iterator on the
-     * returned basic block instance.
+     * Get the end of the basic block iterator
      *
      * @see LLVM.LLVMGetLastBasicBlock
      */
-    public fun getLastBlock(): BasicBlock? {
+    public fun getLastBlock(): BasicBlock.Iterator? {
         val bb = LLVM.LLVMGetLastBasicBlock(ref)
 
-        return bb?.let { BasicBlock(it) }
+        return bb?.let { BasicBlock.Iterator(it) }
     }
 
     /**
@@ -120,30 +116,6 @@ public open class FunctionValue internal constructor() : Value(),
         return ptr.map { BasicBlock(it) }
     }
     //endregion Core::BasicBlock
-
-    //region Core::Modules
-    /**
-     * Get the next [FunctionValue] in the iterator
-     *
-     * @see LLVM.LLVMGetNextFunction
-     */
-    public fun getNextFunction(): FunctionValue? {
-        val next = LLVM.LLVMGetNextFunction(ref)
-
-        return next?.let { FunctionValue(it) }
-    }
-
-    /**
-     * Get the previous [FunctionValue] in the iterator
-     *
-     * @see LLVM.LLVMGetPreviousInstruction
-     */
-    public fun getPreviousFunction(): FunctionValue? {
-        val prev = LLVM.LLVMGetPreviousFunction(ref)
-
-        return prev?.let { FunctionValue(it) }
-    }
-    //endregion Core::Modules
 
     //region Core::Values::Constants::FunctionValues::FunctionParameters
     /**
@@ -481,4 +453,16 @@ public open class FunctionValue internal constructor() : Value(),
         }
     }
     //endregion Analysis
+
+    /**
+     * Class to perform iteration over functions
+     *
+     * @see [PointerIterator]
+     */
+    public class Iterator(ref: LLVMValueRef) :
+        PointerIterator<FunctionValue, LLVMValueRef>(
+            start = ref,
+            yieldNext = { LLVM.LLVMGetNextFunction(it) },
+            apply = { FunctionValue(it) }
+        )
 }

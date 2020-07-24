@@ -153,16 +153,14 @@ public open class Value internal constructor() :
 
     //region Core::Values::Usage
     /**
-     * Get the first [Use] for this value
-     *
-     * Move the iterator with [Use.getNextUse]
+     * Get the start of the use iterator
      *
      * @see LLVM.LLVMGetFirstUse
      */
-    public fun getFirstUse(): Use? {
+    public fun getFirstUse(): Use.Iterator? {
         val use = LLVM.LLVMGetFirstUse(ref)
 
-        return use?.let { Use(it) }
+        return use?.let { Use.Iterator(it) }
     }
     //endregion Core::Values::Usage
 

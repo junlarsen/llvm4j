@@ -9,6 +9,7 @@ import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 internal object NamedMetadataTest : Spek({
     setup()
@@ -28,11 +29,19 @@ internal object NamedMetadataTest : Spek({
             module.getOrCreateNamedMetadata("one")
             module.getOrCreateNamedMetadata("two")
 
-            val first = module.getFirstNamedMetadata()
-            val second = first?.getNextNamedMetadata()
+            val iterator = module.getFirstNamedMetadata()
 
-            assertEquals("one", first?.getName())
-            assertEquals("two", second?.getName())
+            assertNotNull(iterator)
+            assertTrue { iterator.hasNext() }
+
+            val first = iterator.next()
+
+            assertTrue { iterator.hasNext() }
+
+            val second = iterator.next()
+
+            assertEquals("one", first.getName())
+            assertEquals("two", second.getName())
         }
 
         test("finding a metadata node by name") {
