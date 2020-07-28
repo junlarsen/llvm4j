@@ -181,4 +181,16 @@ public open class Instruction internal constructor() : Value(),
         return inst != null
     }
     //endregion Core::Instructions
+
+    /**
+     * Class to perform iteration over instructions
+     *
+     * @see [PointerIterator]
+     */
+    public class Iterator(ref: LLVMValueRef) :
+        PointerIterator<Instruction, LLVMValueRef>(
+            start = ref,
+            yieldNext = { LLVM.LLVMGetNextInstruction(it) },
+            apply = { Instruction(it) }
+        )
 }
