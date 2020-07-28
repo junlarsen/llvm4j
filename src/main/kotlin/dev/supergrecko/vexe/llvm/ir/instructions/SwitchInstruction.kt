@@ -3,10 +3,12 @@ package dev.supergrecko.vexe.llvm.ir.instructions
 import dev.supergrecko.vexe.llvm.ir.BasicBlock
 import dev.supergrecko.vexe.llvm.ir.Instruction
 import dev.supergrecko.vexe.llvm.ir.Value
+import dev.supergrecko.vexe.llvm.ir.instructions.traits.Terminator
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class SwitchInstruction internal constructor() : Instruction() {
+public class SwitchInstruction internal constructor() : Instruction(),
+    Terminator {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }
