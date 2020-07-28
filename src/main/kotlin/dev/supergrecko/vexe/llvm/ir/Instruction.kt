@@ -182,53 +182,6 @@ public open class Instruction internal constructor() : Value(),
     }
     //endregion Core::Instructions
 
-    //region Core::Instructions::Terminators
-    // TODO: Move into Terminator interface
-    /**
-     * Get the number of successors that this terminator has
-     *
-     * @see LLVM.LLVMGetNumSuccessors
-     */
-    public fun getSuccessorCount(): Int {
-        require(isTerminator()) {
-            "This instruction is not a terminator"
-        }
-
-        return LLVM.LLVMGetNumSuccessors(ref)
-    }
-
-    /**
-     * Get a successor at [index]
-     *
-     * @see LLVM.LLVMGetSuccessor
-     */
-    public fun getSuccessor(index: Int): BasicBlock {
-        require(isTerminator()) {
-            "This instruction is not a terminator"
-        }
-        require(index < getSuccessorCount()) {
-            "Out of bounds index. Index: $index, Count: ${getSuccessorCount()}"
-        }
-
-        val bb = LLVM.LLVMGetSuccessor(ref, index)
-
-        return BasicBlock(bb)
-    }
-
-    /**
-     * Set a successor at [index]
-     *
-     * @see LLVM.LLVMSetSuccessor
-     */
-    public fun setSuccessor(index: Int, block: BasicBlock) {
-        require(isTerminator()) {
-            "This instruction is not a terminator"
-        }
-
-        LLVM.LLVMSetSuccessor(ref, index, block.ref)
-    }
-    //endregion Core::Instructions::Terminators
-
     /**
      * Class to perform iteration over instructions
      *

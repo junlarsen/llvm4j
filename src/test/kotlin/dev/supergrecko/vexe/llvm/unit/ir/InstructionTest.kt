@@ -85,46 +85,6 @@ internal object InstructionTest : Spek({
         }
     }
 
-    group("successors of terminating basic blocks") {
-        test("a loose terminator does not have a successor") {
-            val inst = builder.build().createRetVoid()
-
-            assertThrows<IllegalArgumentException> {
-                inst.getSuccessor(0)
-            }
-        }
-
-        test("non terminators do not have a successor") {
-            val inst = builder.build().createAnd(
-                ConstantInt(IntType(32), 1),
-                ConstantInt(IntType(32), 0),
-                "and"
-            )
-            builder.insert(inst)
-
-            assertThrows<IllegalArgumentException> {
-                assertEquals(0, inst.getSuccessorCount())
-            }
-        }
-
-        test("non terminators may not have a successor assigned") {
-            val function = module.createFunction("test", FunctionType(
-                VoidType(), listOf(), false
-            ))
-            val block = function.createBlock("entry")
-            val inst = builder.build().createAnd(
-                ConstantInt(IntType(32), 1),
-                ConstantInt(IntType(32), 0),
-                "and"
-            )
-            builder.insert(inst, "and")
-
-            assertThrows<IllegalArgumentException> {
-                inst.setSuccessor(0, block)
-            }
-        }
-    }
-
     group("removal and deletion of nodes") {
         test("removal of loose instruction fails due to missing parent") {
             val inst = builder.build().createRetVoid()
