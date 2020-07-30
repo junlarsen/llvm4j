@@ -6,13 +6,13 @@ import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.ir.values.traits.AggregateValue
 import dev.supergrecko.vexe.llvm.ir.values.traits.CompositeValue
-import dev.supergrecko.vexe.llvm.ir.values.traits.ConstantValue
+import dev.supergrecko.vexe.llvm.ir.values.ConstantValue
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantStruct internal constructor() : Value(),
-    ConstantValue, AggregateValue, CompositeValue {
+public class ConstantStruct internal constructor() : ConstantValue(),
+    AggregateValue, CompositeValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }
