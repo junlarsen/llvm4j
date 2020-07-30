@@ -1,7 +1,5 @@
-package dev.supergrecko.vexe.llvm.ir.values.traits
+package dev.supergrecko.vexe.llvm.ir.values
 
-import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
-import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.ir.Opcode
 import dev.supergrecko.vexe.llvm.ir.Type
@@ -9,10 +7,11 @@ import dev.supergrecko.vexe.llvm.ir.Value
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-/**
- * Type to which acts like a supertype for all constant LLVM values
- */
-public interface ConstantValue : ContainsReference<LLVMValueRef> {
+public open class ConstantValue internal constructor() : Value() {
+    public constructor(llvmRef: LLVMValueRef) : this() {
+        ref = llvmRef
+    }
+
     //region Core::Values::Constants::ConstantExpressions
     /**
      * Get the opcode for a constant value
@@ -21,17 +20,16 @@ public interface ConstantValue : ContainsReference<LLVMValueRef> {
      *
      * @see LLVM.LLVMGetConstOpcode
      */
-    public fun getOpcode(): Opcode {
+    public fun getOpcode(): Opcode? {
         val isConst = LLVM.LLVMIsConstant(ref).fromLLVMBool()
+
         require(isConst) {
             "Value must be constant to retrieve opcode"
         }
 
-        val int = LLVM.LLVMGetConstOpcode(ref)
+        val int: Int? = LLVM.LLVMGetConstOpcode(ref)
 
-        return Opcode.values()
-            .firstOrNull { it.value == int }
-            ?: throw Unreachable()
+        return Opcode.values().firstOrNull { it.value == int }
     }
 
     /**

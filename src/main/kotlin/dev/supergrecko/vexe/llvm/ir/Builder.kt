@@ -3,11 +3,9 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
-import dev.supergrecko.vexe.llvm.ir.instructions.AddrSpaceCastInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AllocaInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AtomicCmpXchgInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.AtomicRMWInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.BitCastInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.BrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CallInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CatchPadInstruction
@@ -15,44 +13,24 @@ import dev.supergrecko.vexe.llvm.ir.instructions.CatchRetInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CatchSwitchInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CleanupPadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.CleanupRetInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.ExtractElementInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.ExtractValueInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.FPExtInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.FPToSIInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.FPToUIInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.FPTruncInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.FRemInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.FSubInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.FenceInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.GetElementPtrInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.ICmpInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.IndirectBrInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.InsertElementInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.InsertValueInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.IntToPtrInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.InvokeInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LandingPadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.LoadInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.PhiInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.PtrToIntInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.ResumeInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.RetInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.SExtInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.SIToFPInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SelectInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.ShuffleVectorInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.StoreInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.SwitchInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.TruncInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.UIToFPInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.UnreachableInstruction
 import dev.supergrecko.vexe.llvm.ir.instructions.VAArgInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.XorInstruction
-import dev.supergrecko.vexe.llvm.ir.instructions.ZExtInstruction
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
+import dev.supergrecko.vexe.llvm.ir.values.ConstantValue
 import dev.supergrecko.vexe.llvm.ir.values.FunctionValue
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
@@ -66,7 +44,7 @@ public class Builder public constructor(
     )
         internal set
     public override var valid: Boolean = true
-    private val builder: InstructionBuilder = InstructionBuilder()
+    private val builder: IRBuilder = IRBuilder()
 
     public constructor(llvmRef: LLVMBuilderRef) : this() {
         ref = llvmRef
@@ -222,9 +200,9 @@ public class Builder public constructor(
     /**
      * Get the singleton instruction builder
      *
-     * Returns a per-class singleton instance of [InstructionBuilder]
+     * Returns a per-class singleton instance of [IRBuilder]
      */
-    public fun build(): InstructionBuilder = builder
+    public fun build(): IRBuilder = builder
 
     /**
      * An instruction builder is a wrapper class for building instructions
@@ -235,7 +213,7 @@ public class Builder public constructor(
      *
      * Each [Builder] has one of these, retrievable by [build]
      */
-    public inner class InstructionBuilder {
+    public inner class IRBuilder {
         /**
          * Build a return instruction
          *
@@ -621,7 +599,7 @@ public class Builder public constructor(
             variable: String,
             nsw: Boolean = false,
             nuw: Boolean = false
-        ): AddInstruction {
+        ): ConstantValue {
             require(!(nsw && nuw)) {
                 "Instruction can not declare both NUW & " +
                         "NSW"
@@ -633,7 +611,7 @@ public class Builder public constructor(
                 else -> LLVM.LLVMBuildAdd(ref, lhs.ref, rhs.ref, variable)
             }
 
-            return AddInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -648,10 +626,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): FAddInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildFAdd(ref, lhs.ref, rhs.ref, variable)
 
-            return FAddInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -671,7 +649,7 @@ public class Builder public constructor(
             variable: String,
             nsw: Boolean = false,
             nuw: Boolean = false
-        ): SubInstruction {
+        ): ConstantValue {
             require(!(nsw && nuw)) {
                 "Instruction can not declare both NUW & " +
                         "NSW"
@@ -683,7 +661,7 @@ public class Builder public constructor(
                 else -> LLVM.LLVMBuildSub(ref, lhs.ref, rhs.ref, variable)
             }
 
-            return SubInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -698,10 +676,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): FSubInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildFSub(ref, lhs.ref, rhs.ref, variable)
 
-            return FSubInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -721,7 +699,7 @@ public class Builder public constructor(
             variable: String,
             nsw: Boolean = false,
             nuw: Boolean = false
-        ): MulInstruction {
+        ): ConstantValue {
             require(!(nsw && nuw)) {
                 "Instruction can not declare both NUW & " +
                         "NSW"
@@ -733,7 +711,7 @@ public class Builder public constructor(
                 else -> LLVM.LLVMBuildMul(ref, lhs.ref, rhs.ref, variable)
             }
 
-            return MulInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -746,10 +724,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): FMulInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildMul(ref, lhs.ref, rhs.ref, variable)
 
-            return FMulInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -768,14 +746,14 @@ public class Builder public constructor(
             rhs: Value,
             variable: String,
             exact: Boolean = false
-        ): SDivInstruction {
+        ): ConstantValue {
             val inst = if (exact) {
                 LLVM.LLVMBuildExactSDiv(ref, lhs.ref, rhs.ref, variable)
             } else {
                 LLVM.LLVMBuildSDiv(ref, lhs.ref, rhs.ref, variable)
             }
 
-            return SDivInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -794,14 +772,14 @@ public class Builder public constructor(
             rhs: Value,
             variable: String,
             exact: Boolean = false
-        ): UDivInstruction {
+        ): ConstantValue {
             val inst = if (exact) {
                 LLVM.LLVMBuildExactUDiv(ref, lhs.ref, rhs.ref, variable)
             } else {
                 LLVM.LLVMBuildUDiv(ref, lhs.ref, rhs.ref, variable)
             }
 
-            return UDivInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -816,10 +794,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): FDivInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildFDiv(ref, lhs.ref, rhs.ref, variable)
 
-            return FDivInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -834,10 +812,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): URemInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildURem(ref, lhs.ref, rhs.ref, variable)
 
-            return URemInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -852,10 +830,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): SRemInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildSRem(ref, lhs.ref, rhs.ref, variable)
 
-            return SRemInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -872,10 +850,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): FRemInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildFRem(ref, lhs.ref, rhs.ref, variable)
 
-            return FRemInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -890,10 +868,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): ShlInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildShl(ref, lhs.ref, rhs.ref, variable)
 
-            return ShlInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -908,10 +886,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): LShrInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildLShr(ref, rhs.ref, lhs.ref, variable)
 
-            return LShrInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -926,10 +904,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): AShrInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildAShr(ref, rhs.ref, lhs.ref, variable)
 
-            return AShrInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -944,10 +922,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): AndInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildAnd(ref, rhs.ref, lhs.ref, variable)
 
-            return AndInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -962,10 +940,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): OrInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildOr(ref, lhs.ref, rhs.ref, variable)
 
-            return OrInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -980,10 +958,10 @@ public class Builder public constructor(
             lhs: Value,
             rhs: Value,
             variable: String
-        ): XorInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildXor(ref, lhs.ref, rhs.ref, variable)
 
-            return XorInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -999,7 +977,7 @@ public class Builder public constructor(
             variable: String,
             nuw: Boolean = false,
             nsw: Boolean = false
-        ): SubInstruction {
+        ): ConstantValue {
             require(!(nsw && nuw)) {
                 "Instruction can not declare both NUW & " +
                         "NSW"
@@ -1011,7 +989,7 @@ public class Builder public constructor(
                 else -> LLVM.LLVMBuildNeg(ref, value.ref, variable)
             }
 
-            return SubInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1022,10 +1000,10 @@ public class Builder public constructor(
          *
          * @see LLVM.LLVMBuildFNeg
          */
-        public fun createFNeg(value: Value, variable: String): FNegInstruction {
+        public fun createFNeg(value: Value, variable: String): ConstantValue {
             val inst = LLVM.LLVMBuildFNeg(ref, value.ref, variable)
 
-            return FNegInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1039,10 +1017,10 @@ public class Builder public constructor(
         public fun createNot(
             value: Value,
             variable: String
-        ): XorInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildNot(ref, value.ref, variable)
 
-            return XorInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1224,7 +1202,7 @@ public class Builder public constructor(
             indices: List<Value>,
             inBounds: Boolean,
             variable: String
-        ): GetElementPtrInstruction {
+        ): ConstantValue {
             val args = PointerPointer(*indices.map { it.ref }.toTypedArray())
             val inst = if (inBounds) {
                 LLVM.LLVMBuildInBoundsGEP2(
@@ -1246,7 +1224,7 @@ public class Builder public constructor(
                 )
             }
 
-            return GetElementPtrInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1263,10 +1241,10 @@ public class Builder public constructor(
             value: Value,
             target: IntType,
             variable: String
-        ): TruncInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildTrunc(ref, value.ref, target.ref, variable)
 
-            return TruncInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1283,10 +1261,10 @@ public class Builder public constructor(
             value: Value,
             target: IntType,
             variable: String
-        ): ZExtInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildZExt(ref, value.ref, target.ref, variable)
 
-            return ZExtInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1303,10 +1281,10 @@ public class Builder public constructor(
             value: Value,
             target: IntType,
             variable: String
-        ): SExtInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildSExt(ref, value.ref, target.ref, variable)
 
-            return SExtInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1323,7 +1301,7 @@ public class Builder public constructor(
             value: Value,
             target: IntType,
             variable: String
-        ): FPToUIInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildFPToUI(
                 ref,
                 value.ref,
@@ -1331,7 +1309,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return FPToUIInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1348,7 +1326,7 @@ public class Builder public constructor(
             value: Value,
             target: IntType,
             variable: String
-        ): FPToSIInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildFPToSI(
                 ref,
                 value.ref,
@@ -1356,7 +1334,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return FPToSIInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1373,7 +1351,7 @@ public class Builder public constructor(
             value: Value,
             target: FloatType,
             variable: String
-        ): UIToFPInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildUIToFP(
                 ref,
                 value.ref,
@@ -1381,7 +1359,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return UIToFPInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1398,7 +1376,7 @@ public class Builder public constructor(
             value: Value,
             target: IntType,
             variable: String
-        ): SIToFPInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildSIToFP(
                 ref,
                 value.ref,
@@ -1406,7 +1384,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return SIToFPInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1423,7 +1401,7 @@ public class Builder public constructor(
             value: Value,
             target: FloatType,
             variable: String
-        ): FPTruncInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildFPTrunc(
                 ref,
                 value.ref,
@@ -1431,7 +1409,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return FPTruncInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1448,7 +1426,7 @@ public class Builder public constructor(
             value: Value,
             target: FloatType,
             variable: String
-        ): FPExtInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildFPExt(
                 ref,
                 value.ref,
@@ -1456,7 +1434,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return FPExtInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1473,7 +1451,7 @@ public class Builder public constructor(
             value: Value,
             target: IntType,
             variable: String
-        ): PtrToIntInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildPtrToInt(
                 ref,
                 value.ref,
@@ -1481,7 +1459,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return PtrToIntInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1498,7 +1476,7 @@ public class Builder public constructor(
             value: Value,
             target: PointerType,
             variable: String
-        ): IntToPtrInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildIntToPtr(
                 ref,
                 value.ref,
@@ -1506,7 +1484,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return IntToPtrInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1522,7 +1500,7 @@ public class Builder public constructor(
             value: Value,
             target: Type,
             variable: String
-        ): BitCastInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildBitCast(
                 ref,
                 value.ref,
@@ -1530,7 +1508,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return BitCastInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1546,7 +1524,7 @@ public class Builder public constructor(
             value: Value,
             target: IntType,
             variable: String
-        ): AddrSpaceCastInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildAddrSpaceCast(
                 ref,
                 value.ref,
@@ -1554,7 +1532,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return AddrSpaceCastInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1571,7 +1549,7 @@ public class Builder public constructor(
             predicate: IntPredicate,
             rhs: Value,
             variable: String
-        ): ICmpInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildICmp(
                 ref,
                 predicate.value,
@@ -1580,7 +1558,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return ICmpInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1597,7 +1575,7 @@ public class Builder public constructor(
             predicate: RealPredicate,
             rhs: Value,
             variable: String
-        ): FCmpInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildFCmp(
                 ref,
                 predicate.value,
@@ -1606,7 +1584,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return FCmpInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1722,7 +1700,7 @@ public class Builder public constructor(
             vector: Value,
             index: Value,
             variable: String
-        ): ExtractElementInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildExtractElement(
                 ref,
                 vector.ref,
@@ -1730,7 +1708,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return ExtractElementInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1748,7 +1726,7 @@ public class Builder public constructor(
             index: Value,
             element: Value,
             variable: String
-        ): InsertElementInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildInsertElement(
                 ref,
                 vector.ref,
@@ -1757,7 +1735,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return InsertElementInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1772,7 +1750,7 @@ public class Builder public constructor(
             v2: Value,
             mask: Value,
             variable: String
-        ): ShuffleVectorInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildShuffleVector(
                 ref,
                 v1.ref,
@@ -1781,7 +1759,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return ShuffleVectorInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1797,7 +1775,7 @@ public class Builder public constructor(
             aggregate: Value,
             index: Int,
             variable: String
-        ): ExtractValueInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildExtractValue(
                 ref,
                 aggregate.ref,
@@ -1805,7 +1783,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return ExtractValueInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**
@@ -1823,7 +1801,7 @@ public class Builder public constructor(
             index: Int,
             value: Value,
             variable: String
-        ): InsertValueInstruction {
+        ): ConstantValue {
             val inst = LLVM.LLVMBuildInsertValue(
                 ref,
                 aggregate.ref,
@@ -1832,7 +1810,7 @@ public class Builder public constructor(
                 variable
             )
 
-            return InsertValueInstruction(inst)
+            return ConstantValue(inst)
         }
 
         /**

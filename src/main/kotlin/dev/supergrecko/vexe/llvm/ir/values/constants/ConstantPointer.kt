@@ -4,12 +4,11 @@ import dev.supergrecko.vexe.llvm.ir.Type
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
-import dev.supergrecko.vexe.llvm.ir.values.traits.ConstantValue
+import dev.supergrecko.vexe.llvm.ir.values.ConstantValue
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantPointer internal constructor() : Value(),
-    ConstantValue {
+public class ConstantPointer internal constructor() : ConstantValue() {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }

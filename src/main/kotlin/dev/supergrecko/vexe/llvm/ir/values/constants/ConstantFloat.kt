@@ -5,12 +5,11 @@ import dev.supergrecko.vexe.llvm.ir.RealPredicate
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.llvm.ir.values.traits.ConstantValue
+import dev.supergrecko.vexe.llvm.ir.values.ConstantValue
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantFloat internal constructor() : Value(),
-    ConstantValue {
+public class ConstantFloat internal constructor() : ConstantValue() {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }

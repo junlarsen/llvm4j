@@ -6,14 +6,14 @@ import dev.supergrecko.vexe.llvm.ir.IntPredicate
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
+import dev.supergrecko.vexe.llvm.ir.values.ConstantValue
 import dev.supergrecko.vexe.llvm.ir.values.traits.CompositeValue
-import dev.supergrecko.vexe.llvm.ir.values.traits.ConstantValue
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantVector internal constructor() : Value(),
-    ConstantValue, CompositeValue {
+public class ConstantVector internal constructor() : ConstantValue(),
+    CompositeValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }
@@ -455,7 +455,10 @@ public class ConstantVector internal constructor() : Value(),
      *
      * The [value] must be of the same type as what this vector holds.
      */
-    public fun getInsertElement(index: ConstantInt, value: Value): ConstantVector {
+    public fun getInsertElement(
+        index: ConstantInt,
+        value: Value
+    ): ConstantVector {
         // LLVM has InsertElement(this, value, index) which is why args are
         // swapped
         val ref = LLVM.LLVMConstInsertElement(ref, value.ref, index.ref)
