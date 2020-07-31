@@ -9,13 +9,11 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.global.LLVM
 
-/**
- * If value is 0 then no intrinsic was found
- *
- * See https://llvm.org/doxygen/Intrinsics_8h_source.html#l00036
- */
 public class IntrinsicFunction internal constructor() {
     //region Core::Values::Constants::FunctionValues
+    /**
+     * If this value is `0` then no intrinsic was found
+     */
     public var id: Int = 0
 
     /**

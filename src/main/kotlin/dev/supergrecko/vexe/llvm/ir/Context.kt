@@ -13,10 +13,8 @@ import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.global.LLVM
 
 public class Context public constructor(
-    llvmRef: LLVMContextRef = LLVM.LLVMContextCreate()
-) : Disposable,
-    ContainsReference<LLVMContextRef> {
-    public override val ref = llvmRef
+    public override val ref: LLVMContextRef = LLVM.LLVMContextCreate()
+) : Disposable, ContainsReference<LLVMContextRef> {
     public override var valid: Boolean = true
 
     //region Core::Context

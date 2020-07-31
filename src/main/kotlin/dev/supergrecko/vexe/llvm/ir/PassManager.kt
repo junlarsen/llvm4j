@@ -26,7 +26,7 @@ public class PassManager internal constructor() : Disposable,
     }
     //endregion Target
 
-    override fun dispose() {
+    public override fun dispose() {
         require(valid) { "This module has already been disposed." }
 
         valid = false

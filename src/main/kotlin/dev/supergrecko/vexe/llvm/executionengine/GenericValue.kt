@@ -11,9 +11,9 @@ import org.bytedeco.llvm.global.LLVM
 
 public class GenericValue internal constructor() : Disposable,
     ContainsReference<LLVMGenericValueRef> {
+    public override var valid: Boolean = true
     public override lateinit var ref: LLVMGenericValueRef
         internal set
-    public override var valid: Boolean = true
 
     public constructor(llvmRef: LLVMGenericValueRef) : this() {
         ref = llvmRef
@@ -92,7 +92,7 @@ public class GenericValue internal constructor() : Disposable,
     }
     //endregion ExecutionEngine
 
-    override fun dispose() {
+    public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }
 
         valid = false

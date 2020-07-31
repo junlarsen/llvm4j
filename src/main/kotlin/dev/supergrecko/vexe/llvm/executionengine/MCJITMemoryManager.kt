@@ -16,9 +16,9 @@ import org.bytedeco.llvm.global.LLVM
 
 public class MCJITMemoryManager internal constructor() :
     ContainsReference<LLVMMCJITMemoryManagerRef>, Disposable {
+    public override var valid: Boolean = true
     public override lateinit var ref: LLVMMCJITMemoryManagerRef
         internal set
-    public override var valid: Boolean = true
 
     public constructor(llvmRef: LLVMMCJITMemoryManagerRef) : this() {
         ref = llvmRef
@@ -51,7 +51,7 @@ public class MCJITMemoryManager internal constructor() :
     }
     //endregion ExecutionEngine
 
-    override fun dispose() {
+    public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }
 
         valid = false

@@ -1,5 +1,6 @@
 package dev.supergrecko.vexe.llvm.ir.values
 
+import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.ir.ThreadLocalMode
@@ -82,7 +83,9 @@ public class GlobalVariable internal constructor() : Value(),
     public fun getThreadLocalMode(): ThreadLocalMode {
         val tlm = LLVM.LLVMGetThreadLocalMode(ref)
 
-        return ThreadLocalMode.values().first { it.value == tlm }
+        return ThreadLocalMode.values()
+            .firstOrNull { it.value == tlm }
+            ?: throw Unreachable()
     }
 
     /**

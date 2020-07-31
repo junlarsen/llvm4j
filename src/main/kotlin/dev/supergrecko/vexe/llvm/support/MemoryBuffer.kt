@@ -11,9 +11,9 @@ import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
 public class MemoryBuffer internal constructor() : Disposable {
+    public override var valid: Boolean = true
     public lateinit var ref: LLVMMemoryBufferRef
         internal set
-    public override var valid: Boolean = true
 
     public constructor(llvmRef: LLVMMemoryBufferRef) : this() {
         ref = llvmRef
@@ -101,7 +101,7 @@ public class MemoryBuffer internal constructor() : Disposable {
     }
     //endregion MemoryBuffers
 
-    override fun dispose() {
+    public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }
 
         valid = false

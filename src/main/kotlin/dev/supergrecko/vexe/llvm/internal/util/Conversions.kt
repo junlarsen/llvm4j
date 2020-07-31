@@ -1,7 +1,5 @@
 package dev.supergrecko.vexe.llvm.internal.util
 
-import org.bytedeco.javacpp.Pointer
-
 /**
  * Util function to convert kotlin [Int] to [Boolean]
  *

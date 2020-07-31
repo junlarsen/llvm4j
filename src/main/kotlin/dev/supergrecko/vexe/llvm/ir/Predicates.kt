@@ -3,13 +3,6 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
-/**
- * Support types matching LLVMIntPredicate
- *
- * This is used for comparison method between two integers
- *
- * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
- */
 public enum class IntPredicate(public override val value: Int) :
     OrderedEnum<Int> {
     EQ(LLVM.LLVMIntEQ),
@@ -24,11 +17,6 @@ public enum class IntPredicate(public override val value: Int) :
     SLE(LLVM.LLVMIntSLE)
 }
 
-/**
- * Support types matching LLVMRealPredicate
- *
- * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
- */
 public enum class RealPredicate(public override val value: Int) :
     OrderedEnum<Int> {
     PredicateFalse(LLVM.LLVMRealPredicateFalse),
