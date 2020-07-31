@@ -8,9 +8,9 @@ import org.bytedeco.llvm.global.LLVM
 public class ModuleProvider internal constructor() : Disposable,
     ContainsReference<LLVMModuleProviderRef> {
     private lateinit var module: Module
+    public override var valid: Boolean = true
     public override lateinit var ref: LLVMModuleProviderRef
         internal set
-    public override var valid: Boolean = true
 
     public constructor(parent: Module) : this() {
         require(parent.valid) {
@@ -21,7 +21,7 @@ public class ModuleProvider internal constructor() : Disposable,
         ref = LLVM.LLVMCreateModuleProviderForExistingModule(parent.ref)
     }
 
-    override fun dispose() {
+    public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }
 
         valid = false

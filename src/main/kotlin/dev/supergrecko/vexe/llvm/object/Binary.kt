@@ -5,15 +5,14 @@ import org.bytedeco.llvm.LLVM.LLVMBinaryRef
 import org.bytedeco.llvm.global.LLVM
 
 public class Binary internal constructor() : Disposable {
+    public override var valid: Boolean = true
     public lateinit var ref: LLVMBinaryRef
         internal set
-    public override var valid: Boolean = true
-
     public constructor(llvmRef: LLVMBinaryRef) : this() {
         ref = llvmRef
     }
 
-    override fun dispose() {
+    public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }
 
         valid = false

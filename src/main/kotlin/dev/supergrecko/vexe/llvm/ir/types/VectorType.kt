@@ -6,8 +6,7 @@ import dev.supergrecko.vexe.llvm.ir.types.traits.SequentialType
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class VectorType internal constructor() : Type(),
-    CompositeType,
+public class VectorType internal constructor() : Type(), CompositeType,
     SequentialType {
     public constructor(llvmType: LLVMTypeRef) : this() {
         ref = llvmType

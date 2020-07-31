@@ -8,34 +8,10 @@ import dev.supergrecko.vexe.llvm.ir.MetadataEntries
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.Type
 import dev.supergrecko.vexe.llvm.ir.UnnamedAddress
-import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.Visibility
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
-
-/**
- * Enum representing linkage types
- */
-public enum class Linkage(public override val value: Int) : OrderedEnum<Int> {
-    External(LLVM.LLVMExternalLinkage),
-    AvailableExternally(LLVM.LLVMAvailableExternallyLinkage),
-    LinkOnceAny(LLVM.LLVMLinkOnceAnyLinkage),
-    LinkOnceODR(LLVM.LLVMLinkOnceODRLinkage),
-    LinkOnceODRAutoHide(LLVM.LLVMLinkOnceODRAutoHideLinkage),
-    WeakAny(LLVM.LLVMWeakAnyLinkage),
-    WeakODR(LLVM.LLVMWeakODRLinkage),
-    Appending(LLVM.LLVMAppendingLinkage),
-    Internal(LLVM.LLVMInternalLinkage),
-    Private(LLVM.LLVMPrivateLinkage),
-    DLLImport(LLVM.LLVMDLLImportLinkage),
-    DLLExport(LLVM.LLVMDLLExportLinkage),
-    ExternalWeak(LLVM.LLVMExternalWeakLinkage),
-    Ghost(LLVM.LLVMGhostLinkage),
-    Common(LLVM.LLVMCommonLinkage),
-    LinkerPrivate(LLVM.LLVMLinkerPrivateLinkage),
-    PrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage),
-}
 
 public open class GlobalValue internal constructor() : ConstantValue() {
     public constructor(llvmRef: LLVMValueRef) : this() {
@@ -234,4 +210,24 @@ public open class GlobalValue internal constructor() : ConstantValue() {
         return MetadataEntries(entries, ptr)
     }
     //endregion Core::Values::Constants::GlobalValues
+
+    public enum class Linkage(public override val value: Int) : OrderedEnum<Int> {
+        External(LLVM.LLVMExternalLinkage),
+        AvailableExternally(LLVM.LLVMAvailableExternallyLinkage),
+        LinkOnceAny(LLVM.LLVMLinkOnceAnyLinkage),
+        LinkOnceODR(LLVM.LLVMLinkOnceODRLinkage),
+        LinkOnceODRAutoHide(LLVM.LLVMLinkOnceODRAutoHideLinkage),
+        WeakAny(LLVM.LLVMWeakAnyLinkage),
+        WeakODR(LLVM.LLVMWeakODRLinkage),
+        Appending(LLVM.LLVMAppendingLinkage),
+        Internal(LLVM.LLVMInternalLinkage),
+        Private(LLVM.LLVMPrivateLinkage),
+        DLLImport(LLVM.LLVMDLLImportLinkage),
+        DLLExport(LLVM.LLVMDLLExportLinkage),
+        ExternalWeak(LLVM.LLVMExternalWeakLinkage),
+        Ghost(LLVM.LLVMGhostLinkage),
+        Common(LLVM.LLVMCommonLinkage),
+        LinkerPrivate(LLVM.LLVMLinkerPrivateLinkage),
+        PrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage),
+    }
 }

@@ -109,9 +109,9 @@ public class ExecutionEngine public constructor() :
      */
     public fun removeModule(module: Module) {
         val err = ByteArray(0)
-        val success = LLVM.LLVMRemoveModule(ref, module.ref, module.ref, err)
+        val result = LLVM.LLVMRemoveModule(ref, module.ref, module.ref, err)
 
-        if (!success.fromLLVMBool()) {
+        if (result != 0) {
             throw RuntimeException(err.contentToString())
         }
     }
@@ -178,7 +178,7 @@ public class ExecutionEngine public constructor() :
     }
     //endregion ExecutionEngine
 
-    override fun dispose() {
+    public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }
 
         valid = false

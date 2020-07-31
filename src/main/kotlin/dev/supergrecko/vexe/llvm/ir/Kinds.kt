@@ -3,11 +3,6 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
-/**
- * Support types matching LLVMTypeKind
- *
- * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
- */
 public enum class TypeKind(public override val value: Int) : OrderedEnum<Int> {
     Void(LLVM.LLVMVoidTypeKind),
     Half(LLVM.LLVMHalfTypeKind),
@@ -28,11 +23,6 @@ public enum class TypeKind(public override val value: Int) : OrderedEnum<Int> {
     Token(LLVM.LLVMTokenTypeKind)
 }
 
-/**
- * Support types matching LLVMValueKind
- *
- * [Documentation](https://llvm.org/doxygen/group__LLVMCCoreTypes.html)
- */
 public enum class ValueKind(public override val value: Int) : OrderedEnum<Int> {
     Argument(LLVM.LLVMArgumentValueKind),
     BasicBlock(LLVM.LLVMBasicBlockValueKind),

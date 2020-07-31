@@ -8,4 +8,12 @@ package dev.supergrecko.vexe.llvm.internal.contracts
  * done some sort of assertion which the Kotlin compiler is not capable of
  * realizing and thus leaving you with an open branch.
  */
-public class Unreachable : RuntimeException("Unreachable code")
+public class Unreachable : RuntimeException(
+    """
+    This piece of code should have been semantically be unreachable.
+    
+    If you received this exception, please open an issue at the github repository
+    (https://github.com/supergrecko/llvm4kt) with reproduction steps so this 
+    issue can be dealt with.
+    """.trimIndent()
+)

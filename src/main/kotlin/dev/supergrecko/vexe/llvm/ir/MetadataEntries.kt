@@ -22,6 +22,9 @@ public class MetadataEntries internal constructor() :
         sizePtr = size
     }
 
+    /**
+     * Get the amount of items in this collection
+     */
     public fun size(): Long {
         return sizePtr.get()
     }

@@ -39,12 +39,12 @@ import org.bytedeco.llvm.global.LLVM
 public class Builder public constructor(
     context: Context = Context.getGlobalContext()
 ) : Disposable, ContainsReference<LLVMBuilderRef> {
+    public override var valid: Boolean = true
+    private val builder: IRBuilder = IRBuilder()
     public override var ref: LLVMBuilderRef = LLVM.LLVMCreateBuilderInContext(
         context.ref
     )
         internal set
-    public override var valid: Boolean = true
-    private val builder: IRBuilder = IRBuilder()
 
     public constructor(llvmRef: LLVMBuilderRef) : this() {
         ref = llvmRef
@@ -1887,7 +1887,7 @@ public class Builder public constructor(
     }
     //endregion InstructionBuilders
 
-    override fun dispose() {
+    public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }
 
         valid = false

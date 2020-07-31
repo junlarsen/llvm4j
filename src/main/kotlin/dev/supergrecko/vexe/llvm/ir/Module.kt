@@ -25,9 +25,9 @@ import org.bytedeco.llvm.global.LLVM
 
 public class Module internal constructor() : Disposable,
     ContainsReference<LLVMModuleRef>, Cloneable {
+    public override var valid: Boolean = true
     public override lateinit var ref: LLVMModuleRef
         internal set
-    public override var valid: Boolean = true
 
     public constructor(llvmRef: LLVMModuleRef) : this() {
         ref = llvmRef
