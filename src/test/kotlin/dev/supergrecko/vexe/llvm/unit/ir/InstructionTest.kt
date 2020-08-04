@@ -6,11 +6,8 @@ import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.Metadata
 import dev.supergrecko.vexe.llvm.ir.Opcode
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
-import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
-import org.junit.jupiter.api.assertThrows
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
