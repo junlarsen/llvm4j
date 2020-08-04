@@ -33,7 +33,7 @@ public class IR(pointer: BytePointer) : Message(pointer) {
         return toString() == other.toString()
     }
 
-    public override fun hashCode(): Int = pointer.hashCode()
+    public override fun hashCode(): Int = ref.hashCode()
 
     public override fun toString(): String = getString()
 }
