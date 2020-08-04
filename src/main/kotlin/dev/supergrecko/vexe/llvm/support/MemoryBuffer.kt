@@ -27,8 +27,13 @@ public class MemoryBuffer internal constructor() : Disposable {
      */
     public fun parse(context: Context = Context.getGlobalContext()): Module {
         val ptr = LLVMModuleRef()
+        val res = LLVM.LLVMParseBitcodeInContext2(context.ref, ref, ptr)
 
-        LLVM.LLVMParseBitcodeInContext2(context.ref, ref, ptr)
+        if (res != 0) {
+            throw RuntimeException(
+                "Could not parse module from contents: " + getStart().string
+            )
+        }
 
         return Module(ptr)
     }
@@ -42,10 +47,15 @@ public class MemoryBuffer internal constructor() : Disposable {
      */
     public fun getModule(
         context: Context = Context.getGlobalContext()
-    ): Module {
+    ): Module? {
         val ptr = LLVMModuleRef()
+        val res = LLVM.LLVMGetBitcodeModuleInContext2(context.ref, ref, ptr)
 
-        LLVM.LLVMGetBitcodeModuleInContext2(context.ref, ref, ptr)
+        if (res != 0) {
+            throw RuntimeException(
+                "Could not create module from contents: " + getStart().string
+            )
+        }
 
         return Module(ptr)
     }
