@@ -9,7 +9,7 @@ import dev.supergrecko.vexe.llvm.ir.values.traits.DebugLocationValue
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class GlobalVariable internal constructor() : Value(),
+public class GlobalVariable internal constructor() : GlobalValue(),
     DebugLocationValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
