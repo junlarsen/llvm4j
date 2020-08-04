@@ -1,5 +1,6 @@
 package dev.supergrecko.vexe.llvm.support
 
+import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.global.LLVM
@@ -10,10 +11,31 @@ import org.bytedeco.llvm.global.LLVM
  * These byte pointers are retrieved via JNI. Failing to de-allocate them will
  * leak memory.
  */
-public open class Message(
-    protected open val pointer: BytePointer
-) : Disposable {
+public open class Message internal constructor() : Disposable,
+    ContainsReference<BytePointer> {
     public override var valid: Boolean = true
+    public final override lateinit var ref: BytePointer
+
+    /**
+     * Create a Message from a string
+     *
+     * @see LLVM.LLVMCreateMessage
+     */
+    public constructor(message: String) : this() {
+        val ptr = BytePointer(message)
+
+        ref = LLVM.LLVMCreateMessage(ptr)
+    }
+
+    /**
+     * Create a message from a byte pointer
+     *
+     * This constructor should not be used with a byte pointer which did not
+     * originally come from LLVM.
+     */
+    public constructor(pointer: BytePointer) : this() {
+        ref = pointer
+    }
 
     /**
      * Get a string representation of this [Message]
@@ -24,7 +46,7 @@ public open class Message(
     public fun getString(): String {
         require(valid) { "Cannot use disposed memory" }
 
-        return pointer.string
+        return ref.string
     }
 
     public override fun dispose() {
@@ -32,6 +54,6 @@ public open class Message(
 
         valid = false
 
-        LLVM.LLVMDisposeMessage(pointer)
+        LLVM.LLVMDisposeMessage(ref)
     }
 }
