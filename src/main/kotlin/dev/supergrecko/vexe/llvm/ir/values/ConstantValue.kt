@@ -16,8 +16,6 @@ public open class ConstantValue internal constructor() : Value() {
     /**
      * Get the opcode for a constant value
      *
-     * TODO: Move this, presumably to instructions?
-     *
      * @see LLVM.LLVMGetConstOpcode
      */
     public fun getOpcode(): Opcode? {
@@ -54,8 +52,6 @@ public open class ConstantValue internal constructor() : Value() {
      * This is an LLVM-C/C++ specific API. It is not a part of the
      * instruction set.
      *
-     * TODO: Find out which types are compatible here, int?
-     *
      * @see LLVM.LLVMConstSExtOrBitCast
      * @see LLVM.LLVMConstZExtOrBitCast
      */
@@ -89,8 +85,6 @@ public open class ConstantValue internal constructor() : Value() {
 
     /**
      * Attempt to truncate, default to bitcast
-     *
-     * TODO: Find out which types are compatible here, int?
      *
      * @see LLVM.LLVMConstTruncOrBitCast
      */

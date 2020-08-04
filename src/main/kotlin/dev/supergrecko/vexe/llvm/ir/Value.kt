@@ -126,8 +126,6 @@ public open class Value internal constructor() :
     /**
      * Replaces all usages of this value with [value]
      *
-     * TODO: Move this, presumably to Uses?
-     *
      * @see LLVM.LLVMReplaceAllUsesWith
      */
     public fun replaceAllUsesWith(value: Value) {
@@ -192,11 +190,13 @@ public open class Value internal constructor() :
      *
      * This is done by unwrapping the instance into a BasicBlock
      *
-     * TODO: Research more about this cast
-     *
      * @see LLVM.LLVMValueAsBasicBlock
      */
     public fun toBasicBlock(): BasicBlock {
+        require(isBasicBlock()) {
+            "This value is not a basic block"
+        }
+
         val bb = LLVM.LLVMValueAsBasicBlock(ref)
 
         return BasicBlock(bb)

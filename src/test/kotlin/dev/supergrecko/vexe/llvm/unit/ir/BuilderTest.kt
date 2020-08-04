@@ -29,11 +29,6 @@ internal class BuilderTest : TestSuite({
         assertNull(builder.getInsertionBlock())
 
         builder.setPositionAtEnd(basicBlock)
-        // A simple comparison won't do because even though the
-        // underlying reference is the same, the Builder object
-        // that holds the reference is different
-        // TODO?: Implement equals/hashCode for Builder by comparing underlying
-        //   refs?
         assertEquals(builder.getInsertionBlock()?.ref, basicBlock.ref)
 
         builder.clear()

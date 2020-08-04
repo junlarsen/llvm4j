@@ -91,9 +91,6 @@ public class MemoryBuffer internal constructor() : Disposable {
     /**
      * Get the size of the buffer
      *
-     * TODO: Find a reliable, x-platform way to test this as different
-     *   platforms return different sizes for values
-     *
      * @see LLVM.LLVMGetBufferSize
      */
     public fun getSize(): Long {

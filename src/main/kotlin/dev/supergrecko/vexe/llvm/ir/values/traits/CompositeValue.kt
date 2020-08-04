@@ -13,10 +13,6 @@ public interface CompositeValue : ContainsReference<LLVMValueRef> {
     /**
      * Get an element at specified [index] as a constant
      *
-     * This is shared with [ConstantArray], [ConstantVector], [ConstantStruct]
-     *
-     * TODO: Move into shared contract
-     *
      * @see LLVM.LLVMGetElementAsConstant
      */
     public fun getElementAsConstant(index: Int): Value {

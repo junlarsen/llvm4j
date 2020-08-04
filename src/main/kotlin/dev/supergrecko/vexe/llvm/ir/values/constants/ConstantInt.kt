@@ -41,7 +41,7 @@ public class ConstantInt internal constructor() : ConstantValue() {
     /**
      * Create a constant integer of arbitrary precision
      *
-     * TODO: Find out how the words constructor actually works
+     * TODO: Research how this constructor works
      *
      * @see LLVM.LLVMConstIntOfArbitraryPrecision
      */
@@ -213,8 +213,6 @@ public class ConstantInt internal constructor() : ConstantValue() {
      *
      * If the [exact] arg is present, the result value of the sdiv/udiv is a
      * poison value if the result would be rounded.
-     *
-     * TODO: Find a way to determine if types is unsigned
      *
      * @see LLVM.LLVMConstUDiv
      * @see LLVM.LLVMConstSDiv
