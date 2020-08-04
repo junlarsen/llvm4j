@@ -4,13 +4,13 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.bytedeco.llvm.global.LLVM
+import org.spekframework.spek2.Spek
 
-internal class FunctionTypeTest : TestSuite({
-    describe("Creation of parameter-less function") {
+internal class FunctionTypeTest : Spek({
+    test("create parameter-less function type") {
         val ret = IntType(64)
         val fn = FunctionType(ret, listOf(), true)
 
@@ -18,7 +18,7 @@ internal class FunctionTypeTest : TestSuite({
         assertTrue { fn.getReturnType().ref == ret.ref }
     }
 
-    describe("Creation of variadic function") {
+    test("create of variadic function type") {
         val ret = IntType(64)
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)
@@ -26,7 +26,7 @@ internal class FunctionTypeTest : TestSuite({
         assertTrue { fn.isVariadic() }
     }
 
-    describe("Parameter size matches") {
+    test("the given parameter size matches") {
         val ret = IntType(64)
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)
@@ -34,7 +34,7 @@ internal class FunctionTypeTest : TestSuite({
         assertEquals(LLVM.LLVMCountParamTypes(fn.ref), fn.getParameterCount())
     }
 
-    describe("List of parameters match") {
+    test("the passed parameters match") {
         val ret = IntType(64)
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)
@@ -48,7 +48,7 @@ internal class FunctionTypeTest : TestSuite({
         }
     }
 
-    describe("Return type matches") {
+    test("the given return type matches") {
         val ret = IntType(64)
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)

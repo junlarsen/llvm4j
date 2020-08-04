@@ -4,13 +4,19 @@ import dev.supergrecko.vexe.llvm.ir.Builder
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.llvm.utils.cleanup
-import dev.supergrecko.vexe.test.TestSuite
+import dev.supergrecko.vexe.llvm.setup
+import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
+import org.spekframework.spek2.Spek
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
-internal class IndirectBrInstructionTest : TestSuite({
-    describe("Indirect Branching") {
-        val builder = Builder()
-        val module = Module("test.ll")
+internal class IndirectBrInstructionTest : Spek({
+    setup()
+
+    val module: Module by memoized()
+    val builder: Builder by memoized()
+
+    test("create indirect branch") {
         val function = module.createFunction(
             "test", FunctionType(
                 IntType(32),
@@ -18,12 +24,8 @@ internal class IndirectBrInstructionTest : TestSuite({
             )
         )
         val base = function.createBlock("Entry").toValue()
+        val instr = builder.build().createIndirectBr(base)
 
-        describe("Creating a basic break") {
-            builder.build()
-                .createIndirectBr(base)
-        }
-
-        cleanup(module, builder)
+        assertNotNull(instr)
     }
 })

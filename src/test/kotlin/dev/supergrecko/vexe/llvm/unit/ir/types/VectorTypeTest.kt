@@ -4,12 +4,12 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VectorType
-import dev.supergrecko.vexe.test.TestSuite
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-internal class VectorTypeTest : TestSuite({
-    describe("Creation from user-land constructor") {
+internal class VectorTypeTest : Spek({
+    test("create a vector type of 1000 integers") {
         val type = IntType(32)
         val vec = type.toVectorType(1000)
 
@@ -17,14 +17,7 @@ internal class VectorTypeTest : TestSuite({
         assertEquals(1000, vec.getElementCount())
     }
 
-    describe("Creation via LLVM reference") {
-        val type = IntType(16).toVectorType(10)
-        val second = VectorType(type.ref)
-
-        assertEquals(TypeKind.Vector, second.getTypeKind())
-    }
-
-    describe("The type of the elements match the vector type") {
+    test("the element type matches the original type") {
         val type = IntType(32)
         val vec = VectorType(type, 10)
 
@@ -32,7 +25,7 @@ internal class VectorTypeTest : TestSuite({
         assertEquals(type.ref, vec.getElementType().ref)
     }
 
-    describe("The subtypes match") {
+    test("the subtype matches the original type") {
         val type = IntType(32)
         val vec = VectorType(type, 10)
 
@@ -40,7 +33,7 @@ internal class VectorTypeTest : TestSuite({
         assertEquals(type.ref, vec.getSubtypes().first().ref)
     }
 
-    describe("Allocating a vector type with negative size fails") {
+    test("creating a vector of negative size fails") {
         val type = FloatType(TypeKind.Float)
 
         assertFailsWith<IllegalArgumentException> {
@@ -51,5 +44,4 @@ internal class VectorTypeTest : TestSuite({
             VectorType(type, -100)
         }
     }
-}
-)
+})

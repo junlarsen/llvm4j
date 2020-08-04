@@ -3,12 +3,12 @@ package dev.supergrecko.vexe.llvm.unit.ir.types
 import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.ArrayType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.test.TestSuite
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-internal class ArrayTypeTest : TestSuite({
-    describe("Creation from user-land constructor") {
+internal class ArrayTypeTest : Spek({
+    test("create an array type with 10 elements") {
         val type = IntType(64)
         val arr = type.toArrayType(10)
 
@@ -16,14 +16,7 @@ internal class ArrayTypeTest : TestSuite({
         assertEquals(10, arr.getElementCount())
     }
 
-    describe("Creation via LLVM reference") {
-        val type = IntType(1).toArrayType(10)
-        val second = ArrayType(type.ref)
-
-        assertEquals(TypeKind.Array, second.getTypeKind())
-    }
-
-    describe("The LLVMType references match each other") {
+    test("the element type of an array matches the original type") {
         val type = IntType(32)
         val arr = ArrayType(type, 10)
 
@@ -31,7 +24,7 @@ internal class ArrayTypeTest : TestSuite({
         assertEquals(type.ref, arr.getElementType().ref)
     }
 
-    describe("The Subtype trait refers to the same LLVMType") {
+    test("the subtype matches the original type") {
         val type = IntType(32)
         val arr = ArrayType(type, 10)
 
@@ -41,7 +34,7 @@ internal class ArrayTypeTest : TestSuite({
         assertEquals(type.ref, children.first().ref)
     }
 
-    describe("Declaring type of negative size fails") {
+    test("an array may not have a negative size") {
         val type = IntType(32)
 
         assertFailsWith<IllegalArgumentException> {

@@ -4,36 +4,31 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
-import dev.supergrecko.vexe.test.TestSuite
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-internal class StructureTypeTest : TestSuite({
-    describe("Creation from user-land constructor") {
+internal class StructureTypeTest : Spek({
+    test("create an empty structure type") {
         val type = StructType(listOf(), false)
 
         assertEquals(TypeKind.Struct, type.getTypeKind())
     }
 
-    describe("Creation via LLVM reference") {
-        val type = StructType(listOf(IntType(16)), false)
-        val second = StructType(type.ref)
-
-        assertEquals(TypeKind.Struct, second.getTypeKind())
-    }
-
-    describe("All structures are sized") {
+    test("all structures are sized") {
         val arg = FloatType(TypeKind.Float)
         val type = StructType(listOf(arg), false)
 
         assertTrue { type.isSized() }
 
+        // Yes, even structs without a defined body
         val struct = StructType(listOf(), false)
 
         assertTrue { struct.isSized() }
     }
 
-    describe("Struct element size matches") {
+    test("the element size matches") {
         val struct1 = StructType(listOf(), false)
         val struct2 = StructType(listOf(IntType(32)), false)
 
@@ -41,7 +36,7 @@ internal class StructureTypeTest : TestSuite({
         assertEquals(1, struct2.getElementCount())
     }
 
-    describe("Element types match") {
+    test("retrieved element types match") {
         val elements = listOf(IntType(32))
         val struct = StructType(elements, false)
 
@@ -49,34 +44,40 @@ internal class StructureTypeTest : TestSuite({
         assertEquals(elements.first().ref, first.ref)
     }
 
-    describe("A packed struct is packed") {
+    test("structures may be flagged packed") {
         val struct = StructType(listOf(), true)
 
         assertTrue { struct.isPacked() }
     }
 
-    describe("An unnamed struct is literal") {
-        val struct = StructType(listOf(), true)
+    group("literal structs") {
+        test("an empty named struct is not literal") {
+            val struct = StructType("test")
 
-        assertTrue { struct.isLiteral() }
-    }
+            assertFalse { struct.isLiteral() }
+        }
 
-    describe("Giving a structure a name matches") {
-        val struct = StructType("StructureName")
+        test("the structure name matches") {
+            val struct = StructType("test_this")
 
-        assertEquals("StructureName", struct.getName())
+            assertEquals("test_this", struct.getName())
+        }
 
-        assertTrue { struct.isOpaque() }
-    }
+        test("unnamed structs are opaque") {
+            val struct = StructType("test")
 
-    describe("An opaque struct is no longer opaque after body is set") {
-        val struct = StructType("test_struct")
+            assertTrue { struct.isOpaque() }
+        }
 
-        assertEquals(true, struct.isOpaque())
+        test("An opaque struct is no longer opaque after body is set") {
+            val struct = StructType("test")
 
-        val elements = listOf(IntType(32))
-        struct.setBody(elements, false)
+            assertEquals(true, struct.isOpaque())
 
-        assertEquals(false, struct.isOpaque())
+            val elements = listOf(IntType(32))
+            struct.setBody(elements, false)
+
+            assertEquals(false, struct.isOpaque())
+        }
     }
 })

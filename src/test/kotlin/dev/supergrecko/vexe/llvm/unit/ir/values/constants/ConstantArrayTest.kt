@@ -4,19 +4,12 @@ import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantArray
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.utils.constIntPairOf
-import dev.supergrecko.vexe.test.TestSuite
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-internal class ConstantArrayTest : TestSuite({
-    describe("Creation via LLVM reference") {
-        val str = ConstantArray("Hello")
-        val borrow = ConstantArray(str.ref)
-
-        assertEquals(str.ref, borrow.ref)
-    }
-
-    describe("Creation of string (i8 array) from user-land") {
+internal class ConstantArrayTest : Spek({
+    test("create string as constant i8 array") {
         val str = ConstantArray("Hello")
 
         assertTrue { str.isConstantString() }
@@ -25,7 +18,7 @@ internal class ConstantArrayTest : TestSuite({
         assertEquals("Hello", str.getAsString())
     }
 
-    describe("Creation from user-land constructor") {
+    test("create a constant array") {
         val ty = IntType(8)
         val (one, two) = constIntPairOf(1, 2)
         val arr = ConstantArray(ty, listOf(one, two))

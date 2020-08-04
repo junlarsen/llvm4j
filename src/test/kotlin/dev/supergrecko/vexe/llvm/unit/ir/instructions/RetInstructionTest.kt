@@ -7,15 +7,20 @@ import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.cleanup
-import dev.supergrecko.vexe.test.TestSuite
+import dev.supergrecko.vexe.llvm.setup
+import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-internal class RetInstructionTest : TestSuite({
-    describe("Creation of ret void instruction") {
-        val builder = Builder()
+internal class RetInstructionTest : Spek({
+    setup()
+
+    val module: Module by memoized()
+    val builder: Builder by memoized()
+
+    test("create void return") {
         val inst = builder
             .build()
             .createRetVoid()
@@ -23,11 +28,10 @@ internal class RetInstructionTest : TestSuite({
         assertTrue { inst.isTerminator() }
         assertNull(inst.getInstructionBlock())
 
-        cleanup(builder)
+        assertTrue { module.verify(VerifierFailureAction.ReturnStatus) }
     }
 
-    describe("Creation of ret i32 0 instruction") {
-        val builder = Builder()
+    test("create a value return") {
         val value = ConstantInt(IntType(32), 0)
         val inst = builder
             .build()
@@ -35,21 +39,19 @@ internal class RetInstructionTest : TestSuite({
 
         assertTrue { inst.isTerminator() }
         assertEquals(Opcode.Ret, inst.getOpcode())
-
-        cleanup(builder)
+        assertTrue { module.verify(VerifierFailureAction.ReturnStatus) }
     }
 
-    describe("Creation of aggregate ret") {
-        val module = Module("test.ll")
-        val function = module.createFunction("test", FunctionType(
-            StructType(listOf(IntType(1), IntType(1)), false),
-            listOf(),
-            false
-        ))
+    test("create aggregate return") {
+        val function = module.createFunction(
+            "test", FunctionType(
+                StructType(listOf(IntType(1), IntType(1)), false),
+                listOf(),
+                false
+            )
+        )
         val block = function.createBlock("entry")
-        val builder = Builder().apply {
-            setPositionAtEnd(block)
-        }
+        builder.setPositionAtEnd(block)
 
         val left = ConstantInt(IntType(1), 1)
         val right = ConstantInt(IntType(1), 0)
@@ -60,7 +62,6 @@ internal class RetInstructionTest : TestSuite({
         val ir = "  ret { i1, i1 } { i1 true, i1 false }"
 
         assertEquals(ir, inst.getIR().toString())
-
-        cleanup(builder, module)
+        assertTrue { module.verify(VerifierFailureAction.ReturnStatus) }
     }
 })

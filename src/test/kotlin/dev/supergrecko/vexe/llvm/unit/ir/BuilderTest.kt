@@ -3,85 +3,54 @@ package dev.supergrecko.vexe.llvm.unit.ir
 import dev.supergrecko.vexe.llvm.ir.Builder
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
-import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.utils.cleanup
-import dev.supergrecko.vexe.test.TestSuite
+import dev.supergrecko.vexe.llvm.setup
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-internal class BuilderTest : TestSuite({
-    describe("Should be able to position after basic block") {
-        val builder = Builder()
-        val module = Module("utils.ll")
-        val function = module.createFunction(
-            "utils",
-            FunctionType(
-                VoidType(),
-                listOf(),
-                false
-            )
-        )
-        val basicBlock = function.createBlock("entry")
-        assertNull(builder.getInsertionBlock())
+internal class BuilderTest : Spek({
+    setup()
 
-        builder.setPositionAtEnd(basicBlock)
-        assertEquals(builder.getInsertionBlock()?.ref, basicBlock.ref)
+    val module: Module by memoized()
+    val builder: Builder by memoized()
 
-        builder.clear()
-
-        assertNull(builder.getInsertionBlock())
-
-        cleanup(builder, module)
-    }
-
-    describe("Attempting to dispose twice fails") {
-        val builder = Builder()
-        builder.dispose()
-
-        assertFailsWith<IllegalArgumentException> {
-            builder.dispose()
-        }
-    }
-
-    describe("Creation of call instruction") {
-        val boolType = IntType(1)
-        val module = Module("utils.ll").apply {
-            createFunction(
-                "utils",
-                FunctionType(
-                    boolType,
-                    listOf(boolType, boolType),
+    group("positioning the builder") {
+        test("may position after a basic block") {
+            val fn = module.createFunction(
+                "test", FunctionType(
+                    VoidType(),
+                    listOf(),
                     false
                 )
             )
+            val bb = fn.createBlock("entry")
+
+            assertNull(builder.getInsertionBlock())
+
+            builder.setPositionAtEnd(bb)
+
+            assertEquals(builder.getInsertionBlock()?.ref, bb.ref)
         }
-        val externFunc = module.getFunction("utils")
-        val builder = Builder()
-        val falseValue = ConstantInt(boolType, 0, false)
-        val trueValue = ConstantInt(boolType, 1, false)
-        val caller = module.createFunction(
-            "caller",
-            FunctionType(
-                boolType,
-                listOf(boolType, boolType),
-                false
+
+        test("the builder hand may be cleared") {
+            val fn = module.createFunction(
+                "test", FunctionType(
+                    VoidType(),
+                    listOf(),
+                    false
+                )
             )
-        )
-        val basicBlock = caller.createBlock("entry")
+            val bb = fn.createBlock("entry")
 
-        builder.setPositionAtEnd(basicBlock)
+            builder.setPositionAtEnd(bb)
 
-        assertNotNull(externFunc)
+            assertNotNull(builder.getInsertionBlock())
 
-        builder.build().createCall(
-            externFunc, listOf(
-                falseValue,
-                trueValue
-            ), "util"
-        )
+            builder.clear()
+
+            assertNull(builder.getInsertionBlock())
+        }
     }
 })

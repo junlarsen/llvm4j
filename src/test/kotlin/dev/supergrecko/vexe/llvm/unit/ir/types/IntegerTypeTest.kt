@@ -4,25 +4,19 @@ import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.utils.runAll
-import dev.supergrecko.vexe.test.TestSuite
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-internal class IntegerTypeTest : TestSuite({
-    describe("Creation from user-land constructor") {
-        val type = IntType(64)
+internal class IntegerTypeTest : Spek({
+    test("creationg of an arbitrary int type") {
+        val size = (0..8388606).random()
+        val type = IntType(size)
 
         assertEquals(TypeKind.Integer, type.getTypeKind())
     }
 
-    describe("Creation via LLVM reference") {
-        val type = IntType(1)
-        val second = IntType(type.ref)
-
-        assertEquals(type.ref, second.ref)
-    }
-
-    describe("Type width does not change across modules") {
+    test("the width is consistent across contexts") {
         val ctx = Context()
 
         runAll(1, 8, 16, 32, 64, 128) { it, _ ->
@@ -33,7 +27,7 @@ internal class IntegerTypeTest : TestSuite({
         }
     }
 
-    describe("Type width matches returned value") {
+    test("the type width matches") {
         val ctx = Context()
 
         runAll(1, 8, 16, 32, 64, 128) { it, _ ->
@@ -43,21 +37,15 @@ internal class IntegerTypeTest : TestSuite({
         }
     }
 
-    describe("Creation with negative size fails") {
+    test("the integer bit size may not be negative") {
         assertFailsWith<IllegalArgumentException> {
             IntType(-1)
         }
     }
 
-    describe("Creation with size larger than 8388606 fails") {
+    test("the size may not exceed 8388606") {
         assertFailsWith<IllegalArgumentException> {
             IntType(1238234672)
         }
-    }
-
-    describe("The type is sized") {
-        val type = IntType(192)
-
-        assertEquals(true, type.isSized())
     }
 })
