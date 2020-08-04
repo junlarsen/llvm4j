@@ -7,9 +7,6 @@ import dev.supergrecko.vexe.llvm.ir.types.ArrayType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.ir.types.VectorType
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import dev.supergrecko.vexe.llvm.support.Message
-import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 

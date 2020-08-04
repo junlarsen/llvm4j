@@ -10,9 +10,9 @@ import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
+import kotlin.test.assertEquals
 import org.bytedeco.llvm.global.LLVM
 import org.spekframework.spek2.Spek
-import kotlin.test.assertEquals
 
 internal object Factorial : Spek({
     test("translated factorial example") {

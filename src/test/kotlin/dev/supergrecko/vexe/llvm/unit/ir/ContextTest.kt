@@ -2,10 +2,9 @@ package dev.supergrecko.vexe.llvm.unit.ir
 
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.setup
+import kotlin.test.assertEquals
 import org.bytedeco.javacpp.IntPointer
 import org.spekframework.spek2.Spek
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 internal object ContextTest : Spek({
     setup()

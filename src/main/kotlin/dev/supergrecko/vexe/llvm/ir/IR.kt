@@ -1,8 +1,8 @@
 package dev.supergrecko.vexe.llvm.ir
 
 import dev.supergrecko.vexe.llvm.support.Message
-import org.bytedeco.javacpp.BytePointer
 import java.io.File
+import org.bytedeco.javacpp.BytePointer
 
 /**
  * Specific wrapper representing a piece of LLVM IR

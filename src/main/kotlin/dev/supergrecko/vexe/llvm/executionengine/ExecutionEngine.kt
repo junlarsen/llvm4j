@@ -2,7 +2,6 @@ package dev.supergrecko.vexe.llvm.executionengine
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
-import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.TargetData
 import dev.supergrecko.vexe.llvm.ir.Value

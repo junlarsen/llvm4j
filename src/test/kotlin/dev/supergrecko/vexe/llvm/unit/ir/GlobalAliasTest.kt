@@ -4,10 +4,10 @@ import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.setup
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import org.spekframework.spek2.Spek
 
 internal object GlobalAliasTest : Spek({
     setup()

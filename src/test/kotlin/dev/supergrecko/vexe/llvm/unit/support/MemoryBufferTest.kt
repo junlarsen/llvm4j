@@ -4,11 +4,11 @@ import dev.supergrecko.vexe.llvm.TestUtils
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.setup
 import dev.supergrecko.vexe.llvm.support.MemoryBuffer
-import org.spekframework.spek2.Spek
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import org.spekframework.spek2.Spek
 
 internal object MemoryBufferTest : Spek({
     setup()

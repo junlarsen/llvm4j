@@ -2,7 +2,6 @@ package dev.supergrecko.vexe.llvm.support
 
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import org.bytedeco.javacpp.BytePointer
-import java.nio.ByteBuffer
 import org.bytedeco.llvm.global.LLVM
 
 /**

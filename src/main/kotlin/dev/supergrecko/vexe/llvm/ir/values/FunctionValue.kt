@@ -10,7 +10,6 @@ import dev.supergrecko.vexe.llvm.ir.BasicBlock
 import dev.supergrecko.vexe.llvm.ir.CallConvention
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Module
-import dev.supergrecko.vexe.llvm.ir.NamedMetadataNode
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.values.traits.DebugLocationValue

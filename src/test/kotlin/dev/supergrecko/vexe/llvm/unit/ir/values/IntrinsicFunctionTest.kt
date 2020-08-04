@@ -6,31 +6,31 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VectorType
 import dev.supergrecko.vexe.llvm.ir.values.IntrinsicFunction
-import dev.supergrecko.vexe.test.TestSuite
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
 
-internal class IntrinsicFunctionTest : TestSuite({
-    describe("Search for intrinsic function") {
+internal class IntrinsicFunctionTest : Spek({
+    test("performing lookup for intrinsic function") {
         val intrinsic = IntrinsicFunction("llvm.va_start")
 
         assertTrue { intrinsic.exists() }
     }
 
-    describe("Invalid intrinsic name fails") {
+    test("looking up invalid intrinsic name fails") {
         assertFailsWith<IllegalArgumentException> {
             IntrinsicFunction("not.a.valid.intrinsic")
         }
     }
 
-    describe("Search for overloaded intrinsic") {
+    test("overloaded intrinsics are marked overloaded") {
         val intrinsic = IntrinsicFunction("llvm.ctpop")
 
         assertTrue { intrinsic.isOverloaded() }
     }
 
-    describe("Get name by overloaded intrinsic's arguments") {
+    test("finding fully qualified name by overloaded arguments") {
         val ty = VectorType(IntType(8), 4)
         val intrinsic = IntrinsicFunction("llvm.ctpop")
 
@@ -39,13 +39,13 @@ internal class IntrinsicFunctionTest : TestSuite({
         assertEquals("llvm.ctpop.v4i8", overloaded)
     }
 
-    describe("Intrinsic name matches getter") {
+    test("the function name matches") {
         val intrinsic = IntrinsicFunction("llvm.va_start")
 
         assertEquals("llvm.va_start", intrinsic.getName())
     }
 
-    describe("Function declaration can be retrieved from intrinsic") {
+    test("the function declaration can be retrieved from the intrinsic") {
         val ty = VectorType(IntType(8), 4)
         val intrinsic = IntrinsicFunction("llvm.ctpop")
         val mod = Module("utils.ll")
@@ -54,7 +54,7 @@ internal class IntrinsicFunctionTest : TestSuite({
         assertTrue { fn.getIntrinsicId() == intrinsic.id }
     }
 
-    describe("Function type can be retrieved from intrinsic") {
+    test("the function type can be retrieved from intrinsic") {
         val intrinsic = IntrinsicFunction("llvm.va_start")
         val args = listOf(IntType(8).toPointerType())
         val types = intrinsic.getType(Context.getGlobalContext(), args)

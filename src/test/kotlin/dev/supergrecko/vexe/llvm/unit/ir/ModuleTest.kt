@@ -11,13 +11,13 @@ import dev.supergrecko.vexe.llvm.ir.types.VoidType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
 import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
-import org.spekframework.spek2.Spek
 import java.nio.file.Files
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
 
 internal object ModuleTest : Spek({
     setup()

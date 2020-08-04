@@ -3,15 +3,17 @@ package dev.supergrecko.vexe.llvm.unit.ir.values
 import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.GlobalValue
-import dev.supergrecko.vexe.llvm.utils.cleanup
-import dev.supergrecko.vexe.test.TestSuite
+import dev.supergrecko.vexe.llvm.setup
 import kotlin.test.assertEquals
+import org.spekframework.spek2.Spek
 
-internal class GlobalValueTest : TestSuite({
-    describe("Fetching the module from a global works") {
-        val module = Module("utils.ll").apply {
-            setModuleIdentifier("basic")
-        }
+internal class GlobalValueTest : Spek({
+    setup()
+
+    val module: Module by memoized()
+
+    test("pulling the module from a global value") {
+        module.setModuleIdentifier("basic")
 
         val global = module.addGlobal("my_int", IntType(32))
         val globalModule = GlobalValue(global.ref).getModule()
@@ -19,7 +21,5 @@ internal class GlobalValueTest : TestSuite({
         assertEquals(
             module.getModuleIdentifier(), globalModule.getModuleIdentifier()
         )
-
-        cleanup(module)
     }
 })

@@ -4,9 +4,9 @@ import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.StructType
+import dev.supergrecko.vexe.llvm.ir.values.ConstantValue
 import dev.supergrecko.vexe.llvm.ir.values.traits.AggregateValue
 import dev.supergrecko.vexe.llvm.ir.values.traits.CompositeValue
-import dev.supergrecko.vexe.llvm.ir.values.ConstantValue
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM

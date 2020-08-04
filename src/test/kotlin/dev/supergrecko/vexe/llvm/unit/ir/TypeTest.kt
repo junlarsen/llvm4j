@@ -5,9 +5,8 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.setup
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
 
 internal object TypeTest : Spek({
     setup()
