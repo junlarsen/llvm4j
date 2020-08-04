@@ -22,6 +22,8 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     /**
      * Get the linkage type
      *
+     * TODO: Research invalid matches
+     *
      * @see LLVM.LLVMGetLinkage
      */
     public fun getLinkage(): Linkage {
@@ -44,8 +46,10 @@ public open class GlobalValue internal constructor() : ConstantValue() {
      *
      * @see LLVM.LLVMGetSection
      */
-    public fun getSection(): String {
-        return LLVM.LLVMGetSection(ref).string
+    public fun getSection(): String? {
+        val ptr = LLVM.LLVMGetSection(ref)
+
+        return ptr?.string
     }
 
     /**
@@ -139,11 +143,14 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     }
 
     /**
-     * Get the type of this value
+     * Returns the "value type"
+     *
+     * This differs from the formal type of a global value which is always a
+     * pointer type.
      *
      * @see LLVM.LLVMGlobalGetValueType
      */
-    public override fun getType(): Type {
+    public fun getValueType(): Type {
         val ty = LLVM.LLVMGlobalGetValueType(ref)
 
         return Type(ty)
