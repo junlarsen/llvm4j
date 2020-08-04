@@ -6,11 +6,9 @@ import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
-import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.spekframework.spek2.Spek
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 internal class BrInstructionTest : Spek({
     setup()
