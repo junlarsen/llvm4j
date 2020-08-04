@@ -4,9 +4,9 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VectorType
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import org.spekframework.spek2.Spek
 
 internal class VectorTypeTest : Spek({
     test("create a vector type of 1000 integers") {

@@ -1,7 +1,6 @@
 package dev.supergrecko.vexe.llvm.ir.values.constants
 
 import dev.supergrecko.vexe.llvm.ir.Type
-import dev.supergrecko.vexe.llvm.ir.Value
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.values.ConstantValue

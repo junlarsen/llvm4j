@@ -2,15 +2,12 @@ package dev.supergrecko.vexe.llvm.unit.ir
 
 import dev.supergrecko.vexe.llvm.ir.Metadata
 import dev.supergrecko.vexe.llvm.ir.Module
-import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
 
 internal object NamedMetadataTest : Spek({
     setup()

@@ -8,10 +8,10 @@ import org.bytedeco.javacpp.Pointer
  * Store a reference to the FFI element [P] in [start] which will be used to
  * determine if the iterator has a next item or not and to pull the next item
  *
- * @property start     The LLVM object reference to start iterating from
+ * @property start The LLVM object reference to start iterating from
  * @property yieldNext The effect to apply to get the next node
- * @property apply     The effect to apply to create a new [T] from [P]
- * @property head      The current pointer to work with
+ * @property apply The effect to apply to create a new [T] from [P]
+ * @property head The current pointer to work with
  *
  * TODO: Support backwards iteration
  */

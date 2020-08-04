@@ -6,10 +6,10 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.VectorType
 import dev.supergrecko.vexe.llvm.ir.values.IntrinsicFunction
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
 
 internal class IntrinsicFunctionTest : Spek({
     test("performing lookup for intrinsic function") {

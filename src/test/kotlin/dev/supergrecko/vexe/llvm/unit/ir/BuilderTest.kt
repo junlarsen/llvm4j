@@ -5,10 +5,10 @@ import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType
 import dev.supergrecko.vexe.llvm.ir.types.VoidType
 import dev.supergrecko.vexe.llvm.setup
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import org.spekframework.spek2.Spek
 
 internal class BuilderTest : Spek({
     setup()

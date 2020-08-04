@@ -4,10 +4,10 @@ import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.FloatType
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.StructType
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
 
 internal class StructureTypeTest : Spek({
     test("create an empty structure type") {

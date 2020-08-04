@@ -2,9 +2,6 @@ package dev.supergrecko.vexe.llvm.ir.values.traits
 
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.ir.Value
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantArray
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantStruct
-import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantVector
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 

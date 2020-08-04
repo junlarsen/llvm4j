@@ -3,8 +3,8 @@ package dev.supergrecko.vexe.llvm.unit.ir.values
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
+import org.spekframework.spek2.Spek
 
 internal class ConstantTest : Spek({
     // TODO: what on earth is this doing here?

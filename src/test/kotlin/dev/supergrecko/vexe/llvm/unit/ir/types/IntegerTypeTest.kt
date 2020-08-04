@@ -4,9 +4,9 @@ import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.utils.runAll
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import org.spekframework.spek2.Spek
 
 internal class IntegerTypeTest : Spek({
     test("creationg of an arbitrary int type") {

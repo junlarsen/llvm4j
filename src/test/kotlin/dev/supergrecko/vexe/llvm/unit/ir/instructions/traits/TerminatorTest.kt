@@ -2,8 +2,8 @@ package dev.supergrecko.vexe.llvm.unit.ir.instructions.traits
 
 import dev.supergrecko.vexe.llvm.ir.Builder
 import dev.supergrecko.vexe.llvm.setup
-import org.spekframework.spek2.Spek
 import kotlin.test.assertFailsWith
+import org.spekframework.spek2.Spek
 
 internal object TerminatorTest : Spek({
     setup()

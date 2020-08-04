@@ -9,10 +9,10 @@ import dev.supergrecko.vexe.llvm.ir.types.StructType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
 import dev.supergrecko.vexe.llvm.support.VerifierFailureAction
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
 
 internal class RetInstructionTest : Spek({
     setup()

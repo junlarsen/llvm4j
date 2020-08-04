@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
 import org.bytedeco.javacpp.SizeTPointer
-import org.bytedeco.llvm.LLVM.LLVMMetadataRef
 import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.global.LLVM
 

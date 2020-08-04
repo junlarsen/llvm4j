@@ -4,9 +4,9 @@ import dev.supergrecko.vexe.llvm.ir.Module
 import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.setup
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import org.spekframework.spek2.Spek
 
 internal class GlobalAliasTest : Spek({
     setup()

@@ -2,10 +2,10 @@ package dev.supergrecko.vexe.llvm.unit.internal
 
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.toLLVMBool
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
 
 internal object ConversionsTest : Spek({
     group("int to boolean conversion") {

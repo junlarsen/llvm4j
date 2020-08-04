@@ -1,10 +1,10 @@
 package dev.supergrecko.vexe.llvm.ir
 
-import dev.supergrecko.vexe.llvm.internal.contracts.PointerIterator
 import dev.supergrecko.vexe.llvm.executionengine.ExecutionEngine
 import dev.supergrecko.vexe.llvm.executionengine.MCJITCompilerOptions
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Disposable
+import dev.supergrecko.vexe.llvm.internal.contracts.PointerIterator
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
 import dev.supergrecko.vexe.llvm.internal.util.map
 import dev.supergrecko.vexe.llvm.ir.types.FunctionType

@@ -4,9 +4,9 @@ import dev.supergrecko.vexe.llvm.ir.types.IntType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantArray
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.utils.constIntPairOf
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
 
 internal class ConstantArrayTest : Spek({
     test("create string as constant i8 array") {

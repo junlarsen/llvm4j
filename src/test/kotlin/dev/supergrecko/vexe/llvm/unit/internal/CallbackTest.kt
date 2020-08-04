@@ -2,9 +2,9 @@ package dev.supergrecko.vexe.llvm.unit.internal
 
 import dev.supergrecko.vexe.llvm.ir.Context
 import dev.supergrecko.vexe.llvm.setup
+import kotlin.test.assertNotNull
 import org.bytedeco.llvm.global.LLVM
 import org.spekframework.spek2.Spek
-import kotlin.test.assertNotNull
 
 internal object CallbackTest : Spek({
     setup()

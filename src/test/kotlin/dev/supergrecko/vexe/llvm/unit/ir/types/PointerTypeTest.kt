@@ -2,9 +2,8 @@ package dev.supergrecko.vexe.llvm.unit.ir.types
 
 import dev.supergrecko.vexe.llvm.ir.TypeKind
 import dev.supergrecko.vexe.llvm.ir.types.IntType
-import dev.supergrecko.vexe.llvm.ir.types.PointerType
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
+import org.spekframework.spek2.Spek
 
 internal class PointerTypeTest : Spek({
     test("create pointer to integer type") {

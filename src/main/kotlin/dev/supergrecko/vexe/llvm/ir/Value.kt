@@ -3,7 +3,6 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.ContainsReference
 import dev.supergrecko.vexe.llvm.internal.contracts.Unreachable
 import dev.supergrecko.vexe.llvm.internal.util.fromLLVMBool
-import dev.supergrecko.vexe.llvm.support.Message
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM

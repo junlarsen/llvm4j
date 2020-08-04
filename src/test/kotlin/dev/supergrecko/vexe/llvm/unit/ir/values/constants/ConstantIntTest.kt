@@ -8,10 +8,10 @@ import dev.supergrecko.vexe.llvm.ir.types.PointerType
 import dev.supergrecko.vexe.llvm.ir.values.constants.ConstantInt
 import dev.supergrecko.vexe.llvm.utils.constIntPairOf
 import dev.supergrecko.vexe.llvm.utils.runAll
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
 
 internal class ConstantIntTest : Spek({
     test("create integer from long words constructor") {
