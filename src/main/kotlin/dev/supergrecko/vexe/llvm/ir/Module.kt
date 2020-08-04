@@ -225,8 +225,6 @@ public class Module internal constructor() : Disposable,
     /**
      * Get the inline asm for this module
      *
-     * TODO: Do something with the length?
-     *
      * @see LLVM.LLVMGetModuleInlineAsm
      */
     public fun getInlineAssembly(): String {

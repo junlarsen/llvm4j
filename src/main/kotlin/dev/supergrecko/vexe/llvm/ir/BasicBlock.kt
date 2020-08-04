@@ -32,8 +32,6 @@ public class BasicBlock internal constructor() : Validatable,
      *
      * This is done by unwrapping the instance into a Value
      *
-     * TODO: Research more about this cast
-     *
      * @see LLVM.LLVMBasicBlockAsValue
      */
     public fun toValue(): Value {

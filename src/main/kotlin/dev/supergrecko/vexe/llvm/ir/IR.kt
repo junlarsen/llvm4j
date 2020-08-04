@@ -10,7 +10,7 @@ import java.io.File
  * This type is preferred over a [Message] for functions which specifically
  * return a piece of IR because of its utility methods
  */
-public class IR(override val pointer: BytePointer) : Message(pointer) {
+public class IR(pointer: BytePointer) : Message(pointer) {
     /**
      * Writes this IR to a file at the given [path]
      */
