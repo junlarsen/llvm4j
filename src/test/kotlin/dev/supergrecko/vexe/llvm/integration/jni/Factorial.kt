@@ -40,7 +40,7 @@ internal object Factorial : Spek({
         val otherwise = factorial.createBlock("otherwise")
         val exit = factorial.createBlock("exit")
 
-        val builder = Builder().apply {
+        Builder().apply {
             setPositionAtEnd(entry) // enter function
 
             val condition = build().createICmp(

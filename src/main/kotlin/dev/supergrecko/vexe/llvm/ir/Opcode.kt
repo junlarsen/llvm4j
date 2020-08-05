@@ -3,7 +3,7 @@ package dev.supergrecko.vexe.llvm.ir
 import dev.supergrecko.vexe.llvm.internal.contracts.OrderedEnum
 import org.bytedeco.llvm.global.LLVM
 
-enum class Opcode(public override val value: Int) : OrderedEnum<Int> {
+public enum class Opcode(public override val value: Int) : OrderedEnum<Int> {
     Ret(LLVM.LLVMRet),
     Br(LLVM.LLVMBr),
     Switch(LLVM.LLVMSwitch),

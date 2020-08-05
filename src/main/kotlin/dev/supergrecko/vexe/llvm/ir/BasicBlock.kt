@@ -9,7 +9,7 @@ import org.bytedeco.llvm.global.LLVM
 
 public class BasicBlock internal constructor() : Validatable,
     ContainsReference<LLVMBasicBlockRef> {
-    override var valid = true
+    override var valid: Boolean = true
     public override lateinit var ref: LLVMBasicBlockRef
         internal set
 

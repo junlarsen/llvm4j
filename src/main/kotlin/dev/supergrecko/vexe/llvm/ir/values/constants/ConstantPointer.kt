@@ -32,7 +32,7 @@ public class ConstantPointer internal constructor() : ConstantValue() {
      *
      * @see LLVM.LLVMConstPointerCast
      */
-    fun getPointerCast(toType: Type): ConstantPointer {
+    public fun getPointerCast(toType: Type): ConstantPointer {
         val value = LLVM.LLVMConstPointerCast(ref, toType.ref)
 
         return ConstantPointer(value)
