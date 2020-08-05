@@ -39,7 +39,7 @@ public class IntrinsicFunction internal constructor() {
      *
      * See https://llvm.org/doxygen/Function_8cpp_source.html#l00549
      */
-    public fun exists() = id != 0
+    public fun exists(): Boolean = id != 0
 
     /**
      * Determine if this intrinsic has overloads or not

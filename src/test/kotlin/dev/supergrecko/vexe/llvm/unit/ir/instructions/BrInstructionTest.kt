@@ -9,6 +9,7 @@ import dev.supergrecko.vexe.llvm.setup
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import org.spekframework.spek2.Spek
+import kotlin.test.assertEquals
 
 internal class BrInstructionTest : Spek({
     setup()
@@ -45,6 +46,7 @@ internal class BrInstructionTest : Spek({
             .createCondBr(condition, then, otherwise)
         val foundCondition = ConstantInt(subject.getCondition().ref)
 
+        assertEquals(condition.ref, foundCondition.ref)
         assertTrue { subject.isConditional() }
     }
 })

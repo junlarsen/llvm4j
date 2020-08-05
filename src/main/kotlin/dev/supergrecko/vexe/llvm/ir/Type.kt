@@ -115,15 +115,15 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     /**
      * Get an array type of [size] elements containing elements of this type
      */
-    public fun toArrayType(size: Int) = ArrayType(this, size)
+    public fun toArrayType(size: Int): ArrayType = ArrayType(this, size)
 
     /**
      * Get a vector type of [size] elements containing elements of this type
      */
-    public fun toVectorType(size: Int) = VectorType(this, size)
+    public fun toVectorType(size: Int): VectorType = VectorType(this, size)
     //endregion Typecasting
 
-    companion object {
+    public companion object {
         /**
          * Get the type kind of a type
          *

@@ -190,7 +190,9 @@ public class Module internal constructor() : Disposable,
      *
      * @see LLVM.LLVMDumpModule
      */
-    public fun dump() = LLVM.LLVMDumpModule(ref)
+    public fun dump() {
+        LLVM.LLVMDumpModule(ref)
+    }
 
     /**
      * Print the module's IR to a file
@@ -448,7 +450,7 @@ public class Module internal constructor() : Disposable,
      *
      * @see LLVM.LLVMAddGlobal
      */
-    fun addGlobal(
+    public fun addGlobal(
         name: String,
         type: Type,
         addressSpace: Int? = null

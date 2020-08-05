@@ -28,7 +28,10 @@ public class ModuleFlagEntries internal constructor() :
         sizePtr = size
     }
 
-    fun size(): Long {
+    /**
+     * Get the element count in this collection
+     */
+    public fun size(): Long {
         return sizePtr.get()
     }
 

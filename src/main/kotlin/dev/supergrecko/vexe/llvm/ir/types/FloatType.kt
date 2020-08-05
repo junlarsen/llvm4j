@@ -37,7 +37,7 @@ public class FloatType internal constructor() : Type() {
         /**
          * List of all the LLVM floating point types
          */
-        public val kinds = listOf(
+        public val kinds: List<TypeKind> = listOf(
             TypeKind.Half,
             TypeKind.Float,
             TypeKind.Double,

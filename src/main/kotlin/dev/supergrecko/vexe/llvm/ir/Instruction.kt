@@ -11,7 +11,7 @@ import org.bytedeco.llvm.global.LLVM
 
 public open class Instruction internal constructor() : Value(),
     DebugLocationValue, Validatable, Cloneable {
-    public override var valid = true
+    public override var valid: Boolean = true
 
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
