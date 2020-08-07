@@ -21,43 +21,83 @@ public class MemoryBuffer internal constructor() : Disposable {
 
     //region BitReader
     /**
-     * Parse bitecode memory buffer into a LLVM module
+     * Parse this memory buffer as if it was LLVM bit code into an LLVM Module
      *
-     * @see LLVM.LLVMParseBitcodeInContext2
+     * The module will be parsed using the provided [intoContext]. If no
+     * context is passed, it will use the global llvm context.
+     *
+     * LLVM-C provides us two ways to parse bit code into modules:
+     * [LLVM.LLVMParseBitcode] and [LLVM.LLVMGetBitcodeModule].
+     *
+     * [LLVM.LLVMGetBitcodeModule] lazily parses (?) the buffer. If the
+     * [parseLazy] parameter is present, then this will be used. Otherwise
+     * the method will default to [LLVM.LLVMParseBitcode]
+     *
+     * @throws RuntimeException if there was an error parsing the module and
+     * the parsing method was not lazy.
      */
-    public fun parse(context: Context = Context.getGlobalContext()): Module {
-        val ptr = LLVMModuleRef()
-        val res = LLVM.LLVMParseBitcodeInContext2(context.ref, ref, ptr)
-
-        if (res != 0) {
-            throw RuntimeException(
-                "Could not parse module from contents: " + getStart().string
+    public fun getBitCodeModule(
+        intoContext: Context = Context.getGlobalContext(),
+        parseLazy: Boolean = true
+    ) : Module {
+        var error: BytePointer? = null
+        val outModule = LLVMModuleRef()
+        val result = if (parseLazy) {
+            LLVM.LLVMGetBitcodeModuleInContext2(
+                intoContext.ref,
+                ref,
+                outModule
+            )
+        } else {
+            error = BytePointer(0L)
+            LLVM.LLVMParseBitcodeInContext(
+                intoContext.ref,
+                ref,
+                outModule,
+                error
             )
         }
 
-        return Module(ptr)
+        if (result != 0) {
+            outModule.deallocate()
+
+            throw if (error == null) {
+                RuntimeException("Failed to parse bit code")
+            } else {
+                RuntimeException("Failed to parse bit code: ${error.string}")
+            }
+        }
+
+        return Module(outModule)
     }
 
     /**
-     * Parse bitcode in memory buffer into a LLVM module
+     * Parse this memory buffer as if it was LLVM IR into an LLVM Module
      *
-     * TODO: What differentiates this from [parse]
+     * The module will be parsed using the provided [intoContext]. If no
+     * context is passed, it will use the global llvm context.
      *
-     * @see LLVM.LLVMGetBitcodeModuleInContext2
+     * @throws RuntimeException if there was an error parsing the module
      */
-    public fun getModule(
-        context: Context = Context.getGlobalContext()
-    ): Module? {
-        val ptr = LLVMModuleRef()
-        val res = LLVM.LLVMGetBitcodeModuleInContext2(context.ref, ref, ptr)
+    public fun getIRModule(
+        intoContext: Context = Context.getGlobalContext()
+    ): Module {
+        val error = BytePointer(0L)
+        val outModule = LLVMModuleRef()
+        val result = LLVM.LLVMParseIRInContext(
+            intoContext.ref,
+            ref,
+            outModule,
+            error
+        )
 
-        if (res != 0) {
-            throw RuntimeException(
-                "Could not create module from contents: " + getStart().string
-            )
+        if (result != 0) {
+            outModule.deallocate()
+
+            throw RuntimeException("Failed to parse ir: ${error.string}")
         }
 
-        return Module(ptr)
+        return Module(outModule)
     }
     //endregion BitReader
 
