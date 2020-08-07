@@ -69,18 +69,33 @@ internal object MemoryBufferTest : Spek({
     }
 
     group("parsing into modules") {
-        test("with parse()") {
-            val buf = module.toMemoryBuffer()
-            val subject = buf.parse()
+        group("retrieving a bit code module") {
+            test("with lazy parsing") {
+                val buf = module.toMemoryBuffer()
+                val subject = buf.getBitCodeModule(parseLazy = true)
 
-            assertNotNull(subject)
+                assertNotNull(subject)
+                assertEquals("test", subject.getSourceFileName())
+            }
+
+            test("with regular parsing") {
+                val buf = module.toMemoryBuffer()
+                val subject = buf.getBitCodeModule(parseLazy = false)
+
+                assertNotNull(subject)
+                assertEquals("test", subject.getSourceFileName())
+            }
         }
 
-        test("with getModule()") {
-            val buf = module.toMemoryBuffer()
-            val subject = buf.getModule()
+        test("retrieving an ir module") {
+            val fh = utils.getTemporaryFile().apply {
+                createNewFile()
+            }.also(module.getIR()::writeToFile)
+            val buf = MemoryBuffer(fh)
+            val subject = buf.getIRModule()
 
             assertNotNull(subject)
+            assertEquals("test", subject.getSourceFileName())
         }
     }
 })
