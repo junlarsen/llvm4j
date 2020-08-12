@@ -1,6 +1,6 @@
-# LLVM4KT
+# Bitbuilder
 
-There were no decent options to utilize the LLVM from JVM. LLVM 4 KT is a
+There were no decent options to utilize the LLVM from JVM. Bitbuilder is a
 modern library for interacting with the [LLVM](https://llvm.org) from the JVM
 in an idiomatic and object-oriented approach.
 
@@ -10,8 +10,6 @@ The project is still under early development. There are no published releases
 of the library yet. 
 
 ## Getting Started
-
-This is a tiny guide for getting started with LLVM 4 KT
 
 **Installation**
 
@@ -24,11 +22,11 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.supergrecko:llvm4kt:master-SNAPSHOT'
+    implementation 'com.github.vexelabs:bitbuilder:master-SNAPSHOT'
 }
 ```
 
-**NB**: Because LLVM 4 KT does not have any releases yet, the only available
+**NB**: Because Bitbuilder does not have any releases yet, the only available
 build is `master-SNAPSHOT`
 
 **Using the library**
@@ -41,10 +39,11 @@ This library uses the generated LLVM bindings for Java (see [bytedeco/javacpp
 -presets](https://github.com/bytedeco/javacpp-presets/tree/master/llvm)) to
 create a more object-oriented approach which roughly mirrors LLVM's C++ API.
 
-LLVM 4 KT aims to cover 100% of the LLVM-C API.
+Bitbuilder aims to cover 100% of the LLVM-C API and additionally provide a
+wrapper framework for using the LLVM in idiomatic Kotlin.
 
 ## License
 
-The entire LLVM 4 KT project is licensed under the Apache 2.0 license.
+The entire project is licensed under the Apache 2.0 license.
 
 [Apache 2.0](LICENSE)
