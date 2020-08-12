@@ -111,7 +111,7 @@ public class ExecutionEngine public constructor() :
         val result = LLVM.LLVMRemoveModule(ref, module.ref, module.ref, err)
 
         if (result != 0) {
-            throw RuntimeException(err.contentToString())
+            throw RuntimeException(err.joinToString(""))
         }
     }
 

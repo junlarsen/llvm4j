@@ -14,7 +14,7 @@ public interface SequentialType : CompositeType,
      *
      * @see LLVM.LLVMGetSubtypes
      */
-    public open fun getSubtypes(): List<Type> {
+    public fun getSubtypes(): List<Type> {
         val dest = PointerPointer<LLVMTypeRef>(getElementCount().toLong())
         LLVM.LLVMGetSubtypes(ref, dest)
 
@@ -32,7 +32,7 @@ public interface SequentialType : CompositeType,
      *
      * @see LLVM.LLVMGetElementType
      */
-    public open fun getElementType(): Type {
+    public fun getElementType(): Type {
         val type = LLVM.LLVMGetElementType(ref)
 
         return Type(type)
