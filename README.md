@@ -13,7 +13,7 @@ of the library yet.
 
 **Installation**
 
-You can retrieve llvm4kt from Jitpack.io. Add the following to your gradle
+You can retrieve Bitbuilder from Jitpack.io. Add the following to your gradle
 configuration.
 
 ```groovy
