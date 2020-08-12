@@ -32,7 +32,6 @@ LLVM-C APIs.
 ## Table of Contents
 
 - [Getting Started](#getting-started)
-  - [Project Layout](#project-layout)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
@@ -42,18 +41,6 @@ LLVM-C APIs.
 - [Contact](#contact)
 
 ## Getting Started
-
-### Project Layout
-
-Bitbuilder is built with Gradle and it makes use of multi-project builds.
-This is an overview of the project layout and its important directories
-
-- [bitbuilder-llvm](bitbuilder-llvm): Raw LLVM Bindings for Kotlin
-- [bitbuilder](bitbuilder): Bitbuilder Core, Kotlin DSLs and QOL utils
-- [samples](samples): Sample projects using the library
-
-This is a guide to installing Bitbuilder. Bitbuilder is available through
-Jitpack.
 
 ### Prerequisites
 
@@ -88,7 +75,7 @@ version is the current SNAPSHOT build.
 
 ```kotlin
 dependencies {
-    implementation("com.github.vexelabs:bitbuilder:master-SNAPSHOT")
+    implementation("com.github.vexelabs:bitbuilder:-SNAPSHOT")
 }
 ```
 

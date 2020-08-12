@@ -10,7 +10,7 @@ public interface CompositeType : ContainsReference<LLVMTypeRef> {
      *
      * @see LLVM.LLVMGetNumContainedTypes
      */
-    public open fun getElementCount(): Int {
+    public fun getElementCount(): Int {
         return LLVM.LLVMGetNumContainedTypes(ref)
     }
 }
