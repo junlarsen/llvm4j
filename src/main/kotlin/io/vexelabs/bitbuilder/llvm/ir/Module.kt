@@ -295,7 +295,7 @@ public class Module internal constructor() : Disposable,
     public fun getNamedMetadataIterator(): NamedMetadataNode.Iterator? {
         val md = LLVM.LLVMGetFirstNamedMetadata(ref)
 
-        return md?.let { NamedMetadataNode.Iterator(it) }
+        return md?.let { NamedMetadataNode.Iterator(this, it) }
     }
 
     /**
@@ -306,7 +306,7 @@ public class Module internal constructor() : Disposable,
     public fun getNamedMetadata(name: String): NamedMetadataNode? {
         val md = LLVM.LLVMGetNamedMetadata(ref, name, name.length.toLong())
 
-        return md?.let { NamedMetadataNode(it) }
+        return md?.let { NamedMetadataNode(it, ref) }
     }
 
     /**
@@ -322,41 +322,7 @@ public class Module internal constructor() : Disposable,
             name.length.toLong()
         )
 
-        return NamedMetadataNode(md)
-    }
-
-    /**
-     * Get the amount of metadata nodes with name [name]
-     *
-     * @see LLVM.LLVMGetNamedMetadataNumOperands
-     */
-    public fun getNamedMetadataOperandCount(name: String): Int {
-        return LLVM.LLVMGetNamedMetadataNumOperands(ref, name)
-    }
-
-    /**
-     * Get the metadata nodes for [name]
-     *
-     * @see LLVM.LLVMGetNamedMetadataOperands
-     */
-    public fun getNamedMetadataOperands(name: String): List<Metadata> {
-        val size = getNamedMetadataOperandCount(name)
-        val ptr = PointerPointer<LLVMValueRef>(size.toLong())
-
-        LLVM.LLVMGetNamedMetadataOperands(ref, name, ptr)
-
-        return ptr.map { Metadata.fromValue(Value(it)) }
-    }
-
-    /**
-     * Add an operand to the given metadata node
-     *
-     * This expects the [operand] to be a Metadata node, disguised in a Value
-     *
-     * @see LLVM.LLVMAddNamedMetadataOperand
-     */
-    public fun addNamedMetadataOperand(name: String, operand: Value) {
-        LLVM.LLVMAddNamedMetadataOperand(ref, name, operand.ref)
+        return NamedMetadataNode(md, ref)
     }
 
     /**
