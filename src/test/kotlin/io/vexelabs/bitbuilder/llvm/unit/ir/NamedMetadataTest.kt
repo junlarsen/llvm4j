@@ -14,60 +14,28 @@ internal object NamedMetadataTest : Spek({
 
     val module: Module by memoized()
 
-    group("getting metadata from a module") {
-        test("a module without metadata does not have a first or last") {
-            val iter = module.getNamedMetadataIterator()
+    test("the name of a node matches") {
+        val metadata = module.getOrCreateNamedMetadata("test")
 
-            assertNull(iter)
-        }
-
-        test("a module with metadata can use the iterator") {
-            module.getOrCreateNamedMetadata("one")
-            module.getOrCreateNamedMetadata("two")
-
-            val iter = module.getNamedMetadataIterator()
-
-            assertNotNull(iter)
-            assertTrue { iter.hasNext() }
-
-            val first = iter.next()
-
-            assertTrue { iter.hasNext() }
-
-            val second = iter.next()
-
-            assertEquals("one", first.getName())
-            assertEquals("two", second.getName())
-        }
-
-        test("finding a metadata node by name") {
-            module.getOrCreateNamedMetadata("metadata")
-
-            val subject = module.getNamedMetadata("metadata")
-
-            assertNotNull(subject)
-            assertEquals("metadata", subject.getName())
-        }
+        assertEquals("test", metadata.name)
     }
 
-    group("assigning values to the metadata nodes") {
-        test("a node without any values has a size of 0") {
-            module.getOrCreateNamedMetadata("metadata")
+    group("fetching and creating operands for a node") {
+        test("a fresh node does not have any operands") {
+            val metadata = module.getOrCreateNamedMetadata("test")
 
-            assertEquals(0, module.getNamedMetadataOperandCount("metadata"))
+            assertEquals(0, metadata.getOperandCount())
+            assertTrue { metadata.getOperands().isEmpty() }
         }
 
-        test("retrieving the operands from the metadata") {
-            val operand = Metadata("meta").asValue()
+        test("adding an operand to a node") {
+            val metadata = Metadata("never")
+            val node = module.getOrCreateNamedMetadata("test").also {
+                it.addOperand(metadata)
+            }
 
-            module.getOrCreateNamedMetadata("metadata")
-            module.addNamedMetadataOperand("metadata", operand)
-
-            assertEquals(1, module.getNamedMetadataOperandCount("metadata"))
-
-            val subject = module.getNamedMetadataOperands("metadata")
-
-            assertNotNull(subject)
+            assertEquals(1, node.getOperandCount())
+            // TODO: Compare nodes
         }
     }
 })

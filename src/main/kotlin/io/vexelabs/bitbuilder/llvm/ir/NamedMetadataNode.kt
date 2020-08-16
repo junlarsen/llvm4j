@@ -16,7 +16,7 @@ import org.bytedeco.llvm.global.LLVM
  *
  * A named metadata node is essentially an array of other [Metadata] nodes.
  * These are named "operands" in the LLVM-C API and you can modify this list
- * with the [getOperands], [addOperand], [getOrCreateOperand] and
+ * with the [getOperands], [addOperand] and
  * [getOperandCount] member methods.
  *
  * [LLVM Documentation](https://llvm.org/docs/LangRef.html#named-metadata)
@@ -30,7 +30,7 @@ public class NamedMetadataNode public constructor(
      *
      * This name is immutable which means we can get it by lazy like this.
      */
-    private val name: String by lazy { getNodeName() }
+    public val name: String by lazy { getNodeName() }
 
     /**
      * Retrieve the of this metadata node
