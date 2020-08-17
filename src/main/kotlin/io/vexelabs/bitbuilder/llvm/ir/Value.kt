@@ -83,9 +83,7 @@ public open class Value internal constructor() :
     public fun getValueKind(): ValueKind {
         val kind = LLVM.LLVMGetValueKind(ref)
 
-        return ValueKind.values()
-            .firstOrNull { it.value == kind }
-            ?: throw Unreachable()
+        return ValueKind[kind]
     }
 
     /**

@@ -151,9 +151,7 @@ public open class Instruction internal constructor() : Value(),
     public fun getOpcode(): Opcode {
         val opcode = LLVM.LLVMGetInstructionOpcode(ref)
 
-        return Opcode.values()
-            .firstOrNull { it.value == opcode }
-            ?: throw Unreachable()
+        return Opcode[opcode]
     }
 
     /**

@@ -50,8 +50,7 @@ public class ModuleFlagEntries internal constructor() :
 
         val behavior = LLVM.LLVMModuleFlagEntriesGetFlagBehavior(ref, index)
 
-        return ModuleFlagBehavior.values()
-            .firstOrNull { it.value == behavior } ?: throw Unreachable()
+        return ModuleFlagBehavior[behavior]
     }
 
     /**

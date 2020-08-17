@@ -1,6 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir.values
 
-import io.vexelabs.bitbuilder.llvm.internal.contracts.OrderedEnum
+import io.vexelabs.bitbuilder.llvm.internal.contracts.ForeignEnum
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.DLLStorageClass
 import io.vexelabs.bitbuilder.llvm.ir.Metadata
@@ -29,7 +29,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     public fun getLinkage(): Linkage {
         val ln = LLVM.LLVMGetLinkage(ref)
 
-        return Linkage.values().first { it.value == ln }
+        return Linkage[ln]
     }
 
     /**
@@ -69,7 +69,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     public fun getVisibility(): Visibility {
         val visibility = LLVM.LLVMGetVisibility(ref)
 
-        return Visibility.values().first { it.value == visibility }
+        return Visibility[visibility]
     }
 
     /**
@@ -89,7 +89,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     public fun getStorageClass(): DLLStorageClass {
         val storage = LLVM.LLVMGetDLLStorageClass(ref)
 
-        return DLLStorageClass.values().first { it.value == storage }
+        return DLLStorageClass[storage]
     }
 
     /**
@@ -109,7 +109,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     public fun getUnnamedAddress(): UnnamedAddress {
         val addr = LLVM.LLVMGetUnnamedAddress(ref)
 
-        return UnnamedAddress.values().first { it.value == addr }
+        return UnnamedAddress[addr]
     }
 
     /**
@@ -218,7 +218,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     }
     //endregion Core::Values::Constants::GlobalValues
 
-    public enum class Linkage(public override val value: Int) : OrderedEnum<Int> {
+    public enum class Linkage(public override val value: Int) : ForeignEnum<Int> {
         External(LLVM.LLVMExternalLinkage),
         AvailableExternally(LLVM.LLVMAvailableExternallyLinkage),
         LinkOnceAny(LLVM.LLVMLinkOnceAnyLinkage),
@@ -235,6 +235,12 @@ public open class GlobalValue internal constructor() : ConstantValue() {
         Ghost(LLVM.LLVMGhostLinkage),
         Common(LLVM.LLVMCommonLinkage),
         LinkerPrivate(LLVM.LLVMLinkerPrivateLinkage),
-        PrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage),
+        PrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage);
+
+        public companion object : ForeignEnum.CompanionBase<Int, Linkage> {
+            public override val map: Map<Int, Linkage> by lazy {
+                values().associateBy(Linkage::value)
+            }
+        }
     }
 }

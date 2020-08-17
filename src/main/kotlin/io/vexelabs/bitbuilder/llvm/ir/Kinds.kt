@@ -1,9 +1,9 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
-import io.vexelabs.bitbuilder.llvm.internal.contracts.OrderedEnum
+import io.vexelabs.bitbuilder.llvm.internal.contracts.ForeignEnum
 import org.bytedeco.llvm.global.LLVM
 
-public enum class TypeKind(public override val value: Int) : OrderedEnum<Int> {
+public enum class TypeKind(public override val value: Int) : ForeignEnum<Int> {
     Void(LLVM.LLVMVoidTypeKind),
     Half(LLVM.LLVMHalfTypeKind),
     Float(LLVM.LLVMFloatTypeKind),
@@ -20,10 +20,16 @@ public enum class TypeKind(public override val value: Int) : OrderedEnum<Int> {
     Vector(LLVM.LLVMVectorTypeKind),
     Metadata(LLVM.LLVMMetadataTypeKind),
     X86_MMX(LLVM.LLVMX86_MMXTypeKind),
-    Token(LLVM.LLVMTokenTypeKind)
+    Token(LLVM.LLVMTokenTypeKind);
+
+    public companion object : ForeignEnum.CompanionBase<Int, TypeKind> {
+        public override val map: Map<Int, TypeKind> by lazy {
+            values().associateBy(TypeKind::value)
+        }
+    }
 }
 
-public enum class ValueKind(public override val value: Int) : OrderedEnum<Int> {
+public enum class ValueKind(public override val value: Int) : ForeignEnum<Int> {
     Argument(LLVM.LLVMArgumentValueKind),
     BasicBlock(LLVM.LLVMBasicBlockValueKind),
     MemoryUse(LLVM.LLVMMemoryUseValueKind),
@@ -48,5 +54,11 @@ public enum class ValueKind(public override val value: Int) : OrderedEnum<Int> {
     ConstantTokenNone(LLVM.LLVMConstantTokenNoneValueKind),
     MetadataAsValue(LLVM.LLVMMetadataAsValueValueKind),
     InlineAsm(LLVM.LLVMInlineAsmValueKind),
-    Instruction(LLVM.LLVMInstructionValueKind)
+    Instruction(LLVM.LLVMInstructionValueKind);
+
+    public companion object : ForeignEnum.CompanionBase<Int, ValueKind> {
+        public override val map: Map<Int, ValueKind> by lazy {
+            values().associateBy(ValueKind::value)
+        }
+    }
 }

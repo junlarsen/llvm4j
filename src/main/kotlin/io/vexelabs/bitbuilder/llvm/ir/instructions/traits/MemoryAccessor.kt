@@ -36,9 +36,7 @@ public interface MemoryAccessor : ContainsReference<LLVMValueRef> {
     public fun getOrdering(): AtomicOrdering {
         val order = LLVM.LLVMGetOrdering(ref)
 
-        return AtomicOrdering.values()
-            .firstOrNull { it.value == order }
-            ?: throw Unreachable()
+        return AtomicOrdering[order]
     }
 
     /**

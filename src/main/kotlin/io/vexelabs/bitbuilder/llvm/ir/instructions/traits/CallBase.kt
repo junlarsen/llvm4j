@@ -43,9 +43,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
     public fun getCallConvention(): CallConvention {
         val cc = LLVM.LLVMGetInstructionCallConv(ref)
 
-        return CallConvention.values()
-            .firstOrNull { it.value == cc }
-            ?: throw Unreachable()
+        return CallConvention[cc]
     }
 
     /**
