@@ -29,7 +29,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     public fun getLinkage(): Linkage {
         val ln = LLVM.LLVMGetLinkage(ref)
 
-        return Linkage.values().first { it.value == ln }
+        return Linkage[ln]
     }
 
     /**
@@ -69,7 +69,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     public fun getVisibility(): Visibility {
         val visibility = LLVM.LLVMGetVisibility(ref)
 
-        return Visibility.values().first { it.value == visibility }
+        return Visibility[visibility]
     }
 
     /**
@@ -89,7 +89,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     public fun getStorageClass(): DLLStorageClass {
         val storage = LLVM.LLVMGetDLLStorageClass(ref)
 
-        return DLLStorageClass.values().first { it.value == storage }
+        return DLLStorageClass[storage]
     }
 
     /**
@@ -109,7 +109,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     public fun getUnnamedAddress(): UnnamedAddress {
         val addr = LLVM.LLVMGetUnnamedAddress(ref)
 
-        return UnnamedAddress.values().first { it.value == addr }
+        return UnnamedAddress[addr]
     }
 
     /**

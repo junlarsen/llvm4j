@@ -25,9 +25,9 @@ public open class ConstantValue internal constructor() : Value() {
             "Value must be constant to retrieve opcode"
         }
 
-        val int: Int? = LLVM.LLVMGetConstOpcode(ref)
+        val opcode: Int? = LLVM.LLVMGetConstOpcode(ref)
 
-        return Opcode.values().firstOrNull { it.value == int }
+        return opcode?.let { Opcode[it] }
     }
 
     /**

@@ -204,9 +204,7 @@ public open class FunctionValue internal constructor() : Value(),
     public fun getCallConvention(): CallConvention {
         val cc = LLVM.LLVMGetFunctionCallConv(ref)
 
-        return CallConvention.values()
-            .firstOrNull { it.value == cc }
-            ?: throw Unreachable()
+        return CallConvention[cc]
     }
 
     /**

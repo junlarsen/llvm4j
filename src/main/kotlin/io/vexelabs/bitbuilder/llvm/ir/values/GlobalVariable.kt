@@ -83,9 +83,7 @@ public class GlobalVariable internal constructor() : GlobalValue(),
     public fun getThreadLocalMode(): ThreadLocalMode {
         val tlm = LLVM.LLVMGetThreadLocalMode(ref)
 
-        return ThreadLocalMode.values()
-            .firstOrNull { it.value == tlm }
-            ?: throw Unreachable()
+        return ThreadLocalMode[tlm]
     }
 
     /**

@@ -23,9 +23,7 @@ public class AtomicCmpXchgInstruction internal constructor() : Instruction(),
     public fun getSuccessOrdering(): AtomicOrdering {
         val ordering = LLVM.LLVMGetCmpXchgSuccessOrdering(ref)
 
-        return AtomicOrdering.values()
-            .firstOrNull { it.value == ordering }
-            ?: throw Unreachable()
+        return AtomicOrdering[ordering]
     }
 
     /**
@@ -45,9 +43,7 @@ public class AtomicCmpXchgInstruction internal constructor() : Instruction(),
     public fun getFailureOrdering(): AtomicOrdering {
         val ordering = LLVM.LLVMGetCmpXchgFailureOrdering(ref)
 
-        return AtomicOrdering.values()
-            .firstOrNull { it.value == ordering }
-            ?: throw Unreachable()
+        return AtomicOrdering[ordering]
     }
 
     /**

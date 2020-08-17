@@ -33,8 +33,7 @@ public class DiagnosticInfo internal constructor() :
     public fun getSeverity(): DiagnosticSeverity {
         val severity = LLVM.LLVMGetDiagInfoSeverity(ref)
 
-        return DiagnosticSeverity.values()
-            .first { it.value == severity }
+        return DiagnosticSeverity[severity]
     }
     //endregion Core::Context
 }

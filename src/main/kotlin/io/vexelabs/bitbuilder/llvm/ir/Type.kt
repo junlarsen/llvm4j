@@ -133,9 +133,7 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
         internal fun getTypeKind(type: LLVMTypeRef): TypeKind {
             val kind = LLVM.LLVMGetTypeKind(type)
 
-            return TypeKind.values()
-                .firstOrNull { it.value == kind }
-                ?: throw Unreachable()
+            return TypeKind[kind]
         }
     }
 }
