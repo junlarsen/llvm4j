@@ -8,10 +8,17 @@ import org.bytedeco.llvm.LLVM.LLVMMetadataRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public sealed class Metadata : ContainsReference<LLVMMetadataRef> {
+// TODO: Avoid all of this casting with our own LLVM-C bindings (see #166)
+public open class Metadata internal constructor() :
+    ContainsReference<LLVMMetadataRef> {
     public final override lateinit var ref: LLVMMetadataRef
         internal set
 
+    public constructor(llvmRef: LLVMMetadataRef) : this() {
+        ref = llvmRef
+    }
+
+    //region Core::Metadata
     /**
      * Represent a [MetadataNode] which has been cast to a [Value]
      */
@@ -20,7 +27,7 @@ public sealed class Metadata : ContainsReference<LLVMMetadataRef> {
     /**
      * Represent a [Value] which has been cast to a [MetadataNode]
      */
-    public class ValueAsMetadata(ref: LLVMMetadataRef) : MetadataNode(ref)
+    public class ValueAsMetadata(ref: LLVMMetadataRef) : Metadata(ref)
 
     /**
      * Cast this Metadata node to a value
@@ -62,10 +69,41 @@ public sealed class Metadata : ContainsReference<LLVMMetadataRef> {
             withContext: Context = Context.getGlobalContext()
         ): MetadataAsValue = metadata.toValue(withContext)
     }
+    //endregion Core::Metadata
+
+    /**
+     * Test if this is a metadata string
+     *
+     * LLVM-C accepts a [LLVMValueRef] for this so the node is cast to a
+     * [Metadata.MetadataAsValue]. This requires a context. Set the context
+     * which this should use with [withContext]
+     *
+     * @see LLVM.LLVMIsAMDNode
+     */
+    public fun isString(
+        withContext: Context = Context.getGlobalContext()
+    ): Boolean {
+        return LLVM.LLVMIsAMDString(toValue(withContext).ref) != null
+    }
+
+    /**
+     * Test if this is a metadata node
+     *
+     * LLVM-C accepts a [LLVMValueRef] for this so the node is cast to a
+     * [Metadata.MetadataAsValue]. This requires a context. Set the context
+     * which this should use with [withContext]
+     *
+     * @see LLVM.LLVMIsAMDNode
+     */
+    public fun isNode(
+        withContext: Context = Context.getGlobalContext()
+    ): Boolean {
+        return LLVM.LLVMIsAMDNode(toValue(withContext).ref) != null
+    }
 }
 
-public class MetadataString : Metadata {
-    public constructor(llvmRef: LLVMMetadataRef) {
+public class MetadataString internal constructor() : Metadata() {
+    public constructor(llvmRef: LLVMMetadataRef) : this() {
         ref = llvmRef
     }
 
@@ -73,7 +111,7 @@ public class MetadataString : Metadata {
     public constructor(
         data: String,
         context: Context = Context.getGlobalContext()
-    ) {
+    ) : this() {
         ref = LLVM.LLVMMDStringInContext2(
             context.ref,
             data,
@@ -99,8 +137,8 @@ public class MetadataString : Metadata {
     }
 }
 
-public open class MetadataNode : Metadata {
-    public constructor(llvmRef: LLVMMetadataRef) {
+public open class MetadataNode internal constructor(): Metadata() {
+    public constructor(llvmRef: LLVMMetadataRef) : this() {
         ref = llvmRef
     }
 
@@ -108,7 +146,7 @@ public open class MetadataNode : Metadata {
     public constructor(
         values: List<Metadata>,
         context: Context = Context.getGlobalContext()
-    ) {
+    ) : this() {
         val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
         ref = LLVM.LLVMMDNodeInContext2(
             context.ref,

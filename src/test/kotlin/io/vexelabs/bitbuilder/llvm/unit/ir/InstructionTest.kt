@@ -3,6 +3,7 @@ package io.vexelabs.bitbuilder.llvm.unit.ir
 import io.vexelabs.bitbuilder.llvm.ir.Builder
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Metadata
+import io.vexelabs.bitbuilder.llvm.ir.MetadataString
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.Opcode
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
@@ -34,7 +35,7 @@ internal object InstructionTest : Spek({
             val inst = builder.build().createRetVoid().apply {
                 setMetadata(
                     "range",
-                    Metadata("yes").asValue(context)
+                    MetadataString("yes").toValue(context)
                 )
             }
             val subject = inst.getMetadata("range")
@@ -47,7 +48,7 @@ internal object InstructionTest : Spek({
             val inst = builder.build().createRetVoid().apply {
                 setMetadata(
                     "range",
-                    Metadata("yes").asValue(context)
+                    MetadataString("yes").toValue(context)
                 )
             }
             val bucket = inst.getAllMetadataExceptDebugLocations()

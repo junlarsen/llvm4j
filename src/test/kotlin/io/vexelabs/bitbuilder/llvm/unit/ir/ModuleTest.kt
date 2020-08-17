@@ -3,6 +3,7 @@ package io.vexelabs.bitbuilder.llvm.unit.ir
 import io.vexelabs.bitbuilder.llvm.TestUtils
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Metadata
+import io.vexelabs.bitbuilder.llvm.ir.MetadataString
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.ModuleFlagBehavior
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
@@ -91,7 +92,7 @@ internal object ModuleTest : Spek({
 
     group("module flag entries") {
         test("setting a metadata flag and finding it") {
-            val md = Metadata("example")
+            val md = MetadataString("example")
             module.addModuleFlag(ModuleFlagBehavior.Override, "example", md)
 
             val subject = module.getModuleFlag("example")
@@ -100,7 +101,7 @@ internal object ModuleTest : Spek({
         }
 
         test("retrieving all the module flags") {
-            val md = Metadata("example")
+            val md = MetadataString("example")
             module.addModuleFlag(ModuleFlagBehavior.Override, "example", md)
 
             val subject = module.getModuleFlags()
