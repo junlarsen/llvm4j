@@ -1,9 +1,9 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
-import io.vexelabs.bitbuilder.llvm.internal.contracts.OrderedEnum
+import io.vexelabs.bitbuilder.llvm.internal.contracts.ForeignEnum
 import org.bytedeco.llvm.global.LLVM
 
-public enum class Opcode(public override val value: Int) : OrderedEnum<Int> {
+public enum class Opcode(public override val value: Int) : ForeignEnum<Int> {
     Ret(LLVM.LLVMRet),
     Br(LLVM.LLVMBr),
     Switch(LLVM.LLVMSwitch),
@@ -77,5 +77,11 @@ public enum class Opcode(public override val value: Int) : OrderedEnum<Int> {
     CatchRet(LLVM.LLVMCatchRet),
     CatchPad(LLVM.LLVMCatchPad),
     CleanupPad(LLVM.LLVMCleanupPad),
-    CatchSwitch(LLVM.LLVMCatchSwitch)
+    CatchSwitch(LLVM.LLVMCatchSwitch);
+
+    public companion object : ForeignEnum.CompanionBase<Int, Opcode> {
+        public override val map: Map<Int, Opcode> by lazy {
+            values().associateBy(Opcode::value)
+        }
+    }
 }

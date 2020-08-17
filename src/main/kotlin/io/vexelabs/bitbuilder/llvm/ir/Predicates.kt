@@ -1,10 +1,11 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
-import io.vexelabs.bitbuilder.llvm.internal.contracts.OrderedEnum
+import io.vexelabs.bitbuilder.llvm.internal.contracts.ForeignEnum
+import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import org.bytedeco.llvm.global.LLVM
 
 public enum class IntPredicate(public override val value: Int) :
-    OrderedEnum<Int> {
+    ForeignEnum<Int> {
     EQ(LLVM.LLVMIntEQ),
     NE(LLVM.LLVMIntNE),
     UGT(LLVM.LLVMIntUGT),
@@ -14,11 +15,17 @@ public enum class IntPredicate(public override val value: Int) :
     SGT(LLVM.LLVMIntSGT),
     SGE(LLVM.LLVMIntSGE),
     SLT(LLVM.LLVMIntSLT),
-    SLE(LLVM.LLVMIntSLE)
+    SLE(LLVM.LLVMIntSLE);
+
+    public companion object : ForeignEnum.CompanionBase<Int, IntPredicate> {
+        public override val map: Map<Int, IntPredicate> by lazy {
+            values().associateBy(IntPredicate::value)
+        }
+    }
 }
 
 public enum class RealPredicate(public override val value: Int) :
-    OrderedEnum<Int> {
+    ForeignEnum<Int> {
     PredicateFalse(LLVM.LLVMRealPredicateFalse),
     OEQ(LLVM.LLVMRealOEQ),
     OGT(LLVM.LLVMRealOGT),
@@ -34,5 +41,11 @@ public enum class RealPredicate(public override val value: Int) :
     ULT(LLVM.LLVMRealULT),
     ULE(LLVM.LLVMRealULE),
     UNE(LLVM.LLVMRealUNE),
-    PredicateTrue(LLVM.LLVMRealPredicateTrue)
+    PredicateTrue(LLVM.LLVMRealPredicateTrue);
+
+    public companion object : ForeignEnum.CompanionBase<Int, RealPredicate> {
+        public override val map: Map<Int, RealPredicate> by lazy {
+            values().associateBy(RealPredicate::value)
+        }
+    }
 }

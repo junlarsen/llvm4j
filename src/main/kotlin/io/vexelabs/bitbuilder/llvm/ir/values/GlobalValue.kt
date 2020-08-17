@@ -1,6 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir.values
 
-import io.vexelabs.bitbuilder.llvm.internal.contracts.OrderedEnum
+import io.vexelabs.bitbuilder.llvm.internal.contracts.ForeignEnum
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.DLLStorageClass
 import io.vexelabs.bitbuilder.llvm.ir.Metadata
@@ -218,7 +218,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
     }
     //endregion Core::Values::Constants::GlobalValues
 
-    public enum class Linkage(public override val value: Int) : OrderedEnum<Int> {
+    public enum class Linkage(public override val value: Int) : ForeignEnum<Int> {
         External(LLVM.LLVMExternalLinkage),
         AvailableExternally(LLVM.LLVMAvailableExternallyLinkage),
         LinkOnceAny(LLVM.LLVMLinkOnceAnyLinkage),
@@ -235,6 +235,12 @@ public open class GlobalValue internal constructor() : ConstantValue() {
         Ghost(LLVM.LLVMGhostLinkage),
         Common(LLVM.LLVMCommonLinkage),
         LinkerPrivate(LLVM.LLVMLinkerPrivateLinkage),
-        PrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage),
+        PrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage);
+
+        public companion object : ForeignEnum.CompanionBase<Int, Linkage> {
+            public override val map: Map<Int, Linkage> by lazy {
+                values().associateBy(Linkage::value)
+            }
+        }
     }
 }
