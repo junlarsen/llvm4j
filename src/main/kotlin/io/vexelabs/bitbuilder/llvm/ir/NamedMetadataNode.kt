@@ -87,7 +87,7 @@ public class NamedMetadataNode public constructor(
      */
     public fun addOperand(metadata: Metadata, withContext: Context? = null) {
         val ctx = withContext ?: Module(owner).getContext()
-        val value = metadata.asValue(ctx)
+        val value = metadata.toValue(ctx)
 
         LLVM.LLVMAddNamedMetadataOperand(owner, name, value.ref)
     }

@@ -1,6 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir
 
 import io.vexelabs.bitbuilder.llvm.ir.Metadata
+import io.vexelabs.bitbuilder.llvm.ir.MetadataString
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.setup
 import kotlin.test.assertEquals
@@ -29,13 +30,14 @@ internal object NamedMetadataTest : Spek({
         }
 
         test("adding an operand to a node") {
-            val metadata = Metadata("never")
+            val metadata = MetadataString("never")
             val node = module.getOrCreateNamedMetadata("test").also {
                 it.addOperand(metadata)
             }
+            val operands = node.getOperands()
 
             assertEquals(1, node.getOperandCount())
-            // TODO: Compare nodes
+            assertEquals(1, operands.size)
         }
     }
 })
