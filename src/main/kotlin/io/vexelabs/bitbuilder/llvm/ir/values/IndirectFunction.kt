@@ -1,5 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir.values
 
+import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -30,4 +31,16 @@ public class IndirectFunction internal constructor() : FunctionValue() {
         LLVM.LLVMRemoveGlobalIFunc(ref)
     }
     //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
+
+    /**
+     * Class to perform iteration over basic blocks
+     *
+     * @see [PointerIterator]
+     */
+    public class Iterator(ref: LLVMValueRef) :
+        PointerIterator<IndirectFunction, LLVMValueRef>(
+            start = ref,
+            yieldNext = { LLVM.LLVMGetNextGlobalIFunc(it) },
+            apply = { IndirectFunction(it) }
+        )
 }

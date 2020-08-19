@@ -634,6 +634,17 @@ public class Module internal constructor() : Disposable,
 
         return IndirectFunction(func)
     }
+
+    /**
+     * Get the start of the global indirect function iterator
+     *
+     * @see LLVM.LLVMGetFirstGlobalIFunc
+     */
+    public fun getGlobalIndirectFunctionIterator(): IndirectFunction.Iterator? {
+        val fn = LLVM.LLVMGetFirstGlobalIFunc(ref)
+
+        return fn?.let { IndirectFunction.Iterator(fn) }
+    }
     //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
     public override fun dispose() {
