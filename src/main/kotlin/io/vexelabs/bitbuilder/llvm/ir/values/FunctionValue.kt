@@ -1,17 +1,16 @@
 package io.vexelabs.bitbuilder.llvm.ir.values
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
-import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.internal.util.map
-import io.vexelabs.bitbuilder.llvm.ir.Attribute
 import io.vexelabs.bitbuilder.llvm.ir.AttributeIndex
 import io.vexelabs.bitbuilder.llvm.ir.BasicBlock
 import io.vexelabs.bitbuilder.llvm.ir.CallConvention
 import io.vexelabs.bitbuilder.llvm.ir.Context
-import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.Value
-import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
+import io.vexelabs.bitbuilder.llvm.ir.attributes.Attribute
+import io.vexelabs.bitbuilder.llvm.ir.attributes.AttributeEnum
+import io.vexelabs.bitbuilder.llvm.ir.attributes.AttributeString
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.DebugLocationValue
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
 import org.bytedeco.javacpp.PointerPointer
@@ -266,6 +265,8 @@ public open class FunctionValue internal constructor() : Value(),
     /**
      * Add an attribute at an [index]
      *
+     * Overload for passing an [AttributeIndex] instead of an integer
+     *
      * @see LLVM.LLVMAddAttributeAtIndex
      */
     public fun addAttribute(index: AttributeIndex, attribute: Attribute) {
@@ -284,10 +285,21 @@ public open class FunctionValue internal constructor() : Value(),
     /**
      * Get the amount of attributes at an [index]
      *
+     * Overload for passing an [AttributeIndex] instead of an integer
+     *
      * @see LLVM.LLVMGetAttributeCountAtIndex
      */
     public fun getAttributeCount(index: AttributeIndex): Int {
-        return LLVM.LLVMGetAttributeCountAtIndex(ref, index.value.toInt())
+        return getAttributeCount(index.value.toInt())
+    }
+
+    /**
+     * Get the amount of attributes at an [index]
+     *
+     * @see LLVM.LLVMGetAttributeCountAtIndex
+     */
+    public fun getAttributeCount(index: Int): Int {
+        return LLVM.LLVMGetAttributeCountAtIndex(ref, index)
     }
 
     /**
@@ -302,73 +314,119 @@ public open class FunctionValue internal constructor() : Value(),
 
         LLVM.LLVMGetAttributesAtIndex(ref, index.value.toInt(), ptr)
 
-        return ptr.map { Attribute(it) }
+        return ptr.map { Attribute.create(it) }
     }
+
+    /**
+     * Pull the attribute value from an [index] with a [kind]
+     *
+     * Overload for passing an [AttributeIndex] instead of an integer
+     *
+     * @see LLVM.LLVMGetEnumAttributeAtIndex
+     */
+    public fun getEnumAttribute(
+        index: AttributeIndex,
+        kind: Int
+    ): AttributeEnum? = getEnumAttribute(index.value.toInt(), kind)
 
     /**
      * Pull the attribute value from an [index] with a [kind]
      *
      * @see LLVM.LLVMGetEnumAttributeAtIndex
      */
-    public fun getAttribute(
-        index: AttributeIndex,
+    public fun getEnumAttribute(
+        index: Int,
         kind: Int
-    ): Attribute {
+    ): AttributeEnum? {
         val ref = LLVM.LLVMGetEnumAttributeAtIndex(
-            ref, index.value.toInt(), kind
+            ref, index, kind
         )
 
-        return Attribute(ref)
+        return ref?.let { AttributeEnum(it) }
     }
+
+    /**
+     * Pull the attribute value from an [index] with a [kind]
+     *
+     * Overload for passing an [AttributeIndex] instead of an integer
+     *
+     * @see LLVM.LLVMGetStringAttributeAtIndex
+     */
+    public fun getStringAttribute(
+        index: AttributeIndex,
+        kind: String
+    ): AttributeString? = getStringAttribute(index.value.toInt(), kind)
 
     /**
      * Pull the attribute value from an [index] with a [kind]
      *
      * @see LLVM.LLVMGetStringAttributeAtIndex
      */
-    public fun getAttribute(
-        index: AttributeIndex,
+    public fun getStringAttribute(
+        index: Int,
         kind: String
-    ): Attribute {
+    ): AttributeString? {
         val ref = LLVM.LLVMGetStringAttributeAtIndex(
-            ref, index.value.toInt(), kind, kind.length
+            ref, index, kind, kind.length
         )
 
-        return Attribute(ref)
+        return ref?.let { AttributeString(it) }
     }
+
+    /**
+     * Removes an attribute at the given index
+     *
+     * Overload for passing an [AttributeIndex] instead of an integer
+     *
+     * @see LLVM.LLVMRemoveEnumAttributeAtIndex
+     */
+    public fun removeEnumAttribute(
+        index: AttributeIndex,
+        kind: Int
+    ): Unit = removeEnumAttribute(index.value.toInt(), kind)
 
     /**
      * Removes an attribute at the given index
      *
      * @see LLVM.LLVMRemoveEnumAttributeAtIndex
      */
-    public fun removeAttribute(
-        index: AttributeIndex,
+    public fun removeEnumAttribute(
+        index: Int,
         kind: Int
-    ) {
-        LLVM.LLVMRemoveEnumAttributeAtIndex(
-            ref, index.value.toInt(), kind
-        )
-    }
+    ): Unit = LLVM.LLVMRemoveEnumAttributeAtIndex(ref, index, kind)
+
+    /**
+     * Removes an attribute at the given index
+     *
+     * Overload for passing an [AttributeIndex] instead of an integer
+     *
+     * @see LLVM.LLVMRemoveStringAttributeAtIndex
+     */
+    public fun removeStringAttribute(
+        index: AttributeIndex,
+        kind: String
+    ): Unit = removeStringAttribute(index.value.toInt(), kind)
 
     /**
      * Removes an attribute at the given index
      *
      * @see LLVM.LLVMRemoveStringAttributeAtIndex
      */
-    public fun removeAttribute(
-        index: AttributeIndex,
+    public fun removeStringAttribute(
+        index: Int,
         kind: String
-    ) {
-        LLVM.LLVMRemoveStringAttributeAtIndex(
-            ref, index.value.toInt(), kind, kind.length
-        )
-    }
+    ): Unit = LLVM.LLVMRemoveStringAttributeAtIndex(
+        ref, index, kind, kind.length
+    )
 
     /**
+     * TODO: Find out what this does
+     *
      * @see LLVM.LLVMAddTargetDependentFunctionAttr
      */
-    public fun addTargetDependentAttribute(
+    public
+
+    fun addTargetDependentAttribute(
         attribute: String,
         value: String
     ) {
