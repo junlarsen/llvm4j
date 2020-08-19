@@ -13,6 +13,7 @@ import io.vexelabs.bitbuilder.llvm.ir.types.StructType
 import io.vexelabs.bitbuilder.llvm.ir.values.FunctionValue
 import io.vexelabs.bitbuilder.llvm.ir.values.GlobalAlias
 import io.vexelabs.bitbuilder.llvm.ir.values.GlobalVariable
+import io.vexelabs.bitbuilder.llvm.ir.values.IndirectFunction
 import io.vexelabs.bitbuilder.llvm.support.MemoryBuffer
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
 import java.io.File
@@ -591,6 +592,49 @@ public class Module internal constructor() : Disposable,
         }
     }
     //endregion ExecutionEngine
+
+    //region Core::Values::Constants::FunctionValues::IndirectFunctions
+    /**
+     * Looks up a globally available, named IFunc
+     *
+     * @see LLVM.LLVMGetNamedGlobalIFunc
+     */
+    public fun getGlobalIndirectFunction(name: String): IndirectFunction? {
+        val func = LLVM.LLVMGetNamedGlobalIFunc(
+            ref,
+            name,
+            name.length.toLong()
+        )
+
+        return func?.let { IndirectFunction(it) }
+    }
+
+    /**
+     * Create a new Global indirect function with the provided [resolver]
+     *
+     * This registers a new ifunc with the provided [name] and stores it in
+     * the provided [addressSpace]
+     *
+     * @see LLVM.LLVMAddGlobalIFunc
+     */
+    public fun addGlobalIndirectFunction(
+        name: String,
+        signature: FunctionType,
+        resolver: FunctionValue,
+        addressSpace: Int
+    ): IndirectFunction {
+        val func = LLVM.LLVMAddGlobalIFunc(
+            ref,
+            name,
+            name.length.toLong(),
+            signature.ref,
+            addressSpace,
+            resolver.ref
+        )
+
+        return IndirectFunction(func)
+    }
+    //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }
