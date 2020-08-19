@@ -150,6 +150,7 @@ public open class FunctionValue internal constructor() : Value(),
     //endregion Core::Values::Constants::FunctionValues::FunctionParameters
 
     //region Core::Values::Constants::FunctionValues::IndirectFunctions
+    // TODO: Move to IndirectFunction.kt
     /**
      * Get the indirect resolver if it has been set
      *
@@ -172,6 +173,8 @@ public open class FunctionValue internal constructor() : Value(),
 
     /**
      * Make this indirect function global in the given [module]
+     *
+     * TODO: Move to Module.kt
      *
      * @see LLVM.LLVMAddGlobalIFunc
      */
