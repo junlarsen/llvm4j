@@ -41,6 +41,7 @@ public class IndirectFunction internal constructor() : FunctionValue() {
     }
 
     public companion object {
+        // TODO: Move to Module.kt
         @JvmStatic
         public fun fromModule(module: Module, name: String): IndirectFunction {
             val fn = LLVM.LLVMGetNamedGlobalIFunc(

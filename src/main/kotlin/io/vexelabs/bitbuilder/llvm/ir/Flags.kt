@@ -129,10 +129,9 @@ public enum class AtomicRMWBinaryOperation(public override val value: Int) :
     Max(LLVM.LLVMAtomicRMWBinOpMax),
     Min(LLVM.LLVMAtomicRMWBinOpMin),
     UMax(LLVM.LLVMAtomicRMWBinOpUMax),
-    UMin(LLVM.LLVMAtomicRMWBinOpUMin);
-    // TODO: LLVM 10
-    // LLVMAtomicRMWBinOpFAdd(LLVM.LLVMAtomicRMWBinOpFAdd),
-    // LLVMAtomicRMWBinOpFSub(LLVM.LLVMAtomicRMWBinOpFSub)
+    UMin(LLVM.LLVMAtomicRMWBinOpUMin),
+    LLVMAtomicRMWBinOpFAdd(LLVM.LLVMAtomicRMWBinOpFAdd),
+    LLVMAtomicRMWBinOpFSub(LLVM.LLVMAtomicRMWBinOpFSub);
 
     public companion object :
         ForeignEnum.CompanionBase<Int, AtomicRMWBinaryOperation> {
