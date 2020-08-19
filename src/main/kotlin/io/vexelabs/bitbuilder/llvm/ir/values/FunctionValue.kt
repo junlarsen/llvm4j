@@ -143,6 +143,8 @@ public open class FunctionValue internal constructor() : Value(),
 
     /**
      * Set the parameter alignment for parameter [value]
+     *
+     * @see LLVM.LLVMSetParamAlignment
      */
     public fun setParameterAlignment(value: Value, align: Int) {
         LLVM.LLVMSetParamAlignment(value.ref, align)
@@ -150,7 +152,6 @@ public open class FunctionValue internal constructor() : Value(),
     //endregion Core::Values::Constants::FunctionValues::FunctionParameters
 
     //region Core::Values::Constants::FunctionValues::IndirectFunctions
-    // TODO: Move to IndirectFunction.kt
     /**
      * Get the indirect resolver if it has been set
      *
@@ -169,32 +170,6 @@ public open class FunctionValue internal constructor() : Value(),
      */
     public fun setIndirectResolver(function: IndirectFunction) {
         LLVM.LLVMSetGlobalIFuncResolver(ref, function.ref)
-    }
-
-    /**
-     * Make this indirect function global in the given [module]
-     *
-     * TODO: Move to Module.kt
-     *
-     * @see LLVM.LLVMAddGlobalIFunc
-     */
-    public fun makeGlobal(
-        module: Module,
-        name: String,
-        type: FunctionType,
-        addressSpace: Int,
-        resolver: FunctionValue
-    ): IndirectFunction {
-        val indirect = LLVM.LLVMAddGlobalIFunc(
-            module.ref,
-            name,
-            name.length.toLong(),
-            type.ref,
-            addressSpace,
-            resolver.ref
-        )
-
-        return IndirectFunction(indirect)
     }
     //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
