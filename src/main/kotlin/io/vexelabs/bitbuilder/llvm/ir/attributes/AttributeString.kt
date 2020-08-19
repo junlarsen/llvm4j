@@ -21,9 +21,9 @@ public class AttributeString internal constructor() :
      * @see LLVM.LLVMCreateStringAttribute
      */
     public constructor(
+        context: Context,
         kind: String,
-        value: String,
-        context: Context = Context.getGlobalContext()
+        value: String
     ) : this() {
         ref = LLVM.LLVMCreateStringAttribute(
             context.ref,
