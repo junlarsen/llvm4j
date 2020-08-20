@@ -17,6 +17,8 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew build dokkaHtml
+        env:
+          GRADLE_OPTS: -Dorg.gradle.daemon=false
       - uses: JamesIves/github-pages-deploy-action@3.5.9
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

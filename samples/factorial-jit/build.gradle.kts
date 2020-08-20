@@ -16,7 +16,11 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.0-rc")
     implementation("org.bytedeco:llvm-platform:9.0.0-1.5.2")
-    implementation("com.github.vexelabs:bitbuilder:-SNAPSHOT")
+    // For standalone usage, uncomment this line...
+    // implementation("com.github.vexelabs:bitbuilder:-SNAPSHOT")
+
+    // And comment out this one
+    implementation(fileTree("../../build/libs"))
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
