@@ -26,13 +26,13 @@ internal object InstructionTest : Spek({
 
     group("instruction metadata") {
         test("fresh instruction does not have metadata") {
-            val inst = builder.build().createRetVoid()
+            val inst = builder.createRetVoid()
 
             assertFalse { inst.hasMetadata() }
         }
 
         test("retrieving metadata from an instruction") {
-            val inst = builder.build().createRetVoid().apply {
+            val inst = builder.createRetVoid().apply {
                 setMetadata(
                     "range",
                     MetadataString("yes").toValue(context)
@@ -45,7 +45,7 @@ internal object InstructionTest : Spek({
         }
 
         test("metadata bucket contains our metadata") {
-            val inst = builder.build().createRetVoid().apply {
+            val inst = builder.createRetVoid().apply {
                 setMetadata(
                     "range",
                     MetadataString("yes").toValue(context)
@@ -62,7 +62,7 @@ internal object InstructionTest : Spek({
 
     group("residing basic blocks") {
         test("loose instruction has no parent") {
-            val inst = builder.build().createRetVoid()
+            val inst = builder.createRetVoid()
 
             assertNull(inst.getInstructionBlock())
         }
@@ -75,7 +75,7 @@ internal object InstructionTest : Spek({
             val block = function.createBlock("entry")
 
             builder.setPositionAtEnd(block)
-            val inst = builder.build().createRetVoid()
+            val inst = builder.createRetVoid()
             val subject = inst.getInstructionBlock()
 
             assertNotNull(subject)
@@ -85,7 +85,7 @@ internal object InstructionTest : Spek({
 
     group("removal and deletion of nodes") {
         test("removal of loose instruction fails due to missing parent") {
-            val inst = builder.build().createRetVoid()
+            val inst = builder.createRetVoid()
 
             assertFailsWith<IllegalArgumentException> {
                 inst.remove()
@@ -93,7 +93,7 @@ internal object InstructionTest : Spek({
         }
 
         test("deletion of loose instruction fails due to missing parent") {
-            val inst = builder.build().createRetVoid()
+            val inst = builder.createRetVoid()
 
             assertFailsWith<IllegalArgumentException> {
                 inst.delete()
@@ -102,7 +102,7 @@ internal object InstructionTest : Spek({
     }
 
     test("the opcode of an instruction matches") {
-        val inst = builder.build().createRetVoid()
+        val inst = builder.createRetVoid()
 
         assertEquals(Opcode.Ret, inst.getOpcode())
     }
@@ -115,7 +115,7 @@ internal object InstructionTest : Spek({
             val block = function.createBlock("entry")
 
             builder.setPositionAtEnd(block)
-            val inst = builder.build().createRetVoid()
+            val inst = builder.createRetVoid()
 
             assertNotNull(inst.getInstructionBlock())
 

@@ -24,8 +24,7 @@ internal class BrInstructionTest : Spek({
             )
         )
         val destination = function.createBlock("Entry")
-        val subject = builder.build()
-            .createBr(destination)
+        val subject = builder.createBr(destination)
 
         assertFalse { subject.isConditional() }
     }
@@ -41,9 +40,7 @@ internal class BrInstructionTest : Spek({
         // i1 true
         val condition = ConstantInt(IntType(1), 1)
 
-        val subject = builder
-            .build()
-            .createCondBr(condition, then, otherwise)
+        val subject = builder.createCondBr(condition, then, otherwise)
         val foundCondition = ConstantInt(subject.getCondition().ref)
 
         assertEquals(condition.ref, foundCondition.ref)

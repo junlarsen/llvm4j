@@ -22,7 +22,7 @@ internal class IndirectBrInstructionTest : Spek({
             )
         )
         val base = function.createBlock("Entry").toValue()
-        val instr = builder.build().createIndirectBr(base)
+        val instr = builder.createIndirectBr(base)
 
         assertNotNull(instr)
     }

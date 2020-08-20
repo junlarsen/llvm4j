@@ -21,9 +21,7 @@ internal class RetInstructionTest : Spek({
     val builder: Builder by memoized()
 
     test("create void return") {
-        val inst = builder
-            .build()
-            .createRetVoid()
+        val inst = builder.createRetVoid()
 
         assertTrue { inst.isTerminator() }
         assertNull(inst.getInstructionBlock())
@@ -33,9 +31,7 @@ internal class RetInstructionTest : Spek({
 
     test("create a value return") {
         val value = ConstantInt(IntType(32), 0)
-        val inst = builder
-            .build()
-            .createRet(value)
+        val inst = builder.createRet(value)
 
         assertTrue { inst.isTerminator() }
         assertEquals(Opcode.Ret, inst.getOpcode())
@@ -55,9 +51,7 @@ internal class RetInstructionTest : Spek({
 
         val left = ConstantInt(IntType(1), 1)
         val right = ConstantInt(IntType(1), 0)
-        val inst = builder
-            .build()
-            .createAggregateRet(listOf(left, right))
+        val inst = builder.createAggregateRet(listOf(left, right))
 
         val ir = "  ret { i1, i1 } { i1 true, i1 false }"
 

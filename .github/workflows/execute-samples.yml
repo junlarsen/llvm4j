@@ -1,8 +1,5 @@
-name: Dokka Deploy
-on:
-  push:
-    branches:
-      - 'master'
+name: Run all Sample projects
+on: [push]
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -13,14 +10,17 @@ jobs:
           java-version: 8
           java-package: jdk
           architecture: x86
-      - name: Build Documentation
+      - name: Build main project
         run: |
           chmod +x ./gradlew
-          ./gradlew build dokkaHtml
+          ./gradlew build
         env:
           GRADLE_OPTS: -Dorg.gradle.daemon=false
-      - uses: JamesIves/github-pages-deploy-action@3.5.9
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BRANCH: dokka-autodeploy
-          FOLDER: build/dokka
+      - name: Run sample projects
+        run: |
+          pushd samples/factorial-jit
+          chmod +x ./gradlew
+          ./gradlew run
+          popd
+        env:
+          GRADLE_OPTS: -Dorg.gradle.daemon=false
