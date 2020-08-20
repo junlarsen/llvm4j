@@ -12,12 +12,14 @@ jobs:
           architecture: x86
       - name: Build main project
         run: |
+          chmod +x ./gradlew
           ./gradlew build
         env:
           GRADLE_OPTS: -Dorg.gradle.daemon=false
       - name: Run sample projects
         run: |
           pushd samples/factorial-jit
+          chmod +x ./gradlew
           ./gradlew run
           popd
         env:
