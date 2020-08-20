@@ -43,7 +43,7 @@ internal object Factorial : Spek({
         Builder().apply {
             setPositionAtEnd(entry) // enter function
 
-            val condition = build().createICmp(
+            val condition = createICmp(
                 lhs = n,
                 predicate = IntPredicate.EQ,
                 rhs = ConstantInt(IntType(32), 0),
@@ -53,31 +53,31 @@ internal object Factorial : Spek({
             val resultIfTrue = ConstantInt(IntType(32), 1)
 
             // jump based on condition
-            build().createCondBr(condition, then, otherwise)
+            createCondBr(condition, then, otherwise)
             setPositionAtEnd(then) // enter then block
-            build().createBr(exit) // jump to exit
+            createBr(exit) // jump to exit
             setPositionAtEnd(otherwise) // enter otherwise block
 
-            val nMinusOne = build().createSub(
+            val nMinusOne = createSub(
                 lhs = n,
                 rhs = ConstantInt(IntType(32), 1),
                 variable = "n - 1"
             ) // subtract 1 from n
-            val recursiveCall = build().createCall(
+            val recursiveCall = createCall(
                 function = factorial,
                 arguments = listOf(nMinusOne),
                 variable = "factorial(n - 1)"
             ) // call self recursively
-            val resultIfFalse = build().createMul(
+            val resultIfFalse = createMul(
                 lhs = n,
                 rhs = recursiveCall,
                 variable = "n * factorial(n - 1)"
             )
 
-            build().createBr(exit) // jump to exit block
+            createBr(exit) // jump to exit block
             setPositionAtEnd(exit)
 
-            val result = build().createPhi(
+            val result = createPhi(
                 incoming = IntType(32),
                 variable = "result"
             ).apply {
@@ -86,7 +86,7 @@ internal object Factorial : Spek({
                     blocks = listOf(then, otherwise)
                 )
             }
-            build().createRet(result)
+            createRet(result)
         }
 
         module.verify(VerifierFailureAction.PrintMessage)

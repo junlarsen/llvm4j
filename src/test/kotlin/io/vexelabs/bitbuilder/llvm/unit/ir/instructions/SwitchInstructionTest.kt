@@ -23,9 +23,7 @@ internal class SwitchInstructionTest : Spek({
         ))
         val block = function.createBlock("entry")
         val cond = ConstantInt(IntType(1), 1)
-        val inst = builder
-            .build()
-            .createSwitch(cond, block, 1)
+        val inst = builder.createSwitch(cond, block, 1)
 
         inst.addCase(ConstantInt(IntType(1), 1), block)
     }
@@ -38,9 +36,7 @@ internal class SwitchInstructionTest : Spek({
         ))
         val block = function.createBlock("entry")
         val cond = ConstantInt(IntType(1), 1)
-        val inst = builder
-            .build()
-            .createSwitch(cond, block, 1)
+        val inst = builder.createSwitch(cond, block, 1)
 
         for (i in 0..10) {
             inst.addCase(ConstantInt(IntType(1), i), block)

@@ -12,7 +12,7 @@ internal object TerminatorTest : Spek({
 
     group("successors of terminating basic blocks") {
         test("a loose terminator does not have a successor") {
-            val inst = builder.build().createRetVoid()
+            val inst = builder.createRetVoid()
 
             assertFailsWith<IllegalArgumentException> {
                 inst.getSuccessor(0)
