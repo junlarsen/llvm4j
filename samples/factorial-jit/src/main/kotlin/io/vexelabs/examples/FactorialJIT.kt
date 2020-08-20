@@ -39,7 +39,7 @@ fun main() {
     val function = createFactorialFunction(module)
 
     // Lets build our factorial function in [buildFactorialFunction]
-    buildFactorialFunction(function, module, context)
+    buildFactorialFunction(function, context)
 
     // Ensure that the module we just built is valid
     module.verify(VerifierFailureAction.PrintMessage)
@@ -82,12 +82,18 @@ fun main() {
 }
 
 fun createFactorialFunction(module: Module): FunctionValue {
+    // We can get the context the module was created in
+    val context = module.getContext()
+
+    // Create the int32 type
+    val i32 = IntType(32, context)
+
     // This is the signature of our factorial function.
     //
     // declare i32 @factorial(i32 %n)
     val functionType = FunctionType(
-        returns = IntType(32),
-        types = listOf(IntType(32)),
+        returns = i32,
+        types = listOf(i32),
         variadic = false
     )
 
@@ -100,9 +106,13 @@ fun createFactorialFunction(module: Module): FunctionValue {
 
 fun buildFactorialFunction(
     function: FunctionValue,
-    module: Module,
     context: Context
 ) {
+    // LLVM types are cached per context, so us "creating" another does not
+    // actually create another type, we are simply pulling the one we created
+    // in the createFactorialFunction function.
+    val i32 = IntType(32, context)
+
     // Get the first parameter the function receives
     val number = function.getParameter(0)
 
@@ -114,10 +124,10 @@ fun buildFactorialFunction(
         setPositionAtEnd(entry)
 
         // Create the "number == 0" condition to simulate an if block
-        val condition = build().createICmp(
+        val condition = createICmp(
             lhs = number,
             predicate = IntPredicate.EQ,
-            rhs = ConstantInt(IntType(32), 0),
+            rhs = ConstantInt(i32, 0),
             variable = "number == 0"
         )
 
@@ -126,45 +136,45 @@ fun buildFactorialFunction(
         val otherwise = function.createBlock("otherwise")
 
         // Jump based on whether the condition was true or not
-        build().createCondBr(condition, then, otherwise)
+        createCondBr(condition, then, otherwise)
 
         // Enter the if true block
         setPositionAtEnd(then)
         // If number == 0 then we return by jumping to the exit
-        build().createBr(exit)
+        createBr(exit)
 
         // Enter the otherwise block
         setPositionAtEnd(otherwise)
 
         // Subtract 1 from number
-        val numberMinusOne = build().createSub(
+        val numberMinusOne = createSub(
             lhs = number,
-            rhs = ConstantInt(IntType(32), 1),
+            rhs = ConstantInt(i32, 1),
             variable = "number - 1"
         )
         // Call itself recursively with number - 1
-        val callResult = build().createCall(
+        val callResult = createCall(
             function = function,
             arguments = listOf(numberMinusOne),
             variable = "factorial(number - 1)"
         )
         // This is the function result if we ended up in the otherwise block
-        val resultFromOtherwise = build().createMul(
+        val resultFromOtherwise = createMul(
             lhs = number,
             rhs = callResult,
             variable = "number * factorial(number - 1)"
         )
         // This is the function result if we ended up in the then block (1)
-        val resultFromThen = ConstantInt(IntType(32), 1)
+        val resultFromThen = ConstantInt(i32, 1)
 
         // Jump to the exit block
-        build().createBr(exit)
+        createBr(exit)
 
         setPositionAtEnd(exit)
 
         // Get the actual result with a phi node
-        val finalResult = build().createPhi(
-            incoming = IntType(32),
+        val finalResult = createPhi(
+            incoming = i32,
             variable = "result"
         ).apply {
             // See https://llvm.org/docs/LangRef.html#phi-instruction
@@ -175,6 +185,6 @@ fun buildFactorialFunction(
         }
 
         // Return from the function
-        build().createRet(finalResult)
+        createRet(finalResult)
     }
 }
