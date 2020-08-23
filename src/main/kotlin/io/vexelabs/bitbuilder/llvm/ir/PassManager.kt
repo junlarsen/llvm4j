@@ -2,8 +2,10 @@ package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
+import io.vexelabs.bitbuilder.llvm.target.TargetLibraryInfo
 import io.vexelabs.bitbuilder.llvm.target.TargetMachine
 import org.bytedeco.llvm.LLVM.LLVMPassManagerRef
+import org.bytedeco.llvm.LLVM.LLVMTargetLibraryInfoRef
 import org.bytedeco.llvm.global.LLVM
 
 /**
@@ -35,6 +37,15 @@ public class PassManager internal constructor() : Disposable,
      */
     public fun addPassesForTargetMachine(machine: TargetMachine) {
         LLVM.LLVMAddAnalysisPasses(machine.ref, ref)
+    }
+
+    /**
+     * Add the library to this pass manager
+     *
+     * @see LLVM.LLVMAddTargetLibraryInfo
+     */
+    public fun addTargetLibraryInfo(library: TargetLibraryInfo) {
+        LLVM.LLVMAddTargetLibraryInfo(library.ref, ref)
     }
 
     public override fun dispose() {
