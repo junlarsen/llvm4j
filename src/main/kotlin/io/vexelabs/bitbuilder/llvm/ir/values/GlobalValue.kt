@@ -2,6 +2,7 @@ package io.vexelabs.bitbuilder.llvm.ir.values
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ForeignEnum
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
+import io.vexelabs.bitbuilder.llvm.ir.Comdat
 import io.vexelabs.bitbuilder.llvm.ir.DLLStorageClass
 import io.vexelabs.bitbuilder.llvm.ir.Metadata
 import io.vexelabs.bitbuilder.llvm.ir.MetadataEntries
@@ -217,6 +218,26 @@ public open class GlobalValue internal constructor() : ConstantValue() {
         return MetadataEntries(entries, ptr)
     }
     //endregion Core::Values::Constants::GlobalValues
+
+    /**
+     * Get the comdat assigned to this value
+     *
+     * @see LLVM.LLVMGetComdat
+     */
+    public fun getComdat(): Comdat? {
+        val comdat = LLVM.LLVMGetComdat(ref)
+
+        return comdat?.let { Comdat(it) }
+    }
+
+    /**
+     * Set the comdat for this value
+     *
+     * @see LLVM.LLVMSetComdat
+     */
+    public fun setComdat(comdat: Comdat) {
+        LLVM.LLVMSetComdat(ref, comdat.ref)
+    }
 
     public enum class Linkage(public override val value: Int) : ForeignEnum<Int> {
         External(LLVM.LLVMExternalLinkage),

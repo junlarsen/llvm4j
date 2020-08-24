@@ -167,14 +167,14 @@ internal object ModuleTest : Spek({
         assertEquals(type.ref, subject?.ref)
     }
 
-    group("verification") {
-        test("verification of a valid module") {
+    group("verification of a module's ir") {
+        test("using a valid module") {
             val success = module.verify(VerifierFailureAction.PrintMessage)
 
             assertTrue { success }
         }
 
-        test("invalid module") {
+        test("using an invalid module") {
             module.addGlobal("Nothing", VoidType()).apply {
                 setInitializer(ConstantInt(IntType(32), 100))
             }
@@ -183,5 +183,12 @@ internal object ModuleTest : Spek({
 
             assertFalse { success }
         }
+    }
+
+    test("colliding comdat names returns the original") {
+        val original = module.getOrCreateComdat("hello")
+        val subject = module.getOrCreateComdat("hello")
+
+        assertEquals(original.ref, subject.ref)
     }
 })

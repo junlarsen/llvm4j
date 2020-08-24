@@ -647,6 +647,17 @@ public class Module internal constructor() : Disposable,
     }
     //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
+    /**
+     * Get the comdat with the specified name or create it if it does not exist
+     *
+     * @see LLVM.LLVMGetOrInsertComdat
+     */
+    public fun getOrCreateComdat(name: String): Comdat {
+        val comdat = LLVM.LLVMGetOrInsertComdat(ref, name)
+
+        return Comdat(comdat)
+    }
+
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }
 
