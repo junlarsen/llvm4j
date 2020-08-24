@@ -115,6 +115,9 @@ public class TargetMachine internal constructor() :
     /**
      * Emit the given [module] to the target [file]
      *
+     * This emits the given [module] into either an assembly file or an
+     * object file
+     *
      * @see LLVM.LLVMTargetMachineEmitToFile
      */
     public fun emitToFile(
@@ -138,6 +141,9 @@ public class TargetMachine internal constructor() :
 
     /**
      * Emit the given [module] to a memory buffer
+     *
+     * This compiles the given [module] into either an assembly file or an
+     * object file
      *
      * @see LLVM.LLVMTargetMachineEmitToMemoryBuffer
      */
