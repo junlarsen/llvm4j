@@ -10,6 +10,11 @@ import org.bytedeco.llvm.LLVM.LLVMAttributeRef
  * the user can expect a [Attribute] without having to specify the generic
  * types.
  *
+ * The LLVM APIs do not differentiate between Enum attributes and String
+ * attributes and instead fails an assertion if we attempt to pull the String
+ * kind from an Enum value. This can be avoided through the type kotlin type
+ * system.
+ *
  * @param V The return type for [getValue]
  * @param K The return type for [getKind]
  */

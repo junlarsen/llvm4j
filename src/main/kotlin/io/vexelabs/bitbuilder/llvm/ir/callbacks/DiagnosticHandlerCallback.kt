@@ -7,21 +7,35 @@ import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticInfoRef
 
 /**
+ * Kotlin lambda type for [LLVMDiagnosticHandler]
+ *
  * This callback is invoked when the backend needs to report anything to the
  * user
  *
- * [DiagnosticInfo] The associated DiagnosticInfo reporter
- * [Pointer] The payload which was sent with the setter for this callback
+ * @see LLVMDiagnosticHandler
  */
 public typealias DiagnosticHandlerCallback = (
     DiagnosticHandlerCallbackContext
 ) -> Unit
 
+/**
+ * Data payload for [DiagnosticHandlerCallback]
+ *
+ * @property diagnostic The associated DiagnosticInfo reporter
+ * @property payload    Opaque pointer value assigned at callback registration
+ */
 public data class DiagnosticHandlerCallbackContext(
     public val diagnostic: DiagnosticInfo,
     public val payload: Pointer?
 )
 
+/**
+ * Pointer type for [LLVMDiagnosticHandler]
+ *
+ * This is the value passed back into LLVM
+ *
+ * @see LLVMDiagnosticHandler
+ */
 public class DiagnosticHandlerBase(
     private val callback: DiagnosticHandlerCallback
 ) : LLVMDiagnosticHandler(), Callback {

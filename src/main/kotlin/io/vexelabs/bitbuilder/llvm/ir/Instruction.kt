@@ -8,6 +8,16 @@ import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::Instruction
+ *
+ * An instruction is an operation which is performed on a set of [Value]s in
+ * the LLVM IR.
+ *
+ * Common instructions are add, sub, mul and div.
+ *
+ * See https://llvm.org/docs/LangRef.html#instruction-reference
+ */
 public open class Instruction internal constructor() : Value(),
     DebugLocationValue, Validatable, Cloneable {
     public override var valid: Boolean = true

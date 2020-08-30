@@ -4,6 +4,16 @@ import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticInfoRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::DiagnosticInfo
+ *
+ * An abstract interface for reporting diagnostic errors for a backend. This
+ * is used along with [Context.setDiagnosticHandler]
+ *
+ * @see Context.setDiagnosticHandler
+ *
+ * @see LLVMDiagnosticInfoRef
+ */
 public class DiagnosticInfo internal constructor() :
     ContainsReference<LLVMDiagnosticInfoRef> {
     public override lateinit var ref: LLVMDiagnosticInfoRef

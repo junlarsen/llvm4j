@@ -11,6 +11,8 @@ import org.bytedeco.llvm.global.LLVM
  *
  * LLVM uses this as an array of `LLVMModuleFlagEntry`s and thus I feel like it
  * should be named Entries as that is what it used for.
+ *
+ * @see LLVMModuleFlagEntry
  */
 public class ModuleFlagEntries internal constructor() :
     ContainsReference<LLVMModuleFlagEntry>, Disposable {

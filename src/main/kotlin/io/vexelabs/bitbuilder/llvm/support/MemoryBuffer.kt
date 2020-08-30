@@ -10,6 +10,14 @@ import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::MemoryBuffer
+ *
+ * A memory buffer is a simple read-only access to a piece of memory. LLVM
+ * passes around various textual formats like IR or Bitcode in Memory buffers.
+ *
+ * @see LLVMMemoryBufferRef
+ */
 public class MemoryBuffer internal constructor() : Disposable {
     public override var valid: Boolean = true
     public lateinit var ref: LLVMMemoryBufferRef

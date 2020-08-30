@@ -6,6 +6,19 @@ import io.vexelabs.bitbuilder.llvm.target.TargetMachine
 import org.bytedeco.llvm.LLVM.LLVMPassManagerRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::PassManager
+ *
+ * Manages a sequence of passes over a particular unit of IR.
+ *
+ * A pass manager contains a sequence of passes to run over a particular unit
+ * of IR (e.g. Functions, Modules). It is itself a valid pass over that unit of
+ * IR, and when run over some given IR will run each of its contained passes in
+ * sequence. Pass managers are the primary and most basic building block of a
+ * pass pipeline.
+ *
+ * @see LLVMPassManagerRef
+ */
 public class PassManager internal constructor() : Disposable,
     ContainsReference<LLVMPassManagerRef> {
     public override lateinit var ref: LLVMPassManagerRef

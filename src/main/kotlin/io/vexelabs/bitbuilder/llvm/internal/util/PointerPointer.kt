@@ -4,10 +4,12 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.PointerPointer
 
 /**
- * Helper method to turn a [PointerPointer] into a [List] of [R]
+ * Implements [Iterable.map] for [PointerPointer]
  *
  * The method will iterate over every item inside the [PointerPointer] and
  * run [apply] to each of the elements.
+ *
+ * @see Iterable.map
  */
 internal inline fun <reified P : Pointer, R> PointerPointer<P>.map(
     apply: (elem: P) -> R

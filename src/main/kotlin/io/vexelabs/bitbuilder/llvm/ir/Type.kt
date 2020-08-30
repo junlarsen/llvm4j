@@ -9,13 +9,19 @@ import io.vexelabs.bitbuilder.llvm.ir.types.VectorType
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::Type
+ *
+ * A type is the data type of a [Value] in the LLVM IR.
+ *
+ * See https://llvm.org/docs/LangRef.html#type-system
+ *
+ * @see LLVMTypeRef
+ */
 public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     public final override lateinit var ref: LLVMTypeRef
         internal set
 
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
     public constructor(llvmRef: LLVMTypeRef) : this() {
         ref = llvmRef
     }

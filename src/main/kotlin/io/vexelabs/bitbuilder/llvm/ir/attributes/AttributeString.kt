@@ -5,6 +5,16 @@ import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to LLVM String Attributes
+ *
+ * The LLVM APIs do not differentiate between Enum attributes and String
+ * attributes and instead fails an assertion if we attempt to pull the String
+ * kind from an Enum value. This can be avoided through the type kotlin type
+ * system.
+ *
+ * @see Attribute
+ */
 public class AttributeString internal constructor() :
     AttributeBase<String, String>() {
     public constructor(llvmRef: LLVMAttributeRef) : this() {

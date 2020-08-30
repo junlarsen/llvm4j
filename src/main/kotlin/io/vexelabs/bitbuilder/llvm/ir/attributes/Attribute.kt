@@ -6,12 +6,20 @@ import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.global.LLVM
 
 /**
+ * Interface to llvm::Attribute
+ *
  * LLVM has two types of attributes, Enum attributes and String attributes,
  * this is an interface which both types implement and contains shared code
  * between the two.
  *
+ * The LLVM APIs do not differentiate between Enum attributes and String
+ * attributes and instead fails an assertion if we attempt to pull the String
+ * kind from an Enum value. This can be avoided through the type kotlin type
+ * system.
+ *
  * When creating a new [Attribute] of unknown type the static method
- * [Attribute.create] should be used.
+ * [Attribute.create] should be used as this method figures out which subtype
+ * of [Attribute] to return.
  *
  * @see AttributeString
  * @see AttributeEnum

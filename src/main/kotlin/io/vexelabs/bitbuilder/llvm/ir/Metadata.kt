@@ -8,7 +8,17 @@ import org.bytedeco.llvm.LLVM.LLVMMetadataRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-// TODO: Avoid all of this casting with our own LLVM-C bindings (see #166)
+/**
+ * Interface to llvm::Metadata
+ *
+ * LLVM IR allows metadata to be attached to instructions in the program that
+ * can convey extra information about the code to the optimizers and code
+ * generator.
+ *
+ * This can for example be used to generate debug information
+ *
+ * @see LLVMMetadataRef
+ */
 public open class Metadata internal constructor() :
     ContainsReference<LLVMMetadataRef> {
     public final override lateinit var ref: LLVMMetadataRef

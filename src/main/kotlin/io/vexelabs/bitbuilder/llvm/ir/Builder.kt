@@ -36,6 +36,14 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::IRBuilder
+ *
+ * The builder is the API for creating instructions and inserting them into
+ * functions and basic blocks.
+ *
+ * @see LLVMBuilderRef
+ */
 public class Builder public constructor(
     context: Context = Context.getGlobalContext()
 ) : Disposable, ContainsReference<LLVMBuilderRef> {

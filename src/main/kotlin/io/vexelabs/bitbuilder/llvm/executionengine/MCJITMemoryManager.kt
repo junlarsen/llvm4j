@@ -14,6 +14,17 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMCJITMemoryManagerRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * A callback manager for a running Machine Code JIT Compiler
+ *
+ * This is essentially a configuration objects which allows us to subscribe
+ * to lifecycle events of the JIT Memory Manager
+ *
+ * @see MemoryManagerAllocateCodeSectionCallback
+ * @see MemoryManagerAllocateDataSectionCallback
+ * @see MemoryManagerFinalizeMemoryCallback
+ * @see MemoryManagerDestroyCallback
+ */
 public class MCJITMemoryManager internal constructor() :
     ContainsReference<LLVMMCJITMemoryManagerRef>, Disposable {
     public override var valid: Boolean = true
@@ -28,8 +39,13 @@ public class MCJITMemoryManager internal constructor() :
      * Create a new simple MCJIT memory manager
      *
      * This is a memory manager for an MCJIT compiler which operators on
-     * callbacks. You may pass a [client] which will be passed into each
-     * callback upon call.
+     * callbacks. You may pass a [client], an opaque pointer to some value
+     * which will be passed as the payload into every callback.
+     *
+     * @see MemoryManagerAllocateCodeSectionCallback
+     * @see MemoryManagerAllocateDataSectionCallback
+     * @see MemoryManagerFinalizeMemoryCallback
+     * @see MemoryManagerDestroyCallback
      *
      * @see LLVM.LLVMCreateSimpleMCJITMemoryManager
      */

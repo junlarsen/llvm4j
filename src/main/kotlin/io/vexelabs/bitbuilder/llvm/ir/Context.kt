@@ -12,6 +12,21 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::Context
+ *
+ * A context is an instance of LLVMs core infrastructure, including metadata
+ * id tables, types and constant uniquing tables. There should only be one
+ * context per thread if you are running LLVM multithreaded.
+ *
+ * By default, LLVM also provides a "Global Context" which is lazily
+ * initialized upon first usage, meaning you do not need to manually create a
+ * context unless you're using multiple threads.
+ *
+ * @see Context.getGlobalContext
+ *
+ * @see LLVMContextRef
+ */
 public class Context public constructor(
     public override val ref: LLVMContextRef = LLVM.LLVMContextCreate()
 ) : Disposable, ContainsReference<LLVMContextRef> {

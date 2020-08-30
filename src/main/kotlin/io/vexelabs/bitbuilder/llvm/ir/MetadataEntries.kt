@@ -3,9 +3,18 @@ package io.vexelabs.bitbuilder.llvm.ir
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
 import org.bytedeco.javacpp.SizeTPointer
+import org.bytedeco.llvm.LLVM.LLVMModuleFlagEntry
 import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Class wrapping [LLVMValueMetadataEntry]
+ *
+ * LLVM uses this as an array of `LLVMModuleFlagEntry`s and thus I feel like it
+ * should be named Entries as that is what it used for.
+ *
+ * @see LLVMValueMetadataEntry
+ */
 public class MetadataEntries internal constructor() :
     ContainsReference<LLVMValueMetadataEntry>, Disposable {
     internal lateinit var sizePtr: SizeTPointer

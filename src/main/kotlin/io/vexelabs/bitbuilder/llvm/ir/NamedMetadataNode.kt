@@ -11,6 +11,8 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 /**
+ * Interface to llvm::NamedMDNode
+ *
  * Represents a Named Metadata Node which is a top level metadata node in a
  * [Module]
  *
@@ -19,7 +21,7 @@ import org.bytedeco.llvm.global.LLVM
  * with the [getOperands], [addOperand] and
  * [getOperandCount] member methods.
  *
- * [LLVM Documentation](https://llvm.org/docs/LangRef.html#named-metadata)
+ * @see LLVMNamedMDNodeRef
  */
 public class NamedMetadataNode public constructor(
     public override val ref: LLVMNamedMDNodeRef,
@@ -75,7 +77,7 @@ public class NamedMetadataNode public constructor(
     /**
      * Add a metadata operand to this list
      *
-     * LLVM-C expects a metadata node as value (see [Metadata.asValue] for
+     * LLVM-C expects a metadata node as value (see [Metadata.toValue] for
      * this method, but because we know we actually require a metadata node,
      * we can do the conversion ourself, giving the user better type safety.
      *

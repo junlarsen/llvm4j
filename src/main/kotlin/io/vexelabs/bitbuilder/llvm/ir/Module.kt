@@ -22,6 +22,23 @@ import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::Module
+ *
+ * A Module instance is used to store all the information related to an LLVM
+ * module.
+ *
+ * Modules are the top level container of all other LLVM Intermediate
+ * Representation (IR) objects. Each module directly contains a list of
+ * [GlobalVariable]s, a list of [FunctionValue]s, a list of libraries (or
+ * other modules) this module depends on,a symbol table, and various data
+ * about the target's characteristics.
+ *
+ * @see GlobalVariable
+ * @see FunctionValue
+ *
+ * @see LLVMModuleRef
+ */
 public class Module internal constructor() : Disposable,
     ContainsReference<LLVMModuleRef>, Cloneable {
     public override var valid: Boolean = true
@@ -480,17 +497,6 @@ public class Module internal constructor() : Disposable,
         // would expect of a function called "verify"
         // Thus we invert it again ...
         return !res.fromLLVMBool()
-    }
-
-    /**
-     * Changes the type of this to a ModuleProvider
-     *
-     * According to LLVM this is for historical reasons
-     *
-     * @see LLVM.LLVMCreateModuleProviderForExistingModule
-     */
-    public fun getModuleProvider(): ModuleProvider {
-        return ModuleProvider(this)
     }
 
     /**
