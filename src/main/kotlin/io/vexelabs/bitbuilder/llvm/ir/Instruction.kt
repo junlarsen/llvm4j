@@ -1,7 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
-import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Validatable
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.DebugLocationValue
@@ -9,6 +8,16 @@ import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::Instruction
+ *
+ * An instruction is an operation which is performed on a set of [Value]s in
+ * the LLVM IR.
+ *
+ * Common instructions are add, sub, mul and div.
+ *
+ * See https://llvm.org/docs/LangRef.html#instruction-reference
+ */
 public open class Instruction internal constructor() : Value(),
     DebugLocationValue, Validatable, Cloneable {
     public override var valid: Boolean = true
@@ -17,7 +26,6 @@ public open class Instruction internal constructor() : Value(),
         ref = llvmRef
     }
 
-    //region Core::Instructions
     /**
      * Determine if this instruction has metadata
      *
@@ -178,7 +186,6 @@ public open class Instruction internal constructor() : Value(),
 
         return inst != null
     }
-    //endregion Core::Instructions
 
     /**
      * Class to perform iteration over instructions

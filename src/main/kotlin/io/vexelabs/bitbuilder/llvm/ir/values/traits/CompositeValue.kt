@@ -6,7 +6,6 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public interface CompositeValue : ContainsReference<LLVMValueRef> {
-    //region Core::Values::Constants::CompositeConstants
     /**
      * Get an element at specified [index] as a constant
      *
@@ -17,5 +16,4 @@ public interface CompositeValue : ContainsReference<LLVMValueRef> {
 
         return Value(value)
     }
-    //endregion Core::Values::Constants::CompositeConstants
 }

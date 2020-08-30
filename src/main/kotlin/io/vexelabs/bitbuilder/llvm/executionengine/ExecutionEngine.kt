@@ -3,23 +3,34 @@ package io.vexelabs.bitbuilder.llvm.executionengine
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
 import io.vexelabs.bitbuilder.llvm.ir.Module
-import io.vexelabs.bitbuilder.llvm.ir.TargetData
+import io.vexelabs.bitbuilder.llvm.target.TargetData
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.values.FunctionValue
 import io.vexelabs.bitbuilder.llvm.target.TargetMachine
+import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::ExecutionEngine
+ *
+ * An execution engine is an interpreter or a JIT compiler for LLVM IR which
+ * may be invoked at runtime.
+ *
+ * @see LLVMExecutionEngineRef
+ */
 public class ExecutionEngine public constructor() :
     ContainsReference<LLVMExecutionEngineRef>, Disposable {
     public override val ref: LLVMExecutionEngineRef = LLVMExecutionEngineRef()
     public override var valid: Boolean = true
 
-    //region ExecutionEngine
     /**
      * Runs the llvm.global_ctors global variable
+     *
+     * This is similar to how we might need to acquire resources for values
+     * at startup, eg: initializing/constructing a global variable
      *
      * @see LLVM.LLVMRunStaticConstructors
      */
@@ -30,6 +41,9 @@ public class ExecutionEngine public constructor() :
     /**
      * Runs the llvm.global_dtors global variable
      *
+     * This is similar to how we will destroy resources right before the
+     * program ends, eg: destructing a global variable
+     *
      * @see LLVM.LLVMRunStaticDestructors
      */
     public fun runStaticDestructors() {
@@ -39,7 +53,11 @@ public class ExecutionEngine public constructor() :
     /**
      * Run a given [function] with a list of arguments
      *
-     * The execution result of the function is returned
+     * The argument list is an array of [GenericValue]s which is the
+     * Execution Engine's way to interfere with the outside world.
+     *
+     * The execution result of the function is returned in the form of a
+     * [GenericValue].
      *
      * @see LLVM.LLVMRunFunction
      */
@@ -59,32 +77,36 @@ public class ExecutionEngine public constructor() :
     }
 
     /**
-     * Run a given [function] as main with the provided argv and argc.
+     * Run a given [function] a program's "main" function
      *
-     * The function's "exit code" is returned.
+     * The caller may optionally provide an [argc], [argv] and [envp] which
+     * all correspond to a typical C++ application's entry point
+     *
+     * The [envp] defaults to all the environment variables, in a key=value
+     * format.
+     *
+     * The "exit code" from the function is returned.
      *
      * @see LLVM.LLVMRunFunctionAsMain
      */
     public fun runFunctionAsMain(
         function: FunctionValue,
-        argv: String,
-        envp: String,
-        argc: Int
+        argv: List<String> = emptyList(),
+        argc: Int = argv.size,
+        envp: List<String> = System.getenv().map { "${it.key}=${it.value}" }
     ): Int {
-        return LLVM.LLVMRunFunctionAsMain(
-            ref,
-            function.ref,
-            argc,
-            argv.toByteArray(),
-            envp.toByteArray()
-        )
+        val env = PointerPointer(*envp.map { BytePointer(it) }.toTypedArray())
+        val arg = PointerPointer(*argv.map { BytePointer(it) }.toTypedArray())
+
+        return LLVM.LLVMRunFunctionAsMain(ref, function.ref, argc, arg, env)
     }
 
     /**
-     * Free machine code for the function?????
+     * Free machine code for the function?
      *
-     * No idea what this actually does, there is no implementation in the
-     * source code for this, so at the moment it's most likely a no-op
+     * This function lacks documentation in the LLVM-C API and its function
+     * body is empty at its implementation. Possibly kept for binary
+     * backwards compatibility
      *
      * @see LLVM.LLVMFreeMachineCodeForFunction
      */
@@ -95,6 +117,8 @@ public class ExecutionEngine public constructor() :
     /**
      * Add a module to the execution context
      *
+     * TODO: Research behavior of symbol collision
+     *
      * @see LLVM.LLVMAddModule
      */
     public fun addModule(module: Module) {
@@ -102,24 +126,27 @@ public class ExecutionEngine public constructor() :
     }
 
     /**
-     * Unlink the given module
+     * Unlink the given module from the execution context
      *
      * @see LLVM.LLVMRemoveModule
      */
     public fun removeModule(module: Module) {
-        val err = ByteArray(0)
+        val err = BytePointer(0L)
         val result = LLVM.LLVMRemoveModule(ref, module.ref, module.ref, err)
 
         if (result != 0) {
-            throw RuntimeException(err.joinToString(""))
+            throw RuntimeException(err.string)
         }
+
+        err.deallocate()
     }
 
     /**
-     * Relink and recompile the function??????
+     * Relink and recompile the function?
      *
-     * No idea what this actually does, there is no implementation in the
-     * source code for this, so at the moment it's most likely a no-op
+     * This function lacks documentation in the LLVM-C API and its function
+     * body is empty at its implementation. Possibly kept for binary
+     * backwards compatibility
      *
      * @see LLVM.LLVMRecompileAndRelinkFunction
      */
@@ -152,6 +179,9 @@ public class ExecutionEngine public constructor() :
     /**
      * Create a global mapping to a value
      *
+     * This adds a mapping to the provided [value] at the given [address]. An
+     * address should be fetched from [getPointerToGlobal]
+     *
      * @see LLVM.LLVMAddGlobalMapping
      */
     public fun addGlobalMapping(value: Value, address: Pointer) {
@@ -175,7 +205,6 @@ public class ExecutionEngine public constructor() :
     public fun getFunctionAddress(function: String): Long {
         return LLVM.LLVMGetFunctionAddress(ref, function)
     }
-    //endregion ExecutionEngine
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

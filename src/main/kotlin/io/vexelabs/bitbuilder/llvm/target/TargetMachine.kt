@@ -11,6 +11,14 @@ import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.LLVM.LLVMTargetMachineRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::TargetMachine
+ *
+ * A target machine is a target triple which may own multiple [Target]s which
+ * it will be capable of compiling to.
+ *
+ * @see LLVMTargetMachineRef
+ */
 public class TargetMachine internal constructor() :
     ContainsReference<LLVMTargetMachineRef>, Disposable {
     public override lateinit var ref: LLVMTargetMachineRef
@@ -21,9 +29,8 @@ public class TargetMachine internal constructor() :
         ref = llvmRef
     }
 
-    //region Target
     /**
-     * Create a new Target Machine
+     * Create a new Target Machine for a specific Target
      *
      * @see LLVM.LLVMCreateTargetMachine
      */
@@ -50,9 +57,9 @@ public class TargetMachine internal constructor() :
     /**
      * Get the start of the target iterator
      *
-     * @see LLVM.LLVMGetNextTarget
+     * @see LLVM.LLVMGetFirstTarget
      */
-    public fun getFirstTarget(): Target.Iterator? {
+    public fun getTargetIterator(): Target.Iterator? {
         val target = LLVM.LLVMGetFirstTarget()
 
         return target?.let { Target.Iterator(it) }
@@ -154,7 +161,6 @@ public class TargetMachine internal constructor() :
             throw RuntimeException(err.string)
         }
     }
-    //endregion Target
 
     public override fun dispose() {
         require(valid) { "This target machine has already been disposed." }

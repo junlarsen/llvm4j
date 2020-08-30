@@ -13,7 +13,6 @@ public class FunctionType internal constructor() : Type() {
         ref = llvmRef
     }
 
-    //region Core::Types::FunctionTypes
     /**
      * Create a function types
      *
@@ -77,5 +76,4 @@ public class FunctionType internal constructor() : Type() {
 
         return dest.map { Type(it) }
     }
-    //endregion Core::Types::FunctionTypes
 }

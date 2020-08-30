@@ -10,7 +10,6 @@ import org.bytedeco.llvm.global.LLVM
  * llvm::Function
  */
 public interface DebugLocationValue : ContainsReference<LLVMValueRef> {
-    //region Core::Modules
     /**
      * Get the directory of the debug location for this value
      *
@@ -56,5 +55,4 @@ public interface DebugLocationValue : ContainsReference<LLVMValueRef> {
     public fun getDebugLocationColumn(): Int {
         return LLVM.LLVMGetDebugLocColumn(ref)
     }
-    //endregion Core::Modules
 }

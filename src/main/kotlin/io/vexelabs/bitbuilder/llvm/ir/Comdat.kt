@@ -5,6 +5,14 @@ import io.vexelabs.bitbuilder.llvm.internal.contracts.ForeignEnum
 import org.bytedeco.llvm.LLVM.LLVMComdatRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::Comdat
+ *
+ * Comdats provides access to COFF and ELF object file comdat functionality.
+ * You may attach a comdat to a value
+ *
+ * @see LLVMComdatRef
+ */
 public class Comdat internal constructor() : ContainsReference<LLVMComdatRef> {
     public override lateinit var ref: LLVMComdatRef
         internal set
@@ -41,7 +49,8 @@ public class Comdat internal constructor() : ContainsReference<LLVMComdatRef> {
         NoDuplicates(LLVM.LLVMNoDuplicatesComdatSelectionKind),
         SameSize(LLVM.LLVMSameSizeComdatSelectionKind);
 
-        public companion object : ForeignEnum.CompanionBase<Int, SelectionKind> {
+        public companion object :
+            ForeignEnum.CompanionBase<Int, SelectionKind> {
             public override val map: Map<Int, SelectionKind> by lazy {
                 values().associateBy(SelectionKind::value)
             }

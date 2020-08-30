@@ -1,12 +1,12 @@
 package io.vexelabs.bitbuilder.llvm.unit.support
 
 import io.vexelabs.bitbuilder.llvm.support.Message
-import org.bytedeco.javacpp.BytePointer
-import org.spekframework.spek2.Spek
 import java.lang.IllegalArgumentException
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
+import org.bytedeco.javacpp.BytePointer
+import org.spekframework.spek2.Spek
 
 internal object MessageTest : Spek({
     test("create a message from a string") {

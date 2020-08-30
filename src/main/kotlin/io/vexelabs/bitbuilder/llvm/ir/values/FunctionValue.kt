@@ -25,7 +25,6 @@ public open class FunctionValue internal constructor() : Value(),
         ref = llvmRef
     }
 
-    //region Core::BasicBlock
     /**
      * Add a new basic block to this function and returns it
      *
@@ -102,9 +101,7 @@ public open class FunctionValue internal constructor() : Value(),
 
         return ptr.map { BasicBlock(it) }
     }
-    //endregion Core::BasicBlock
 
-    //region Core::Values::Constants::FunctionValues::FunctionParameters
     /**
      * Get a parameter from this function at [index]
      *
@@ -148,9 +145,7 @@ public open class FunctionValue internal constructor() : Value(),
     public fun setParameterAlignment(value: Value, align: Int) {
         LLVM.LLVMSetParamAlignment(value.ref, align)
     }
-    //endregion Core::Values::Constants::FunctionValues::FunctionParameters
 
-    //region Core::Values::Constants::FunctionValues::IndirectFunctions
     /**
      * Get the indirect resolver if it has been set
      *
@@ -170,9 +165,7 @@ public open class FunctionValue internal constructor() : Value(),
     public fun setIndirectResolver(function: IndirectFunction) {
         LLVM.LLVMSetGlobalIFuncResolver(ref, function.ref)
     }
-    //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
-    //region Core::Values::Constants::FunctionValues
     /**
      * Get the calling convention for this function
      *
@@ -432,9 +425,7 @@ public open class FunctionValue internal constructor() : Value(),
     ) {
         LLVM.LLVMAddTargetDependentFunctionAttr(ref, attribute, value)
     }
-    //endregion Core::Values::Constants::FunctionValues
 
-    //region Analysis
     /**
      * Verify that the function structure is valid
      *
@@ -474,7 +465,6 @@ public open class FunctionValue internal constructor() : Value(),
             LLVM.LLVMViewFunctionCFG(ref)
         }
     }
-    //endregion Analysis
 
     /**
      * Class to perform iteration over functions

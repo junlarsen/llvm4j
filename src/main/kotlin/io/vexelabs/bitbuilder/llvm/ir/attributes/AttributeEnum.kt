@@ -4,12 +4,21 @@ import io.vexelabs.bitbuilder.llvm.ir.Context
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to LLVM Enum Attributes
+ *
+ * The LLVM APIs do not differentiate between Enum attributes and String
+ * attributes and instead fails an assertion if we attempt to pull the String
+ * kind from an Enum value. This can be avoided through the type kotlin type
+ * system.
+ *
+ * @see Attribute
+ */
 public class AttributeEnum internal constructor() : AttributeBase<Int, Long>() {
     public constructor(llvmRef: LLVMAttributeRef) : this() {
         ref = llvmRef
     }
 
-    //region Core::Context
     /**
      * Create an enum attribute
      *
@@ -36,5 +45,4 @@ public class AttributeEnum internal constructor() : AttributeBase<Int, Long>() {
     public override fun getValue(): Long {
         return LLVM.LLVMGetEnumAttributeValue(ref)
     }
-    //endregion Core::Context
 }

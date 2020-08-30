@@ -50,5 +50,4 @@ public class ConstantPointer internal constructor() : ConstantValue() {
 
         return ConstantPointer(ref)
     }
-    //endregion Core::Values::Constants::ConstantExpressions
 }

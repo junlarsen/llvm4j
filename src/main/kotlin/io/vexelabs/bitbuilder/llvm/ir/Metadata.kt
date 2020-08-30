@@ -8,7 +8,17 @@ import org.bytedeco.llvm.LLVM.LLVMMetadataRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-// TODO: Avoid all of this casting with our own LLVM-C bindings (see #166)
+/**
+ * Interface to llvm::Metadata
+ *
+ * LLVM IR allows metadata to be attached to instructions in the program that
+ * can convey extra information about the code to the optimizers and code
+ * generator.
+ *
+ * This can for example be used to generate debug information
+ *
+ * @see LLVMMetadataRef
+ */
 public open class Metadata internal constructor() :
     ContainsReference<LLVMMetadataRef> {
     public final override lateinit var ref: LLVMMetadataRef
@@ -18,7 +28,6 @@ public open class Metadata internal constructor() :
         ref = llvmRef
     }
 
-    //region Core::Metadata
     /**
      * Represent a [MetadataNode] which has been cast to a [Value]
      */
@@ -69,7 +78,6 @@ public open class Metadata internal constructor() :
             withContext: Context = Context.getGlobalContext()
         ): MetadataAsValue = metadata.toValue(withContext)
     }
-    //endregion Core::Metadata
 
     /**
      * Test if this is a metadata string
@@ -107,7 +115,6 @@ public class MetadataString internal constructor() : Metadata() {
         ref = llvmRef
     }
 
-    //region Core::Metadata
     public constructor(
         data: String,
         context: Context = Context.getGlobalContext()
@@ -118,7 +125,6 @@ public class MetadataString internal constructor() : Metadata() {
             data.length.toLong()
         )
     }
-    //endregion Core::Metadata
 
     /**
      * Get the string from a MDString node
@@ -137,12 +143,11 @@ public class MetadataString internal constructor() : Metadata() {
     }
 }
 
-public open class MetadataNode internal constructor(): Metadata() {
+public open class MetadataNode internal constructor() : Metadata() {
     public constructor(llvmRef: LLVMMetadataRef) : this() {
         ref = llvmRef
     }
 
-    //region Core::Metadata
     public constructor(
         values: List<Metadata>,
         context: Context = Context.getGlobalContext()
@@ -192,5 +197,4 @@ public open class MetadataNode internal constructor(): Metadata() {
 
         return ptr.map { Value(it) }
     }
-    //endregion Core::Metadata
 }

@@ -18,7 +18,6 @@ public class ConstantVector internal constructor() : ConstantValue(),
         ref = llvmRef
     }
 
-    //region Core::Values::Constants::ConstantExpressions
     /**
      * Create a new vector of a list of values
      *
@@ -480,5 +479,4 @@ public class ConstantVector internal constructor() : ConstantValue(),
 
         return ConstantVector(ref)
     }
-    //endregion Core::Values::Constants::ConstantExpressions
 }

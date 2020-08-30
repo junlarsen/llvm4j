@@ -1,6 +1,5 @@
 package io.vexelabs.bitbuilder.llvm.ir.values
 
-import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.internal.util.toLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.ThreadLocalMode
@@ -15,7 +14,6 @@ public class GlobalVariable internal constructor() : GlobalValue(),
         ref = llvmRef
     }
 
-    //region Core::Values::Constants::GlobalVariables
     /**
      * Is this variable initialized outside of this module?
      *
@@ -112,5 +110,4 @@ public class GlobalVariable internal constructor() : GlobalValue(),
     public fun setThreadLocal(isThreadLocal: Boolean) {
         LLVM.LLVMSetThreadLocal(ref, isThreadLocal.toLLVMBool())
     }
-    //endregion Core::Values::Constants::GlobalVariables
 }

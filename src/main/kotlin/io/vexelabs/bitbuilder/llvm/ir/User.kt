@@ -3,12 +3,21 @@ package io.vexelabs.bitbuilder.llvm.ir
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::User
+ *
+ * A user is a value which keeps track of what references a [Value].
+ *
+ * A user may retrieve all the values which references the value the user is
+ * tracking. Each reference is a [Use]
+ *
+ * @see Use
+ */
 public class User internal constructor() : Value() {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }
 
-    //region Core::Values::UserValue
     /**
      * Get the operand for the user
      *
@@ -60,5 +69,4 @@ public class User internal constructor() : Value() {
     public fun getOperandCount(): Int {
         return LLVM.LLVMGetNumOperands(ref)
     }
-    //endregion Core::Values::UserValue
 }

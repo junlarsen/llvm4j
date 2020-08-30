@@ -12,7 +12,6 @@ public class VectorType internal constructor() : Type(), CompositeType,
         ref = llvmType
     }
 
-    //region Core::Types::SequentialTypes
     /**
      * Create a vector types
      *
@@ -32,5 +31,4 @@ public class VectorType internal constructor() : Type(), CompositeType,
     public override fun getElementCount(): Int {
         return LLVM.LLVMGetVectorSize(ref)
     }
-    //endregion Core::Types::SequentialTypes
 }

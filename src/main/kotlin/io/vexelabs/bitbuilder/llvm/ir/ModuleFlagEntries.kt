@@ -2,7 +2,6 @@ package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
-import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleFlagEntry
 import org.bytedeco.llvm.global.LLVM
@@ -12,6 +11,8 @@ import org.bytedeco.llvm.global.LLVM
  *
  * LLVM uses this as an array of `LLVMModuleFlagEntry`s and thus I feel like it
  * should be named Entries as that is what it used for.
+ *
+ * @see LLVMModuleFlagEntry
  */
 public class ModuleFlagEntries internal constructor() :
     ContainsReference<LLVMModuleFlagEntry>, Disposable {
@@ -35,7 +36,6 @@ public class ModuleFlagEntries internal constructor() :
         return sizePtr.get()
     }
 
-    //region Core::Modules
     /**
      * Get the [ModuleFlagBehavior] for the entry at [index]
      *
@@ -89,7 +89,6 @@ public class ModuleFlagEntries internal constructor() :
 
         return Metadata(md)
     }
-    //endregion Core::Modules
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

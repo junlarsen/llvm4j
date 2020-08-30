@@ -15,7 +15,6 @@ public class CatchSwitchInstruction internal constructor() : Instruction(),
         ref = llvmRef
     }
 
-    //region InstructionBuilders
     /**
      * Get the amount of handlers this catch switch has
      *
@@ -47,5 +46,4 @@ public class CatchSwitchInstruction internal constructor() : Instruction(),
     public fun addHandler(handler: BasicBlock) {
         LLVM.LLVMAddHandler(ref, handler.ref)
     }
-    //endregion InstructionBuilders
 }

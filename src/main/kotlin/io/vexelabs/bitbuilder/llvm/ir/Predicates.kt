@@ -1,7 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ForeignEnum
-import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import org.bytedeco.llvm.global.LLVM
 
 public enum class IntPredicate(public override val value: Int) :

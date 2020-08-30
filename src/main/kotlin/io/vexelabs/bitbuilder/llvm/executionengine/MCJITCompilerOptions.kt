@@ -4,6 +4,14 @@ import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import org.bytedeco.llvm.LLVM.LLVMMCJITCompilerOptions
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * An interface to LLVMMCJitCompilerOptions
+ *
+ * TODO: Find a way to create [org.bytedeco.llvm.LLVM.LLVMMCJITCompilerOptions]
+ *   from userland
+ *
+ * @see LLVMMCJITCompilerOptions
+ */
 public class MCJITCompilerOptions internal constructor() :
     ContainsReference<LLVMMCJITCompilerOptions> {
     public override lateinit var ref: LLVMMCJITCompilerOptions
@@ -13,10 +21,6 @@ public class MCJITCompilerOptions internal constructor() :
         ref = llvmRef
     }
 
-    //region ExecutionEngine
-    // TODO: Find a way to create
-    //   [org.bytedeco.llvm.LLVM.LLVMMCJITCompilerOptions] from userland
-
     /**
      * Initialize a set of options
      *
@@ -25,5 +29,4 @@ public class MCJITCompilerOptions internal constructor() :
     public fun initialize() {
         LLVM.LLVMInitializeMCJITCompilerOptions(ref, ref.sizeof().toLong())
     }
-    //endregion ExecutionEngine
 }

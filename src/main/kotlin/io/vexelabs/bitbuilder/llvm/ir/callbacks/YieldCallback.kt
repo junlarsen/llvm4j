@@ -7,15 +7,22 @@ import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.LLVM.LLVMYieldCallback
 
 /**
+ * Kotlin lambda type for [LLVMYieldCallback]
+ *
  * The yield callback function may be called by LLVM to transfer control back
  * to the client that invoked the LLVM compilation. There is no guarantee
  * that this callback ever goes off.
  *
- * [Context] The context this was set to
- * [Pointer] The payload which was sent with the setter for this callback
+ * @see LLVMYieldCallback
  */
 public typealias YieldCallback = (YieldCallbackContext) -> Unit
 
+/**
+ * Data payload for [YieldCallback]
+ *
+ * @property context The context callback was triggered on
+ * @property payload Opaque pointer value assigned at callback registration
+ */
 public data class YieldCallbackContext(
     public val context: Context,
     public val payload: Pointer?

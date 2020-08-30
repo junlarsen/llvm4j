@@ -6,7 +6,6 @@ import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
-import io.vexelabs.bitbuilder.llvm.internal.util.map
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.ir.types.StructType
@@ -18,12 +17,28 @@ import io.vexelabs.bitbuilder.llvm.support.MemoryBuffer
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
 import java.io.File
 import org.bytedeco.javacpp.BytePointer
-import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::Module
+ *
+ * A Module instance is used to store all the information related to an LLVM
+ * module.
+ *
+ * Modules are the top level container of all other LLVM Intermediate
+ * Representation (IR) objects. Each module directly contains a list of
+ * [GlobalVariable]s, a list of [FunctionValue]s, a list of libraries (or
+ * other modules) this module depends on,a symbol table, and various data
+ * about the target's characteristics.
+ *
+ * @see GlobalVariable
+ * @see FunctionValue
+ *
+ * @see LLVMModuleRef
+ */
 public class Module internal constructor() : Disposable,
     ContainsReference<LLVMModuleRef>, Cloneable {
     public override var valid: Boolean = true
@@ -34,7 +49,6 @@ public class Module internal constructor() : Disposable,
         ref = llvmRef
     }
 
-    //region Core::Modules
     /**
      * Create a new module with a file name
      *
@@ -369,9 +383,7 @@ public class Module internal constructor() : Disposable,
 
         return Module(mod)
     }
-    //endregion Core::Modules
 
-    //region Core::Values::Constants::GlobalAliases
     /**
      * Add an alias of a global variable or function inside this module
      *
@@ -407,9 +419,7 @@ public class Module internal constructor() : Disposable,
 
         return alias?.let { GlobalAlias(it) }
     }
-    //endregion Core::Values::Constants::GlobalAliases
 
-    //region Core::Values::Constants::GlobalVariables
     /**
      * Add a global variable to this module
      *
@@ -430,9 +440,7 @@ public class Module internal constructor() : Disposable,
 
         return GlobalVariable(global)
     }
-    //endregion Core::Values::Constants::GlobalVariables
 
-    //region BitWriter
     /**
      * Write the module bit-code to a memory buffer
      *
@@ -461,9 +469,7 @@ public class Module internal constructor() : Disposable,
     public fun writeBitCodeToFile(file: File) {
         LLVM.LLVMWriteBitcodeToFile(ref, file.absolutePath)
     }
-    //endregion BitWriter
 
-    //region Analysis
     /**
      * Verifies that the module structure is valid
      *
@@ -492,22 +498,7 @@ public class Module internal constructor() : Disposable,
         // Thus we invert it again ...
         return !res.fromLLVMBool()
     }
-    //endregion Analysis
 
-    //region ModuleProviders
-    /**
-     * Changes the type of this to a ModuleProvider
-     *
-     * According to LLVM this is for historical reasons
-     *
-     * @see LLVM.LLVMCreateModuleProviderForExistingModule
-     */
-    public fun getModuleProvider(): ModuleProvider {
-        return ModuleProvider(this)
-    }
-    //endregion ModuleProviders
-
-    //region ExecutionEngine
     /**
      * Create a generic execution engine for this module
      *
@@ -591,9 +582,7 @@ public class Module internal constructor() : Disposable,
             throw RuntimeException(error.contentToString())
         }
     }
-    //endregion ExecutionEngine
 
-    //region Core::Values::Constants::FunctionValues::IndirectFunctions
     /**
      * Looks up a globally available, named IFunc
      *
@@ -645,7 +634,6 @@ public class Module internal constructor() : Disposable,
 
         return fn?.let { IndirectFunction.Iterator(fn) }
     }
-    //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
     /**
      * Get the comdat with the specified name or create it if it does not exist

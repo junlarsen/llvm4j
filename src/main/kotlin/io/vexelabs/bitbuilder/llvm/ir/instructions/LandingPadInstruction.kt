@@ -12,7 +12,6 @@ public class LandingPadInstruction internal constructor() : Instruction() {
         ref = llvmRef
     }
 
-    //region InstructionBuilders
     /**
      * Get the amount of clauses appended
      *
@@ -62,5 +61,4 @@ public class LandingPadInstruction internal constructor() : Instruction() {
     public fun setCleanup(isCleanup: Boolean) {
         LLVM.LLVMSetCleanup(ref, isCleanup.toLLVMBool())
     }
-    //endregion InstructionBuilders
 }

@@ -1,25 +1,48 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
-import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
+import io.vexelabs.bitbuilder.llvm.ir.values.FunctionValue
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::Value
+ *
+ * This is a very important LLVM class. It is the base class of all values
+ * computed by a program that may be used as operands to other values. Value
+ * is the super class of other important classes such as Instruction and
+ * Function.
+ *
+ * - All Values have a [Type].
+ * - Type is not a subclass of Value.
+ * - Some values can have a name and they belong to some [Module].
+ * - Setting the name on the Value automatically updates the module's symbol
+ *   table.
+ *
+ * @see Type
+ * @see Instruction
+ * @see FunctionValue
+ * @see Module
+ *
+ * Every value has a "use list" that keeps track of which other Values are
+ * using this Value.
+ *
+ * @see Use
+ * @see User
+ *
+ * @see LLVMValueRef
+ */
 public open class Value internal constructor() :
     ContainsReference<LLVMValueRef> {
     public final override lateinit var ref: LLVMValueRef
         internal set
 
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }
 
-    //region Core::Values::GeneralAPIs
     /**
      * Get the IR name for this value
      *
@@ -146,9 +169,7 @@ public open class Value internal constructor() :
     public fun isMetadataString(): Boolean {
         return LLVM.LLVMIsAMDString(ref) != null
     }
-    //endregion Core::Values::GeneralAPIs
 
-    //region Core::Values::Usage
     /**
      * Get the start of the use iterator
      *
@@ -159,9 +180,7 @@ public open class Value internal constructor() :
 
         return use?.let { Use.Iterator(it) }
     }
-    //endregion Core::Values::Usage
 
-    //region Core::Values::Constants
     /**
      * Determine if this value is a null pointer
      *
@@ -170,9 +189,7 @@ public open class Value internal constructor() :
     public fun isNull(): Boolean {
         return LLVM.LLVMIsNull(ref).fromLLVMBool()
     }
-    //endregion Core::Values::Constants
 
-    //region Core::BasicBlock
     /**
      * Is this value a basic block?
      *
@@ -198,5 +215,4 @@ public open class Value internal constructor() :
 
         return BasicBlock(bb)
     }
-    //endregion Core::BasicBlock
 }

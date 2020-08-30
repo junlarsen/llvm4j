@@ -10,6 +10,14 @@ import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::MemoryBuffer
+ *
+ * A memory buffer is a simple read-only access to a piece of memory. LLVM
+ * passes around various textual formats like IR or Bitcode in Memory buffers.
+ *
+ * @see LLVMMemoryBufferRef
+ */
 public class MemoryBuffer internal constructor() : Disposable {
     public override var valid: Boolean = true
     public lateinit var ref: LLVMMemoryBufferRef
@@ -19,7 +27,6 @@ public class MemoryBuffer internal constructor() : Disposable {
         ref = llvmRef
     }
 
-    //region BitReader
     /**
      * Parse this memory buffer as if it was LLVM bit code into an LLVM Module
      *
@@ -39,7 +46,7 @@ public class MemoryBuffer internal constructor() : Disposable {
     public fun getBitCodeModule(
         intoContext: Context = Context.getGlobalContext(),
         parseLazy: Boolean = true
-    ) : Module {
+    ): Module {
         var error: BytePointer? = null
         val outModule = LLVMModuleRef()
         val result = if (parseLazy) {
@@ -99,9 +106,7 @@ public class MemoryBuffer internal constructor() : Disposable {
 
         return Module(outModule)
     }
-    //endregion BitReader
 
-    //region MemoryBuffers
     /**
      * Loads file contents into a memory buffer
      *
@@ -146,7 +151,6 @@ public class MemoryBuffer internal constructor() : Disposable {
     public fun getSize(): Long {
         return LLVM.LLVMGetBufferSize(ref)
     }
-    //endregion MemoryBuffers
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

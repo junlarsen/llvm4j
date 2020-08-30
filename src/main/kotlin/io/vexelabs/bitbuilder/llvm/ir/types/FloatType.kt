@@ -12,7 +12,6 @@ public class FloatType internal constructor() : Type() {
         ref = llvmRef
     }
 
-    //region Core::Types::FloatingPointTypes
     /**
      * Create a floating point types
      *
@@ -46,5 +45,4 @@ public class FloatType internal constructor() : Type() {
             TypeKind.PPC_FP128
         )
     }
-    //endregion Core::Types::FloatingPointTypes
 }

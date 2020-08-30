@@ -6,7 +6,6 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public interface Terminator : ContainsReference<LLVMValueRef> {
-    //region Core::Instructions::Terminators
     /**
      * Get the number of successors that this terminator has
      *
@@ -39,5 +38,4 @@ public interface Terminator : ContainsReference<LLVMValueRef> {
     public fun setSuccessor(index: Int, block: BasicBlock) {
         LLVM.LLVMSetSuccessor(ref, index, block.ref)
     }
-    //endregion Core::Instructions::Terminators
 }

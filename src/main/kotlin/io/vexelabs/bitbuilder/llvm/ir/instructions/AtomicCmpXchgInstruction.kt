@@ -1,6 +1,5 @@
 package io.vexelabs.bitbuilder.llvm.ir.instructions
 
-import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.llvm.ir.AtomicOrdering
 import io.vexelabs.bitbuilder.llvm.ir.Instruction
 import io.vexelabs.bitbuilder.llvm.ir.instructions.traits.Atomic
@@ -14,7 +13,6 @@ public class AtomicCmpXchgInstruction internal constructor() : Instruction(),
         ref = llvmRef
     }
 
-    //region InstructionBuilders
     /**
      * Get the atomic ordering upon success
      *
@@ -54,5 +52,4 @@ public class AtomicCmpXchgInstruction internal constructor() : Instruction(),
     public fun setFailureOrdering(ordering: AtomicOrdering) {
         LLVM.LLVMSetCmpXchgFailureOrdering(ref, ordering.value)
     }
-    //endregion InstructionBuilders
 }

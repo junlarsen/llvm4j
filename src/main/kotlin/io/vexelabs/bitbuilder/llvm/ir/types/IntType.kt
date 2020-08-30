@@ -11,7 +11,6 @@ public class IntType internal constructor() : Type() {
         ref = llvmRef
     }
 
-    //region Core::Types::Int
     /**
      * Create an integer types
      *
@@ -48,9 +47,7 @@ public class IntType internal constructor() : Type() {
     public fun getTypeWidth(): Int {
         return LLVM.LLVMGetIntTypeWidth(ref)
     }
-    //endregion Core::Types::Int
 
-    //region Core::Values::Constants
     /**
      * Get a constant all 1's for this integer type
      *
@@ -61,5 +58,4 @@ public class IntType internal constructor() : Type() {
 
         return ConstantInt(v)
     }
-    //endregion Core::Values::Constants
 }

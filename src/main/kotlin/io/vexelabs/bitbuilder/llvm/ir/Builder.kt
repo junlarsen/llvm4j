@@ -36,6 +36,14 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::IRBuilder
+ *
+ * The builder is the API for creating instructions and inserting them into
+ * functions and basic blocks.
+ *
+ * @see LLVMBuilderRef
+ */
 public class Builder public constructor(
     context: Context = Context.getGlobalContext()
 ) : Disposable, ContainsReference<LLVMBuilderRef> {
@@ -49,7 +57,6 @@ public class Builder public constructor(
         ref = llvmRef
     }
 
-    //region InstructionBuilders
     /**
      * Position the builder at the [block]
      *
@@ -1866,7 +1873,6 @@ public class Builder public constructor(
 
         return AtomicCmpXchgInstruction(inst)
     }
-    //endregion InstructionBuilders
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

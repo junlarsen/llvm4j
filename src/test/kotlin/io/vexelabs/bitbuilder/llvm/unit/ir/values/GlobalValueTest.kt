@@ -9,9 +9,9 @@ import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.GlobalValue
 import io.vexelabs.bitbuilder.llvm.setup
 import kotlin.test.assertEquals
-import org.spekframework.spek2.Spek
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import org.spekframework.spek2.Spek
 
 internal class GlobalValueTest : Spek({
     setup()

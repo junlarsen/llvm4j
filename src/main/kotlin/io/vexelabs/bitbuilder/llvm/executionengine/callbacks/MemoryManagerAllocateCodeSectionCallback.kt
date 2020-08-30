@@ -5,10 +5,24 @@ import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryManagerAllocateCodeSectionCallback
 
+/**
+ * Kotlin lambda type for [LLVMMemoryManagerAllocateCodeSectionCallback]
+ *
+ * @see LLVMMemoryManagerAllocateCodeSectionCallback
+ */
 public typealias MemoryManagerAllocateCodeSectionCallback = (
     MemoryManagerAllocateCodeSectionCallbackContext
 ) -> BytePointer
 
+/**
+ * Data payload for [MemoryManagerAllocateCodeSectionCallback]
+ *
+ * @property payload     Opaque pointer value assigned at callback registration
+ * @property size
+ * @property alignment
+ * @property sectionId   The section which was just allocated
+ * @property sectionName The name of the section
+ */
 public data class MemoryManagerAllocateCodeSectionCallbackContext(
     public val payload: Pointer?,
     public val size: Long,
@@ -17,6 +31,13 @@ public data class MemoryManagerAllocateCodeSectionCallbackContext(
     public val sectionName: String
 )
 
+/**
+ * Pointer type for [LLVMMemoryManagerAllocateCodeSectionCallback]
+ *
+ * This is the value passed back into LLVM
+ *
+ * @see LLVMMemoryManagerAllocateCodeSectionCallback
+ */
 public class MemoryManagerAllocateCodeSectionBase(
     private val callback: MemoryManagerAllocateCodeSectionCallback
 ) : LLVMMemoryManagerAllocateCodeSectionCallback(), Callback {

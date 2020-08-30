@@ -9,6 +9,17 @@ import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMGenericValueRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::GenericValue
+ *
+ * In LLVM, generic values are values of an arbitrary type which we may pass
+ * into an interpreter or JIT compiler.
+ *
+ * It is a union value which can be one of three following C types, `int`,
+ * `float` or an opaque `void*`
+ *
+ * @see ExecutionEngine
+ */
 public class GenericValue internal constructor() : Disposable,
     ContainsReference<LLVMGenericValueRef> {
     public override var valid: Boolean = true
@@ -19,7 +30,6 @@ public class GenericValue internal constructor() : Disposable,
         ref = llvmRef
     }
 
-    //region ExecutionEngine
     /**
      * Create a generic value of an integer
      *
@@ -58,6 +68,9 @@ public class GenericValue internal constructor() : Disposable,
     /**
      * Get the bit width of an integer Generic value
      *
+     * This will only yield results for generic values which are underlying
+     * integers.
+     *
      * @see LLVM.LLVMGenericValueIntWidth
      */
     public fun getIntWidth(): Int? {
@@ -90,7 +103,6 @@ public class GenericValue internal constructor() : Disposable,
     public fun toPointer(): Pointer? {
         return LLVM.LLVMGenericValueToPointer(ref)
     }
-    //endregion ExecutionEngine
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

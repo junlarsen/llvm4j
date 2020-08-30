@@ -8,7 +8,6 @@ import org.bytedeco.llvm.global.LLVM
 
 public interface SequentialType : CompositeType,
     ContainsReference<LLVMTypeRef> {
-    //region Core::Types::SequentialTypes
     /**
      * Returns types's subtypes
      *
@@ -37,5 +36,4 @@ public interface SequentialType : CompositeType,
 
         return Type(type)
     }
-    //endregion Core::Types::SequentialTypes
 }

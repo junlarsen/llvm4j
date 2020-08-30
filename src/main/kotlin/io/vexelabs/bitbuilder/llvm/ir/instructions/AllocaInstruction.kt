@@ -10,7 +10,6 @@ public class AllocaInstruction internal constructor() : Instruction() {
         ref = llvmRef
     }
 
-    //region Core::Instructions::Allocas
     /**
      * Get the type this alloca instruction is allocating
      *
@@ -21,5 +20,4 @@ public class AllocaInstruction internal constructor() : Instruction() {
 
         return Type(ty)
     }
-    //endregion Core::Instructions::Allocas
 }

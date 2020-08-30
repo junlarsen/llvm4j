@@ -5,18 +5,25 @@ import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
 import org.bytedeco.llvm.LLVM.LLVMUseRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::Use
+ *
+ * This is notionally a two-dimensional linked list. It supports traversing
+ * all of the uses for a particular value definition. It also supports
+ * jumping directly to the used value when we arrive from the [User]'s
+ * operands, and jumping directly to the [User] when we arrive from the
+ * [Value]'s uses
+ *
+ * @see LLVMUseRef
+ */
 public class Use internal constructor() : ContainsReference<LLVMUseRef> {
     public override lateinit var ref: LLVMUseRef
         internal set
 
-    /**
-     * Construct a new Type from an LLVM pointer reference
-     */
     public constructor(use: LLVMUseRef) : this() {
         ref = use
     }
 
-    //region Core::Values::Usage
     /**
      * Get the next [Use] in the iterator
      *
@@ -53,7 +60,6 @@ public class Use internal constructor() : ContainsReference<LLVMUseRef> {
 
         return Value(value)
     }
-    //endregion Core::Values::Usage
 
     /**
      * Class to perform iteration over targets

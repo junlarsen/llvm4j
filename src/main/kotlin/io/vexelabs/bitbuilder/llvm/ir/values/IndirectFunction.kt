@@ -9,7 +9,6 @@ public class IndirectFunction internal constructor() : FunctionValue() {
         ref = llvmRef
     }
 
-    //region Core::Values::Constants::FunctionValues::IndirectFunctions
     /**
      * Remove a global indirect function from its parent module and delete it.
      *
@@ -30,7 +29,6 @@ public class IndirectFunction internal constructor() : FunctionValue() {
     public fun remove() {
         LLVM.LLVMRemoveGlobalIFunc(ref)
     }
-    //endregion Core::Values::Constants::FunctionValues::IndirectFunctions
 
     /**
      * Class to perform iteration over basic blocks

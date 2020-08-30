@@ -7,6 +7,14 @@ import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMTargetRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::Target
+ *
+ * A target is a backend LLVM may compile to. The target provides necessary
+ * information for what runtime compilers are available.
+ *
+ * @see LLVMTargetRef
+ */
 public class Target internal constructor() :
     ContainsReference<LLVMTargetRef> {
     public override lateinit var ref: LLVMTargetRef
@@ -14,18 +22,6 @@ public class Target internal constructor() :
 
     public constructor(llvmRef: LLVMTargetRef) : this() {
         ref = llvmRef
-    }
-
-    //region Target
-    /**
-     * Get the next [Target] in the iterator
-     *
-     * @see LLVM.LLVMGetNextTarget
-     */
-    public fun getNextTarget(): Target? {
-        val next = LLVM.LLVMGetNextTarget(ref)
-
-        return next?.let { Target(it) }
     }
 
     /**
@@ -118,7 +114,6 @@ public class Target internal constructor() :
             }
         }
     }
-    //endregion Target
 
     /**
      * Class to perform iteration over targets

@@ -3,10 +3,25 @@ package io.vexelabs.bitbuilder.llvm.ir
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Validatable
+import io.vexelabs.bitbuilder.llvm.ir.types.LabelType
 import io.vexelabs.bitbuilder.llvm.ir.values.FunctionValue
 import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.global.LLVM
 
+/**
+ * Interface to llvm::BasicBlock
+ *
+ * This represents a single basic block in LLVM. A basic block is simply a
+ * list of instructions that execute sequentially. Each basic block must end
+ * with a terminator and the [Type] of a basic block is always [LabelType]
+ *
+ * The builder allows malformed basic blocks to occur because they may be
+ * used in the intermediate stage of constructing or modifying a program,
+ * however the verified ([Module.verify], [FunctionValue.verify]) will reject
+ * malformed blocks.
+ *
+ * @see LLVMBasicBlockRef
+ */
 public class BasicBlock internal constructor() : Validatable,
     ContainsReference<LLVMBasicBlockRef> {
     override var valid: Boolean = true
@@ -17,7 +32,6 @@ public class BasicBlock internal constructor() : Validatable,
         ref = llvmRef
     }
 
-    //region Core::BasicBlock
     /**
      * Create a new basic block without inserting it into a function
      *
@@ -152,7 +166,6 @@ public class BasicBlock internal constructor() : Validatable,
 
         return instr?.let { Instruction.Iterator(it) }
     }
-    //endregion Core::BasicBlock
 
     /**
      * Class to perform iteration over basic blocks

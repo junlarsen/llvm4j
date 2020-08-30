@@ -19,7 +19,6 @@ public class ConstantArray internal constructor() : ConstantValue(),
         ref = llvmRef
     }
 
-    //region Core::Values::Constants::CompositeConstants
     /**
      * Create an array of values of a given [type]
      *
@@ -74,5 +73,4 @@ public class ConstantArray internal constructor() : ConstantValue(),
 
         return ptr.string
     }
-    //endregion Core::Values::Constants::CompositeConstants
 }

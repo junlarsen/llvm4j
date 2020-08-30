@@ -12,7 +12,6 @@ public open class ConstantValue internal constructor() : Value() {
         ref = llvmRef
     }
 
-    //region Core::Values::Constants::ConstantExpressions
     /**
      * Get the opcode for a constant value
      *
@@ -93,5 +92,4 @@ public open class ConstantValue internal constructor() : Value() {
 
         return Value(ref)
     }
-    //endregion Core::Values::Constants::ConstantExpressions
 }

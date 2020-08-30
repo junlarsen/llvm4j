@@ -9,7 +9,8 @@ public enum class VerifierFailureAction(public override val value: Int) :
     PrintMessage(LLVM.LLVMPrintMessageAction),
     ReturnStatus(LLVM.LLVMReturnStatusAction);
 
-    public companion object : ForeignEnum.CompanionBase<Int, VerifierFailureAction> {
+    public companion object :
+        ForeignEnum.CompanionBase<Int, VerifierFailureAction> {
         public override val map: Map<Int, VerifierFailureAction> by lazy {
             values().associateBy(VerifierFailureAction::value)
         }
