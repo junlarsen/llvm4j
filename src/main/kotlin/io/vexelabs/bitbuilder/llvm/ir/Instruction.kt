@@ -1,7 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
-import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Validatable
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.DebugLocationValue
@@ -17,7 +16,6 @@ public open class Instruction internal constructor() : Value(),
         ref = llvmRef
     }
 
-    //region Core::Instructions
     /**
      * Determine if this instruction has metadata
      *
@@ -178,7 +176,6 @@ public open class Instruction internal constructor() : Value(),
 
         return inst != null
     }
-    //endregion Core::Instructions
 
     /**
      * Class to perform iteration over instructions

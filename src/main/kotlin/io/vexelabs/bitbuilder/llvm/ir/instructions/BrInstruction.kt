@@ -12,7 +12,6 @@ public class BrInstruction internal constructor() : Instruction(), Terminator {
         ref = llvmRef
     }
 
-    //region Core::Instructions::Terminators
     /**
      * Is this branch conditional?
      *
@@ -43,5 +42,4 @@ public class BrInstruction internal constructor() : Instruction(), Terminator {
     public fun setCondition(value: Value) {
         LLVM.LLVMSetCondition(ref, value.ref)
     }
-    //endregion Core::Instructions::Terminators
 }

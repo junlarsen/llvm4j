@@ -18,7 +18,6 @@ public open class Metadata internal constructor() :
         ref = llvmRef
     }
 
-    //region Core::Metadata
     /**
      * Represent a [MetadataNode] which has been cast to a [Value]
      */
@@ -69,7 +68,6 @@ public open class Metadata internal constructor() :
             withContext: Context = Context.getGlobalContext()
         ): MetadataAsValue = metadata.toValue(withContext)
     }
-    //endregion Core::Metadata
 
     /**
      * Test if this is a metadata string
@@ -107,7 +105,6 @@ public class MetadataString internal constructor() : Metadata() {
         ref = llvmRef
     }
 
-    //region Core::Metadata
     public constructor(
         data: String,
         context: Context = Context.getGlobalContext()
@@ -118,7 +115,6 @@ public class MetadataString internal constructor() : Metadata() {
             data.length.toLong()
         )
     }
-    //endregion Core::Metadata
 
     /**
      * Get the string from a MDString node
@@ -137,12 +133,11 @@ public class MetadataString internal constructor() : Metadata() {
     }
 }
 
-public open class MetadataNode internal constructor(): Metadata() {
+public open class MetadataNode internal constructor() : Metadata() {
     public constructor(llvmRef: LLVMMetadataRef) : this() {
         ref = llvmRef
     }
 
-    //region Core::Metadata
     public constructor(
         values: List<Metadata>,
         context: Context = Context.getGlobalContext()
@@ -192,5 +187,4 @@ public open class MetadataNode internal constructor(): Metadata() {
 
         return ptr.map { Value(it) }
     }
-    //endregion Core::Metadata
 }

@@ -1,7 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir.instructions.traits
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
-import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.internal.util.toLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.AtomicOrdering
@@ -9,7 +8,6 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public interface MemoryAccessor : ContainsReference<LLVMValueRef> {
-    //region InstructionBuilders
     /**
      * Is this operation volatile?
      *
@@ -47,5 +45,4 @@ public interface MemoryAccessor : ContainsReference<LLVMValueRef> {
     public fun setOrdering(ordering: AtomicOrdering) {
         LLVM.LLVMSetOrdering(ref, ordering.value)
     }
-    //endregion InstructionBuilders
 }

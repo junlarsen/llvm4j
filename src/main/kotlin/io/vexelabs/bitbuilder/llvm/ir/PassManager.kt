@@ -15,7 +15,6 @@ public class PassManager internal constructor() : Disposable,
         ref = pass
     }
 
-    //region Target
     /**
      * Add target-specific analysis passes to the pass manager
      *
@@ -24,7 +23,6 @@ public class PassManager internal constructor() : Disposable,
     public fun addPassesForTargetMachine(machine: TargetMachine) {
         LLVM.LLVMAddAnalysisPasses(machine.ref, ref)
     }
-    //endregion Target
 
     public override fun dispose() {
         require(valid) { "This module has already been disposed." }

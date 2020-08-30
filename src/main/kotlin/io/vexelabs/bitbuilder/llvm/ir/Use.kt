@@ -16,7 +16,6 @@ public class Use internal constructor() : ContainsReference<LLVMUseRef> {
         ref = use
     }
 
-    //region Core::Values::Usage
     /**
      * Get the next [Use] in the iterator
      *
@@ -53,7 +52,6 @@ public class Use internal constructor() : ContainsReference<LLVMUseRef> {
 
         return Value(value)
     }
-    //endregion Core::Values::Usage
 
     /**
      * Class to perform iteration over targets

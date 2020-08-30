@@ -13,7 +13,6 @@ public class DiagnosticInfo internal constructor() :
         ref = llvmRef
     }
 
-    //region Core::Context
     /**
      * Get the message for this diagnostic
      *
@@ -35,5 +34,4 @@ public class DiagnosticInfo internal constructor() :
 
         return DiagnosticSeverity[severity]
     }
-    //endregion Core::Context
 }

@@ -12,7 +12,6 @@ public class PointerType internal constructor() : Type(), CompositeType,
         ref = llvmRef
     }
 
-    //region Core::Types::SequentialTypes
     /**
      * Create a pointer types
      *
@@ -35,5 +34,4 @@ public class PointerType internal constructor() : Type(), CompositeType,
     public fun getAddressSpace(): Int {
         return LLVM.LLVMGetPointerAddressSpace(ref)
     }
-    //endregion Core::Types::SequentialTypes
 }

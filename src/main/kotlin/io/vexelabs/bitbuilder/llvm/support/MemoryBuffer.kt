@@ -19,7 +19,6 @@ public class MemoryBuffer internal constructor() : Disposable {
         ref = llvmRef
     }
 
-    //region BitReader
     /**
      * Parse this memory buffer as if it was LLVM bit code into an LLVM Module
      *
@@ -39,7 +38,7 @@ public class MemoryBuffer internal constructor() : Disposable {
     public fun getBitCodeModule(
         intoContext: Context = Context.getGlobalContext(),
         parseLazy: Boolean = true
-    ) : Module {
+    ): Module {
         var error: BytePointer? = null
         val outModule = LLVMModuleRef()
         val result = if (parseLazy) {
@@ -99,9 +98,7 @@ public class MemoryBuffer internal constructor() : Disposable {
 
         return Module(outModule)
     }
-    //endregion BitReader
 
-    //region MemoryBuffers
     /**
      * Loads file contents into a memory buffer
      *
@@ -146,7 +143,6 @@ public class MemoryBuffer internal constructor() : Disposable {
     public fun getSize(): Long {
         return LLVM.LLVMGetBufferSize(ref)
     }
-    //endregion MemoryBuffers
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

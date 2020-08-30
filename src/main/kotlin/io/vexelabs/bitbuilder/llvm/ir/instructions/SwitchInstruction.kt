@@ -13,7 +13,6 @@ public class SwitchInstruction internal constructor() : Instruction(),
         ref = llvmRef
     }
 
-    //region InstructionBuilders
     /**
      * Append a case to this switch
      *
@@ -22,5 +21,4 @@ public class SwitchInstruction internal constructor() : Instruction(),
     public fun addCase(condition: Value, handler: BasicBlock) {
         LLVM.LLVMAddCase(ref, condition.ref, handler.ref)
     }
-    //endregion InstructionBuilders
 }

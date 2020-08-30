@@ -21,7 +21,6 @@ public class TargetMachine internal constructor() :
         ref = llvmRef
     }
 
-    //region Target
     /**
      * Create a new Target Machine
      *
@@ -154,7 +153,6 @@ public class TargetMachine internal constructor() :
             throw RuntimeException(err.string)
         }
     }
-    //endregion Target
 
     public override fun dispose() {
         require(valid) { "This target machine has already been disposed." }

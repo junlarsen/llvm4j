@@ -8,6 +8,7 @@ public class Binary internal constructor() : Disposable {
     public override var valid: Boolean = true
     public lateinit var ref: LLVMBinaryRef
         internal set
+
     public constructor(llvmRef: LLVMBinaryRef) : this() {
         ref = llvmRef
     }

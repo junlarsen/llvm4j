@@ -12,8 +12,6 @@ public class MCJITCompilerOptions internal constructor() :
     public constructor(llvmRef: LLVMMCJITCompilerOptions) : this() {
         ref = llvmRef
     }
-
-    //region ExecutionEngine
     // TODO: Find a way to create
     //   [org.bytedeco.llvm.LLVM.LLVMMCJITCompilerOptions] from userland
 
@@ -25,5 +23,4 @@ public class MCJITCompilerOptions internal constructor() :
     public fun initialize() {
         LLVM.LLVMInitializeMCJITCompilerOptions(ref, ref.sizeof().toLong())
     }
-    //endregion ExecutionEngine
 }

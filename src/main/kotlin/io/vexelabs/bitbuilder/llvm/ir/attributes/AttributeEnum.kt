@@ -9,7 +9,6 @@ public class AttributeEnum internal constructor() : AttributeBase<Int, Long>() {
         ref = llvmRef
     }
 
-    //region Core::Context
     /**
      * Create an enum attribute
      *
@@ -36,5 +35,4 @@ public class AttributeEnum internal constructor() : AttributeBase<Int, Long>() {
     public override fun getValue(): Long {
         return LLVM.LLVMGetEnumAttributeValue(ref)
     }
-    //endregion Core::Context
 }

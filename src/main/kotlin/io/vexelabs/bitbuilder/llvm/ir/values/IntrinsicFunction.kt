@@ -10,7 +10,6 @@ import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.global.LLVM
 
 public class IntrinsicFunction internal constructor() {
-    //region Core::Values::Constants::FunctionValues
     /**
      * If this value is `0` then no intrinsic was found
      */
@@ -119,5 +118,4 @@ public class IntrinsicFunction internal constructor() {
 
         return FunctionType(type)
     }
-    //endregion Core::Values::Constants::FunctionValues
 }

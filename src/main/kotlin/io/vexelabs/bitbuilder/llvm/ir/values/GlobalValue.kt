@@ -19,7 +19,6 @@ public open class GlobalValue internal constructor() : ConstantValue() {
         ref = llvmRef
     }
 
-    //region Core::Values::Constants::GlobalValues
     /**
      * Get the linkage type
      *
@@ -217,7 +216,6 @@ public open class GlobalValue internal constructor() : ConstantValue() {
 
         return MetadataEntries(entries, ptr)
     }
-    //endregion Core::Values::Constants::GlobalValues
 
     /**
      * Get the comdat assigned to this value
@@ -239,7 +237,8 @@ public open class GlobalValue internal constructor() : ConstantValue() {
         LLVM.LLVMSetComdat(ref, comdat.ref)
     }
 
-    public enum class Linkage(public override val value: Int) : ForeignEnum<Int> {
+    public enum class Linkage(public override val value: Int) :
+        ForeignEnum<Int> {
         External(LLVM.LLVMExternalLinkage),
         AvailableExternally(LLVM.LLVMAvailableExternallyLinkage),
         LinkOnceAny(LLVM.LLVMLinkOnceAnyLinkage),

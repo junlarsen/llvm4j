@@ -53,7 +53,6 @@ public class ConstantInt internal constructor() : ConstantValue() {
         )
     }
 
-    //region Core::Values::Constants::ScalarConstants
     /**
      * Get the zero extended (unsigned) value of this Constant
      *
@@ -71,9 +70,7 @@ public class ConstantInt internal constructor() : ConstantValue() {
     public fun getSignedValue(): Long {
         return LLVM.LLVMConstIntGetSExtValue(ref)
     }
-    //endregion  Core::Values::Constants::ScalarConstants
 
-    //region Core::Values::Constants::ConstantExpressions
     /**
      * Negate this operand
      *
@@ -537,5 +534,4 @@ public class ConstantInt internal constructor() : ConstantValue() {
 
         return Value(ref)
     }
-    //endregion Core::Values::Constants::ConstantExpressions
 }

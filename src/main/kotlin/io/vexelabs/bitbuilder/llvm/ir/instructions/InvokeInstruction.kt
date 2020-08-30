@@ -14,7 +14,6 @@ public class InvokeInstruction internal constructor() : Instruction(),
         ref = llvmRef
     }
 
-    //region Core::Instructions::CallSitesAndInvocations
     /**
      * Get the pointer to the function which this instruction invokes
      *
@@ -67,5 +66,4 @@ public class InvokeInstruction internal constructor() : Instruction(),
     public fun setUnwindDestination(bb: BasicBlock) {
         LLVM.LLVMSetUnwindDest(ref, bb.ref)
     }
-    //endregion Core::Instructions::CallSitesAndInvocations
 }

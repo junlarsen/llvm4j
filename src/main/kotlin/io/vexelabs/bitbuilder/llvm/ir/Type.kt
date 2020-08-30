@@ -1,7 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
-import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.types.ArrayType
 import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
@@ -21,7 +20,6 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
         ref = llvmRef
     }
 
-    //region Core::Types
     /**
      * Get the type kind for this type
      *
@@ -62,9 +60,7 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
 
         return IR(ptr)
     }
-    //endregion Core::Types
 
-    //region Core::Values::Constants
     /**
      * Get a constant null of this type
      *
@@ -102,9 +98,7 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
 
         return Value(v)
     }
-    //endregion Core::Values::Constants
 
-    //region Typecasting
     /**
      * Get a pointer type which points to this type
      */
@@ -121,7 +115,6 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
      * Get a vector type of [size] elements containing elements of this type
      */
     public fun toVectorType(size: Int): VectorType = VectorType(this, size)
-    //endregion Typecasting
 
     public companion object {
         /**

@@ -17,7 +17,6 @@ public class BasicBlock internal constructor() : Validatable,
         ref = llvmRef
     }
 
-    //region Core::BasicBlock
     /**
      * Create a new basic block without inserting it into a function
      *
@@ -152,7 +151,6 @@ public class BasicBlock internal constructor() : Validatable,
 
         return instr?.let { Instruction.Iterator(it) }
     }
-    //endregion Core::BasicBlock
 
     /**
      * Class to perform iteration over basic blocks

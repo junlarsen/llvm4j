@@ -21,7 +21,6 @@ import org.bytedeco.llvm.global.LLVM
  * @see AttributeBase
  */
 public interface Attribute : ContainsReference<LLVMAttributeRef> {
-    //region Core::Context
     /**
      * Is this attribute a string attribute?
      *
@@ -39,7 +38,6 @@ public interface Attribute : ContainsReference<LLVMAttributeRef> {
     public fun isEnumAttribute(): Boolean {
         return LLVM.LLVMIsEnumAttribute(ref).fromLLVMBool()
     }
-    //endregion Core::Context
 
     public companion object {
         /**

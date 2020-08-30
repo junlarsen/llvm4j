@@ -49,7 +49,6 @@ public class NamedMetadataNode public constructor(
         return ptr.string
     }
 
-    //region Core::Modules
     /**
      * Get all the operands in this list
      *
@@ -91,7 +90,6 @@ public class NamedMetadataNode public constructor(
 
         LLVM.LLVMAddNamedMetadataOperand(owner, name, value.ref)
     }
-    //endregion Core::Modules
 
     /**
      * Class to perform iteration over named metadata nodes

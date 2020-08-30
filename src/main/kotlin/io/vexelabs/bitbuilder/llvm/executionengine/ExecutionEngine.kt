@@ -17,7 +17,6 @@ public class ExecutionEngine public constructor() :
     public override val ref: LLVMExecutionEngineRef = LLVMExecutionEngineRef()
     public override var valid: Boolean = true
 
-    //region ExecutionEngine
     /**
      * Runs the llvm.global_ctors global variable
      *
@@ -175,7 +174,6 @@ public class ExecutionEngine public constructor() :
     public fun getFunctionAddress(function: String): Long {
         return LLVM.LLVMGetFunctionAddress(ref, function)
     }
-    //endregion ExecutionEngine
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

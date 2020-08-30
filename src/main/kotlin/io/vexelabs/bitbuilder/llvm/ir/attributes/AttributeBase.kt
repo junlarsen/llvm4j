@@ -1,11 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.ir.attributes
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
-import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
-import io.vexelabs.bitbuilder.llvm.ir.Context
-import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
-import org.bytedeco.llvm.global.LLVM
 
 /**
  * Common sibling interface for Enum Attributes
@@ -31,5 +27,4 @@ public abstract class AttributeBase<K, V> internal constructor() :
      * Get the attribute value for this attribute
      */
     public abstract fun getValue(): V
-    //endregion Core::Context
 }

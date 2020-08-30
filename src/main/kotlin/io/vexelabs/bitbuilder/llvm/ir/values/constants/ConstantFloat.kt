@@ -13,7 +13,6 @@ public class ConstantFloat internal constructor() : ConstantValue() {
         ref = llvmRef
     }
 
-    //region Core::Values::Constants::ScalarConstants
     /**
      * Create a new constant float of a [type] with the provided [value]
      *
@@ -44,9 +43,7 @@ public class ConstantFloat internal constructor() : ConstantValue() {
 
         return buf.first().fromLLVMBool()
     }
-    //endregion Core::Values::Constants::ScalarConstants
 
-    //region Core::Values::Constants::ConstantExpressions
     /**
      * Negate this operand
      *
@@ -200,5 +197,4 @@ public class ConstantFloat internal constructor() : ConstantValue() {
 
         return ConstantFloat(ref)
     }
-    //endregion Core::Values::Constants::ConstantExpressions
 }

@@ -8,7 +8,6 @@ public class User internal constructor() : Value() {
         ref = llvmRef
     }
 
-    //region Core::Values::UserValue
     /**
      * Get the operand for the user
      *
@@ -60,5 +59,4 @@ public class User internal constructor() : Value() {
     public fun getOperandCount(): Int {
         return LLVM.LLVMGetNumOperands(ref)
     }
-    //endregion Core::Values::UserValue
 }

@@ -12,7 +12,6 @@ public class PhiInstruction internal constructor() : Instruction() {
         ref = llvmRef
     }
 
-    //region Core::Instructions::PHINodes
     /**
      * Add an incoming value to the phi node
      *
@@ -62,5 +61,4 @@ public class PhiInstruction internal constructor() : Instruction() {
 
         return block?.let { BasicBlock(it) }
     }
-    //endregion Core::Instructions::PHINodes
 }

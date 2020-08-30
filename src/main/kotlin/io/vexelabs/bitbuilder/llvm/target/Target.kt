@@ -16,7 +16,6 @@ public class Target internal constructor() :
         ref = llvmRef
     }
 
-    //region Target
     /**
      * Get the next [Target] in the iterator
      *
@@ -118,7 +117,6 @@ public class Target internal constructor() :
             }
         }
     }
-    //endregion Target
 
     /**
      * Class to perform iteration over targets

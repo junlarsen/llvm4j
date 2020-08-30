@@ -19,7 +19,6 @@ public class GenericValue internal constructor() : Disposable,
         ref = llvmRef
     }
 
-    //region ExecutionEngine
     /**
      * Create a generic value of an integer
      *
@@ -90,7 +89,6 @@ public class GenericValue internal constructor() : Disposable,
     public fun toPointer(): Pointer? {
         return LLVM.LLVMGenericValueToPointer(ref)
     }
-    //endregion ExecutionEngine
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

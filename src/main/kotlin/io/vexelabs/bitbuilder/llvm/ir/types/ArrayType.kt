@@ -12,7 +12,6 @@ public class ArrayType internal constructor() : Type(), CompositeType,
         ref = llvmRef
     }
 
-    //region Core::Types::SequentialTypes
     /**
      * Create an array types
      *
@@ -32,5 +31,4 @@ public class ArrayType internal constructor() : Type(), CompositeType,
     public override fun getElementCount(): Int {
         return LLVM.LLVMGetArrayLength(ref)
     }
-    //endregion Core::Types::SequentialTypes
 }

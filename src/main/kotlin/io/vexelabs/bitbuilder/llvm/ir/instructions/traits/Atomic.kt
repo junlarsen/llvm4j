@@ -7,7 +7,6 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public interface Atomic : ContainsReference<LLVMValueRef> {
-    //region InstructionBuilders
     /**
      * Does this execute on a single thread?
      *
@@ -25,5 +24,4 @@ public interface Atomic : ContainsReference<LLVMValueRef> {
     public fun setSingleThread(isSingleThread: Boolean) {
         LLVM.LLVMSetAtomicSingleThread(ref, isSingleThread.toLLVMBool())
     }
-    //endregion InstructionBuilders
 }

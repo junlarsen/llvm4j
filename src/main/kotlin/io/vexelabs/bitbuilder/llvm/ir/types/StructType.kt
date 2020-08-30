@@ -18,7 +18,6 @@ public class StructType internal constructor() : Type(),
         ref = llvmRef
     }
 
-    //region Core::Types::StructureTypes
     /**
      * Create a structure types
      *
@@ -137,9 +136,7 @@ public class StructType internal constructor() : Type(),
 
         return dest.map { Type(it) }
     }
-    //endregion Core::Types::StructureTypes
 
-    //region Core::Values::Constants::ConstantExpressions
     /**
      * Get the size of this struct in bytes as an i64 ConstantInt
      *
@@ -162,5 +159,4 @@ public class StructType internal constructor() : Type(),
 
         return ConstantInt(ref)
     }
-    //endregion Core::Values::Constants::ConstantExpressions
 }

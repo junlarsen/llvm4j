@@ -6,7 +6,6 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public interface FuncletPad : ContainsReference<LLVMValueRef> {
-    //region Core::Instructions::CallSitesAndInvocations
     /**
      * Get the argument count for the call
      *
@@ -18,9 +17,7 @@ public interface FuncletPad : ContainsReference<LLVMValueRef> {
     public fun getArgumentCount(): Int {
         return LLVM.LLVMGetNumArgOperands(ref)
     }
-    //endregion Core::Instructions::CallSitesAndInvocations
 
-    //region InstructionBuilders
     /**
      * Get the operand for the funclet
      *
@@ -40,5 +37,4 @@ public interface FuncletPad : ContainsReference<LLVMValueRef> {
     public fun setOperand(index: Int, value: Value) {
         LLVM.LLVMSetArgOperand(ref, index, value.ref)
     }
-    //endregion InstructionBuilders
 }

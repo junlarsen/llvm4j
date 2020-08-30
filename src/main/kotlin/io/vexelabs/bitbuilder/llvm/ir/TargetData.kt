@@ -16,13 +16,10 @@ public class TargetData internal constructor() :
         ref = llvmRef
     }
 
-    //region TargetInformation
     public constructor(target: String) : this() {
         ref = LLVM.LLVMCreateTargetData(target)
     }
-    //endregion TargetInformation
 
-    //region Target
     /**
      * Create a target data layout from a target machine
      *
@@ -31,7 +28,6 @@ public class TargetData internal constructor() :
     public constructor(machine: TargetMachine) : this() {
         ref = LLVM.LLVMCreateTargetDataLayout(machine.ref)
     }
-    //endregion Target
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

@@ -12,7 +12,6 @@ public class IndirectBrInstruction internal constructor() : Instruction(),
         ref = llvmRef
     }
 
-    //region InstructionBuilders
     /**
      * Append a destination to this indirect branch
      *
@@ -21,5 +20,4 @@ public class IndirectBrInstruction internal constructor() : Instruction(),
     public fun addDestination(handler: BasicBlock) {
         LLVM.LLVMAddDestination(ref, handler.ref)
     }
-    //endregion InstructionBuilders
 }

@@ -17,7 +17,6 @@ public class Context public constructor(
 ) : Disposable, ContainsReference<LLVMContextRef> {
     public override var valid: Boolean = true
 
-    //region Core::Context
     /**
      * Does this context discard the IR names for values
      *
@@ -113,7 +112,6 @@ public class Context public constructor(
             return Context(ctx)
         }
     }
-    //endregion Core::Context
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

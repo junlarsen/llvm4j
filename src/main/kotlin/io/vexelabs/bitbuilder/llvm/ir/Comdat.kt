@@ -41,7 +41,8 @@ public class Comdat internal constructor() : ContainsReference<LLVMComdatRef> {
         NoDuplicates(LLVM.LLVMNoDuplicatesComdatSelectionKind),
         SameSize(LLVM.LLVMSameSizeComdatSelectionKind);
 
-        public companion object : ForeignEnum.CompanionBase<Int, SelectionKind> {
+        public companion object :
+            ForeignEnum.CompanionBase<Int, SelectionKind> {
             public override val map: Map<Int, SelectionKind> by lazy {
                 values().associateBy(SelectionKind::value)
             }

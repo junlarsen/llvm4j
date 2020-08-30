@@ -9,7 +9,6 @@ public class GlobalAlias internal constructor() : GlobalValue() {
         ref = llvmRef
     }
 
-    //region Core::Values::Constants::GlobalAliases
     /**
      * Get the value this alias is an alias for
      *
@@ -29,5 +28,4 @@ public class GlobalAlias internal constructor() : GlobalValue() {
     public fun setAliasOf(value: Value) {
         LLVM.LLVMAliasSetAliasee(ref, value.ref)
     }
-    //endregion Core::Values::Constants::GlobalAliases
 }

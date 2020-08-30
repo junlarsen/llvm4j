@@ -24,7 +24,6 @@ public class MCJITMemoryManager internal constructor() :
         ref = llvmRef
     }
 
-    //region ExecutionEngine
     /**
      * Create a new simple MCJIT memory manager
      *
@@ -49,7 +48,6 @@ public class MCJITMemoryManager internal constructor() :
             MemoryManagerDestroyBase(onManagerDestroy)
         )
     }
-    //endregion ExecutionEngine
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

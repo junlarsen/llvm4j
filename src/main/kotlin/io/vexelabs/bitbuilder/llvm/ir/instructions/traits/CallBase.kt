@@ -2,7 +2,6 @@ package io.vexelabs.bitbuilder.llvm.ir.instructions.traits
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.util.map
-import io.vexelabs.bitbuilder.llvm.ir.attributes.AttributeBase
 import io.vexelabs.bitbuilder.llvm.ir.AttributeIndex
 import io.vexelabs.bitbuilder.llvm.ir.CallConvention
 import io.vexelabs.bitbuilder.llvm.ir.Type
@@ -13,7 +12,6 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
 public interface CallBase : ContainsReference<LLVMValueRef> {
-    //region Core::Instructions::CallSitesAndInvocations
     /**
      * Get the argument count for the call
      *
@@ -218,5 +216,4 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
 
         LLVM.LLVMRemoveCallSiteStringAttribute(ref, index, kind, strlen)
     }
-    //endregion Core::Instructions::CallSitesAndInvocations
 }

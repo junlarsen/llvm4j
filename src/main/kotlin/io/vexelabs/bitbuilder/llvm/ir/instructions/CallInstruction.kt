@@ -14,7 +14,6 @@ public class CallInstruction internal constructor() :
         ref = llvmRef
     }
 
-    //region Core::Instructions::CallSitesAndInvocations
     /**
      * Get the pointer to the function which this instruction invokes
      *
@@ -45,5 +44,4 @@ public class CallInstruction internal constructor() :
     public fun setTailCall(isTailCall: Boolean) {
         LLVM.LLVMSetTailCall(ref, isTailCall.toLLVMBool())
     }
-    //endregion Core::Instructions::CallSitesAndInvocations
 }

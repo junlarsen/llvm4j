@@ -11,7 +11,6 @@ public class CatchPadInstruction internal constructor() : Instruction(),
         ref = llvmRef
     }
 
-    //region InstructionBuilders
     /**
      * Get the parent catch switch
      *
@@ -31,5 +30,4 @@ public class CatchPadInstruction internal constructor() : Instruction(),
     public fun setParent(catchSwitch: CatchSwitchInstruction) {
         LLVM.LLVMSetParentCatchSwitch(ref, catchSwitch.ref)
     }
-    //endregion InstructionBuilders
 }

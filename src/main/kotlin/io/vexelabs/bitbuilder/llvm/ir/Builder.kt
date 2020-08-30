@@ -49,7 +49,6 @@ public class Builder public constructor(
         ref = llvmRef
     }
 
-    //region InstructionBuilders
     /**
      * Position the builder at the [block]
      *
@@ -1866,7 +1865,6 @@ public class Builder public constructor(
 
         return AtomicCmpXchgInstruction(inst)
     }
-    //endregion InstructionBuilders
 
     public override fun dispose() {
         require(valid) { "Cannot dispose object twice" }

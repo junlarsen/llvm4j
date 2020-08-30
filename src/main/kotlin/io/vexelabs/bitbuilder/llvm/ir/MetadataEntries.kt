@@ -28,7 +28,6 @@ public class MetadataEntries internal constructor() :
         return sizePtr.get()
     }
 
-    //region Core::Metadata
     /**
      * Get the metadata kind at [index]
      *
@@ -60,7 +59,6 @@ public class MetadataEntries internal constructor() :
 
         return Metadata(metadata)
     }
-    //endregion Core::Metadata
 
     override fun dispose() {
         require(valid) { "Cannot dispose object twice" }
