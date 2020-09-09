@@ -1,8 +1,10 @@
 package io.vexelabs.bitbuilder.llvm.executionengine.callbacks
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Callback
+import io.vexelabs.bitbuilder.llvm.internal.util.map
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
+import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryManagerFinalizeMemoryCallback
 
 /**
@@ -28,17 +30,27 @@ public data class MemoryManagerFinalizeMemoryCallbackContext(
 /**
  * Pointer type for [LLVMMemoryManagerFinalizeMemoryCallback]
  *
- * This is the value passed back int oLLVM
+ * This is the value passed back into LLVM
+ *
+ * TODO: Find a reliable way of testing this (see #179)
  *
  * @see LLVMMemoryManagerFinalizeMemoryCallback
  */
 public class MemoryManagerFinalizeMemoryBase(
     private val callback: MemoryManagerFinalizeMemoryCallback
 ) : LLVMMemoryManagerFinalizeMemoryCallback(), Callback {
-    public override fun call(arg0: Pointer?, arg1: BytePointer?): Int {
+    public override fun call(
+        arg0: Pointer?,
+        arg1: PointerPointer<*>?
+    ): Int {
+        val msg = (arg1 as? PointerPointer<BytePointer>)
+            ?.map { it.string }
+            ?.joinToString("\n")
+            ?: ""
+
         val data = MemoryManagerFinalizeMemoryCallbackContext(
             payload = arg0,
-            error = arg1?.string ?: ""
+            error = msg
         )
 
         return callback.invoke(data)
