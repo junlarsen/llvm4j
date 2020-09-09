@@ -81,6 +81,8 @@ public class Target internal constructor() :
         /**
          * Create a target from a name if it exists
          *
+         * @throws IllegalArgumentException If the target could not be found
+         *
          * @see LLVM.LLVMGetTargetFromName
          */
         public fun createFromName(name: String): Target {
@@ -90,14 +92,15 @@ public class Target internal constructor() :
                 Target(target)
             } else {
                 throw IllegalArgumentException(
-                    "The specified target could " +
-                            "not be found"
+                    "The specified target could not be found"
                 )
             }
         }
 
         /**
          * Create a target from a target triple
+         *
+         * @throws IllegalArgumentException If the target could not be found
          *
          * @see LLVM.LLVMGetTargetFromTriple
          */
@@ -110,7 +113,7 @@ public class Target internal constructor() :
             return if (result == 0) {
                 Target(out)
             } else {
-                throw RuntimeException(err.string)
+                throw IllegalArgumentException(err.string)
             }
         }
     }
