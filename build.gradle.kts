@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.0-rc")
-    implementation("org.bytedeco:llvm-platform:10.0.0-1.5.3")
+    implementation("org.bytedeco:llvm-platform:10.0.1-1.5.4")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.4.0-rc")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.11")
