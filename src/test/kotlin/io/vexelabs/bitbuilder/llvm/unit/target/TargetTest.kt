@@ -4,6 +4,7 @@ import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.llvm.target.Target
 import io.vexelabs.bitbuilder.llvm.target.TargetMachine
+import org.bytedeco.llvm.global.LLVM
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -17,7 +18,7 @@ internal object TargetTest : Spek({
 
     test("there are registered targets") {
         val machine = module.createExecutionEngine().getTargetMachine()
-        val iterator = machine?.getFirstTarget()
+        val iterator = machine?.getTargetIterator()
         val targets = mutableListOf<Target>()
 
         assertNotNull(iterator)
@@ -48,8 +49,22 @@ internal object TargetTest : Spek({
             }
         }
 
-        // TODO: Test valid target triples once JavaCPP ships binaries with
-        //  non-host targets
-        //  (see https://github.com/bytedeco/javacpp-presets/issues/932)
+        test("all targets which llvm builds are available") {
+            LLVM.LLVMInitializeAllTargets()
+            LLVM.LLVMInitializeAllTargetInfos()
+
+            // TODO: Expand this list
+            val triples = listOf(
+                "x86_64-apple-macos",
+                "ppc64le-windows-pc",
+                "arm-unknown-unknown"
+            )
+
+            for (triple in triples) {
+                val target = Target.createFromTriple(triple)
+
+                assertEquals(triple, target.getName())
+            }
+        }
     }
 })
