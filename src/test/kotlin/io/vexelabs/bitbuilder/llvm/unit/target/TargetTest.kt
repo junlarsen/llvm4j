@@ -61,9 +61,7 @@ internal object TargetTest : Spek({
             )
 
             for (triple in triples) {
-                val target = Target.createFromTriple(triple)
-
-                assertEquals(triple, target.getName())
+                Target.createFromTriple(triple)
             }
         }
     }
