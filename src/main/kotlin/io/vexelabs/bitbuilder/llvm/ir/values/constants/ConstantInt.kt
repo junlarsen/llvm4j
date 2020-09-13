@@ -433,7 +433,7 @@ public class ConstantInt internal constructor() : ConstantValue() {
     public fun getZExt(type: IntType): ConstantInt = getExt(type, false)
 
     /**
-     * Converstion to float type
+     * Conversion to float type
      *
      * @see LLVM.LLVMConstSIToFP
      * @see LLVM.LLVMConstUIToFP

@@ -3,6 +3,7 @@ package io.vexelabs.bitbuilder.llvm.ir.values.constants
 import io.vexelabs.bitbuilder.internal.toLLVMBool
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.llvm.ir.IntPredicate
+import io.vexelabs.bitbuilder.llvm.ir.RealPredicate
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
@@ -20,6 +21,8 @@ public class ConstantVector internal constructor() :
 
     /**
      * Negate the constant value
+     *
+     * This should only be used for integer vectors
      *
      * LLVM doesn't actually have a neg instruction, but it's implemented using
      * subtraction. It subtracts the value of max value of the types of the
@@ -48,7 +51,26 @@ public class ConstantVector internal constructor() :
     }
 
     /**
+     * Negate the constant value
+     *
+     * This should only be used for float vectors
+     *
+     * LLVM doesn't actually have a neg instruction, but it's implemented using
+     * subtraction. It subtracts the value of max value of the types of the
+     * value
+     *
+     * @see LLVM.LLVMConstFNeg
+     */
+    public fun getFNeg(): ConstantVector {
+        val ref = LLVM.LLVMConstFNeg(ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
      * Invert each integer value using XOR
+     *
+     * This should only be used for integer vectors
      *
      * This in short performs the same action as [getNeg] but instead of using
      * subtraction it uses a bitwise XOR where B is always true.
@@ -63,6 +85,8 @@ public class ConstantVector internal constructor() :
 
     /**
      * Add another value to this vector of integers
+     *
+     * This should only be used for integer vectors
      *
      * If the sum has unsigned overflow, the result returned is the
      * mathematical result modulo 2n, where n is the bit width of the result.
@@ -91,7 +115,25 @@ public class ConstantVector internal constructor() :
     }
 
     /**
+     * Perform addition for the two operands
+     *
+     * This should only be used for float vectors
+     *
+     * If the sum has unsigned overflow, the result returned is the
+     * mathematical result modulo 2^n, where n is the bit width of the result.
+     *
+     * @see LLVM.LLVMConstFAdd
+     */
+    public fun getFAdd(rhs: ConstantVector): ConstantVector {
+        val ref = LLVM.LLVMConstFAdd(ref, rhs.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
      * Subtract another value from this vector of integers
+     *
+     * This should only be used for integer vectors
      *
      * If the sum has unsigned overflow, the result returned is the
      * mathematical result modulo 2n, where n is the bit width of the result.
@@ -120,7 +162,25 @@ public class ConstantVector internal constructor() :
     }
 
     /**
+     * Subtract another float from this float
+     *
+     * This should only be used for float vectors
+     *
+     * If the sum has unsigned overflow, the result returned is the
+     * mathematical result modulo 2n, where n is the bit width of the result.
+     *
+     * @see LLVM.LLVMConstFSub
+     */
+    public fun getFSub(rhs: ConstantVector): ConstantVector {
+        val ref = LLVM.LLVMConstFSub(ref, rhs.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
      * Multiply another value with this vector of integers
+     *
+     * This should only be used for integer vectors
      *
      * If the sum has unsigned overflow, the result returned is the
      * mathematical result modulo 2n, where n is the bit width of the result.
@@ -149,7 +209,22 @@ public class ConstantVector internal constructor() :
     }
 
     /**
+     * Perform multiplication for the two operands
+     *
+     * This should only be used for float vectors
+     *
+     * @see LLVM.LLVMConstFMul
+     */
+    public fun getFMul(rhs: ConstantVector): ConstantVector {
+        val ref = LLVM.LLVMConstFMul(ref, rhs.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
      * Perform division for the two operands
+     *
+     * This should only be used for integer vectors
      *
      * Division by zero is undefined behavior. For vectors, if any element of
      * the divisor is zero, the operation has undefined behavior. Overflow also
@@ -184,6 +259,8 @@ public class ConstantVector internal constructor() :
     /**
      * Perform division with another signed integer vector
      *
+     * This should only be used for integer vectors
+     *
      * Division by zero is undefined behavior. For vectors, if any element of
      * the divisor is zero, the operation has undefined behavior. Overflow also
      * leads to undefined behavior; this is a rare case, but can occur,
@@ -202,6 +279,8 @@ public class ConstantVector internal constructor() :
     /**
      * Perform division with another unsigned integer vector
      *
+     * This should only be used for integer vectors
+     *
      * Division by zero is undefined behavior. If any element of
      * the divisor is zero, the operation has undefined behavior
      *
@@ -217,7 +296,22 @@ public class ConstantVector internal constructor() :
     ): ConstantVector = getDiv(rhs, exact, true)
 
     /**
+     * Perform division for the two operands
+     *
+     * This should only be used for float vectors
+     *
+     * @see LLVM.LLVMConstFDiv
+     */
+    public fun getFDiv(rhs: ConstantVector): ConstantVector {
+        val ref = LLVM.LLVMConstFDiv(ref, rhs.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
      * Get the remainder from the unsigned division for the two operands
+     *
+     * This should only be used for integer vectors
      *
      * Taking the remainder of a division by zero is undefined behavior.
      *
@@ -237,7 +331,22 @@ public class ConstantVector internal constructor() :
     }
 
     /**
+     * Get the remainder from the division of the two operands
+     *
+     * This should only be used for float vectors
+     *
+     * @see LLVM.LLVMFRem
+     */
+    public fun getFRem(rhs: ConstantVector): ConstantVector {
+        val ref = LLVM.LLVMConstFRem(ref, rhs.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
      * Perform bitwise logical and for the two operands
+     *
+     * This should only be used for integer vectors
      *
      * The truth table used for the 'and' instruction is:
      *
@@ -258,6 +367,8 @@ public class ConstantVector internal constructor() :
     /**
      * Perform bitwise logical or for the two operands
      *
+     * This should only be used for integer vectors
+     *
      * The truth table used for the 'or' instruction is:
      *
      * In0	In1	Out
@@ -276,6 +387,8 @@ public class ConstantVector internal constructor() :
 
     /**
      * Perform bitwise logical xor for the two operands
+     *
+     * This should only be used for integer vectors
      *
      * The truth table used for the 'xor' instruction is:
      *
@@ -296,6 +409,8 @@ public class ConstantVector internal constructor() :
     /**
      * Perform logical comparison for the two operands
      *
+     * This should only be used for integer vectors
+     *
      * This method receives a [predicate] which determines which logical
      * comparison method shall be used for the comparison.
      *
@@ -311,7 +426,28 @@ public class ConstantVector internal constructor() :
     }
 
     /**
+     * Perform logical comparison for the two operands
+     *
+     * This should only be used for float vectors
+     *
+     * This method receives a [predicate] which determines which logical
+     * comparison method shall be used for the comparison.
+     *
+     * @see LLVM.LLVMConstFCmp
+     */
+    public fun getFCmp(
+        predicate: RealPredicate,
+        rhs: ConstantVector
+    ): ConstantVector {
+        val ref = LLVM.LLVMConstFCmp(predicate.value, ref, rhs.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
      * Shift the operand to the left [rhs] number of bits
+     *
+     * This should only be used for integer vectors
      *
      * LLVM-C does not support NUW/NSW attributes for this operation
      *
@@ -327,6 +463,8 @@ public class ConstantVector internal constructor() :
      * Logically shift the operand to the right [bits] number of bits with
      * zero fill
      *
+     * This should only be used for integer vectors
+     *
      * LLVM-C does not support NUW/NSW attributes for this operation
      *
      * @see LLVM.LLVMConstLShr
@@ -341,6 +479,8 @@ public class ConstantVector internal constructor() :
      * Arithmetically shift the operand to the right [bits] number with sign
      * extension
      *
+     * This should only be used for integer vectors
+     *
      * LLVM-C does nt support the 'exact' attribute for this operation
      *
      * @see LLVM.LLVMConstAShr
@@ -354,6 +494,8 @@ public class ConstantVector internal constructor() :
     /**
      * Truncates this operand to the type [type]
      *
+     * This should only be used for integer vectors
+     *
      * The bit size of this must be larger than the bit size of [type]. Equal
      * sizes are not allowed
      *
@@ -366,7 +508,25 @@ public class ConstantVector internal constructor() :
     }
 
     /**
+     * Truncates this operand to the type [type]
+     *
+     * This should only be used for float vectors
+     *
+     * The bit size of this must be larger than the bit size of [type]. Equal
+     * sizes are not allowed
+     *
+     * @see LLVM.LLVMConstFPTrunc
+     */
+    public fun getFPTrunc(type: FloatType): ConstantVector {
+        val ref = LLVM.LLVMConstFPTrunc(ref, type.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
      * Sign extend this value to type [type]
+     *
+     * This should only be used for integer vectors
      *
      * The bit size of this must be tinier than the bit size of the
      * destination type
@@ -382,6 +542,8 @@ public class ConstantVector internal constructor() :
     /**
      * Zero extend this value to type [type]
      *
+     * This should only be used for integer vectors
+     *
      * The bit size of this must be tinier than the bit size of the
      * destination type
      *
@@ -394,7 +556,25 @@ public class ConstantVector internal constructor() :
     }
 
     /**
+     * Extend this value to type [type]
+     *
+     * This should only be used for float vectors
+     *
+     * The bit size of this must be tinier than the bit size of the
+     * destination type
+     *
+     * @see LLVM.LLVMConstFPExt
+     */
+    public fun getFPExt(type: FloatType): ConstantVector {
+        val ref = LLVM.LLVMConstFPExt(ref, type.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
      * Cast to another integer type
+     *
+     * This should only be used for integer vectors
      *
      * @see LLVM.LLVMConstIntCast
      */
@@ -407,10 +587,64 @@ public class ConstantVector internal constructor() :
     /**
      * Cast to another float type
      *
+     * This should only be used for float vectors
+     *
      * @see LLVM.LLVMConstFPCast
      */
     public fun getFPCast(type: FloatType): ConstantVector {
         val ref = LLVM.LLVMConstFPCast(ref, type.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
+     * Conversion to signed integer type
+     *
+     * This should only be used for float vectors
+     *
+     * @see LLVM.LLVMConstFPToSI
+     */
+    public fun getFPToSI(type: IntType): ConstantVector {
+        val ref = LLVM.LLVMConstFPToSI(ref, type.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
+     * Conversion to unsigned integer type
+     *
+     * This should only be used for float vectors
+     *
+     * @see LLVM.LLVMConstFPToUI
+     */
+    public fun getFPToUI(type: IntType): ConstantVector {
+        val ref = LLVM.LLVMConstFPToUI(ref, type.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
+     * Conversion to float type using this as unsigned
+     *
+     * This should only be used for integer vectors
+     *
+     * @see LLVM.LLVMConstUIToFP
+     */
+    public fun getUIToFP(type: FloatType): ConstantVector {
+        val ref = LLVM.LLVMConstUIToFP(ref, type.ref)
+
+        return ConstantVector(ref)
+    }
+
+    /**
+     * Conversion to float type using this as signed
+     *
+     * This should only be used for integer vectors
+     *
+     * @see LLVM.LLVMConstSIToFP
+     */
+    public fun getSIToFP(type: FloatType): ConstantVector {
+        val ref =LLVM.LLVMConstSIToFP(ref, type.ref)
 
         return ConstantVector(ref)
     }
@@ -447,11 +681,9 @@ public class ConstantVector internal constructor() :
      * @see LLVM.LLVMConstInsertElement
      */
     public fun getInsertElement(
-        index: ConstantInt,
-        value: Value
+        value: Value,
+        index: ConstantInt
     ): ConstantVector {
-        // LLVM has InsertElement(this, value, index) which is why args are
-        // swapped
         val ref = LLVM.LLVMConstInsertElement(ref, value.ref, index.ref)
 
         return ConstantVector(ref)
