@@ -12,7 +12,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-internal class ConstantIntTest : Spek({
+internal object ConstantIntTest : Spek({
     setup()
 
     val context: Context by memoized()
