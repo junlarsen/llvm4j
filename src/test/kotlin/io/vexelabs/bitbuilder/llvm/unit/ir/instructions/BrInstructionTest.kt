@@ -6,6 +6,7 @@ import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
+import io.vexelabs.bitbuilder.rtti.cast
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -41,7 +42,7 @@ internal class BrInstructionTest : Spek({
         val condition = ConstantInt(IntType(1), 1)
 
         val subject = builder.createCondBr(condition, then, otherwise)
-        val foundCondition = ConstantInt(subject.getCondition().ref)
+        val foundCondition = cast<ConstantInt>(condition)
 
         assertEquals(condition.ref, foundCondition.ref)
         assertTrue { subject.isConditional() }

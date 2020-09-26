@@ -6,6 +6,7 @@ import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.llvm.utils.runAll
+import io.vexelabs.bitbuilder.rtti.cast
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull
@@ -29,7 +30,7 @@ internal class GlobalVariableTest : Spek({
             assertFalse { isThreadLocal() }
             assertFalse { isExternallyInitialized() }
 
-            val initializer = ConstantInt(value.getInitializer()!!.ref)
+            val initializer = cast<ConstantInt>(value.getInitializer()!!)
                 .getSignedValue()
 
             assertEquals(100L, initializer)

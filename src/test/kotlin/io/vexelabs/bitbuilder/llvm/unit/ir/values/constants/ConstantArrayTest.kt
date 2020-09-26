@@ -4,6 +4,7 @@ import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantArray
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.utils.constIntPairOf
+import io.vexelabs.bitbuilder.rtti.cast
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.spekframework.spek2.Spek
@@ -27,7 +28,7 @@ internal class ConstantArrayTest : Spek({
 
         assertEquals(
             one.getSignedValue(),
-            ConstantInt(first.ref).getSignedValue()
+            cast<ConstantInt>(first).getSignedValue()
         )
     }
 })

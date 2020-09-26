@@ -31,7 +31,7 @@ internal class FunctionTypeTest : Spek({
         val args = listOf(FloatType(TypeKind.Float))
         val fn = FunctionType(ret, args, true)
 
-        assertEquals(LLVM.LLVMCountParamTypes(fn.ref), fn.getParameterCount())
+        assertEquals(1, fn.getParameterCount())
     }
 
     test("the passed parameters match") {
