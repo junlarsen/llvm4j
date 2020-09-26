@@ -8,6 +8,7 @@ import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.utils.constIntPairOf
 import io.vexelabs.bitbuilder.llvm.utils.runAll
+import io.vexelabs.bitbuilder.rtti.cast
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -258,6 +259,6 @@ internal class ConstantIntTest : Spek({
 
         val res = cond.getSelect(lhs, rhs)
 
-        assertEquals(10, ConstantInt(res.ref).getSignedValue())
+        assertEquals(10, cast<ConstantInt>(res).getSignedValue())
     }
 })

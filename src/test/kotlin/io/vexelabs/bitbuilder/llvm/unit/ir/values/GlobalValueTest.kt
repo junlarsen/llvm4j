@@ -8,6 +8,7 @@ import io.vexelabs.bitbuilder.llvm.ir.Visibility
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.GlobalValue
 import io.vexelabs.bitbuilder.llvm.setup
+import io.vexelabs.bitbuilder.rtti.cast
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -93,7 +94,7 @@ internal class GlobalValueTest : Spek({
         module.setModuleIdentifier("basic")
 
         val global = module.addGlobal("my_int", IntType(32))
-        val globalModule = GlobalValue(global.ref).getModule()
+        val globalModule = cast<GlobalValue>(global).getModule()
 
         assertEquals(
             module.getModuleIdentifier(), globalModule.getModuleIdentifier()

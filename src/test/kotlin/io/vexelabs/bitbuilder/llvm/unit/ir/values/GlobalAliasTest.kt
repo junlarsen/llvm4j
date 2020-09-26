@@ -4,6 +4,7 @@ import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
+import io.vexelabs.bitbuilder.rtti.cast
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import org.spekframework.spek2.Spek
@@ -25,8 +26,8 @@ internal class GlobalAliasTest : Spek({
         val aliasValue = alias.getAliasOf()
 
         assertEquals(
-            ConstantInt(aliasValue.ref).getSignedValue(),
-            ConstantInt(global.ref).getSignedValue()
+            cast<ConstantInt>(aliasValue).getSignedValue(),
+            cast<ConstantInt>(global).getSignedValue()
         )
     }
 
