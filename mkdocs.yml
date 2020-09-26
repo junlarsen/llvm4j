@@ -1,0 +1,17 @@
+site_name: BitBuilder Documentation
+site_url: https://docs.vexelabs.io/bitbuilder
+site_author: Vexelabs Contributors
+
+# Repository Config
+repo_name: vexelabs/bitbuilder
+repo_url: https://github.com/vexelabs/bitbuilder
+edit_uri: edit/master/docs/
+
+theme:
+  name: material
+  favicon: static/vexelabs512x512.png
+  icon:
+    logo: material/memory
+
+nav:
+  - Home: index.md
