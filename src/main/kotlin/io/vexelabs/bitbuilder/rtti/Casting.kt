@@ -74,6 +74,9 @@ public inline fun <reified T, P : Pointer> path(
  *
  * @see cast
  * @see path
+ *
+ * TODO: This Map type is very hacky, should replace Any with an actual
+ *   function type.
  */
 public val constructorMap: Map<Class<*>, Any> =
     mapOf(
@@ -141,6 +144,8 @@ public val constructorMap: Map<Class<*>, Any> =
  * constructed with a single argument [T]
  *
  * @see constructorMap for valid casting paths
+ *
+ * TODO: Fix unchecked cast warning, find proper type
  */
 @Suppress("UNCHECKED_CAST")
 public inline fun <reified T> castOrNull(self: ContainsReference<*>): T? {
