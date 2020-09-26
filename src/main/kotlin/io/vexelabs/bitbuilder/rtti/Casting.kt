@@ -1,6 +1,5 @@
 package io.vexelabs.bitbuilder.rtti
 
-import com.sun.jdi.FloatType
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.ir.Instruction
 import io.vexelabs.bitbuilder.llvm.ir.User
@@ -28,6 +27,8 @@ import io.vexelabs.bitbuilder.llvm.ir.instructions.StoreInstruction
 import io.vexelabs.bitbuilder.llvm.ir.instructions.SwitchInstruction
 import io.vexelabs.bitbuilder.llvm.ir.instructions.UnreachableInstruction
 import io.vexelabs.bitbuilder.llvm.ir.instructions.VAArgInstruction
+import io.vexelabs.bitbuilder.llvm.ir.types.ArrayType
+import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.types.LabelType
@@ -53,90 +54,85 @@ import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantVector
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
-import java.lang.reflect.Constructor
-import javax.lang.model.type.ArrayType
 
 /**
- * Helper function to retrieve the java.lang.Class<[T]> and the constructor of
- * said class which accepts [P]
- *
- * For this to be valid, type [T] should be able to be constructed from type [P]
- *
- * This is only for internal usage to map out RTTI casting paths
+ * Helper function to pull the [java.lang.Class] from [T] as well as
+ * scaffolding the function which will transform [P] into [T] into a [Pair]
+ * to be inserted into [constructorMap]
  */
-private inline fun <reified T, reified P : Pointer> path():
-        Pair<Class<T>, Constructor<T>> {
-    val clazz = T::class.java
-    val ptr = P::class.java
+public inline fun <reified T, P : Pointer> path(
+    noinline generator: (P) -> T
+): Pair<Class<*>, (P) -> T> {
+    val clz = T::class.java
 
-    return Pair(clazz, clazz.getConstructor(ptr))
+    return clz to generator
 }
 
 /**
- * A lazy map listing all the valid type casting paths, meaning that the
- * BitBuilder type can be constructed with the JavaCPP Pointer Type
+ * A map listing all the types which can be converted from which, and which
+ * function will be capable of doing the transformation
  *
+ * @see cast
  * @see path
  */
-public val constructorMap: Map<Class<*>, Constructor<*>> by lazy {
+public val constructorMap: Map<Class<*>, Any> =
     mapOf(
-        // Basic Values
-        path<FunctionValue, LLVMValueRef>(),
-        path<IndirectFunction, LLVMValueRef>(),
-        path<GlobalValue, LLVMValueRef>(),
-        path<GlobalVariable, LLVMValueRef>(),
-        path<GlobalAlias, LLVMValueRef>(),
-        // Constant Values
-        path<ConstantValue, LLVMValueRef>(),
-        path<ConstantInt, LLVMValueRef>(),
-        path<ConstantVector, LLVMValueRef>(),
-        path<ConstantStruct, LLVMValueRef>(),
-        path<ConstantPointer, LLVMValueRef>(),
-        path<ConstantFloat, LLVMValueRef>(),
-        path<ConstantArray, LLVMValueRef>(),
-        // Types
-        path<ArrayType, LLVMTypeRef>(),
-        path<FloatType, LLVMTypeRef>(),
-        path<FunctionType, LLVMTypeRef>(),
-        path<IntType, LLVMTypeRef>(),
-        path<LabelType, LLVMTypeRef>(),
-        path<MetadataType, LLVMTypeRef>(),
-        path<PointerType, LLVMTypeRef>(),
-        path<StructType, LLVMTypeRef>(),
-        path<TokenType, LLVMTypeRef>(),
-        path<VectorType, LLVMTypeRef>(),
-        path<VoidType, LLVMTypeRef>(),
-        path<X86MMXType, LLVMTypeRef>(),
-        // Users
-        path<User, LLVMValueRef>(),
-        // Instructions
-        path<Instruction, LLVMValueRef>(),
-        path<AllocaInstruction, LLVMValueRef>(),
-        path<AtomicCmpXchgInstruction, LLVMValueRef>(),
-        path<AtomicRMWInstruction, LLVMValueRef>(),
-        path<BrInstruction, LLVMValueRef>(),
-        path<CallBrInstruction, LLVMValueRef>(),
-        path<CallInstruction, LLVMValueRef>(),
-        path<CatchPadInstruction, LLVMValueRef>(),
-        path<CatchRetInstruction, LLVMValueRef>(),
-        path<CatchSwitchInstruction, LLVMValueRef>(),
-        path<CleanupPadInstruction, LLVMValueRef>(),
-        path<CleanupRetInstruction, LLVMValueRef>(),
-        path<FenceInstruction, LLVMValueRef>(),
-        path<IndirectBrInstruction, LLVMValueRef>(),
-        path<InvokeInstruction, LLVMValueRef>(),
-        path<LandingPadInstruction, LLVMValueRef>(),
-        path<LoadInstruction, LLVMValueRef>(),
-        path<PhiInstruction, LLVMValueRef>(),
-        path<ResumeInstruction, LLVMValueRef>(),
-        path<RetInstruction, LLVMValueRef>(),
-        path<SelectInstruction, LLVMValueRef>(),
-        path<StoreInstruction, LLVMValueRef>(),
-        path<SwitchInstruction, LLVMValueRef>(),
-        path<UnreachableInstruction, LLVMValueRef>(),
-        path<VAArgInstruction, LLVMValueRef>()
-    )
-}
+    path<FunctionValue, LLVMValueRef>(::FunctionValue),
+    path<IndirectFunction, LLVMValueRef>(::IndirectFunction),
+    path<GlobalValue, LLVMValueRef>(::GlobalValue),
+    path<GlobalVariable, LLVMValueRef>(::GlobalVariable),
+    path<GlobalAlias, LLVMValueRef>(::GlobalAlias),
+    // Constant Values
+    path<ConstantValue, LLVMValueRef>(::ConstantValue),
+    path<ConstantInt, LLVMValueRef>(::ConstantInt),
+    path<ConstantFloat, LLVMValueRef>(::ConstantFloat),
+    path<ConstantPointer, LLVMValueRef>(::ConstantPointer),
+    path<ConstantStruct, LLVMValueRef>(::ConstantStruct),
+    path<ConstantVector, LLVMValueRef>(::ConstantVector),
+    path<ConstantArray, LLVMValueRef>(::ConstantArray),
+    // Types
+    path<IntType, LLVMTypeRef>(::IntType),
+    path<FloatType, LLVMTypeRef>(::FloatType),
+    path<FunctionType, LLVMTypeRef>(::FunctionType),
+    path<ArrayType, LLVMTypeRef>(::ArrayType),
+    path<VectorType, LLVMTypeRef>(::VectorType),
+    path<StructType, LLVMTypeRef>(::StructType),
+    path<PointerType, LLVMTypeRef>(::PointerType),
+    path<LabelType, LLVMTypeRef>(::LabelType),
+    path<MetadataType, LLVMTypeRef>(::MetadataType),
+    path<TokenType, LLVMTypeRef>(::TokenType),
+    path<VoidType, LLVMTypeRef>(::VoidType),
+    path<X86MMXType, LLVMTypeRef>(::X86MMXType),
+    // Users
+    path<User, LLVMValueRef>(::User),
+    // Instructions
+    path<Instruction, LLVMValueRef>(::Instruction),
+    path<AllocaInstruction, LLVMValueRef>(::AllocaInstruction),
+    path<AtomicCmpXchgInstruction, LLVMValueRef>(::AtomicCmpXchgInstruction),
+    path<AtomicRMWInstruction, LLVMValueRef>(::AtomicRMWInstruction),
+    path<BrInstruction, LLVMValueRef>(::BrInstruction),
+    path<CallBrInstruction, LLVMValueRef>(::CallBrInstruction),
+    path<CallInstruction, LLVMValueRef>(::CallInstruction),
+    path<CatchRetInstruction, LLVMValueRef>(::CatchRetInstruction),
+    path<CatchPadInstruction, LLVMValueRef>(::CatchPadInstruction),
+    path<CatchSwitchInstruction, LLVMValueRef>(::CatchSwitchInstruction),
+    path<CleanupPadInstruction, LLVMValueRef>(::CleanupPadInstruction),
+    path<CleanupRetInstruction, LLVMValueRef>(::CleanupRetInstruction),
+    path<FenceInstruction, LLVMValueRef>(::FenceInstruction),
+    path<IndirectBrInstruction, LLVMValueRef>(::IndirectBrInstruction),
+    path<InvokeInstruction, LLVMValueRef>(::InvokeInstruction),
+    path<LandingPadInstruction, LLVMValueRef>(::LandingPadInstruction),
+    path<LoadInstruction, LLVMValueRef>(::LoadInstruction),
+    path<PhiInstruction, LLVMValueRef>(::PhiInstruction),
+    path<ResumeInstruction, LLVMValueRef>(::ResumeInstruction),
+    path<RetInstruction, LLVMValueRef>(::RetInstruction),
+    path<SelectInstruction, LLVMValueRef>(::SelectInstruction),
+    path<StoreInstruction, LLVMValueRef>(::StoreInstruction),
+    path<StoreInstruction, LLVMValueRef>(::StoreInstruction),
+    path<SwitchInstruction, LLVMValueRef>(::SwitchInstruction),
+    path<UnreachableInstruction, LLVMValueRef>(::UnreachableInstruction),
+    path<VAArgInstruction, LLVMValueRef>(::VAArgInstruction)
+)
 
 /**
  * Cast the provided value, [self] into type [T] using unsafe RTTI
@@ -146,9 +142,12 @@ public val constructorMap: Map<Class<*>, Constructor<*>> by lazy {
  *
  * @see constructorMap for valid casting paths
  */
+@Suppress("UNCHECKED_CAST")
 public inline fun <reified T> castOrNull(self: ContainsReference<*>): T? {
-    return constructorMap.getOrElse(T::class.java) { null }
-        ?.newInstance(self.ref) as? T
+    val fn = constructorMap.getOrElse(T::class.java) { null }
+    val res = (fn as? (Any) -> ContainsReference<*>)?.invoke(self.ref)
+
+    return res as T?
 }
 
 /**
