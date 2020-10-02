@@ -35,11 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-        with:
-          name: build
       - name: Build and run FactorialJIT example
         run: |
-          pushd samples/factorial-jit
-          bash ./gradlew run
-          popd
+          bash ./gradlew build --refresh-dependencies
+          bash samples/run.sh factorial-jit
