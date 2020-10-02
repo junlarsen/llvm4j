@@ -1,18 +1,54 @@
-name: Test Suite
-on: [push, pull_request]
+name: CI Automation
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+env:
+  GRADLE_OPTS: -Dorg.gradle.daemon=false
 jobs:
-  run:
-    name: Execute Test Suite
+  test:
+    name: Test Suite
     strategy:
       matrix:
         operating-system: [macos-latest, windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v2
-      - name: Run Tests
+      - name: Log and prepare environment information
         run: |
           java -version
           chmod +x ./gradlew
-          ./gradlew clean build test --refresh-dependencies
-        env:
-          GRADLE_OPTS: -Dorg.gradle.daemon=false
+      - name: Fetch Gradle dependencies
+        run: |
+          ./gradlew clean --refresh-dependencies
+      - name: Build project from source
+        run: |
+          ./gradlew build
+      - name: Execute Kotlin tests
+        run: |
+          ./gradlew test
+  samples:
+    needs: [test]
+    name: Ensure sample projects run
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Log and prepare environment information
+        run: |
+          java -version
+          chmod +x ./gradlew
+      - name: Fetch Gradle dependencies
+        run: |
+          ./gradlew clean --refresh-dependencies
+      - name: Build main project
+        run: |
+          ./gradlew build
+      - name: Build and run FactorialJIT example
+        run: |
+          pushd samples/factorial-jit
+          chmod +x ./gradlew
+          ./gradlew run
+          popd
