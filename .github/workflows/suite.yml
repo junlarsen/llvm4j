@@ -25,7 +25,7 @@ jobs:
         run: bash ./gradlew build
       - uses: actions/upload-artifact@v2
         with:
-          name: build
+          name: main-project-build
           path: build/
       - name: Execute Kotlin tests
         run: bash ./gradlew test
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Build and run FactorialJIT example
-        run: |
-          bash ./gradlew build --refresh-dependencies
-          bash samples/run.sh factorial-jit
+      - name: Build parent project
+        run: bash ./gradlew build --refresh-dependencies
+      - name: FactorialJIT Example
+        run: bash samples/run.sh factorial-jit
