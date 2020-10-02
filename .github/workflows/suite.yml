@@ -7,7 +7,7 @@ on:
     branches:
       - master
 env:
-  GRADLE_OPTS: -Dorg.gradle.daemon=false
+  GRADLE_OPTS: -Dorg.gradle.caching=true
 jobs:
   test:
     name: Test Suite
@@ -18,37 +18,29 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Log and prepare environment information
-        run: |
-          java -version
-          chmod +x ./gradlew
+        run: java -version
       - name: Fetch Gradle dependencies
-        run: |
-          ./gradlew clean --refresh-dependencies
+        run: bash ./gradlew clean --refresh-dependencies
       - name: Build project from source
-        run: |
-          ./gradlew build
+        run: bash ./gradlew build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: build/
       - name: Execute Kotlin tests
-        run: |
-          ./gradlew test
+        run: bash ./gradlew test
   samples:
     needs: [test]
     name: Ensure sample projects run
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Log and prepare environment information
-        run: |
-          java -version
-          chmod +x ./gradlew
+      - uses: actions/download-artifact@v2
+        with:
+          name: build
       - name: Fetch Gradle dependencies
-        run: |
-          ./gradlew clean --refresh-dependencies
-      - name: Build main project
-        run: |
-          ./gradlew build
       - name: Build and run FactorialJIT example
         run: |
           pushd samples/factorial-jit
-          chmod +x ./gradlew
-          ./gradlew run
+          bash ./gradlew run
           popd
