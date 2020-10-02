@@ -38,7 +38,6 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build
-      - name: Fetch Gradle dependencies
       - name: Build and run FactorialJIT example
         run: |
           pushd samples/factorial-jit
