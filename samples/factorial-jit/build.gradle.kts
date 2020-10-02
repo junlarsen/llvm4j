@@ -16,11 +16,15 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.0-rc")
     implementation("org.bytedeco:llvm-platform:10.0.1-1.5.4")
-    // For standalone usage, uncomment this line...
-    // implementation("com.github.vexelabs:bitbuilder:-SNAPSHOT")
 
-    // And comment out this one
-    implementation(fileTree("../../build/libs"))
+    // @internal: run a local build on CI machines
+    // regular users should use
+    // implementation("com.github.vexelabs:bitbuilder:-SNAPSHOT")
+    if (System.getProperty("CI") == "true") {
+        implementation(fileTree("../../build/libs"))
+    } else {
+        implementation("com.github.vexelabs:bitbuilder:-SNAPSHOT")
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
