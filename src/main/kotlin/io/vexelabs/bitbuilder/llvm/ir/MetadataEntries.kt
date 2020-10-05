@@ -3,7 +3,6 @@ package io.vexelabs.bitbuilder.llvm.ir
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
 import org.bytedeco.javacpp.SizeTPointer
-import org.bytedeco.llvm.LLVM.LLVMModuleFlagEntry
 import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.global.LLVM
 

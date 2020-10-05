@@ -4,10 +4,10 @@ import io.vexelabs.bitbuilder.llvm.executionengine.MCJITCompilerOptions
 import io.vexelabs.bitbuilder.llvm.executionengine.MCJITMemoryManager
 import io.vexelabs.bitbuilder.llvm.target.CodeGenOptimizationLevel
 import io.vexelabs.bitbuilder.llvm.target.CodeModel
+import kotlin.test.assertEquals
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
 import org.spekframework.spek2.Spek
-import kotlin.test.assertEquals
 
 internal object MCJITCompilerOptionsTest : Spek({
     test("a new object zero initialies everything") {

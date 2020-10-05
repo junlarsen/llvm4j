@@ -22,7 +22,7 @@ public typealias DiagnosticHandlerCallback = (
  * Data payload for [DiagnosticHandlerCallback]
  *
  * @property diagnostic The associated DiagnosticInfo reporter
- * @property payload    Opaque pointer value assigned at callback registration
+ * @property payload Opaque pointer value assigned at callback registration
  */
 public data class DiagnosticHandlerCallbackContext(
     public val diagnostic: DiagnosticInfo,

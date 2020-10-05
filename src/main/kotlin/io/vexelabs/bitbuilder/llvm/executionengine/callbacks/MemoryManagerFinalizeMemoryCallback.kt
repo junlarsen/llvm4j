@@ -20,7 +20,7 @@ public typealias MemoryManagerFinalizeMemoryCallback = (
  * Data payload for [MemoryManagerFinalizeMemoryCallback]
  *
  * @property payload Opaque pointer value assigned at callback registration
- * @property error   Error message, if present
+ * @property error Error message, if present
  */
 public data class MemoryManagerFinalizeMemoryCallbackContext(
     public val payload: Pointer?,

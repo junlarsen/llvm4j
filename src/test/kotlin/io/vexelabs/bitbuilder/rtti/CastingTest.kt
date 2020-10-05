@@ -4,11 +4,9 @@ import io.vexelabs.bitbuilder.llvm.ir.Use
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
-import org.spekframework.spek2.Spek
-import kotlin.system.measureNanoTime
-import kotlin.system.measureTimeMillis
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import org.spekframework.spek2.Spek
 
 internal object CastingTest : Spek({
     test("casting between valid paths") {
