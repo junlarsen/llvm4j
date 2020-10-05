@@ -6,7 +6,6 @@ import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.bytedeco.llvm.global.LLVM
 import org.spekframework.spek2.Spek
 
 internal class FunctionTypeTest : Spek({

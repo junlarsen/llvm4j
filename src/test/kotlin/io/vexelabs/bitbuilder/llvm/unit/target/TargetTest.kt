@@ -3,13 +3,12 @@ package io.vexelabs.bitbuilder.llvm.unit.target
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.llvm.target.Target
-import io.vexelabs.bitbuilder.llvm.target.TargetMachine
-import org.bytedeco.llvm.global.LLVM
-import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import org.bytedeco.llvm.global.LLVM
+import org.spekframework.spek2.Spek
 
 internal object TargetTest : Spek({
     setup()

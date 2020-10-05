@@ -5,7 +5,6 @@ import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
 import io.vexelabs.bitbuilder.llvm.target.TargetLibraryInfo
 import io.vexelabs.bitbuilder.llvm.target.TargetMachine
 import org.bytedeco.llvm.LLVM.LLVMPassManagerRef
-import org.bytedeco.llvm.LLVM.LLVMTargetLibraryInfoRef
 import org.bytedeco.llvm.global.LLVM
 
 /**

@@ -18,10 +18,10 @@ public typealias MemoryManagerAllocateDataSectionCallback = (
 /**
  * Data payload for [MemoryManagerAllocateDataSectionCallback]
  *
- * @property payload     Opaque pointer value assigned at callback registration
+ * @property payload Opaque pointer value assigned at callback registration
  * @property size
  * @property alignment
- * @property sectionId   The section which was just allocated
+ * @property sectionId The section which was just allocated
  * @property sectionName The name of the section
  * @property isReadOnly
  */

@@ -5,5 +5,4 @@ import org.spekframework.spek2.Spek
 
 internal object TargetMachineTest : Spek({
     setup()
-
 })
