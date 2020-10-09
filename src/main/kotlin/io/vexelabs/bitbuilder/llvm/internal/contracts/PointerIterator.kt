@@ -27,6 +27,8 @@ public open class PointerIterator<T, P : Pointer>(
      *
      * This should only be called if the caller is certain the next item
      * exists. Existence of the next item can be done with [hasNext]
+     *
+     * @throws RuntimeException
      */
     public override operator fun next(): T {
         // This iterator is yet to be used, return the starting node

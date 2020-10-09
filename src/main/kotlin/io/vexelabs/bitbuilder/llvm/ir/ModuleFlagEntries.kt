@@ -40,6 +40,7 @@ public class ModuleFlagEntries internal constructor() :
      * Get the [ModuleFlagBehavior] for the entry at [index]
      *
      * @see LLVM.LLVMModuleFlagEntriesGetFlagBehavior
+     * @throws IndexOutOfBoundsException
      */
     public fun getBehavior(index: Int): ModuleFlagBehavior {
         if (index >= size()) {
@@ -57,6 +58,7 @@ public class ModuleFlagEntries internal constructor() :
      * Get the key for the entry at [index]
      *
      * @see LLVM.LLVMModuleFlagEntriesGetKey
+     * @throws IndexOutOfBoundsException
      */
     public fun getKey(index: Int): String {
         if (index >= size()) {
@@ -77,6 +79,7 @@ public class ModuleFlagEntries internal constructor() :
      * Get the [Metadata] for the entry at [index]
      *
      * @see LLVM.LLVMModuleFlagEntriesGetMetadata
+     * @throws IndexOutOfBoundsException
      */
     public fun getMetadata(index: Int): Metadata {
         if (index >= size()) {

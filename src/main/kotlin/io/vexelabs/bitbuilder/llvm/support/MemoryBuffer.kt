@@ -111,6 +111,7 @@ public class MemoryBuffer internal constructor() : Disposable {
      * Loads file contents into a memory buffer
      *
      * @see LLVM.LLVMCreateMemoryBufferWithContentsOfFile
+     * @throws RuntimeException
      */
     public constructor(file: File) : this() {
         require(file.exists()) { "File does not exist" }

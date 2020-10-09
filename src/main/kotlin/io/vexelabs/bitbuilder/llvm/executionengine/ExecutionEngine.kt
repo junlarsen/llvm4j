@@ -129,6 +129,7 @@ public class ExecutionEngine public constructor() :
      * Unlink the given module from the execution context
      *
      * @see LLVM.LLVMRemoveModule
+     * @throws RuntimeException
      */
     public fun removeModule(module: Module) {
         val err = BytePointer(0L)

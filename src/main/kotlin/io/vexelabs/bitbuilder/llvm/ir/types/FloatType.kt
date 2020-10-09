@@ -16,6 +16,7 @@ public class FloatType internal constructor() : Type() {
      * Create a floating point types
      *
      * This function will create a fp types of the provided [kind].
+     * @throws Unreachable
      */
     public constructor(
         kind: TypeKind,

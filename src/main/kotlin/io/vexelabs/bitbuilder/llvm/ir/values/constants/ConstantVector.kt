@@ -174,6 +174,7 @@ public class ConstantVector internal constructor() : ConstantValue(),
      *
      * @see LLVM.LLVMConstUDiv
      * @see LLVM.LLVMConstSDiv
+     * @throws Unreachable
      */
     public fun getDiv(
         rhs: ConstantVector,

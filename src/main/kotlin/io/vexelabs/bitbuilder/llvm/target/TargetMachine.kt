@@ -119,6 +119,7 @@ public class TargetMachine internal constructor() :
      * object file
      *
      * @see LLVM.LLVMTargetMachineEmitToFile
+     * @throws RuntimeException
      */
     public fun emitToFile(
         module: Module,
@@ -146,6 +147,7 @@ public class TargetMachine internal constructor() :
      * object file
      *
      * @see LLVM.LLVMTargetMachineEmitToMemoryBuffer
+     * @throws RuntimeException
      */
     public fun emitToMemoryBuffer(
         module: Module,

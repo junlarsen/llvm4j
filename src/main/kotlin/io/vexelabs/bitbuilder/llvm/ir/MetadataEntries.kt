@@ -40,6 +40,7 @@ public class MetadataEntries internal constructor() :
      * Get the metadata kind at [index]
      *
      * @see LLVM.LLVMValueMetadataEntriesGetKind
+     * @throws IndexOutOfBoundsException
      */
     public fun getKind(index: Int): Int {
         if (index >= size()) {
@@ -55,6 +56,7 @@ public class MetadataEntries internal constructor() :
      * Get the metadata at [index]
      *
      * @see LLVM.LLVMValueMetadataEntriesGetMetadata
+     * @throws IndexOutOfBoundsException
      */
     public fun getMetadata(index: Int): Metadata {
         if (index >= size()) {
