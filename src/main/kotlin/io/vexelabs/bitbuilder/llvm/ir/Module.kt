@@ -213,6 +213,7 @@ public class Module internal constructor() : Disposable,
      * Print the module's IR to a file
      *
      * @see LLVM.LLVMPrintModuleToFile
+     * @throws RuntimeException
      */
     public fun saveIRToFile(path: File) {
         require(path.exists()) { "Cannot print to file which does not exist." }
@@ -503,6 +504,7 @@ public class Module internal constructor() : Disposable,
      * Create a generic execution engine for this module
      *
      * @see LLVM.LLVMCreateExecutionEngineForModule
+     * @throws RuntimeException
      */
     public fun createExecutionEngine(): ExecutionEngine {
         val error = ByteArray(0)
@@ -522,6 +524,7 @@ public class Module internal constructor() : Disposable,
      * Create an interpreter for this module
      *
      * @see LLVM.LLVMCreateInterpreterForModule
+     * @throws RuntimeException
      */
     public fun createInterpreter(): ExecutionEngine {
         val error = ByteArray(0)
@@ -542,6 +545,7 @@ public class Module internal constructor() : Disposable,
      * [optimizationLevel]
      *
      * @see LLVM.LLVMCreateJITCompilerForModule
+     * @throws RuntimeException
      */
     public fun createJITCompiler(optimizationLevel: Int): ExecutionEngine {
         val error = ByteArray(0)
@@ -566,6 +570,7 @@ public class Module internal constructor() : Disposable,
      *   There is no obvious way to create this object from the C API
      *
      * @see LLVM.LLVMCreateMCJITCompilerForModule
+     * @throws RuntimeException
      */
     public fun createMCJITCompiler(
         options: MCJITCompilerOptions

@@ -213,6 +213,7 @@ public class ConstantInt internal constructor() : ConstantValue() {
      *
      * @see LLVM.LLVMConstUDiv
      * @see LLVM.LLVMConstSDiv
+     * @throws Unreachable
      */
     public fun getDiv(
         rhs: ConstantInt,

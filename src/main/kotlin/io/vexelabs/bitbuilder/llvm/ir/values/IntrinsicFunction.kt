@@ -20,6 +20,8 @@ public class IntrinsicFunction internal constructor() {
      *
      * If [throwOnFailure] is true, then this function will throw an
      * [IllegalArgumentException] if the intrinsic does not exist.
+     *
+     * @throws IllegalArgumentException
      */
     public constructor(name: String, throwOnFailure: Boolean = true) : this() {
         val found = LLVM.LLVMLookupIntrinsicID(name, name.length.toLong())
