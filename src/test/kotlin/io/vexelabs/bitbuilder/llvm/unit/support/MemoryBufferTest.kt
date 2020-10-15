@@ -4,13 +4,13 @@ import io.vexelabs.bitbuilder.llvm.TestUtils
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.llvm.support.MemoryBuffer
+import org.spekframework.spek2.Spek
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal object MemoryBufferTest : Spek({
     setup()
@@ -45,11 +45,11 @@ internal object MemoryBufferTest : Spek({
         }
     }
 
-        test("fails when the path does not exist") {
-            assertFailsWith<IllegalArgumentException> {
-                MemoryBuffer(File("this file does not exist"))
-            }
+    test("fails when the path does not exist") {
+        assertFailsWith<IllegalArgumentException> {
+            MemoryBuffer(File("this file does not exist"))
         }
+    }
 
     group("finding buffer size") {
         test("a buffer with contents has a size") {

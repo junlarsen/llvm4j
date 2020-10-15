@@ -2,8 +2,8 @@ package io.vexelabs.bitbuilder.llvm.unit.ir.types
 
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import kotlin.test.assertEquals
 import org.spekframework.spek2.Spek
+import kotlin.test.assertEquals
 
 internal class PointerTypeTest : Spek({
     test("create pointer to integer type") {

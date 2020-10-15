@@ -1,8 +1,8 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.llvm.support.Message
-import java.io.File
 import org.bytedeco.javacpp.BytePointer
+import java.io.File
 
 /**
  * Specific wrapper representing a piece of LLVM IR

@@ -2,8 +2,8 @@ package io.vexelabs.bitbuilder.llvm.unit.ir.instructions.traits
 
 import io.vexelabs.bitbuilder.llvm.ir.Builder
 import io.vexelabs.bitbuilder.llvm.setup
-import kotlin.test.assertFailsWith
 import org.spekframework.spek2.Spek
+import kotlin.test.assertFailsWith
 
 internal object TerminatorTest : Spek({
     setup()

@@ -5,9 +5,9 @@ import io.vexelabs.bitbuilder.llvm.ir.attributes.Attribute
 import io.vexelabs.bitbuilder.llvm.ir.attributes.AttributeEnum
 import io.vexelabs.bitbuilder.llvm.ir.attributes.AttributeString
 import io.vexelabs.bitbuilder.llvm.setup
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal object AttributeTest : Spek({
     setup()

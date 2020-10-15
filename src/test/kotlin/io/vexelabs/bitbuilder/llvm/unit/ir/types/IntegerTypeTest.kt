@@ -4,9 +4,9 @@ import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.utils.runAll
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import org.spekframework.spek2.Spek
 
 internal class IntegerTypeTest : Spek({
     test("creationg of an arbitrary int type") {

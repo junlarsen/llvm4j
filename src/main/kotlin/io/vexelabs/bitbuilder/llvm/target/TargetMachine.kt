@@ -5,11 +5,11 @@ import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
 import io.vexelabs.bitbuilder.llvm.internal.util.toLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.support.MemoryBuffer
-import java.io.File
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.LLVM.LLVMTargetMachineRef
 import org.bytedeco.llvm.global.LLVM
+import java.io.File
 
 /**
  * Interface to llvm::TargetMachine

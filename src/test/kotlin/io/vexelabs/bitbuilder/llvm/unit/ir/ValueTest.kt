@@ -8,10 +8,10 @@ import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.types.VoidType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal object ValueTest : Spek({
     setup()
@@ -23,11 +23,14 @@ internal object ValueTest : Spek({
         test("getting a manually set name") {
             assertFalse { context.isDiscardingValueNames() }
 
-            val value = module.createFunction("NotTrue", FunctionType(
-                VoidType(),
-                listOf(),
-                variadic = false
-            )).apply {
+            val value = module.createFunction(
+                "NotTrue",
+                FunctionType(
+                    VoidType(),
+                    listOf(),
+                    variadic = false
+                )
+            ).apply {
                 setName("True")
             }
 

@@ -5,8 +5,8 @@ import io.vexelabs.bitbuilder.llvm.ir.TypeKind
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.types.StructType
 import io.vexelabs.bitbuilder.llvm.setup
-import kotlin.test.assertEquals
 import org.spekframework.spek2.Spek
+import kotlin.test.assertEquals
 
 internal object TypeTest : Spek({
     setup()

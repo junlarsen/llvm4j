@@ -6,10 +6,10 @@ import io.vexelabs.bitbuilder.llvm.ir.TypeKind
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.types.VectorType
 import io.vexelabs.bitbuilder.llvm.ir.values.IntrinsicFunction
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal class IntrinsicFunctionTest : Spek({
     test("performing lookup for intrinsic function") {
@@ -61,7 +61,8 @@ internal class IntrinsicFunctionTest : Spek({
 
         assertEquals(1, types.getParameterCount())
         assertEquals(
-            TypeKind.Pointer, types.getParameterTypes().first().getTypeKind()
+            TypeKind.Pointer,
+            types.getParameterTypes().first().getTypeKind()
         )
     }
 })

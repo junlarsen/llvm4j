@@ -8,8 +8,10 @@ import io.vexelabs.bitbuilder.llvm.ir.instructions.traits.Terminator
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class InvokeInstruction internal constructor() : Instruction(),
-    CallBase, Terminator {
+public class InvokeInstruction internal constructor() :
+    Instruction(),
+    CallBase,
+    Terminator {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }

@@ -20,7 +20,8 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @see LLVMPassManagerRef
  */
-public class PassManager internal constructor() : Disposable,
+public class PassManager internal constructor() :
+    Disposable,
     ContainsReference<LLVMPassManagerRef> {
     public override lateinit var ref: LLVMPassManagerRef
     public override var valid: Boolean = true

@@ -15,12 +15,12 @@ import io.vexelabs.bitbuilder.llvm.ir.values.GlobalVariable
 import io.vexelabs.bitbuilder.llvm.ir.values.IndirectFunction
 import io.vexelabs.bitbuilder.llvm.support.MemoryBuffer
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
-import java.io.File
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
+import java.io.File
 
 /**
  * Interface to llvm::Module
@@ -39,8 +39,10 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @see LLVMModuleRef
  */
-public class Module internal constructor() : Disposable,
-    ContainsReference<LLVMModuleRef>, Cloneable {
+public class Module internal constructor() :
+    Disposable,
+    ContainsReference<LLVMModuleRef>,
+    Cloneable {
     public override var valid: Boolean = true
     public override lateinit var ref: LLVMModuleRef
         internal set
@@ -510,7 +512,9 @@ public class Module internal constructor() : Disposable,
         val error = ByteArray(0)
         val ee = ExecutionEngine()
         val result = LLVM.LLVMCreateExecutionEngineForModule(
-            ee.ref, ref, error
+            ee.ref,
+            ref,
+            error
         )
 
         return if (result == 0) {
@@ -530,7 +534,9 @@ public class Module internal constructor() : Disposable,
         val error = ByteArray(0)
         val ee = ExecutionEngine()
         val result = LLVM.LLVMCreateInterpreterForModule(
-            ee.ref, ref, error
+            ee.ref,
+            ref,
+            error
         )
 
         return if (result == 0) {
@@ -551,7 +557,10 @@ public class Module internal constructor() : Disposable,
         val error = ByteArray(0)
         val ee = ExecutionEngine()
         val result = LLVM.LLVMCreateJITCompilerForModule(
-            ee.ref, ref, optimizationLevel, error
+            ee.ref,
+            ref,
+            optimizationLevel,
+            error
         )
 
         return if (result == 0) {
@@ -578,7 +587,11 @@ public class Module internal constructor() : Disposable,
         val error = ByteArray(0)
         val ee = ExecutionEngine()
         val result = LLVM.LLVMCreateMCJITCompilerForModule(
-            ee.ref, ref, options.ref, options.ref.sizeof().toLong(), error
+            ee.ref,
+            ref,
+            options.ref,
+            options.ref.sizeof().toLong(),
+            error
         )
 
         return if (result == 0) {

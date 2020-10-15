@@ -4,9 +4,9 @@ import io.vexelabs.bitbuilder.llvm.ir.TypeKind
 import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal class FunctionTypeTest : Spek({
     test("create parameter-less function type") {

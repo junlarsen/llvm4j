@@ -8,13 +8,13 @@ import io.vexelabs.bitbuilder.llvm.ir.Opcode
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.VoidType
 import io.vexelabs.bitbuilder.llvm.setup
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal object InstructionTest : Spek({
     setup()
@@ -67,9 +67,13 @@ internal object InstructionTest : Spek({
         }
 
         test("retrieving the residing block") {
-            val function = module.createFunction("test", FunctionType(
-                VoidType(), listOf(), false
-            )
+            val function = module.createFunction(
+                "test",
+                FunctionType(
+                    VoidType(),
+                    listOf(),
+                    false
+                )
             )
             val block = function.createBlock("entry")
 
@@ -108,9 +112,14 @@ internal object InstructionTest : Spek({
 
     group("cloning an instruction") {
         test("cloning creates an instruction without a parent") {
-            val function = module.createFunction("test", FunctionType(
-                VoidType(), listOf(), false
-            ))
+            val function = module.createFunction(
+                "test",
+                FunctionType(
+                    VoidType(),
+                    listOf(),
+                    false
+                )
+            )
             val block = function.createBlock("entry")
 
             builder.setPositionAtEnd(block)

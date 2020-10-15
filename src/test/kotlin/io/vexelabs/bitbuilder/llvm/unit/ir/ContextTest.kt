@@ -2,9 +2,9 @@ package io.vexelabs.bitbuilder.llvm.unit.ir
 
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.setup
-import kotlin.test.assertEquals
 import org.bytedeco.javacpp.IntPointer
 import org.spekframework.spek2.Spek
+import kotlin.test.assertEquals
 
 internal object ContextTest : Spek({
     setup()

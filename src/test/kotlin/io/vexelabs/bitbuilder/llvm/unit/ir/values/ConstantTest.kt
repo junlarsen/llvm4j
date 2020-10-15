@@ -3,8 +3,8 @@ package io.vexelabs.bitbuilder.llvm.unit.ir.values
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
-import kotlin.test.assertEquals
 import org.spekframework.spek2.Spek
+import kotlin.test.assertEquals
 
 internal class ConstantTest : Spek({
     // TODO: what on earth is this doing here?

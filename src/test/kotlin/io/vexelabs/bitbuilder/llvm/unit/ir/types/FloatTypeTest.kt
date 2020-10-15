@@ -2,8 +2,8 @@ package io.vexelabs.bitbuilder.llvm.unit.ir.types
 
 import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
 import io.vexelabs.bitbuilder.llvm.utils.runAll
-import kotlin.test.assertEquals
 import org.spekframework.spek2.Spek
+import kotlin.test.assertEquals
 
 internal class FloatTypeTest : Spek({
     test("creation of each float type") {

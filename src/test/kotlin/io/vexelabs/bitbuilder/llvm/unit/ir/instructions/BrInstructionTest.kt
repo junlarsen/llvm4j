@@ -7,10 +7,10 @@ import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.rtti.cast
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal class BrInstructionTest : Spek({
     setup()
@@ -20,8 +20,11 @@ internal class BrInstructionTest : Spek({
 
     test("create unconditional branch") {
         val function = module.createFunction(
-            "test", FunctionType(
-                IntType(32), listOf(), false
+            "test",
+            FunctionType(
+                IntType(32),
+                listOf(),
+                false
             )
         )
         val destination = function.createBlock("Entry")
@@ -32,8 +35,11 @@ internal class BrInstructionTest : Spek({
 
     test("create conditional branch") {
         val function = module.createFunction(
-            "test", FunctionType(
-                IntType(32), listOf(), false
+            "test",
+            FunctionType(
+                IntType(32),
+                listOf(),
+                false
             )
         )
         val then = function.createBlock("then")

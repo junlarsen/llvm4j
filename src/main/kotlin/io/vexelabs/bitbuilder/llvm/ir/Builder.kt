@@ -591,7 +591,7 @@ public class Builder public constructor(
     ): ConstantValue {
         require(!(nsw && nuw)) {
             "Instruction can not declare both NUW & " +
-                    "NSW"
+                "NSW"
         }
 
         val inst = when {
@@ -641,7 +641,7 @@ public class Builder public constructor(
     ): ConstantValue {
         require(!(nsw && nuw)) {
             "Instruction can not declare both NUW & " +
-                    "NSW"
+                "NSW"
         }
 
         val inst = when {
@@ -691,7 +691,7 @@ public class Builder public constructor(
     ): ConstantValue {
         require(!(nsw && nuw)) {
             "Instruction can not declare both NUW & " +
-                    "NSW"
+                "NSW"
         }
 
         val inst = when {
@@ -969,7 +969,7 @@ public class Builder public constructor(
     ): ConstantValue {
         require(!(nsw && nuw)) {
             "Instruction can not declare both NUW & " +
-                    "NSW"
+                "NSW"
         }
 
         val inst = when {

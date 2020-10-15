@@ -10,7 +10,7 @@ env:
   GRADLE_OPTS: -Dorg.gradle.caching=true
 jobs:
   lint:
-    name: Perform ktlint analysis
+    name: Ensure code style follows ktlint guidelines
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

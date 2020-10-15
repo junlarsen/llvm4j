@@ -10,9 +10,9 @@ import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
-import kotlin.test.assertEquals
 import org.bytedeco.llvm.global.LLVM
 import org.spekframework.spek2.Spek
+import kotlin.test.assertEquals
 
 internal object Factorial : Spek({
     test("translated factorial example") {

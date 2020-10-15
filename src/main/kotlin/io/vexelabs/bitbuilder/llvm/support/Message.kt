@@ -11,7 +11,8 @@ import org.bytedeco.llvm.global.LLVM
  * These byte pointers are retrieved via JNI. Failing to de-allocate them will
  * leak memory.
  */
-public open class Message internal constructor() : Disposable,
+public open class Message internal constructor() :
+    Disposable,
     ContainsReference<BytePointer> {
     public override var valid: Boolean = true
     public final override lateinit var ref: BytePointer

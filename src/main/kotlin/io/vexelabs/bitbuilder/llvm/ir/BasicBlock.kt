@@ -22,7 +22,8 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @see LLVMBasicBlockRef
  */
-public class BasicBlock internal constructor() : Validatable,
+public class BasicBlock internal constructor() :
+    Validatable,
     ContainsReference<LLVMBasicBlockRef> {
     override var valid: Boolean = true
     public override lateinit var ref: LLVMBasicBlockRef

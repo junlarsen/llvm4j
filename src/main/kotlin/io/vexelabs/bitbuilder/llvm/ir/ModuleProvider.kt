@@ -13,7 +13,8 @@ import org.bytedeco.llvm.global.LLVM
  * [Module] as well.
  */
 @Deprecated("Deprecated, use Module instead")
-public class ModuleProvider internal constructor() : Disposable,
+public class ModuleProvider internal constructor() :
+    Disposable,
     ContainsReference<LLVMModuleProviderRef> {
     private lateinit var module: Module
     public override var valid: Boolean = true
@@ -28,7 +29,7 @@ public class ModuleProvider internal constructor() : Disposable,
     public constructor(parent: Module) : this() {
         require(parent.valid) {
             "Cannot retrieve Module Provider of deleted " +
-                    "module"
+                "module"
         }
         module = parent
         ref = LLVM.LLVMCreateModuleProviderForExistingModule(parent.ref)

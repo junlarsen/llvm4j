@@ -5,10 +5,10 @@ import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.VoidType
 import io.vexelabs.bitbuilder.llvm.setup
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import org.spekframework.spek2.Spek
 
 internal class BuilderTest : Spek({
     setup()
@@ -19,7 +19,8 @@ internal class BuilderTest : Spek({
     group("positioning the builder") {
         test("may position after a basic block") {
             val fn = module.createFunction(
-                "test", FunctionType(
+                "test",
+                FunctionType(
                     VoidType(),
                     listOf(),
                     false
@@ -36,7 +37,8 @@ internal class BuilderTest : Spek({
 
         test("the builder hand may be cleared") {
             val fn = module.createFunction(
-                "test", FunctionType(
+                "test",
+                FunctionType(
                     VoidType(),
                     listOf(),
                     false

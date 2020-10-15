@@ -3,9 +3,9 @@ package io.vexelabs.bitbuilder.llvm.unit.ir
 import io.vexelabs.bitbuilder.llvm.ir.MetadataString
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.setup
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal object NamedMetadataTest : Spek({
     setup()

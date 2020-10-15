@@ -2,9 +2,9 @@ package io.vexelabs.bitbuilder.llvm.unit.internal
 
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.setup
-import kotlin.test.assertNotNull
 import org.bytedeco.llvm.global.LLVM
 import org.spekframework.spek2.Spek
+import kotlin.test.assertNotNull
 
 internal object CallbackTest : Spek({
     setup()
