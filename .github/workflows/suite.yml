@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run ktlint
-        run: java -jar assets/ktlint.jar
+        run: bash ./gradlew ktlintCheck
   test:
     name: Test Suite
     strategy:

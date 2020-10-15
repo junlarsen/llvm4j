@@ -1,5 +1,6 @@
 plugins {
     id("com.github.johnrengelman.shadow") version "5.2.0"
+    id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
     id("org.jetbrains.dokka") version "1.4.0-rc"
     id("org.jetbrains.kotlin.jvm") version "1.4.10"
     id("maven")
@@ -56,4 +57,8 @@ tasks.dokkaHtml {
             noJdkLink = false
         }
     }
+}
+
+ktlint {
+    debug.set(true)
 }
