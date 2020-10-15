@@ -5,9 +5,9 @@ import io.vexelabs.bitbuilder.llvm.ir.MetadataNode
 import io.vexelabs.bitbuilder.llvm.ir.MetadataString
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal object MetadataTest : Spek({
     group("casting values to and from metadata") {

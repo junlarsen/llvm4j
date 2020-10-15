@@ -12,7 +12,8 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public class StructType internal constructor() : Type(),
+public class StructType internal constructor() :
+    Type(),
     CompositeType {
     public constructor(llvmRef: LLVMTypeRef) : this() {
         ref = llvmRef

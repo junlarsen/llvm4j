@@ -9,10 +9,10 @@ import io.vexelabs.bitbuilder.llvm.ir.types.StructType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal class RetInstructionTest : Spek({
     setup()
@@ -40,7 +40,8 @@ internal class RetInstructionTest : Spek({
 
     test("create aggregate return") {
         val function = module.createFunction(
-            "test", FunctionType(
+            "test",
+            FunctionType(
                 StructType(listOf(IntType(1), IntType(1)), false),
                 listOf(),
                 false

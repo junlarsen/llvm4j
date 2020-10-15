@@ -5,8 +5,8 @@ import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.setup
-import kotlin.test.assertNotNull
 import org.spekframework.spek2.Spek
+import kotlin.test.assertNotNull
 
 internal class IndirectBrInstructionTest : Spek({
     setup()
@@ -16,9 +16,11 @@ internal class IndirectBrInstructionTest : Spek({
 
     test("create indirect branch") {
         val function = module.createFunction(
-            "test", FunctionType(
+            "test",
+            FunctionType(
                 IntType(32),
-                listOf(), false
+                listOf(),
+                false
             )
         )
         val base = function.createBlock("Entry").toValue()

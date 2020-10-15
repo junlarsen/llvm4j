@@ -2,10 +2,10 @@ package io.vexelabs.bitbuilder.llvm.unit.internal
 
 import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.internal.util.toLLVMBool
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal object ConversionsTest : Spek({
     group("int to boolean conversion") {

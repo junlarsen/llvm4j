@@ -5,12 +5,12 @@ import io.vexelabs.bitbuilder.llvm.ir.ThreadLocalMode
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal object GlobalVariableTest : Spek({
     setup()

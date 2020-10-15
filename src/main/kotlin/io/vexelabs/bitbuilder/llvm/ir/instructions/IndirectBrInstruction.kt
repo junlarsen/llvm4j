@@ -6,7 +6,8 @@ import io.vexelabs.bitbuilder.llvm.ir.instructions.traits.Terminator
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class IndirectBrInstruction internal constructor() : Instruction(),
+public class IndirectBrInstruction internal constructor() :
+    Instruction(),
     Terminator {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef

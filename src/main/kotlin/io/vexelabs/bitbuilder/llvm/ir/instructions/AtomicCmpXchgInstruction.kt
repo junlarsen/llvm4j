@@ -7,8 +7,10 @@ import io.vexelabs.bitbuilder.llvm.ir.instructions.traits.MemoryAccessor
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class AtomicCmpXchgInstruction internal constructor() : Instruction(),
-    MemoryAccessor, Atomic {
+public class AtomicCmpXchgInstruction internal constructor() :
+    Instruction(),
+    MemoryAccessor,
+    Atomic {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }

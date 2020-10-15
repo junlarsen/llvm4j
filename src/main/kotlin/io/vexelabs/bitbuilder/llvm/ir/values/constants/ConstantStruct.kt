@@ -11,8 +11,10 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantStruct internal constructor() : ConstantValue(),
-    AggregateValue, CompositeValue {
+public class ConstantStruct internal constructor() :
+    ConstantValue(),
+    AggregateValue,
+    CompositeValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }

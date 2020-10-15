@@ -4,9 +4,9 @@ import io.vexelabs.bitbuilder.llvm.ir.TypeKind
 import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.types.VectorType
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import org.spekframework.spek2.Spek
 
 internal class VectorTypeTest : Spek({
     test("create a vector type of 1000 integers") {

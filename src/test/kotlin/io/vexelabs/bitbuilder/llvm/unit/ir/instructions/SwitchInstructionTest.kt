@@ -16,11 +16,14 @@ internal class SwitchInstructionTest : Spek({
     val builder: Builder by memoized()
 
     test("assigning same block to two conditions is valid") {
-        val function = module.createFunction("test", FunctionType(
-            StructType(listOf(IntType(1), IntType(1)), false),
-            listOf(),
-            false
-        ))
+        val function = module.createFunction(
+            "test",
+            FunctionType(
+                StructType(listOf(IntType(1), IntType(1)), false),
+                listOf(),
+                false
+            )
+        )
         val block = function.createBlock("entry")
         val cond = ConstantInt(IntType(1), 1)
         val inst = builder.createSwitch(cond, block, 1)
@@ -29,11 +32,14 @@ internal class SwitchInstructionTest : Spek({
     }
 
     test("you may exceed the expected amount of cases") {
-        val function = module.createFunction("test", FunctionType(
-            StructType(listOf(IntType(1), IntType(1)), false),
-            listOf(),
-            false
-        ))
+        val function = module.createFunction(
+            "test",
+            FunctionType(
+                StructType(listOf(IntType(1), IntType(1)), false),
+                listOf(),
+                false
+            )
+        )
         val block = function.createBlock("entry")
         val cond = ConstantInt(IntType(1), 1)
         val inst = builder.createSwitch(cond, block, 1)

@@ -5,9 +5,9 @@ import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantArray
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.utils.constIntPairOf
 import io.vexelabs.bitbuilder.rtti.cast
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal class ConstantArrayTest : Spek({
     test("create string as constant i8 array") {

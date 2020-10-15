@@ -9,10 +9,10 @@ import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.GlobalValue
 import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.rtti.cast
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import org.spekframework.spek2.Spek
 
 internal class GlobalValueTest : Spek({
     setup()
@@ -97,7 +97,8 @@ internal class GlobalValueTest : Spek({
         val globalModule = cast<GlobalValue>(global).getModule()
 
         assertEquals(
-            module.getModuleIdentifier(), globalModule.getModuleIdentifier()
+            module.getModuleIdentifier(),
+            globalModule.getModuleIdentifier()
         )
     }
 })

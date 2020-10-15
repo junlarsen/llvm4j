@@ -8,7 +8,8 @@ import io.vexelabs.bitbuilder.llvm.ir.values.traits.DebugLocationValue
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class GlobalVariable internal constructor() : GlobalValue(),
+public class GlobalVariable internal constructor() :
+    GlobalValue(),
     DebugLocationValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef

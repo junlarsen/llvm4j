@@ -6,7 +6,8 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
-public interface SequentialType : CompositeType,
+public interface SequentialType :
+    CompositeType,
     ContainsReference<LLVMTypeRef> {
     /**
      * Returns types's subtypes

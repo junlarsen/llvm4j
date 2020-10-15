@@ -5,7 +5,8 @@ import io.vexelabs.bitbuilder.llvm.ir.instructions.traits.FuncletPad
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class CatchPadInstruction internal constructor() : Instruction(),
+public class CatchPadInstruction internal constructor() :
+    Instruction(),
     FuncletPad {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef

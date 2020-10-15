@@ -3,12 +3,12 @@ package io.vexelabs.bitbuilder.llvm.support
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
-import java.io.File
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
+import java.io.File
 
 /**
  * Interface to llvm::MemoryBuffer
@@ -128,7 +128,7 @@ public class MemoryBuffer internal constructor() : Disposable {
         if (res != 0) {
             throw RuntimeException(
                 "Error occurred while creating buffer from" +
-                        " file. Provided LLVM Error: $outMessage"
+                    " file. Provided LLVM Error: $outMessage"
             )
         }
 

@@ -20,7 +20,8 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @see ExecutionEngine
  */
-public class GenericValue internal constructor() : Disposable,
+public class GenericValue internal constructor() :
+    Disposable,
     ContainsReference<LLVMGenericValueRef> {
     public override var valid: Boolean = true
     public override lateinit var ref: LLVMGenericValueRef

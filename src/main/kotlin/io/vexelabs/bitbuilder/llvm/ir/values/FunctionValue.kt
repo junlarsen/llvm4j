@@ -19,7 +19,8 @@ import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public open class FunctionValue internal constructor() : Value(),
+public open class FunctionValue internal constructor() :
+    Value(),
     DebugLocationValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
@@ -332,7 +333,9 @@ public open class FunctionValue internal constructor() : Value(),
         kind: Int
     ): AttributeEnum? {
         val ref = LLVM.LLVMGetEnumAttributeAtIndex(
-            ref, index, kind
+            ref,
+            index,
+            kind
         )
 
         return ref?.let { AttributeEnum(it) }
@@ -360,7 +363,10 @@ public open class FunctionValue internal constructor() : Value(),
         kind: String
     ): AttributeString? {
         val ref = LLVM.LLVMGetStringAttributeAtIndex(
-            ref, index, kind, kind.length
+            ref,
+            index,
+            kind,
+            kind.length
         )
 
         return ref?.let { AttributeString(it) }
@@ -409,7 +415,10 @@ public open class FunctionValue internal constructor() : Value(),
         index: Int,
         kind: String
     ): Unit = LLVM.LLVMRemoveStringAttributeAtIndex(
-        ref, index, kind, kind.length
+        ref,
+        index,
+        kind,
+        kind.length
     )
 
     /**

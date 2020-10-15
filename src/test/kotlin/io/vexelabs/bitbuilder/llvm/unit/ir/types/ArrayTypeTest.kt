@@ -3,9 +3,9 @@ package io.vexelabs.bitbuilder.llvm.unit.ir.types
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
 import io.vexelabs.bitbuilder.llvm.ir.types.ArrayType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
+import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import org.spekframework.spek2.Spek
 
 internal class ArrayTypeTest : Spek({
     test("create an array type with 10 elements") {

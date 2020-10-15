@@ -13,8 +13,10 @@ import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class ConstantArray internal constructor() : ConstantValue(),
-    AggregateValue, CompositeValue {
+public class ConstantArray internal constructor() :
+    ConstantValue(),
+    AggregateValue,
+    CompositeValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
     }

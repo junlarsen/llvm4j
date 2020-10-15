@@ -9,7 +9,8 @@ import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
-public class CatchSwitchInstruction internal constructor() : Instruction(),
+public class CatchSwitchInstruction internal constructor() :
+    Instruction(),
     Terminator {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef

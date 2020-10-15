@@ -4,8 +4,8 @@ import io.vexelabs.bitbuilder.llvm.TestUtils
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.setup
-import kotlin.test.assertEquals
 import org.spekframework.spek2.Spek
+import kotlin.test.assertEquals
 
 internal object IRTest : Spek({
     setup()
