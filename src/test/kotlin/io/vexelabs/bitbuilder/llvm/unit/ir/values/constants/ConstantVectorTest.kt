@@ -4,10 +4,10 @@ import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.types.VectorType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantVector
+import io.vexelabs.bitbuilder.rtti.cast
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 
-// TODO: Test ConstantVector.getShuffleVector
 internal object ConstantVectorTest : Spek({
     val int32 by memoized { IntType(32) }
     val vec by memoized {
@@ -47,5 +47,14 @@ internal object ConstantVectorTest : Spek({
 
             assertEquals(expected[i], int.getSignedValue().toInt())
         }
+    }
+
+    test("shuffle vector instruction") {
+        val vec2 = ConstantVector(listOf(ConstantInt(int32, 1)))
+        val mask = ConstantVector(listOf(ConstantInt(int32, 2)))
+        val newVec = vec.getShuffleVector(vec2, mask)
+        val vecSize = cast<VectorType>(newVec.getType()).getElementCount()
+
+        assertEquals(1, vecSize)
     }
 })
