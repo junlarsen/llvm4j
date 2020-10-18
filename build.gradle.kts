@@ -87,8 +87,8 @@ publishing {
                     }
 
                     credentials {
-                        username = project.property("publishRepository.username") as String?
-                        password = project.property("publishRepository.password") as String?
+                        username = project.properties.getOrDefault("publishRepository.username", "default") as? String
+                        password = project.properties.getOrDefault("publishRepository.password", "default") as? String
                     }
                 }
             }
