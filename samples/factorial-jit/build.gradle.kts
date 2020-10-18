@@ -11,20 +11,13 @@ repositories {
     mavenCentral()
     maven("https://jitpack.io")
     maven("https://jcenter.bintray.com")
+    maven("https://repo.vexelabs.io/snapshots")
 }
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.0-rc")
     implementation("org.bytedeco:llvm-platform:10.0.1-1.5.4")
-
-    // @internal: run a local build on CI machines
-    // regular users should use
-    // implementation("com.github.vexelabs:bitbuilder:-SNAPSHOT")
-    if (System.getProperty("CI") == "true") {
-        implementation(fileTree("../../build/libs"))
-    } else {
-        implementation("com.github.vexelabs:bitbuilder:-SNAPSHOT")
-    }
+    implementation("io.vexelabs:bitbuilder:0.1.0-SNAPSHOT")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
