@@ -48,7 +48,7 @@ public class AttributeString internal constructor() :
      * @see LLVM.LLVMGetStringAttributeKind
      */
     public override fun getKind(): String {
-        val len = IntPointer(0)
+        val len = IntPointer(1)
         val ptr = LLVM.LLVMGetStringAttributeKind(ref, len)
 
         len.deallocate()
@@ -62,7 +62,7 @@ public class AttributeString internal constructor() :
      * @see LLVM.LLVMGetStringAttributeValue
      */
     public override fun getValue(): String {
-        val len = IntPointer(0)
+        val len = IntPointer(1)
         val ptr = LLVM.LLVMGetStringAttributeValue(ref, len)
 
         len.deallocate()

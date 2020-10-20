@@ -59,7 +59,7 @@ public class IntrinsicFunction internal constructor() {
     public fun getOverloadedName(parameters: List<Type>): String {
         require(isOverloaded()) { "This intrinsic is not overloaded." }
 
-        val len = SizeTPointer(0)
+        val len = SizeTPointer(1)
         val ptr = PointerPointer(*parameters.map { it.ref }.toTypedArray())
 
         return LLVM.LLVMIntrinsicCopyOverloadedName(
@@ -76,7 +76,7 @@ public class IntrinsicFunction internal constructor() {
      * @see LLVM.LLVMIntrinsicGetName
      */
     public fun getName(): String {
-        val len = SizeTPointer(0)
+        val len = SizeTPointer(1)
         val ptr = LLVM.LLVMIntrinsicGetName(id, len)
 
         len.deallocate()

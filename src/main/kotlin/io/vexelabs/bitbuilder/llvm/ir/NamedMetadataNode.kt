@@ -43,7 +43,7 @@ public class NamedMetadataNode public constructor(
      * @see LLVM.LLVMGetNamedMetadataName
      */
     private fun getNodeName(): String {
-        val len = SizeTPointer(0)
+        val len = SizeTPointer(1)
         val ptr = LLVM.LLVMGetNamedMetadataName(ref, len)
 
         len.deallocate()

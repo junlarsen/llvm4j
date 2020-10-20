@@ -68,7 +68,7 @@ public class ConstantArray internal constructor() :
     public fun getAsString(): String {
         require(isConstantString())
 
-        val len = SizeTPointer(0)
+        val len = SizeTPointer(1)
         val ptr = LLVM.LLVMGetAsString(ref, len)
 
         len.deallocate()
