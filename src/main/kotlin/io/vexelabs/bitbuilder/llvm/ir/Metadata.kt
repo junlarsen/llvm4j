@@ -134,7 +134,7 @@ public class MetadataString internal constructor() : Metadata() {
     public fun getString(
         context: Context = Context.getGlobalContext()
     ): String {
-        val len = IntPointer(0)
+        val len = IntPointer(1)
         val ptr = LLVM.LLVMGetMDString(toValue(context).ref, len)
 
         len.deallocate()

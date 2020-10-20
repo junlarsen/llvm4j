@@ -49,7 +49,7 @@ public open class Value internal constructor() :
      * @see LLVM.LLVMGetValueName2
      */
     public fun getName(): String {
-        val len = SizeTPointer(0)
+        val len = SizeTPointer(1)
         val ptr = LLVM.LLVMGetValueName2(ref, len)
 
         len.deallocate()

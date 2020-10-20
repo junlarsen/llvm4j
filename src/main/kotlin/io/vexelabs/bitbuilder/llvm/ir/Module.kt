@@ -75,7 +75,7 @@ public class Module internal constructor() :
      * @see LLVM.LLVMGetModuleIdentifier
      */
     public fun getModuleIdentifier(): String {
-        val len = SizeTPointer(0)
+        val len = SizeTPointer(1)
         val ptr = LLVM.LLVMGetModuleIdentifier(ref, len)
 
         len.deallocate()
@@ -101,7 +101,7 @@ public class Module internal constructor() :
      * @see LLVM.LLVMGetSourceFileName
      */
     public fun getSourceFileName(): String {
-        val len = SizeTPointer(0)
+        val len = SizeTPointer(1)
         val ptr = LLVM.LLVMGetSourceFileName(ref, len)
 
         len.deallocate()
@@ -170,7 +170,7 @@ public class Module internal constructor() :
      * @see LLVM.LLVMCopyModuleFlagsMetadata
      */
     public fun getModuleFlags(): ModuleFlagEntries {
-        val size = SizeTPointer(0)
+        val size = SizeTPointer(1)
         val entries = LLVM.LLVMCopyModuleFlagsMetadata(ref, size)
 
         return ModuleFlagEntries(entries, size)
@@ -248,7 +248,7 @@ public class Module internal constructor() :
      * @see LLVM.LLVMGetModuleInlineAsm
      */
     public fun getInlineAssembly(): String {
-        val len = SizeTPointer(0)
+        val len = SizeTPointer(1)
         val asm = LLVM.LLVMGetModuleInlineAsm(ref, len)
 
         len.deallocate()
