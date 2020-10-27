@@ -36,10 +36,11 @@ internal object TargetTest : Spek({
                 Target.createFromTriple(triple)
             }
 
-            val expected = "No available targets are compatible with triple " +
-                "\"$triple\""
-
-            assertEquals(expected, error.message)
+            assertTrue {
+                error.message
+                    ?.contains("No available targets are compatible with")
+                    ?: false
+            }
         }
 
         test("invalid target name") {

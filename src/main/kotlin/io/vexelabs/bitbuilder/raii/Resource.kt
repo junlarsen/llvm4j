@@ -32,7 +32,7 @@ public class Resource<T : Pointer>(
      * @throws ConcurrentModificationException if the item is already handed out
      */
     public fun acquire(): T {
-        return if (acquirable) {
+        return if (!acquirable) {
             throw ConcurrentModificationException()
         } else {
             acquirable = false

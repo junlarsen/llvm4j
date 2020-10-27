@@ -1,8 +1,11 @@
 package io.vexelabs.bitbuilder.llvm.support
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
+import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
+import io.vexelabs.bitbuilder.raii.resourceScope
+import io.vexelabs.bitbuilder.raii.toResource
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
@@ -30,7 +33,7 @@ public class MemoryBuffer internal constructor() : Disposable {
     /**
      * Parse this memory buffer as if it was LLVM bit code into an LLVM Module
      *
-     * The module will be parsed using the provided [intoContext]. If no
+     * The module will be parsed using the provided [ctx]. If no
      * context is passed, it will use the global llvm context.
      *
      * LLVM-C provides us two ways to parse bit code into modules:
@@ -44,38 +47,28 @@ public class MemoryBuffer internal constructor() : Disposable {
      * the parsing method was not lazy.
      */
     public fun getBitCodeModule(
-        intoContext: Context = Context.getGlobalContext(),
+        ctx: Context = Context.getGlobalContext(),
         parseLazy: Boolean = true
     ): Module {
-        var error: BytePointer? = null
-        val outModule = LLVMModuleRef()
-        val result = if (parseLazy) {
-            LLVM.LLVMGetBitcodeModuleInContext2(
-                intoContext.ref,
-                ref,
-                outModule
-            )
-        } else {
-            error = BytePointer(0L)
-            LLVM.LLVMParseBitcodeInContext(
-                intoContext.ref,
-                ref,
-                outModule,
-                error
-            )
-        }
+        val buf = BytePointer(256).toResource { it.deallocate() }
 
-        if (result != 0) {
-            outModule.deallocate()
-
-            throw if (error == null) {
-                RuntimeException("Failed to parse bit code")
+        return resourceScope(buf) {
+            val outModule = LLVMModuleRef()
+            val result = if (parseLazy) {
+                LLVM.LLVMGetBitcodeModuleInContext2(ctx.ref, ref, outModule)
             } else {
-                RuntimeException("Failed to parse bit code: ${error.string}")
+                LLVM.LLVMParseBitcodeInContext(ctx.ref, ref, outModule, it)
             }
-        }
 
-        return Module(outModule)
+            if (result != 0) {
+                outModule.deallocate()
+                throw RuntimeException(
+                    "Failed to parse bit code ${":" + it.string}"
+                )
+            }
+
+            return@resourceScope Module(outModule)
+        }
     }
 
     /**
@@ -89,50 +82,24 @@ public class MemoryBuffer internal constructor() : Disposable {
     public fun getIRModule(
         intoContext: Context = Context.getGlobalContext()
     ): Module {
-        val error = BytePointer(0L)
-        val outModule = LLVMModuleRef()
-        val result = LLVM.LLVMParseIRInContext(
-            intoContext.ref,
-            ref,
-            outModule,
-            error
-        )
+        val buf = BytePointer(256).toResource { it.deallocate() }
 
-        if (result != 0) {
-            outModule.deallocate()
-
-            throw RuntimeException("Failed to parse ir: ${error.string}")
-        }
-
-        return Module(outModule)
-    }
-
-    /**
-     * Loads file contents into a memory buffer
-     *
-     * @see LLVM.LLVMCreateMemoryBufferWithContentsOfFile
-     * @throws RuntimeException
-     */
-    public constructor(file: File) : this() {
-        require(file.exists()) { "File does not exist" }
-
-        val ptr = PointerPointer<LLVMMemoryBufferRef>(1L)
-        val outMessage = BytePointer()
-
-        val res = LLVM.LLVMCreateMemoryBufferWithContentsOfFile(
-            file.absolutePath,
-            ptr,
-            outMessage
-        )
-
-        if (res != 0) {
-            throw RuntimeException(
-                "Error occurred while creating buffer from" +
-                    " file. Provided LLVM Error: $outMessage"
+        return resourceScope(buf) {
+            val outModule = LLVMModuleRef()
+            val result = LLVM.LLVMParseIRInContext(
+                intoContext.ref,
+                ref,
+                outModule,
+                it
             )
-        }
 
-        ref = ptr.get(LLVMMemoryBufferRef::class.java, 0)
+            if (result != 0) {
+                outModule.deallocate()
+                throw RuntimeException("Failed to parse ir: ${it.string}")
+            }
+
+            return@resourceScope Module(outModule)
+        }
     }
 
     /**
@@ -151,6 +118,42 @@ public class MemoryBuffer internal constructor() : Disposable {
      */
     public fun getSize(): Long {
         return LLVM.LLVMGetBufferSize(ref)
+    }
+
+    public companion object {
+        /**
+         * Loads file contents into a memory buffer
+         *
+         * @see LLVM.LLVMCreateMemoryBufferWithContentsOfFile
+         * @throws RuntimeException
+         */
+        @JvmStatic
+        public fun fromFile(file: File): MemoryBuffer {
+            require(file.exists()) { "File does not exist" }
+
+            val buf = BytePointer(256).toResource { it.deallocate() }
+
+            return resourceScope(buf) {
+                val pointer = PointerPointer<LLVMMemoryBufferRef>(1)
+                val result = LLVM.LLVMCreateMemoryBufferWithContentsOfFile(
+                    file.absolutePath,
+                    pointer,
+                    it
+                )
+
+                if (result != 0) {
+                    pointer.deallocate()
+                    throw RuntimeException(
+                        "Error occurred while creating buffer from" +
+                        " file. Provided LLVM Error: ${it.string}"
+                    )
+                }
+
+                val memBuf = pointer.get(LLVMMemoryBufferRef::class.java, 0)
+
+                return@resourceScope MemoryBuffer(memBuf)
+            }
+        }
     }
 
     public override fun dispose() {

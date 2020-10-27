@@ -31,7 +31,7 @@ internal object MemoryBufferTest : Spek({
             val file = utils.getTemporaryFile()
 
             module.writeBitCodeToFile(file)
-            val buffer = MemoryBuffer(file)
+            val buffer = MemoryBuffer.fromFile(file)
 
             assertFalse { buffer.ref.isNull }
         }
@@ -46,8 +46,9 @@ internal object MemoryBufferTest : Spek({
     }
 
     test("fails when the path does not exist") {
+        val file = File("this file does not exist")
         assertFailsWith<IllegalArgumentException> {
-            MemoryBuffer(File("this file does not exist"))
+            MemoryBuffer.fromFile(file)
         }
     }
 
@@ -62,7 +63,7 @@ internal object MemoryBufferTest : Spek({
             val file = utils.getTemporaryFile().apply {
                 createNewFile()
             }
-            val buff = MemoryBuffer(file)
+            val buff = MemoryBuffer.fromFile(file)
 
             assertEquals(0, buff.getSize())
         }
@@ -91,7 +92,7 @@ internal object MemoryBufferTest : Spek({
             val fh = utils.getTemporaryFile().apply {
                 createNewFile()
             }.also(module.getIR()::writeToFile)
-            val buf = MemoryBuffer(fh)
+            val buf = MemoryBuffer.fromFile(fh)
             val subject = buf.getIRModule()
 
             assertNotNull(subject)

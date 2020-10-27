@@ -11,17 +11,20 @@ import org.bytedeco.javacpp.Pointer
  *
  * Once the block has been executed, the resource is de-allocated.
  */
-public inline fun <T : Pointer> resourceScope(
+public inline fun <T : Pointer, R> resourceScope(
     resource: Resource<T>,
-    block: (T) -> Unit
-): Unit = try {
-    synchronized(resource) {
+    block: (T) -> R
+): R = try {
+    val res = synchronized(resource) {
         val self = resource.acquire()
-
-        block(self)
+        val result = block.invoke(self)
 
         resource.release()
+
+        return@synchronized result
     }
+
+    res
 } finally {
     resource.free()
 }

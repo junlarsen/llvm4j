@@ -7,10 +7,14 @@ import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.values.FunctionValue
 import io.vexelabs.bitbuilder.llvm.target.TargetData
 import io.vexelabs.bitbuilder.llvm.target.TargetMachine
+import io.vexelabs.bitbuilder.raii.Resource
+import io.vexelabs.bitbuilder.raii.resourceScope
+import io.vexelabs.bitbuilder.raii.toResource
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
+import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
 /**
@@ -132,14 +136,17 @@ public class ExecutionEngine public constructor() :
      * @throws RuntimeException
      */
     public fun removeModule(module: Module) {
-        val err = BytePointer(0L)
-        val result = LLVM.LLVMRemoveModule(ref, module.ref, module.ref, err)
+        val buf = BytePointer(256).toResource { it.deallocate() }
 
-        if (result != 0) {
-            throw RuntimeException(err.string)
+        resourceScope(buf) {
+            val decoy = LLVMModuleRef()
+            val result = LLVM.LLVMRemoveModule(ref, module.ref, decoy, it)
+            decoy.deallocate()
+
+            if (result != 0) {
+                throw RuntimeException(it.string)
+            }
         }
-
-        err.deallocate()
     }
 
     /**
