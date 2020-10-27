@@ -107,7 +107,7 @@ public class Target internal constructor() :
          * @see LLVM.LLVMGetTargetFromTriple
          */
         public fun createFromTriple(triple: String): Target {
-            val buf = BytePointer(256).toResource { it.deallocate() }
+            val buf = BytePointer(256).toResource()
 
             return resourceScope(buf) {
                 val outTarget = LLVMTargetRef()

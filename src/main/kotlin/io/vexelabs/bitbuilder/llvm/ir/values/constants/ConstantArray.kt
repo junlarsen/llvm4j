@@ -8,6 +8,8 @@ import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.values.ConstantValue
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.AggregateValue
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.CompositeValue
+import io.vexelabs.bitbuilder.raii.resourceScope
+import io.vexelabs.bitbuilder.raii.toResource
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
@@ -68,11 +70,15 @@ public class ConstantArray internal constructor() :
     public fun getAsString(): String {
         require(isConstantString())
 
-        val len = SizeTPointer(1)
-        val ptr = LLVM.LLVMGetAsString(ref, len)
+        val len = SizeTPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val ptr = LLVM.LLVMGetAsString(ref, it)
+            val contents = ptr.string
 
-        return ptr.string
+            ptr.deallocate()
+
+            return@resourceScope contents
+        }
     }
 }

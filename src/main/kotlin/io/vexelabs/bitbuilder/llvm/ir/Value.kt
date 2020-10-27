@@ -51,7 +51,7 @@ public open class Value internal constructor() :
      * @see LLVM.LLVMGetValueName2
      */
     public fun getName(): String {
-        val len = SizeTPointer(1).toResource { it.deallocate() }
+        val len = SizeTPointer(1).toResource()
 
         return resourceScope(len) {
             val ptr = LLVM.LLVMGetValueName2(ref, it)

@@ -50,7 +50,7 @@ public class MemoryBuffer internal constructor() : Disposable {
         ctx: Context = Context.getGlobalContext(),
         parseLazy: Boolean = true
     ): Module {
-        val buf = BytePointer(256).toResource { it.deallocate() }
+        val buf = BytePointer(256).toResource()
 
         return resourceScope(buf) {
             val outModule = LLVMModuleRef()
@@ -82,7 +82,7 @@ public class MemoryBuffer internal constructor() : Disposable {
     public fun getIRModule(
         intoContext: Context = Context.getGlobalContext()
     ): Module {
-        val buf = BytePointer(256).toResource { it.deallocate() }
+        val buf = BytePointer(256).toResource()
 
         return resourceScope(buf) {
             val outModule = LLVMModuleRef()
@@ -131,7 +131,7 @@ public class MemoryBuffer internal constructor() : Disposable {
         public fun fromFile(file: File): MemoryBuffer {
             require(file.exists()) { "File does not exist" }
 
-            val buf = BytePointer(256).toResource { it.deallocate() }
+            val buf = BytePointer(256).toResource()
 
             return resourceScope(buf) {
                 val pointer = PointerPointer<LLVMMemoryBufferRef>(1)

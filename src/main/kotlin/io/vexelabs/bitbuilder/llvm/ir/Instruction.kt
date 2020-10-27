@@ -108,6 +108,7 @@ public open class Instruction internal constructor() :
      * @see LLVM.LLVMInstructionGetAllMetadataOtherThanDebugLoc
      */
     public fun getAllMetadataExceptDebugLocations(): MetadataEntries {
+        // Do not resourceScope this as it is passed to MetadataEntries
         val size = SizeTPointer(1)
         val entries = LLVM.LLVMInstructionGetAllMetadataOtherThanDebugLoc(
             ref,

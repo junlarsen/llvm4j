@@ -75,6 +75,7 @@ public class MetadataEntries internal constructor() :
 
         valid = false
 
+        sizePtr.deallocate()
         LLVM.LLVMDisposeValueMetadataEntries(ref)
     }
 }

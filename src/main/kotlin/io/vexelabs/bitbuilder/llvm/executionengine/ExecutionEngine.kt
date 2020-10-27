@@ -25,10 +25,14 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @see LLVMExecutionEngineRef
  */
-public class ExecutionEngine public constructor() :
+public class ExecutionEngine internal constructor() :
     ContainsReference<LLVMExecutionEngineRef>, Disposable {
-    public override val ref: LLVMExecutionEngineRef = LLVMExecutionEngineRef()
+    public override lateinit var ref: LLVMExecutionEngineRef
     public override var valid: Boolean = true
+
+    public constructor(llvmRef: LLVMExecutionEngineRef) : this() {
+        ref = llvmRef
+    }
 
     /**
      * Runs the llvm.global_ctors global variable
@@ -136,7 +140,7 @@ public class ExecutionEngine public constructor() :
      * @throws RuntimeException
      */
     public fun removeModule(module: Module) {
-        val buf = BytePointer(256).toResource { it.deallocate() }
+        val buf = BytePointer(256).toResource()
 
         resourceScope(buf) {
             val decoy = LLVMModuleRef()

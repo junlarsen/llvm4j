@@ -428,10 +428,7 @@ public open class FunctionValue internal constructor() :
      */
     public
 
-    fun addTargetDependentAttribute(
-        attribute: String,
-        value: String
-    ) {
+    fun addTargetDependentAttribute(attribute: String, value: String) {
         LLVM.LLVMAddTargetDependentFunctionAttr(ref, attribute, value)
     }
 

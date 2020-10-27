@@ -2,6 +2,8 @@ package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.util.map
+import io.vexelabs.bitbuilder.raii.resourceScope
+import io.vexelabs.bitbuilder.raii.toResource
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMMetadataRef
@@ -134,12 +136,17 @@ public class MetadataString internal constructor() : Metadata() {
     public fun getString(
         context: Context = Context.getGlobalContext()
     ): String {
-        val len = IntPointer(1)
-        val ptr = LLVM.LLVMGetMDString(toValue(context).ref, len)
+        val len = IntPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val metadata = toValue(context)
+            val ptr = LLVM.LLVMGetMDString(metadata.ref, it)
+            val contents = ptr.string
 
-        return ptr.string
+            ptr.deallocate()
+
+            return@resourceScope contents
+        }
     }
 }
 

@@ -210,6 +210,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
      * @see LLVM.LLVMGlobalCopyAllMetadata
      */
     public fun copyMetadata(): MetadataEntries {
+        // Do not resourceScope this as it is passed to MetadataEntries
         val ptr = SizeTPointer(1)
 
         val entries = LLVM.LLVMGlobalCopyAllMetadata(ref, ptr)

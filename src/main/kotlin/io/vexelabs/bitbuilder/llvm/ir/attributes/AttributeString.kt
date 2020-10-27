@@ -1,6 +1,8 @@
 package io.vexelabs.bitbuilder.llvm.ir.attributes
 
 import io.vexelabs.bitbuilder.llvm.ir.Context
+import io.vexelabs.bitbuilder.raii.resourceScope
+import io.vexelabs.bitbuilder.raii.toResource
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.global.LLVM
@@ -48,12 +50,16 @@ public class AttributeString internal constructor() :
      * @see LLVM.LLVMGetStringAttributeKind
      */
     public override fun getKind(): String {
-        val len = IntPointer(1)
-        val ptr = LLVM.LLVMGetStringAttributeKind(ref, len)
+        val len = IntPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val ptr = LLVM.LLVMGetStringAttributeKind(ref, it)
+            val contents = ptr.string
 
-        return ptr.string
+            ptr.deallocate()
+
+            return@resourceScope contents
+        }
     }
 
     /**
@@ -62,11 +68,15 @@ public class AttributeString internal constructor() :
      * @see LLVM.LLVMGetStringAttributeValue
      */
     public override fun getValue(): String {
-        val len = IntPointer(1)
-        val ptr = LLVM.LLVMGetStringAttributeValue(ref, len)
+        val len = IntPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val ptr = LLVM.LLVMGetStringAttributeValue(ref, it)
+            val contents = ptr.string
 
-        return ptr.string
+            ptr.deallocate()
+
+            return@resourceScope contents
+        }
     }
 }

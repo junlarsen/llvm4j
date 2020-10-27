@@ -128,7 +128,7 @@ public class TargetMachine internal constructor() :
         file: File,
         fileType: CodeGenFileType
     ) {
-        val buf = BytePointer(256).toResource { it.deallocate() }
+        val buf = BytePointer(256).toResource()
 
         resourceScope(buf) {
             val filePath = BytePointer(file.absolutePath)
@@ -159,7 +159,7 @@ public class TargetMachine internal constructor() :
         module: Module,
         fileType: CodeGenFileType
     ): MemoryBuffer {
-        val buf = BytePointer(256).toResource { it.deallocate() }
+        val buf = BytePointer(256).toResource()
 
         return resourceScope(buf) {
             val outBuf = LLVMMemoryBufferRef()

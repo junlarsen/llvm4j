@@ -5,6 +5,9 @@ import io.vexelabs.bitbuilder.llvm.ir.RealPredicate
 import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.ConstantValue
+import io.vexelabs.bitbuilder.raii.resourceScope
+import io.vexelabs.bitbuilder.raii.toResource
+import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -28,20 +31,24 @@ public class ConstantFloat internal constructor() : ConstantValue() {
      * @see LLVM.LLVMConstRealGetDouble
      */
     public fun getDouble(): Double {
-        val buf = IntArray(1)
+        val buf = IntPointer(1).toResource()
 
-        return LLVM.LLVMConstRealGetDouble(ref, buf)
+        return resourceScope(buf) {
+            return@resourceScope LLVM.LLVMConstRealGetDouble(ref, it)
+        }
     }
 
     /**
      * Determine whether [getDouble] will lose precision when converting
      */
     public fun getDoubleLosesPrecision(): Boolean {
-        val buf = IntArray(1)
+        val buf = IntPointer(1).toResource()
 
-        LLVM.LLVMConstRealGetDouble(ref, buf)
+        return resourceScope(buf) {
+            LLVM.LLVMConstRealGetDouble(ref, it)
 
-        return buf.first().fromLLVMBool()
+            return@resourceScope it[0].fromLLVMBool()
+        }
     }
 
     /**

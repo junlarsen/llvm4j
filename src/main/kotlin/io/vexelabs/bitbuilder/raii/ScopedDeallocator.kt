@@ -34,8 +34,6 @@ public inline fun <T : Pointer, R> resourceScope(
  *
  * @see Resource
  */
-public fun <T : Pointer> T.toResource(
-    releaseHandle: (T) -> Unit
-): Resource<T> {
-    return Resource(this, releaseHandle)
+public fun <T : Pointer> T.toResource(): Resource<T> {
+    return Resource(this, { it.deallocate() })
 }
