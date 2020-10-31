@@ -1,8 +1,8 @@
 package io.vexelabs.bitbuilder.llvm.ir.attributes
 
 import io.vexelabs.bitbuilder.llvm.ir.Context
-import io.vexelabs.bitbuilder.raii.resourceScope
-import io.vexelabs.bitbuilder.raii.toResource
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toResource
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.global.LLVM

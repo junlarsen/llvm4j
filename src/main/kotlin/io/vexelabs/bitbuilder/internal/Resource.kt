@@ -1,4 +1,4 @@
-package io.vexelabs.bitbuilder.raii
+package io.vexelabs.bitbuilder.internal
 
 import org.bytedeco.javacpp.Pointer
 

@@ -1,5 +1,6 @@
-package io.vexelabs.bitbuilder.rtti
+package io.vexelabs.bitbuilder.internal.rtti
 
+import io.vexelabs.bitbuilder.internal.cast
 import io.vexelabs.bitbuilder.llvm.ir.Use
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType

@@ -2,9 +2,9 @@ package io.vexelabs.bitbuilder.llvm.target
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
-import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
-import io.vexelabs.bitbuilder.raii.resourceScope
-import io.vexelabs.bitbuilder.raii.toResource
+import io.vexelabs.bitbuilder.internal.fromLLVMBool
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toResource
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMTargetRef
 import org.bytedeco.llvm.global.LLVM

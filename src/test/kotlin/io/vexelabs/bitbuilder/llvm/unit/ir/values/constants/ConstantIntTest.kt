@@ -8,7 +8,7 @@ import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.utils.constIntPairOf
 import io.vexelabs.bitbuilder.llvm.utils.runAll
-import io.vexelabs.bitbuilder.rtti.cast
+import io.vexelabs.bitbuilder.internal.cast
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

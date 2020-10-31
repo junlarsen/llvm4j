@@ -1,6 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir.values.constants
 
-import io.vexelabs.bitbuilder.llvm.internal.util.toLLVMBool
+import io.vexelabs.bitbuilder.internal.toLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.types.StructType

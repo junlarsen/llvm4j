@@ -7,9 +7,8 @@ import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.values.FunctionValue
 import io.vexelabs.bitbuilder.llvm.target.TargetData
 import io.vexelabs.bitbuilder.llvm.target.TargetMachine
-import io.vexelabs.bitbuilder.raii.Resource
-import io.vexelabs.bitbuilder.raii.resourceScope
-import io.vexelabs.bitbuilder.raii.toResource
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toResource
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.PointerPointer

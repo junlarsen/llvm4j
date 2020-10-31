@@ -1,4 +1,4 @@
-package io.vexelabs.bitbuilder.rtti
+package io.vexelabs.bitbuilder.internal
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.ir.Instruction

@@ -2,7 +2,7 @@ package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
-import io.vexelabs.bitbuilder.llvm.internal.util.toLLVMBool
+import io.vexelabs.bitbuilder.internal.toLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.instructions.AllocaInstruction
 import io.vexelabs.bitbuilder.llvm.ir.instructions.AtomicCmpXchgInstruction
 import io.vexelabs.bitbuilder.llvm.ir.instructions.AtomicRMWInstruction

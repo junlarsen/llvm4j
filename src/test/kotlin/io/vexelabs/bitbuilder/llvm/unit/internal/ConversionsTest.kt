@@ -1,7 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.unit.internal
 
-import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
-import io.vexelabs.bitbuilder.llvm.internal.util.toLLVMBool
+import io.vexelabs.bitbuilder.internal.fromLLVMBool
+import io.vexelabs.bitbuilder.internal.toLLVMBool
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

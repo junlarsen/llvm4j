@@ -1,6 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir.instructions
 
-import io.vexelabs.bitbuilder.llvm.internal.util.map
+import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.llvm.ir.BasicBlock
 import io.vexelabs.bitbuilder.llvm.ir.Instruction
 import io.vexelabs.bitbuilder.llvm.ir.instructions.traits.Terminator
