@@ -16,13 +16,23 @@ internal inline fun <reified P : Pointer, R> PointerPointer<P>.map(
 ): List<R> {
     val res = mutableListOf<R>()
 
-    for (i in 0 until capacity()) {
+    for (i in position() until capacity()) {
         val item = get(P::class.java, i)
 
         res += apply(item)
     }
 
     return res
+}
+
+/**
+ * Collapses an List of pointer types into a PointerPointer of the same size
+ * as the list
+ *
+ * @see PointerPointer
+ */
+internal inline fun <reified T : Pointer> List<T>.toPointerPointer(): PointerPointer<T> {
+    return PointerPointer(*toTypedArray())
 }
 
 /**

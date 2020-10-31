@@ -124,7 +124,9 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
 
         LLVM.LLVMGetCallSiteAttributes(ref, index, ptr)
 
-        return ptr.map { Attribute.create(it) }
+        return ptr.map { Attribute.create(it) }.also {
+            ptr.deallocate()
+        }
     }
 
     /**

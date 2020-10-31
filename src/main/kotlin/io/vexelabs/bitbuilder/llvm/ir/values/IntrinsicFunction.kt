@@ -6,6 +6,7 @@ import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.Type
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.internal.toResource
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
@@ -64,7 +65,7 @@ public class IntrinsicFunction internal constructor() {
         val len = SizeTPointer(1).toResource()
 
         return resourceScope(len) {
-            val ptr = PointerPointer(*parameters.map { it.ref }.toTypedArray())
+            val ptr = parameters.map { it.ref }.toPointerPointer()
             val result = LLVM.LLVMIntrinsicCopyOverloadedName(
                 id,
                 ptr,
@@ -105,13 +106,15 @@ public class IntrinsicFunction internal constructor() {
         module: Module,
         parameters: List<Type>
     ): FunctionValue {
-        val ptr = PointerPointer(*parameters.map { it.ref }.toTypedArray())
+        val ptr = parameters.map { it.ref }.toPointerPointer()
         val decl = LLVM.LLVMGetIntrinsicDeclaration(
             module.ref,
             id,
             ptr,
             parameters.size.toLong()
         )
+
+        ptr.deallocate()
 
         return FunctionValue(decl)
     }
@@ -122,13 +125,15 @@ public class IntrinsicFunction internal constructor() {
      * @see LLVM.LLVMIntrinsicGetType
      */
     public fun getType(context: Context, parameters: List<Type>): FunctionType {
-        val ptr = PointerPointer(*parameters.map { it.ref }.toTypedArray())
+        val ptr = parameters.map { it.ref }.toPointerPointer()
         val type = LLVM.LLVMIntrinsicGetType(
             context.ref,
             id,
             ptr,
             parameters.size.toLong()
         )
+
+        ptr.deallocate()
 
         return FunctionType(type)
     }

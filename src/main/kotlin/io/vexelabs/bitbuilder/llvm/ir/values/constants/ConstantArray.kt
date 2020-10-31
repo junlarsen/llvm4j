@@ -9,6 +9,7 @@ import io.vexelabs.bitbuilder.llvm.ir.values.ConstantValue
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.AggregateValue
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.CompositeValue
 import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.internal.toResource
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
@@ -29,9 +30,11 @@ public class ConstantArray internal constructor() :
      * @see LLVM.LLVMConstArray
      */
     public constructor(type: Type, values: List<Value>) : this() {
-        val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
+        val ptr = values.map { it.ref }.toPointerPointer()
 
         ref = LLVM.LLVMConstArray(type.ref, ptr, values.size)
+
+        ptr.deallocate()
     }
 
     /**

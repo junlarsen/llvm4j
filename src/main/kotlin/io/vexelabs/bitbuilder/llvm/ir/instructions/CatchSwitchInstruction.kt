@@ -36,7 +36,9 @@ public class CatchSwitchInstruction internal constructor() :
 
         LLVM.LLVMGetHandlers(ref, ptr)
 
-        return ptr.map { BasicBlock(it) }
+        return ptr.map { BasicBlock(it) }.also {
+            ptr.deallocate()
+        }
     }
 
     /**

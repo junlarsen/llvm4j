@@ -1,6 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.ir.values.constants
 
 import io.vexelabs.bitbuilder.internal.toLLVMBool
+import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.types.StructType
@@ -29,7 +30,7 @@ public class ConstantStruct internal constructor() :
         packed: Boolean,
         context: Context = Context.getGlobalContext()
     ) : this() {
-        val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
+        val ptr = values.map { it.ref }.toPointerPointer()
 
         ref = LLVM.LLVMConstStructInContext(
             context.ref,
@@ -37,6 +38,8 @@ public class ConstantStruct internal constructor() :
             values.size,
             packed.toLLVMBool()
         )
+
+        ptr.deallocate()
     }
 
     /**
@@ -45,8 +48,10 @@ public class ConstantStruct internal constructor() :
      * @see LLVM.LLVMConstNamedStruct
      */
     public constructor(type: StructType, values: List<Value>) : this() {
-        val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
+        val ptr = values.map { it.ref }.toPointerPointer()
 
         ref = LLVM.LLVMConstNamedStruct(type.ref, ptr, values.size)
+
+        ptr.deallocate()
     }
 }

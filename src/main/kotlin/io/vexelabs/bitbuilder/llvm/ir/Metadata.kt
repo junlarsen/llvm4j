@@ -3,6 +3,7 @@ package io.vexelabs.bitbuilder.llvm.ir
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.internal.toResource
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.javacpp.PointerPointer
@@ -159,12 +160,15 @@ public open class MetadataNode internal constructor() : Metadata() {
         values: List<Metadata>,
         context: Context = Context.getGlobalContext()
     ) : this() {
-        val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
+        val ptr = values.map { it.ref }.toPointerPointer()
+
         ref = LLVM.LLVMMDNodeInContext2(
             context.ref,
             ptr,
             values.size.toLong()
         )
+
+        ptr.deallocate()
     }
 
     /**

@@ -68,7 +68,9 @@ public class NamedMetadataNode public constructor(
 
         LLVM.LLVMGetNamedMetadataOperands(owner, name, ptr)
 
-        return ptr.map { Metadata.fromValue(Value(it)) }
+        return ptr.map { Metadata.fromValue(Value(it)) }.also {
+            ptr.deallocate()
+        }
     }
 
     /**

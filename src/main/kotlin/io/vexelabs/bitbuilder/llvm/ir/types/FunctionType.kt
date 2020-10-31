@@ -3,6 +3,7 @@ package io.vexelabs.bitbuilder.llvm.ir.types
 import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.internal.toLLVMBool
+import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.llvm.ir.Type
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
@@ -26,7 +27,7 @@ public class FunctionType internal constructor() : Type() {
         types: List<Type>,
         variadic: Boolean
     ) : this() {
-        val ptr = PointerPointer(*types.map { it.ref }.toTypedArray())
+        val ptr = types.map { it.ref }.toPointerPointer()
 
         ref = LLVM.LLVMFunctionType(
             returns.ref,
@@ -34,6 +35,8 @@ public class FunctionType internal constructor() : Type() {
             types.size,
             variadic.toLLVMBool()
         )
+
+        ptr.deallocate()
     }
 
     /**
@@ -74,6 +77,8 @@ public class FunctionType internal constructor() : Type() {
         val dest = PointerPointer<LLVMTypeRef>(getParameterCount().toLong())
         LLVM.LLVMGetParamTypes(ref, dest)
 
-        return dest.map { Type(it) }
+        return dest.map { Type(it) }.also {
+            dest.deallocate()
+        }
     }
 }

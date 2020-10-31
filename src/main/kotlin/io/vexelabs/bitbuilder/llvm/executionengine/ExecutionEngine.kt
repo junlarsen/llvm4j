@@ -8,6 +8,7 @@ import io.vexelabs.bitbuilder.llvm.ir.values.FunctionValue
 import io.vexelabs.bitbuilder.llvm.target.TargetData
 import io.vexelabs.bitbuilder.llvm.target.TargetMachine
 import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.internal.toResource
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
@@ -72,13 +73,15 @@ public class ExecutionEngine internal constructor() :
         function: FunctionValue,
         values: List<GenericValue>
     ): GenericValue {
-        val args = PointerPointer(*values.map { it.ref }.toTypedArray())
+        val args = values.map { it.ref }.toPointerPointer()
         val res = LLVM.LLVMRunFunction(
             ref,
             function.ref,
             values.size,
             args
         )
+
+        args.deallocate()
 
         return GenericValue(res)
     }
@@ -102,10 +105,13 @@ public class ExecutionEngine internal constructor() :
         argc: Int = argv.size,
         envp: List<String> = System.getenv().map { "${it.key}=${it.value}" }
     ): Int {
-        val env = PointerPointer(*envp.map { BytePointer(it) }.toTypedArray())
-        val arg = PointerPointer(*argv.map { BytePointer(it) }.toTypedArray())
+        val env = envp.map(::BytePointer).toPointerPointer()
+        val arg = argv.map(::BytePointer).toPointerPointer()
 
-        return LLVM.LLVMRunFunctionAsMain(ref, function.ref, argc, arg, env)
+        return LLVM.LLVMRunFunctionAsMain(ref, function.ref, argc, arg, env).also {
+            env.deallocate()
+            arg.deallocate()
+        }
     }
 
     /**

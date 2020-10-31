@@ -100,7 +100,9 @@ public open class FunctionValue internal constructor() :
 
         LLVM.LLVMGetBasicBlocks(ref, ptr)
 
-        return ptr.map { BasicBlock(it) }
+        return ptr.map { BasicBlock(it) }.also {
+            ptr.deallocate()
+        }
     }
 
     /**
@@ -135,7 +137,9 @@ public open class FunctionValue internal constructor() :
 
         LLVM.LLVMGetParams(ref, ptr)
 
-        return ptr.map { Value(it) }
+        return ptr.map { Value(it) }.also {
+            ptr.deallocate()
+        }
     }
 
     /**
@@ -308,7 +312,9 @@ public open class FunctionValue internal constructor() :
 
         LLVM.LLVMGetAttributesAtIndex(ref, index.value.toInt(), ptr)
 
-        return ptr.map { Attribute.create(it) }
+        return ptr.map { Attribute.create(it) }.also {
+            ptr.deallocate()
+        }
     }
 
     /**

@@ -1,8 +1,12 @@
 package io.vexelabs.bitbuilder.llvm.ir.values.traits
 
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toPointerPointer
+import io.vexelabs.bitbuilder.internal.toResource
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
+import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -19,14 +23,16 @@ public interface AggregateValue : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMConstInBoundsGEP
      */
     public fun getGEP(inbounds: Boolean, indices: List<ConstantInt>): Value {
-        val ptr = PointerPointer(*indices.map { it.ref }.toTypedArray())
+        val ptr = indices.map { it.ref }.toPointerPointer()
         val ref = if (inbounds) {
             LLVM.LLVMConstInBoundsGEP(ref, ptr, indices.size)
         } else {
             LLVM.LLVMConstGEP(ref, ptr, indices.size)
         }
 
-        return Value(ref)
+        return Value(ref).also {
+            ptr.deallocate()
+        }
     }
 
     /**
@@ -44,10 +50,13 @@ public interface AggregateValue : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMConstExtractValue
      */
     public fun getExtractValue(indices: List<Int>): Value {
-        val arr = indices.toTypedArray().toIntArray()
-        val ref = LLVM.LLVMConstExtractValue(ref, arr, arr.size)
+        val ptr = IntPointer(*indices.toTypedArray().toIntArray()).toResource()
 
-        return Value(ref)
+        return resourceScope(ptr) {
+            val ref = LLVM.LLVMConstExtractValue(ref, it, indices.size)
+
+            return@resourceScope Value(ref)
+        }
     }
 
     /**
@@ -58,9 +67,12 @@ public interface AggregateValue : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMConstInsertValue
      */
     public fun getInsertValue(value: Value, indices: List<Int>): Value {
-        val arr = indices.toTypedArray().toIntArray()
-        val ref = LLVM.LLVMConstInsertValue(ref, value.ref, arr, arr.size)
+        val ptr = IntPointer(*indices.toTypedArray().toIntArray()).toResource()
 
-        return Value(ref)
+        return resourceScope(ptr) {
+            val ref = LLVM.LLVMConstInsertValue(ref, value.ref, it, indices.size)
+
+            return@resourceScope Value(ref)
+        }
     }
 }

@@ -3,6 +3,7 @@ package io.vexelabs.bitbuilder.llvm.ir.types
 import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.internal.toLLVMBool
+import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Type
 import io.vexelabs.bitbuilder.llvm.ir.Value
@@ -33,7 +34,7 @@ public class StructType internal constructor() :
         packed: Boolean,
         ctx: Context = Context.getGlobalContext()
     ) : this() {
-        val ptr = PointerPointer(*types.map { it.ref }.toTypedArray())
+        val ptr = types.map { it.ref }.toPointerPointer()
 
         ref = LLVM.LLVMStructTypeInContext(
             ctx.ref,
@@ -41,6 +42,8 @@ public class StructType internal constructor() :
             types.size,
             packed.toLLVMBool()
         )
+
+        ptr.deallocate()
     }
 
     /**
@@ -93,9 +96,11 @@ public class StructType internal constructor() :
     public fun setBody(types: List<Type>, packed: Boolean) {
         require(isOpaque()) { "Cannot set body of non-opaque struct" }
 
-        val ptr = PointerPointer(*types.map { it.ref }.toTypedArray())
+        val ptr = types.map { it.ref }.toPointerPointer()
 
         LLVM.LLVMStructSetBody(ref, ptr, types.size, packed.toLLVMBool())
+
+        ptr.deallocate()
     }
 
     /**
@@ -133,9 +138,12 @@ public class StructType internal constructor() :
      */
     public fun getElementTypes(): List<Type> {
         val dest = PointerPointer<LLVMTypeRef>(getElementCount().toLong())
+
         LLVM.LLVMGetStructElementTypes(ref, dest)
 
-        return dest.map { Type(it) }
+        return dest.map { Type(it) }.also {
+            dest.deallocate()
+        }
     }
 
     /**

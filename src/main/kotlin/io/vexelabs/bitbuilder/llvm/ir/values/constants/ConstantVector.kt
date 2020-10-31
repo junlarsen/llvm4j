@@ -2,6 +2,7 @@ package io.vexelabs.bitbuilder.llvm.ir.values.constants
 
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.internal.toLLVMBool
+import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.llvm.ir.IntPredicate
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
@@ -25,9 +26,11 @@ public class ConstantVector internal constructor() :
      * @see LLVM.LLVMConstVector
      */
     public constructor(values: List<Value>) : this() {
-        val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
+        val ptr = values.map { it.ref }.toPointerPointer()
 
         ref = LLVM.LLVMConstVector(ptr, values.size)
+
+        ptr.deallocate()
     }
 
     /**

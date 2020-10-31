@@ -1,5 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir.types.traits
 
+import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.ir.Type
 import org.bytedeco.javacpp.PointerPointer
@@ -15,7 +16,9 @@ public interface SequentialType :
      * @see LLVM.LLVMGetSubtypes
      */
     public fun getSubtypes(): List<Type> {
+        // TODO: Research why PointerPointer.map cannot be used here
         val dest = PointerPointer<LLVMTypeRef>(getElementCount().toLong())
+
         LLVM.LLVMGetSubtypes(ref, dest)
 
         val res = mutableListOf<LLVMTypeRef>()
@@ -23,6 +26,8 @@ public interface SequentialType :
         for (i in 0 until dest.capacity()) {
             res += LLVMTypeRef(dest.get(i))
         }
+
+        dest.deallocate()
 
         return res.map { Type(it) }
     }
