@@ -20,6 +20,7 @@ public enum class TypeKind(public override val value: Int) : ForeignEnum<Int> {
     Vector(LLVM.LLVMVectorTypeKind),
     Metadata(LLVM.LLVMMetadataTypeKind),
     X86_MMX(LLVM.LLVMX86_MMXTypeKind),
+    BFloat(LLVM.LLVMBFloatTypeKind),
     Token(LLVM.LLVMTokenTypeKind);
 
     public companion object : ForeignEnum.CompanionBase<Int, TypeKind> {
