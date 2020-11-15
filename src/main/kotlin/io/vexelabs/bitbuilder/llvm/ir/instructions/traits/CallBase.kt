@@ -72,7 +72,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMAddCallSiteAttribute
      */
     public fun addAttribute(index: AttributeIndex, attribute: Attribute) {
-        return addAttribute(index.value.toInt(), attribute)
+        return addAttribute(index.value, attribute)
     }
 
     /**
@@ -90,7 +90,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMGetCallSiteAttributeCount
      */
     public fun getAttributeCount(index: AttributeIndex): Int {
-        return getAttributeCount(index.value.toInt())
+        return getAttributeCount(index.value)
     }
 
     /**
@@ -135,7 +135,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMGetCallSiteEnumAttribute
      */
     public fun getEnumAttribute(index: AttributeIndex, kind: Int): Attribute? {
-        return getEnumAttribute(index.value.toInt(), kind)
+        return getEnumAttribute(index.value, kind)
     }
 
     /**
@@ -160,7 +160,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
         index: AttributeIndex,
         kind: String
     ): Attribute? {
-        return getStringAttribute(index.value.toInt(), kind)
+        return getStringAttribute(index.value, kind)
     }
 
     /**
@@ -183,7 +183,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMRemoveCallSiteEnumAttribute
      */
     public fun removeEnumAttribute(index: AttributeIndex, kind: Int) {
-        removeEnumAttribute(index.value.toInt(), kind)
+        removeEnumAttribute(index.value, kind)
     }
 
     /**
@@ -203,7 +203,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMRemoveCallSiteStringAttribute
      */
     public fun removeStringAttribute(index: AttributeIndex, kind: String) {
-        removeStringAttribute(index.value.toInt(), kind)
+        removeStringAttribute(index.value, kind)
     }
 
     /**
