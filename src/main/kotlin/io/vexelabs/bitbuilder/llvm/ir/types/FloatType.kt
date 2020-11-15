@@ -29,6 +29,7 @@ public class FloatType internal constructor() : Type() {
             TypeKind.X86_FP80 -> LLVM.LLVMX86FP80TypeInContext(ctx.ref)
             TypeKind.FP128 -> LLVM.LLVMFP128TypeInContext(ctx.ref)
             TypeKind.PPC_FP128 -> LLVM.LLVMPPCFP128TypeInContext(ctx.ref)
+            TypeKind.BFloat -> LLVM.LLVMBFloatTypeInContext(ctx.ref)
             else -> throw Unreachable()
         }
     }
@@ -43,7 +44,8 @@ public class FloatType internal constructor() : Type() {
             TypeKind.Double,
             TypeKind.X86_FP80,
             TypeKind.FP128,
-            TypeKind.PPC_FP128
+            TypeKind.PPC_FP128,
+            TypeKind.BFloat
         )
     }
 }
