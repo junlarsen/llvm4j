@@ -141,13 +141,13 @@ public enum class AtomicRMWBinaryOperation(public override val value: Int) :
     }
 }
 
-public enum class AttributeIndex(public override val value: Long) :
-    ForeignEnum<Long> {
+public enum class AttributeIndex(public override val value: Int) :
+    ForeignEnum<Int> {
     Return(LLVM.LLVMAttributeReturnIndex),
     Function(LLVM.LLVMAttributeFunctionIndex);
 
-    public companion object : ForeignEnum.CompanionBase<Long, AttributeIndex> {
-        public override val map: Map<Long, AttributeIndex> by lazy {
+    public companion object : ForeignEnum.CompanionBase<Int, AttributeIndex> {
+        public override val map: Map<Int, AttributeIndex> by lazy {
             values().associateBy(AttributeIndex::value)
         }
     }

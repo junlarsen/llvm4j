@@ -310,7 +310,7 @@ public open class FunctionValue internal constructor() :
             getAttributeCount(index).toLong()
         )
 
-        LLVM.LLVMGetAttributesAtIndex(ref, index.value.toInt(), ptr)
+        LLVM.LLVMGetAttributesAtIndex(ref, index.value, ptr)
 
         return ptr.map { Attribute.create(it) }.also {
             ptr.deallocate()
@@ -327,7 +327,7 @@ public open class FunctionValue internal constructor() :
     public fun getEnumAttribute(
         index: AttributeIndex,
         kind: Int
-    ): AttributeEnum? = getEnumAttribute(index.value.toInt(), kind)
+    ): AttributeEnum? = getEnumAttribute(index.value, kind)
 
     /**
      * Pull the attribute value from an [index] with a [kind]
