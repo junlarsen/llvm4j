@@ -22,11 +22,12 @@ repositories {
     mavenCentral()
     maven("https://jitpack.io")
     maven("https://jcenter.bintray.com")
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
 }
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.10")
-    implementation("org.bytedeco:llvm-platform:10.0.1-1.5.4")
+    implementation("org.bytedeco:llvm-platform:11.0.0-1.5.5-SNAPSHOT")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.4.10")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.11")
