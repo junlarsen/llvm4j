@@ -457,6 +457,8 @@ public class ConstantVector internal constructor() :
      * Insert an element at [index] in this vector
      *
      * The [value] must be of the same type as what this vector holds.
+     *
+     * @see LLVM.LLVMConstInsertElement
      */
     public fun getInsertElement(
         index: ConstantInt,
@@ -474,6 +476,8 @@ public class ConstantVector internal constructor() :
      *
      * This returns a vector with the same element type as the input length
      * that is the same as the shuffle mask.
+     *
+     * @see LLVM.LLVMConstShuffleVector
      */
     public fun getShuffleVector(
         other: ConstantVector,
@@ -482,5 +486,25 @@ public class ConstantVector internal constructor() :
         val ref = LLVM.LLVMConstShuffleVector(ref, other.ref, mask.ref)
 
         return ConstantVector(ref)
+    }
+
+    /**
+     * Get the mask value at position [element] in the mask of a ShuffleVector
+     * instruction
+     *
+     * @see LLVM.LLVMGetMaskValue
+     */
+    public fun getShuffleVectorMask(element: Int): Int {
+        return LLVM.LLVMGetMaskValue(ref, element)
+    }
+
+    /**
+     * Returns a constant that specifies that the result of a ShuffleVectorInst
+     * is undefined.
+     *
+     * @see LLVM.LLVMGetUndefMaskElem
+     */
+    public fun getShuffleVectorUndefMask(): Int {
+        return LLVM.LLVMGetUndefMaskElem()
     }
 }
