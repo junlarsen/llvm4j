@@ -32,11 +32,7 @@ public class Use internal constructor() : ContainsReference<LLVMUseRef> {
     public fun getNextUse(): Use? {
         val use = LLVM.LLVMGetNextUse(ref)
 
-        return if (use != null) {
-            Use(use)
-        } else {
-            null
-        }
+        return use?.let { Use(it) }
     }
 
     /**

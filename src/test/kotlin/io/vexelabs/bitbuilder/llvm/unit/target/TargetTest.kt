@@ -5,7 +5,6 @@ import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.llvm.target.Target
 import org.bytedeco.llvm.global.LLVM
 import org.spekframework.spek2.Spek
-import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -36,10 +35,11 @@ internal object TargetTest : Spek({
                 Target.createFromTriple(triple)
             }
 
-            val expected = "No available targets are compatible with triple " +
-                "\"$triple\""
-
-            assertEquals(expected, error.message)
+            assertTrue {
+                error.message
+                    ?.contains("No available targets are compatible with")
+                    ?: false
+            }
         }
 
         test("invalid target name") {

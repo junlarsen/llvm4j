@@ -1,5 +1,8 @@
 package io.vexelabs.bitbuilder.llvm.executionengine
 
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toPointerPointer
+import io.vexelabs.bitbuilder.internal.toResource
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
 import io.vexelabs.bitbuilder.llvm.ir.Module
@@ -9,8 +12,8 @@ import io.vexelabs.bitbuilder.llvm.target.TargetData
 import io.vexelabs.bitbuilder.llvm.target.TargetMachine
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
-import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
+import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 
 /**
@@ -21,10 +24,14 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @see LLVMExecutionEngineRef
  */
-public class ExecutionEngine public constructor() :
+public class ExecutionEngine internal constructor() :
     ContainsReference<LLVMExecutionEngineRef>, Disposable {
-    public override val ref: LLVMExecutionEngineRef = LLVMExecutionEngineRef()
+    public override lateinit var ref: LLVMExecutionEngineRef
     public override var valid: Boolean = true
+
+    public constructor(llvmRef: LLVMExecutionEngineRef) : this() {
+        ref = llvmRef
+    }
 
     /**
      * Runs the llvm.global_ctors global variable
@@ -65,13 +72,15 @@ public class ExecutionEngine public constructor() :
         function: FunctionValue,
         values: List<GenericValue>
     ): GenericValue {
-        val args = PointerPointer(*values.map { it.ref }.toTypedArray())
+        val args = values.map { it.ref }.toPointerPointer()
         val res = LLVM.LLVMRunFunction(
             ref,
             function.ref,
             values.size,
             args
         )
+
+        args.deallocate()
 
         return GenericValue(res)
     }
@@ -95,10 +104,13 @@ public class ExecutionEngine public constructor() :
         argc: Int = argv.size,
         envp: List<String> = System.getenv().map { "${it.key}=${it.value}" }
     ): Int {
-        val env = PointerPointer(*envp.map { BytePointer(it) }.toTypedArray())
-        val arg = PointerPointer(*argv.map { BytePointer(it) }.toTypedArray())
+        val env = envp.map(::BytePointer).toPointerPointer()
+        val arg = argv.map(::BytePointer).toPointerPointer()
 
-        return LLVM.LLVMRunFunctionAsMain(ref, function.ref, argc, arg, env)
+        return LLVM.LLVMRunFunctionAsMain(ref, function.ref, argc, arg, env).also {
+            env.deallocate()
+            arg.deallocate()
+        }
     }
 
     /**
@@ -132,14 +144,17 @@ public class ExecutionEngine public constructor() :
      * @throws RuntimeException
      */
     public fun removeModule(module: Module) {
-        val err = BytePointer(0L)
-        val result = LLVM.LLVMRemoveModule(ref, module.ref, module.ref, err)
+        val buf = BytePointer(256).toResource()
 
-        if (result != 0) {
-            throw RuntimeException(err.string)
+        resourceScope(buf) {
+            val decoy = LLVMModuleRef()
+            val result = LLVM.LLVMRemoveModule(ref, module.ref, decoy, it)
+            decoy.deallocate()
+
+            if (result != 0) {
+                throw RuntimeException(it.string)
+            }
         }
-
-        err.deallocate()
     }
 
     /**

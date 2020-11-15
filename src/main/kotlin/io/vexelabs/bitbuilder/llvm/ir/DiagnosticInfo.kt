@@ -30,8 +30,11 @@ public class DiagnosticInfo internal constructor() :
      */
     public fun getDescription(): String {
         val ptr = LLVM.LLVMGetDiagInfoDescription(ref)
+        val contents = ptr.string
 
-        return ptr.string
+        ptr.deallocate()
+
+        return contents
     }
 
     /**

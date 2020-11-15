@@ -1,10 +1,10 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.values.constants
 
+import io.vexelabs.bitbuilder.internal.cast
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantArray
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.utils.constIntPairOf
-import io.vexelabs.bitbuilder.rtti.cast
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

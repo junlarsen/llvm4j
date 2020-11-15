@@ -1,11 +1,13 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
+import io.vexelabs.bitbuilder.internal.fromLLVMBool
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toResource
 import io.vexelabs.bitbuilder.llvm.executionengine.ExecutionEngine
 import io.vexelabs.bitbuilder.llvm.executionengine.MCJITCompilerOptions
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
-import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.ir.types.StructType
@@ -17,6 +19,7 @@ import io.vexelabs.bitbuilder.llvm.support.MemoryBuffer
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
+import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -75,12 +78,16 @@ public class Module internal constructor() :
      * @see LLVM.LLVMGetModuleIdentifier
      */
     public fun getModuleIdentifier(): String {
-        val len = SizeTPointer(1)
-        val ptr = LLVM.LLVMGetModuleIdentifier(ref, len)
+        val len = SizeTPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val ptr = LLVM.LLVMGetModuleIdentifier(ref, it)
+            val contents = ptr.string
 
-        return ptr.string
+            ptr.deallocate()
+
+            return@resourceScope contents
+        }
     }
 
     /**
@@ -101,12 +108,16 @@ public class Module internal constructor() :
      * @see LLVM.LLVMGetSourceFileName
      */
     public fun getSourceFileName(): String {
-        val len = SizeTPointer(1)
-        val ptr = LLVM.LLVMGetSourceFileName(ref, len)
+        val len = SizeTPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val ptr = LLVM.LLVMGetSourceFileName(ref, it)
+            val contents = ptr.string
 
-        return ptr.string
+            ptr.deallocate()
+
+            return@resourceScope contents
+        }
     }
 
     /**
@@ -170,6 +181,7 @@ public class Module internal constructor() :
      * @see LLVM.LLVMCopyModuleFlagsMetadata
      */
     public fun getModuleFlags(): ModuleFlagEntries {
+        // Do not resourceScope this as it is passed to ModuleFlagEntries
         val size = SizeTPointer(1)
         val entries = LLVM.LLVMCopyModuleFlagsMetadata(ref, size)
 
@@ -220,11 +232,14 @@ public class Module internal constructor() :
     public fun saveIRToFile(path: File) {
         require(path.exists()) { "Cannot print to file which does not exist." }
 
-        val message = BytePointer(0L)
-        val result = LLVM.LLVMPrintModuleToFile(ref, path.absolutePath, message)
+        val message = BytePointer(256).toResource()
 
-        if (result != 0) {
-            throw RuntimeException(message.string)
+        resourceScope(message) {
+            val result = LLVM.LLVMPrintModuleToFile(ref, path.absolutePath, it)
+
+            if (result != 0) {
+                throw RuntimeException(it.string)
+            }
         }
     }
 
@@ -248,12 +263,16 @@ public class Module internal constructor() :
      * @see LLVM.LLVMGetModuleInlineAsm
      */
     public fun getInlineAssembly(): String {
-        val len = SizeTPointer(1)
-        val asm = LLVM.LLVMGetModuleInlineAsm(ref, len)
+        val len = SizeTPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val asm = LLVM.LLVMGetModuleInlineAsm(ref, it)
+            val contents = asm.string
 
-        return asm.string
+            asm.deallocate()
+
+            return@resourceScope contents
+        }
     }
 
     /**
@@ -491,15 +510,13 @@ public class Module internal constructor() :
      * @see LLVM.LLVMVerifyModule
      */
     public fun verify(action: VerifierFailureAction): Boolean {
-        val ptr = BytePointer(0L)
+        val ptr = BytePointer(256).toResource()
 
-        val res = LLVM.LLVMVerifyModule(ref, action.value, ptr)
+        return resourceScope(ptr) {
+            val res = LLVM.LLVMVerifyModule(ref, action.value, it)
 
-        // LLVM Source says:
-        // > Note that this function's return value is inverted from what you
-        // would expect of a function called "verify"
-        // Thus we invert it again ...
-        return !res.fromLLVMBool()
+            return@resourceScope !res.fromLLVMBool()
+        }
     }
 
     /**
@@ -509,18 +526,22 @@ public class Module internal constructor() :
      * @throws RuntimeException
      */
     public fun createExecutionEngine(): ExecutionEngine {
-        val error = ByteArray(0)
-        val ee = ExecutionEngine()
-        val result = LLVM.LLVMCreateExecutionEngineForModule(
-            ee.ref,
-            ref,
-            error
-        )
+        val error = BytePointer(256).toResource()
 
-        return if (result == 0) {
-            ee
-        } else {
-            throw RuntimeException(error.contentToString())
+        return resourceScope(error) {
+            val executionEngine = LLVMExecutionEngineRef()
+            val result = LLVM.LLVMCreateExecutionEngineForModule(
+                executionEngine,
+                ref,
+                it
+            )
+
+            if (result != 0) {
+                executionEngine.deallocate()
+                throw RuntimeException(it.string)
+            }
+
+            return@resourceScope ExecutionEngine(executionEngine)
         }
     }
 
@@ -531,18 +552,22 @@ public class Module internal constructor() :
      * @throws RuntimeException
      */
     public fun createInterpreter(): ExecutionEngine {
-        val error = ByteArray(0)
-        val ee = ExecutionEngine()
-        val result = LLVM.LLVMCreateInterpreterForModule(
-            ee.ref,
-            ref,
-            error
-        )
+        val error = BytePointer(256).toResource()
 
-        return if (result == 0) {
-            ee
-        } else {
-            throw RuntimeException(error.contentToString())
+        return resourceScope(error) {
+            val executionEngine = LLVMExecutionEngineRef()
+            val result = LLVM.LLVMCreateInterpreterForModule(
+                executionEngine,
+                ref,
+                it
+            )
+
+            if (result != 0) {
+                executionEngine.deallocate()
+                throw RuntimeException(it.string)
+            }
+
+            return@resourceScope ExecutionEngine(executionEngine)
         }
     }
 
@@ -554,29 +579,28 @@ public class Module internal constructor() :
      * @throws RuntimeException
      */
     public fun createJITCompiler(optimizationLevel: Int): ExecutionEngine {
-        val error = ByteArray(0)
-        val ee = ExecutionEngine()
-        val result = LLVM.LLVMCreateJITCompilerForModule(
-            ee.ref,
-            ref,
-            optimizationLevel,
-            error
-        )
+        val error = BytePointer(256).toResource()
 
-        return if (result == 0) {
-            ee
-        } else {
-            throw RuntimeException(error.contentToString())
+        return resourceScope(error) {
+            val executionEngine = LLVMExecutionEngineRef()
+            val result = LLVM.LLVMCreateJITCompilerForModule(
+                executionEngine,
+                ref,
+                optimizationLevel,
+                it
+            )
+
+            if (result != 0) {
+                executionEngine.deallocate()
+                throw RuntimeException(it.string)
+            }
+
+            return@resourceScope ExecutionEngine(executionEngine)
         }
     }
 
     /**
      * Create a mcjit compiler for this module
-     *
-     * This function is currently unusable, see to do
-     *
-     * TODO: Find a way to create [MCJITCompilerOptions] from the C api
-     *   There is no obvious way to create this object from the C API
      *
      * @see LLVM.LLVMCreateMCJITCompilerForModule
      * @throws RuntimeException
@@ -584,20 +608,24 @@ public class Module internal constructor() :
     public fun createMCJITCompiler(
         options: MCJITCompilerOptions
     ): ExecutionEngine {
-        val error = ByteArray(0)
-        val ee = ExecutionEngine()
-        val result = LLVM.LLVMCreateMCJITCompilerForModule(
-            ee.ref,
-            ref,
-            options.ref,
-            options.ref.sizeof().toLong(),
-            error
-        )
+        val error = BytePointer(256).toResource()
 
-        return if (result == 0) {
-            ee
-        } else {
-            throw RuntimeException(error.contentToString())
+        return resourceScope(error) {
+            val executionEngine = LLVMExecutionEngineRef()
+            val result = LLVM.LLVMCreateMCJITCompilerForModule(
+                executionEngine,
+                ref,
+                options.ref,
+                options.ref.sizeof().toLong(),
+                it
+            )
+
+            if (result != 0) {
+                executionEngine.deallocate()
+                throw RuntimeException(it.string)
+            }
+
+            return@resourceScope ExecutionEngine(executionEngine)
         }
     }
 

@@ -1,8 +1,10 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
+import io.vexelabs.bitbuilder.internal.map
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toResource
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
-import io.vexelabs.bitbuilder.llvm.internal.util.map
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
@@ -43,12 +45,16 @@ public class NamedMetadataNode public constructor(
      * @see LLVM.LLVMGetNamedMetadataName
      */
     private fun getNodeName(): String {
-        val len = SizeTPointer(1)
-        val ptr = LLVM.LLVMGetNamedMetadataName(ref, len)
+        val len = SizeTPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val ptr = LLVM.LLVMGetNamedMetadataName(ref, it)
+            val contents = ptr.string
 
-        return ptr.string
+            ptr.deallocate()
+
+            return@resourceScope contents
+        }
     }
 
     /**
@@ -62,7 +68,9 @@ public class NamedMetadataNode public constructor(
 
         LLVM.LLVMGetNamedMetadataOperands(owner, name, ptr)
 
-        return ptr.map { Metadata.fromValue(Value(it)) }
+        return ptr.map { Metadata.fromValue(Value(it)) }.also {
+            ptr.deallocate()
+        }
     }
 
     /**

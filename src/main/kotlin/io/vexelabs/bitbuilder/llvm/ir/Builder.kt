@@ -1,8 +1,9 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
+import io.vexelabs.bitbuilder.internal.toLLVMBool
+import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
-import io.vexelabs.bitbuilder.llvm.internal.util.toLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.instructions.AllocaInstruction
 import io.vexelabs.bitbuilder.llvm.ir.instructions.AtomicCmpXchgInstruction
 import io.vexelabs.bitbuilder.llvm.ir.instructions.AtomicRMWInstruction
@@ -32,7 +33,6 @@ import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.ir.values.ConstantValue
 import io.vexelabs.bitbuilder.llvm.ir.values.FunctionValue
-import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -248,8 +248,10 @@ public class Builder public constructor(
     public fun createAggregateRet(
         values: List<Value>
     ): RetInstruction {
-        val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
+        val ptr = values.map { it.ref }.toPointerPointer()
         val inst = LLVM.LLVMBuildAggregateRet(ref, ptr, values.size)
+
+        ptr.deallocate()
 
         return RetInstruction(inst)
     }
@@ -363,7 +365,7 @@ public class Builder public constructor(
         catch: BasicBlock,
         variable: String
     ): InvokeInstruction {
-        val args = PointerPointer(*arguments.map { it.ref }.toTypedArray())
+        val args = arguments.map { it.ref }.toPointerPointer()
         val inst = LLVM.LLVMBuildInvoke2(
             ref,
             functionType.ref,
@@ -374,6 +376,8 @@ public class Builder public constructor(
             catch.ref,
             variable
         )
+
+        args.deallocate()
 
         return InvokeInstruction(inst)
     }
@@ -500,7 +504,7 @@ public class Builder public constructor(
         arguments: List<Value>,
         variable: String
     ): CatchPadInstruction {
-        val args = PointerPointer(*arguments.map { it.ref }.toTypedArray())
+        val args = arguments.map { it.ref }.toPointerPointer()
         val inst = LLVM.LLVMBuildCatchPad(
             ref,
             parent.ref,
@@ -508,6 +512,8 @@ public class Builder public constructor(
             arguments.size,
             variable
         )
+
+        args.deallocate()
 
         return CatchPadInstruction(inst)
     }
@@ -530,7 +536,7 @@ public class Builder public constructor(
         arguments: List<Value>,
         variable: String
     ): CleanupPadInstruction {
-        val args = PointerPointer(*arguments.map { it.ref }.toTypedArray())
+        val args = arguments.map { it.ref }.toPointerPointer()
         val inst = LLVM.LLVMBuildCleanupPad(
             ref,
             parent.ref,
@@ -538,6 +544,8 @@ public class Builder public constructor(
             arguments.size,
             variable
         )
+
+        args.deallocate()
 
         return CleanupPadInstruction(inst)
     }
@@ -1192,7 +1200,7 @@ public class Builder public constructor(
         inBounds: Boolean,
         variable: String
     ): ConstantValue {
-        val args = PointerPointer(*indices.map { it.ref }.toTypedArray())
+        val args = indices.map { it.ref }.toPointerPointer()
         val inst = if (inBounds) {
             LLVM.LLVMBuildInBoundsGEP2(
                 ref,
@@ -1212,6 +1220,8 @@ public class Builder public constructor(
                 variable
             )
         }
+
+        args.deallocate()
 
         return ConstantValue(inst)
     }
@@ -1612,7 +1622,7 @@ public class Builder public constructor(
         arguments: List<Value>,
         variable: String = ""
     ): CallInstruction {
-        val args = PointerPointer(*arguments.map { it.ref }.toTypedArray())
+        val args = arguments.map { it.ref }.toPointerPointer()
         val inst = LLVM.LLVMBuildCall(
             ref,
             function.ref,

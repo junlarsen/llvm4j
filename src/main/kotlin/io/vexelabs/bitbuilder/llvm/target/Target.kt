@@ -1,8 +1,10 @@
 package io.vexelabs.bitbuilder.llvm.target
 
+import io.vexelabs.bitbuilder.internal.fromLLVMBool
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toResource
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
-import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.llvm.LLVM.LLVMTargetRef
 import org.bytedeco.llvm.global.LLVM
@@ -105,15 +107,19 @@ public class Target internal constructor() :
          * @see LLVM.LLVMGetTargetFromTriple
          */
         public fun createFromTriple(triple: String): Target {
-            val out = LLVMTargetRef()
-            val err = BytePointer(0L)
-            val t = BytePointer(triple)
-            val result = LLVM.LLVMGetTargetFromTriple(t, out, err)
+            val buf = BytePointer(256).toResource()
 
-            return if (result == 0) {
-                Target(out)
-            } else {
-                throw IllegalArgumentException(err.string)
+            return resourceScope(buf) {
+                val outTarget = LLVMTargetRef()
+                val targetTriple = BytePointer(triple)
+                val result = LLVM.LLVMGetTargetFromTriple(targetTriple, outTarget, it)
+
+                if (result != 0) {
+                    outTarget.deallocate()
+                    throw IllegalArgumentException(it.string)
+                }
+
+                return@resourceScope Target(outTarget)
             }
         }
     }

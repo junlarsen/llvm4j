@@ -1,8 +1,8 @@
 package io.vexelabs.bitbuilder.llvm.ir.values
 
+import io.vexelabs.bitbuilder.internal.fromLLVMBool
+import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
-import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
-import io.vexelabs.bitbuilder.llvm.internal.util.map
 import io.vexelabs.bitbuilder.llvm.ir.AttributeIndex
 import io.vexelabs.bitbuilder.llvm.ir.BasicBlock
 import io.vexelabs.bitbuilder.llvm.ir.CallConvention
@@ -100,7 +100,9 @@ public open class FunctionValue internal constructor() :
 
         LLVM.LLVMGetBasicBlocks(ref, ptr)
 
-        return ptr.map { BasicBlock(it) }
+        return ptr.map { BasicBlock(it) }.also {
+            ptr.deallocate()
+        }
     }
 
     /**
@@ -135,7 +137,9 @@ public open class FunctionValue internal constructor() :
 
         LLVM.LLVMGetParams(ref, ptr)
 
-        return ptr.map { Value(it) }
+        return ptr.map { Value(it) }.also {
+            ptr.deallocate()
+        }
     }
 
     /**
@@ -308,7 +312,9 @@ public open class FunctionValue internal constructor() :
 
         LLVM.LLVMGetAttributesAtIndex(ref, index.value.toInt(), ptr)
 
-        return ptr.map { Attribute.create(it) }
+        return ptr.map { Attribute.create(it) }.also {
+            ptr.deallocate()
+        }
     }
 
     /**
@@ -428,10 +434,7 @@ public open class FunctionValue internal constructor() :
      */
     public
 
-    fun addTargetDependentAttribute(
-        attribute: String,
-        value: String
-    ) {
+    fun addTargetDependentAttribute(attribute: String, value: String) {
         LLVM.LLVMAddTargetDependentFunctionAttr(ref, attribute, value)
     }
 

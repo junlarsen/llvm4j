@@ -1,8 +1,8 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
+import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Validatable
-import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.DebugLocationValue
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
@@ -108,6 +108,7 @@ public open class Instruction internal constructor() :
      * @see LLVM.LLVMInstructionGetAllMetadataOtherThanDebugLoc
      */
     public fun getAllMetadataExceptDebugLocations(): MetadataEntries {
+        // Do not resourceScope this as it is passed to MetadataEntries
         val size = SizeTPointer(1)
         val entries = LLVM.LLVMInstructionGetAllMetadataOtherThanDebugLoc(
             ref,

@@ -1,5 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.ir.values.traits
 
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toResource
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
@@ -16,12 +18,16 @@ public interface DebugLocationValue : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMGetDebugLocDirectory
      */
     public fun getDebugLocationDirectory(): String? {
-        val len = IntPointer(1)
-        val ptr = LLVM.LLVMGetDebugLocDirectory(ref, len)
+        val len = IntPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val ptr = LLVM.LLVMGetDebugLocDirectory(ref, it)
+            val contents = ptr?.string
 
-        return ptr?.string
+            ptr.deallocate()
+
+            return@resourceScope contents
+        }
     }
 
     /**
@@ -30,12 +36,16 @@ public interface DebugLocationValue : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMGetDebugLocFilename
      */
     public fun getDebugLocationFilename(): String? {
-        val len = IntPointer(1)
-        val ptr = LLVM.LLVMGetDebugLocFilename(ref, len)
+        val len = IntPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val ptr = LLVM.LLVMGetDebugLocFilename(ref, it)
+            val contents = ptr?.string
 
-        return ptr?.string
+            ptr.deallocate()
+
+            return@resourceScope contents
+        }
     }
 
     /**

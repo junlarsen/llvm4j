@@ -1,8 +1,10 @@
 package io.vexelabs.bitbuilder.llvm.target
 
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toLLVMBool
+import io.vexelabs.bitbuilder.internal.toResource
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
-import io.vexelabs.bitbuilder.llvm.internal.util.toLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.support.MemoryBuffer
 import org.bytedeco.javacpp.BytePointer
@@ -126,17 +128,21 @@ public class TargetMachine internal constructor() :
         file: File,
         fileType: CodeGenFileType
     ) {
-        val err = BytePointer(0L)
-        val result = LLVM.LLVMTargetMachineEmitToFile(
-            ref,
-            module.ref,
-            BytePointer(file.absolutePath),
-            fileType.value,
-            err
-        )
+        val buf = BytePointer(256).toResource()
 
-        if (result != 0) {
-            throw RuntimeException(err.string)
+        resourceScope(buf) {
+            val filePath = BytePointer(file.absolutePath)
+            val result = LLVM.LLVMTargetMachineEmitToFile(
+                ref,
+                module.ref,
+                filePath,
+                fileType.value,
+                it
+            )
+
+            if (result != 0) {
+                throw RuntimeException(it.string)
+            }
         }
     }
 
@@ -153,20 +159,24 @@ public class TargetMachine internal constructor() :
         module: Module,
         fileType: CodeGenFileType
     ): MemoryBuffer {
-        val err = BytePointer(0L)
-        val out = LLVMMemoryBufferRef()
-        val result = LLVM.LLVMTargetMachineEmitToMemoryBuffer(
-            ref,
-            module.ref,
-            fileType.value,
-            err,
-            out
-        )
+        val buf = BytePointer(256).toResource()
 
-        return if (result == 0) {
-            MemoryBuffer(out)
-        } else {
-            throw RuntimeException(err.string)
+        return resourceScope(buf) {
+            val outBuf = LLVMMemoryBufferRef()
+            val result = LLVM.LLVMTargetMachineEmitToMemoryBuffer(
+                ref,
+                module.ref,
+                fileType.value,
+                it,
+                outBuf
+            )
+
+            if (result != 0) {
+                outBuf.deallocate()
+                throw RuntimeException(it.string)
+            }
+
+            return@resourceScope MemoryBuffer(outBuf)
         }
     }
 

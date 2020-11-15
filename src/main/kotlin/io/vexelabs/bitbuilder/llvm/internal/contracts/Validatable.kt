@@ -9,5 +9,5 @@ package io.vexelabs.bitbuilder.llvm.internal.contracts
  * ourselves we may accidentally crash the JVM or leak memory.
  */
 internal interface Validatable {
-    public var valid: Boolean
+    var valid: Boolean
 }

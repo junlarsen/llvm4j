@@ -1,9 +1,9 @@
 package io.vexelabs.bitbuilder.llvm.ir.instructions
 
+import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.llvm.ir.BasicBlock
 import io.vexelabs.bitbuilder.llvm.ir.Instruction
 import io.vexelabs.bitbuilder.llvm.ir.Value
-import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -20,13 +20,16 @@ public class PhiInstruction internal constructor() : Instruction() {
     public fun addIncoming(values: List<Value>, blocks: List<BasicBlock>) {
         require(values.size == blocks.size)
 
-        val valuePtr = PointerPointer(*values.map { it.ref }.toTypedArray())
-        val blockPtr = PointerPointer(*blocks.map { it.ref }.toTypedArray())
+        val valuePtr = values.map { it.ref }.toPointerPointer()
+        val blockPtr = blocks.map { it.ref }.toPointerPointer()
 
         values.mapIndexed { i, v -> valuePtr.put(i.toLong(), v.ref) }
         blocks.mapIndexed { i, v -> blockPtr.put(i.toLong(), v.ref) }
 
         LLVM.LLVMAddIncoming(ref, valuePtr, blockPtr, values.size)
+
+        valuePtr.deallocate()
+        blockPtr.deallocate()
     }
 
     /**

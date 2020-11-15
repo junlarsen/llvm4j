@@ -11,7 +11,4 @@ public class TargetLibraryInfo internal constructor() :
     public constructor(llvmRef: LLVMTargetLibraryInfoRef) : this() {
         ref = llvmRef
     }
-
-    //region Target
-    //endregion Target
 }

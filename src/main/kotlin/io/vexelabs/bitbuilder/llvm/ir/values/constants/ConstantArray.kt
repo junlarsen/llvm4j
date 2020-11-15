@@ -1,14 +1,16 @@
 package io.vexelabs.bitbuilder.llvm.ir.values.constants
 
-import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
-import io.vexelabs.bitbuilder.llvm.internal.util.toLLVMBool
+import io.vexelabs.bitbuilder.internal.fromLLVMBool
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toLLVMBool
+import io.vexelabs.bitbuilder.internal.toPointerPointer
+import io.vexelabs.bitbuilder.internal.toResource
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Type
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.values.ConstantValue
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.AggregateValue
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.CompositeValue
-import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -27,9 +29,11 @@ public class ConstantArray internal constructor() :
      * @see LLVM.LLVMConstArray
      */
     public constructor(type: Type, values: List<Value>) : this() {
-        val ptr = PointerPointer(*values.map { it.ref }.toTypedArray())
+        val ptr = values.map { it.ref }.toPointerPointer()
 
         ref = LLVM.LLVMConstArray(type.ref, ptr, values.size)
+
+        ptr.deallocate()
     }
 
     /**
@@ -68,11 +72,15 @@ public class ConstantArray internal constructor() :
     public fun getAsString(): String {
         require(isConstantString())
 
-        val len = SizeTPointer(1)
-        val ptr = LLVM.LLVMGetAsString(ref, len)
+        val len = SizeTPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val ptr = LLVM.LLVMGetAsString(ref, it)
+            val contents = ptr.string
 
-        return ptr.string
+            ptr.deallocate()
+
+            return@resourceScope contents
+        }
     }
 }

@@ -1,11 +1,13 @@
 package io.vexelabs.bitbuilder.llvm.ir.values
 
-import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
+import io.vexelabs.bitbuilder.internal.fromLLVMBool
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toPointerPointer
+import io.vexelabs.bitbuilder.internal.toResource
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.Type
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
-import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.global.LLVM
 
@@ -59,15 +61,21 @@ public class IntrinsicFunction internal constructor() {
     public fun getOverloadedName(parameters: List<Type>): String {
         require(isOverloaded()) { "This intrinsic is not overloaded." }
 
-        val len = SizeTPointer(1)
-        val ptr = PointerPointer(*parameters.map { it.ref }.toTypedArray())
+        val len = SizeTPointer(1).toResource()
 
-        return LLVM.LLVMIntrinsicCopyOverloadedName(
-            id,
-            ptr,
-            parameters.size.toLong(),
-            len
-        )
+        return resourceScope(len) {
+            val ptr = parameters.map { it.ref }.toPointerPointer()
+            val result = LLVM.LLVMIntrinsicCopyOverloadedName(
+                id,
+                ptr,
+                parameters.size.toLong(),
+                it
+            )
+
+            ptr.deallocate()
+
+            return@resourceScope result
+        }
     }
 
     /**
@@ -76,12 +84,16 @@ public class IntrinsicFunction internal constructor() {
      * @see LLVM.LLVMIntrinsicGetName
      */
     public fun getName(): String {
-        val len = SizeTPointer(1)
-        val ptr = LLVM.LLVMIntrinsicGetName(id, len)
+        val len = SizeTPointer(1).toResource()
 
-        len.deallocate()
+        return resourceScope(len) {
+            val ptr = LLVM.LLVMIntrinsicGetName(id, it)
+            val contents = ptr.string
 
-        return ptr.string
+            ptr.deallocate()
+
+            return@resourceScope contents
+        }
     }
 
     /**
@@ -93,13 +105,15 @@ public class IntrinsicFunction internal constructor() {
         module: Module,
         parameters: List<Type>
     ): FunctionValue {
-        val ptr = PointerPointer(*parameters.map { it.ref }.toTypedArray())
+        val ptr = parameters.map { it.ref }.toPointerPointer()
         val decl = LLVM.LLVMGetIntrinsicDeclaration(
             module.ref,
             id,
             ptr,
             parameters.size.toLong()
         )
+
+        ptr.deallocate()
 
         return FunctionValue(decl)
     }
@@ -110,13 +124,15 @@ public class IntrinsicFunction internal constructor() {
      * @see LLVM.LLVMIntrinsicGetType
      */
     public fun getType(context: Context, parameters: List<Type>): FunctionType {
-        val ptr = PointerPointer(*parameters.map { it.ref }.toTypedArray())
+        val ptr = parameters.map { it.ref }.toPointerPointer()
         val type = LLVM.LLVMIntrinsicGetType(
             context.ref,
             id,
             ptr,
             parameters.size.toLong()
         )
+
+        ptr.deallocate()
 
         return FunctionType(type)
     }

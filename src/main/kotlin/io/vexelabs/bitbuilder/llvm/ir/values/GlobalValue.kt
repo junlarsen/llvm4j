@@ -1,7 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.ir.values
 
+import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ForeignEnum
-import io.vexelabs.bitbuilder.llvm.internal.util.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.Comdat
 import io.vexelabs.bitbuilder.llvm.ir.DLLStorageClass
 import io.vexelabs.bitbuilder.llvm.ir.Metadata
@@ -210,6 +210,7 @@ public open class GlobalValue internal constructor() : ConstantValue() {
      * @see LLVM.LLVMGlobalCopyAllMetadata
      */
     public fun copyMetadata(): MetadataEntries {
+        // Do not resourceScope this as it is passed to MetadataEntries
         val ptr = SizeTPointer(1)
 
         val entries = LLVM.LLVMGlobalCopyAllMetadata(ref, ptr)
