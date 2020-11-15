@@ -1,11 +1,13 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
+import io.vexelabs.bitbuilder.internal.fromLLVMBool
+import io.vexelabs.bitbuilder.internal.resourceScope
+import io.vexelabs.bitbuilder.internal.toResource
 import io.vexelabs.bitbuilder.llvm.executionengine.ExecutionEngine
 import io.vexelabs.bitbuilder.llvm.executionengine.MCJITCompilerOptions
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Disposable
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
-import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.ir.types.StructType
@@ -15,8 +17,6 @@ import io.vexelabs.bitbuilder.llvm.ir.values.GlobalVariable
 import io.vexelabs.bitbuilder.llvm.ir.values.IndirectFunction
 import io.vexelabs.bitbuilder.llvm.support.MemoryBuffer
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
-import io.vexelabs.bitbuilder.internal.resourceScope
-import io.vexelabs.bitbuilder.internal.toResource
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef

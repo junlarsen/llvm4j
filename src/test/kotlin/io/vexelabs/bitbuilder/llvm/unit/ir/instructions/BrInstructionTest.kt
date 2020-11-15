@@ -1,12 +1,12 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.instructions
 
+import io.vexelabs.bitbuilder.internal.cast
 import io.vexelabs.bitbuilder.llvm.ir.Builder
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
-import io.vexelabs.bitbuilder.internal.cast
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

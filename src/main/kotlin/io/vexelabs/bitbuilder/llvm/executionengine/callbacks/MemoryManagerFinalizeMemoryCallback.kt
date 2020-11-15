@@ -1,7 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.executionengine.callbacks
 
-import io.vexelabs.bitbuilder.llvm.internal.contracts.Callback
 import io.vexelabs.bitbuilder.internal.map
+import io.vexelabs.bitbuilder.llvm.internal.contracts.Callback
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.PointerPointer

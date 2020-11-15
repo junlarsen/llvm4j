@@ -1,8 +1,8 @@
 package io.vexelabs.bitbuilder.llvm.executionengine
 
-import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.internal.toLLVMBool
+import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.target.CodeGenOptimizationLevel
 import io.vexelabs.bitbuilder.llvm.target.CodeModel
 import org.bytedeco.llvm.LLVM.LLVMMCJITCompilerOptions

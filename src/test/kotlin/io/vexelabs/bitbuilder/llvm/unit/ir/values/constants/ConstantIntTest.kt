@@ -1,5 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.values.constants
 
+import io.vexelabs.bitbuilder.internal.cast
 import io.vexelabs.bitbuilder.llvm.ir.IntPredicate
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
 import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
@@ -8,7 +9,6 @@ import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.utils.constIntPairOf
 import io.vexelabs.bitbuilder.llvm.utils.runAll
-import io.vexelabs.bitbuilder.internal.cast
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

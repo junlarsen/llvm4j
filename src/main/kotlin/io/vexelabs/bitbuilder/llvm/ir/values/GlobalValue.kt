@@ -1,7 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.ir.values
 
-import io.vexelabs.bitbuilder.llvm.internal.contracts.ForeignEnum
 import io.vexelabs.bitbuilder.internal.fromLLVMBool
+import io.vexelabs.bitbuilder.llvm.internal.contracts.ForeignEnum
 import io.vexelabs.bitbuilder.llvm.ir.Comdat
 import io.vexelabs.bitbuilder.llvm.ir.DLLStorageClass
 import io.vexelabs.bitbuilder.llvm.ir.Metadata
