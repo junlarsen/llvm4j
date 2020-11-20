@@ -21,47 +21,6 @@ public class StructType internal constructor() :
     }
 
     /**
-     * Create a structure types
-     *
-     * This method creates a structure types inside the given [ctx]. Do not that
-     * this constructor cannot produce opaque types, use the secondary
-     * constructor accepting a [String] for this.
-     *
-     * The struct body will be the types provided in [types].
-     */
-    public constructor(
-        types: List<Type>,
-        packed: Boolean,
-        ctx: Context = Context.getGlobalContext()
-    ) : this() {
-        val ptr = types.map { it.ref }.toPointerPointer()
-
-        ref = LLVM.LLVMStructTypeInContext(
-            ctx.ref,
-            ptr,
-            types.size,
-            packed.toLLVMBool()
-        )
-
-        ptr.deallocate()
-    }
-
-    /**
-     * Create an opaque struct types
-     *
-     * This will create an opaque struct (a struct without a body, like C
-     * forward declaration) with the given [name].
-     *
-     * You will be able to use [setBody] to assign a body to the opaque struct.
-     */
-    public constructor(
-        name: String,
-        ctx: Context = Context.getGlobalContext()
-    ) : this() {
-        ref = LLVM.LLVMStructCreateNamed(ctx.ref, name)
-    }
-
-    /**
      * Is this struct type packed?
      *
      * @see LLVM.LLVMIsPackedStruct

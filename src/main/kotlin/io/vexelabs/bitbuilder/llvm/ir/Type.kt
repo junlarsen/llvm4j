@@ -106,21 +106,54 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
     }
 
     /**
-     * Get a pointer type which points to this type
+     * Get a pointer type
+     *
+     * Creates a pointer which points to this type. An address space may be
+     * provided but defaults to 0 (unspecified).
+     *
+     * @throws IllegalArgumentException if pointer space is negative
+     *
+     * @see LLVM.LLVMPointerType
      */
-    public fun toPointerType(addressSpace: Int = 0): PointerType {
-        return PointerType(this, addressSpace)
+    public fun intoPointerType(withAddressSpace: Int? = null): PointerType {
+        if (withAddressSpace != null) {
+            require(withAddressSpace >= 0) { "Cannot use negative address space" }
+        }
+
+        val ref = LLVM.LLVMPointerType(ref, withAddressSpace ?: 0)
+
+        return PointerType(ref)
     }
 
     /**
-     * Get an array type of [size] elements containing elements of this type
+     * Get an array type
+     *
+     * Constructs an array of this type with size [size].
+     *
+     * @see LLVM.LLVMArrayType
      */
-    public fun toArrayType(size: Int): ArrayType = ArrayType(this, size)
+    public fun intoArrayType(size: Int): ArrayType {
+        require(size >= 0) { "Cannot make array of negative size" }
+
+        val ref = LLVM.LLVMArrayType(ref, size)
+
+        return ArrayType(ref)
+    }
 
     /**
-     * Get a vector type of [size] elements containing elements of this type
+     * Get a vector type
+     *
+     * Constructs a vector types of this type with size [size].
+     *
+     * @see LLVM.LLVMVectorType
      */
-    public fun toVectorType(size: Int): VectorType = VectorType(this, size)
+    public fun intoVectorType(size: Int): VectorType {
+        require(size >= 0) { "Cannot make vector of negative size" }
+
+        val ref = LLVM.LLVMVectorType(ref, size)
+
+        return VectorType(ref)
+    }
 
     public companion object {
         /**

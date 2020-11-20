@@ -15,31 +15,6 @@ public class FunctionType internal constructor() : Type() {
     }
 
     /**
-     * Create a function types
-     *
-     * This will construct a function types which returns the types provided in
-     * [returns] which expects to receive parameters of the types provided in
-     * [types]. You can mark a function types as variadic by setting the
-     * [variadic] arg to true.
-     */
-    public constructor(
-        returns: Type,
-        types: List<Type>,
-        variadic: Boolean
-    ) : this() {
-        val ptr = types.map { it.ref }.toPointerPointer()
-
-        ref = LLVM.LLVMFunctionType(
-            returns.ref,
-            ptr,
-            types.size,
-            variadic.toLLVMBool()
-        )
-
-        ptr.deallocate()
-    }
-
-    /**
      * Is this function type variadic?
      *
      * @see LLVM.LLVMIsFunctionVarArg

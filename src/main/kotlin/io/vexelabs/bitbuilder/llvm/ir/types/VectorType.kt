@@ -15,17 +15,6 @@ public class VectorType internal constructor() :
     }
 
     /**
-     * Create a vector types
-     *
-     * Constructs a vector types of types [type] with size [size].
-     */
-    public constructor(type: Type, size: Int) : this() {
-        require(size >= 0) { "Cannot make vector of negative size" }
-
-        ref = LLVM.LLVMVectorType(type.ref, size)
-    }
-
-    /**
      * Get the amount of elements this vector supports
      *
      * @see LLVM.LLVMGetVectorSize
