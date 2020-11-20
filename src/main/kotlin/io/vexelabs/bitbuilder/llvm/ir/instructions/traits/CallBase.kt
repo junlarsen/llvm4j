@@ -2,10 +2,10 @@ package io.vexelabs.bitbuilder.llvm.ir.instructions.traits
 
 import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
+import io.vexelabs.bitbuilder.llvm.ir.Attribute
 import io.vexelabs.bitbuilder.llvm.ir.AttributeIndex
 import io.vexelabs.bitbuilder.llvm.ir.CallConvention
 import io.vexelabs.bitbuilder.llvm.ir.Type
-import io.vexelabs.bitbuilder.llvm.ir.Attribute
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef

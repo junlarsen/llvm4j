@@ -124,7 +124,11 @@ public class Context public constructor(
         value: String
     ): StringAttribute {
         val ref = LLVM.LLVMCreateStringAttribute(
-            ref, kind, kind.length, value, value.length
+            ref,
+            kind,
+            kind.length,
+            value,
+            value.length
         )
 
         return StringAttribute(ref)

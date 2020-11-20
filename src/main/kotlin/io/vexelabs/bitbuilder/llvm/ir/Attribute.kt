@@ -63,7 +63,8 @@ public sealed class Attribute : ContainsReference<LLVMAttributeRef> {
         public fun getValue(): V
     }
 
-    public class Enum internal constructor() : Attribute(),
+    public class Enum internal constructor() :
+        Attribute(),
         AbstractAttribute<Int, Long> {
         public constructor(llvmRef: LLVMAttributeRef) : this() {
             ref = llvmRef
@@ -86,10 +87,10 @@ public sealed class Attribute : ContainsReference<LLVMAttributeRef> {
         public override fun getValue(): Long {
             return LLVM.LLVMGetEnumAttributeValue(ref)
         }
-
     }
 
-    public class String internal constructor() : Attribute(),
+    public class String internal constructor() :
+        Attribute(),
         AbstractAttribute<kotlin.String, kotlin.String> {
         public constructor(llvmRef: LLVMAttributeRef) : this() {
             ref = llvmRef
