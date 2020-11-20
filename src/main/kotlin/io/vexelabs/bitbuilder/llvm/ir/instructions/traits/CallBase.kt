@@ -5,7 +5,7 @@ import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.ir.AttributeIndex
 import io.vexelabs.bitbuilder.llvm.ir.CallConvention
 import io.vexelabs.bitbuilder.llvm.ir.Type
-import io.vexelabs.bitbuilder.llvm.ir.attributes.Attribute
+import io.vexelabs.bitbuilder.llvm.ir.Attribute
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
@@ -124,7 +124,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
 
         LLVM.LLVMGetCallSiteAttributes(ref, index, ptr)
 
-        return ptr.map { Attribute.create(it) }.also {
+        return ptr.map { Attribute.fromRef(it) }.also {
             ptr.deallocate()
         }
     }
@@ -148,7 +148,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
     public fun getEnumAttribute(index: Int, kind: Int): Attribute? {
         val attr = LLVM.LLVMGetCallSiteEnumAttribute(ref, index, kind)
 
-        return attr?.let { Attribute.create(it) }
+        return attr?.let { Attribute.fromRef(it) }
     }
 
     /**
@@ -174,7 +174,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
         val strlen = kind.length
         val attr = LLVM.LLVMGetCallSiteStringAttribute(ref, index, kind, strlen)
 
-        return attr?.let { Attribute.create(it) }
+        return attr?.let { Attribute.fromRef(it) }
     }
 
     /**

@@ -114,6 +114,36 @@ public class Context public constructor(
         return LLVM.LLVMGetMDKindIDInContext(ref, name, name.length)
     }
 
+    /**
+     * Create a string attribute
+     *
+     * @see LLVM.LLVMCreateStringAttribute
+     */
+    public fun createStringAttribute(
+        kind: String,
+        value: String
+    ): StringAttribute {
+        val ref = LLVM.LLVMCreateStringAttribute(
+            ref, kind, kind.length, value, value.length
+        )
+
+        return StringAttribute(ref)
+    }
+
+    /**
+     * Create an enum attribute
+     *
+     * @see LLVM.LLVMCreateEnumAttribute
+     */
+    public fun createEnumAttribute(
+        kind: Int,
+        value: Long
+    ): EnumAttribute {
+        val ref = LLVM.LLVMCreateEnumAttribute(ref, kind, value)
+
+        return EnumAttribute(ref)
+    }
+
     public companion object {
         /**
          * Obtain the global LLVM context
