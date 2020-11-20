@@ -3,14 +3,14 @@ package io.vexelabs.bitbuilder.llvm.ir.values
 import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
-import io.vexelabs.bitbuilder.llvm.ir.Attribute
 import io.vexelabs.bitbuilder.llvm.ir.AttributeIndex
 import io.vexelabs.bitbuilder.llvm.ir.BasicBlock
 import io.vexelabs.bitbuilder.llvm.ir.CallConvention
 import io.vexelabs.bitbuilder.llvm.ir.Context
+import io.vexelabs.bitbuilder.llvm.ir.Value
+import io.vexelabs.bitbuilder.llvm.ir.Attribute
 import io.vexelabs.bitbuilder.llvm.ir.EnumAttribute
 import io.vexelabs.bitbuilder.llvm.ir.StringAttribute
-import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.DebugLocationValue
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
 import org.bytedeco.javacpp.PointerPointer

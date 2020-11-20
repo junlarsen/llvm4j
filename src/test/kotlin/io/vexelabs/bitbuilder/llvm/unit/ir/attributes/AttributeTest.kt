@@ -1,7 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.attributes
 
-import io.vexelabs.bitbuilder.llvm.ir.Attribute
 import io.vexelabs.bitbuilder.llvm.ir.Context
+import io.vexelabs.bitbuilder.llvm.ir.Attribute
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
@@ -11,7 +11,9 @@ internal object AttributeTest : Spek({
     setup()
 
     val context: Context by memoized()
-    val stringAttr by memoized { context.createStringAttribute("test", "value") }
+    val stringAttr by memoized {
+        context.createStringAttribute("test", "value")
+    }
     val enumAttr by memoized { context.createEnumAttribute(0, 1L) }
 
     test("construction from either type") {
