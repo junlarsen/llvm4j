@@ -110,7 +110,7 @@ public interface CallBase : ContainsReference<LLVMValueRef> {
      * @see LLVM.LLVMGetCallSiteAttributes
      */
     public fun getAttributes(index: AttributeIndex): List<Attribute> {
-        return getAttributes(index.value.toInt())
+        return getAttributes(index.value)
     }
 
     /**

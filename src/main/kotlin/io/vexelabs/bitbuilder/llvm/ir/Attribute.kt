@@ -59,8 +59,8 @@ public sealed class Attribute : ContainsReference<LLVMAttributeRef> {
      * @param K The return type for [getKind]
      */
     private interface AbstractAttribute<K, V> {
-        public fun getKind(): K
-        public fun getValue(): V
+        fun getKind(): K
+        fun getValue(): V
     }
 
     public class Enum internal constructor() :
