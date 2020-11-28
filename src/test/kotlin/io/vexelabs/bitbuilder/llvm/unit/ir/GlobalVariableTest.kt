@@ -1,5 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir
 
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.ThreadLocalMode
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
@@ -16,17 +17,20 @@ internal object GlobalVariableTest : Spek({
     setup()
 
     val module: Module by memoized()
+    val context: Context by memoized()
 
     group("the initializer values for a global") {
         test("an uninitialized value returns null") {
-            val global = module.addGlobal("global", IntType(32))
+            val i32 = context.getIntType(32)
+            val global = module.addGlobal("global", i32)
 
             assertNull(global.getInitializer())
         }
 
         test("an initialized value returns") {
-            val initializer = ConstantInt(IntType(32), 8)
-            val global = module.addGlobal("global", IntType(32)).apply {
+            val i32 = context.getIntType(32)
+            val initializer = ConstantInt(i32, 8)
+            val global = module.addGlobal("global", i32).apply {
                 setInitializer(initializer)
             }
             val subject = global.getInitializer()
@@ -38,7 +42,9 @@ internal object GlobalVariableTest : Spek({
 
     group("toggleable properties for global values") {
         test("is externally initialized") {
-            module.addGlobal("global", IntType(32)).apply {
+            val i32 = context.getIntType(32)
+
+            module.addGlobal("global", i32).apply {
                 assertFalse { isExternallyInitialized() }
 
                 setExternallyInitialized(true)
@@ -48,7 +54,9 @@ internal object GlobalVariableTest : Spek({
         }
 
         test("is global constant") {
-            module.addGlobal("global", IntType(32)).apply {
+            val i32 = context.getIntType(32)
+
+            module.addGlobal("global", i32).apply {
                 assertFalse { isGlobalConstant() }
 
                 setGlobalConstant(true)
@@ -58,7 +66,9 @@ internal object GlobalVariableTest : Spek({
         }
 
         test("thread locality") {
-            val global = module.addGlobal("global", IntType(32)).apply {
+            val i32 = context.getIntType(32)
+
+            val global = module.addGlobal("global", i32).apply {
                 assertEquals(
                     ThreadLocalMode.NotThreadLocal,
                     getThreadLocalMode()

@@ -76,7 +76,8 @@ internal object MemoryBufferTest : Spek({
                 val subject = buf.getBitCodeModule(parseLazy = true)
 
                 assertNotNull(subject)
-                assertEquals("test", subject.getSourceFileName())
+                // Spek module is named test.ll
+                assertEquals("test.ll", subject.getSourceFileName())
             }
 
             test("with regular parsing") {
@@ -84,7 +85,8 @@ internal object MemoryBufferTest : Spek({
                 val subject = buf.getBitCodeModule(parseLazy = false)
 
                 assertNotNull(subject)
-                assertEquals("test", subject.getSourceFileName())
+                // Spek module is named test.ll
+                assertEquals("test.ll", subject.getSourceFileName())
             }
         }
 
@@ -96,7 +98,8 @@ internal object MemoryBufferTest : Spek({
             val subject = buf.getIRModule()
 
             assertNotNull(subject)
-            assertEquals("test", subject.getSourceFileName())
+            // Spek module is named test.ll
+            assertEquals("test.ll", subject.getSourceFileName())
         }
     }
 })

@@ -1,13 +1,11 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.values.constants
 
 import io.vexelabs.bitbuilder.internal.cast
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.IntPredicate
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
-import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
-import io.vexelabs.bitbuilder.llvm.utils.constIntPairOf
+import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.llvm.utils.runAll
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
@@ -15,37 +13,37 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 internal class ConstantIntTest : Spek({
+    setup()
+
+    val context: Context by memoized()
+
     test("create integer from long words constructor") {
-        val ty = IntType(32)
+        val ty = context.getIntType(32)
         val value = ConstantInt(ty, listOf(100L, 20L))
 
         assertEquals(100, value.getSignedValue())
     }
 
     test("get the negation value") {
-        val ty = IntType(32)
+        val ty = context.getIntType(32)
         val v = ConstantInt(ty, 100)
-
         val neg = v.getNeg()
 
         assertEquals(-100L, neg.getSignedValue())
     }
 
     test("get the inversion value") {
-        val ty = IntType(32)
+        val ty = context.getIntType(32)
         val v = ConstantInt(ty, 100)
-
         val not = v.getNot()
 
         assertEquals(-101, not.getSignedValue())
     }
 
     test("get sum of two integers") {
-        val ty = IntType(32)
-
+        val ty = context.getIntType(32)
         val v1 = ConstantInt(ty, 100)
         val v2 = ConstantInt(ty, 300)
-
         val sum = v1.getAdd(v2)
 
         assertEquals(400, sum.getSignedValue())
@@ -53,11 +51,9 @@ internal class ConstantIntTest : Spek({
     }
 
     test("get difference between two integers") {
-        val ty = IntType(32)
-
+        val ty = context.getIntType(32)
         val v1 = ConstantInt(ty, 400)
         val v2 = ConstantInt(ty, 200)
-
         val diff = v1.getSub(v2)
 
         assertEquals(200, diff.getSignedValue())
@@ -65,11 +61,9 @@ internal class ConstantIntTest : Spek({
     }
 
     test("get the product of two integers") {
-        val ty = IntType(32)
-
+        val ty = context.getIntType(32)
         val v1 = ConstantInt(ty, 100)
         val v2 = ConstantInt(ty, 10)
-
         val product = v1.getMul(v2)
 
         assertEquals(1000, product.getSignedValue())
@@ -77,8 +71,7 @@ internal class ConstantIntTest : Spek({
     }
 
     test("get the quotient of two integers") {
-        val ty = IntType(32)
-
+        val ty = context.getIntType(32)
         val v1 = ConstantInt(ty, 100, false)
         val v2 = ConstantInt(ty, 10, false)
 
@@ -94,8 +87,7 @@ internal class ConstantIntTest : Spek({
     }
 
     test("get the truncated value from floating point division") {
-        val ty = IntType(32)
-
+        val ty = context.getIntType(32)
         // 10 div 3 is not an even number
         val v1 = ConstantInt(ty, 10, false)
         val v2 = ConstantInt(ty, 3, false)
@@ -112,8 +104,7 @@ internal class ConstantIntTest : Spek({
     }
 
     test("get the remainder of this and another integer") {
-        val ty = IntType(32)
-
+        val ty = context.getIntType(32)
         val v1 = ConstantInt(ty, 10, false)
         val v2 = ConstantInt(ty, 3, false)
 
@@ -127,32 +118,36 @@ internal class ConstantIntTest : Spek({
     }
 
     test("get the logical and result with this and another integer") {
-        val (lhs, rhs) = constIntPairOf(2, 6)
-
+        val i32 = context.getIntType(32)
+        val lhs = ConstantInt(i32, 2)
+        val rhs = ConstantInt(i32, 6)
         val res = lhs.getAnd(rhs).getSignedValue()
 
         assertEquals(2 and 6, res)
     }
 
     test("get the logical or result with this and another integer") {
-        val (lhs, rhs) = constIntPairOf(16, 92)
-
+        val i32 = context.getIntType(32)
+        val lhs = ConstantInt(i32, 16)
+        val rhs = ConstantInt(i32, 92)
         val res = lhs.getOr(rhs).getSignedValue()
 
         assertEquals(16 or 92, res)
     }
 
     test("get the logical xor result with this and another integer") {
-        val (lhs, rhs) = constIntPairOf(100, 200)
-
+        val i32 = context.getIntType(32)
+        val lhs = ConstantInt(i32, 100)
+        val rhs = ConstantInt(i32, 200)
         val res = lhs.getXor(rhs).getSignedValue()
 
         assertEquals(100 xor 200, res)
     }
 
     test("perform comparison of two integers") {
-        val (lhs, rhs) = constIntPairOf(10, 20)
-
+        val i32 = context.getIntType(32)
+        val lhs = ConstantInt(i32, 10)
+        val rhs = ConstantInt(i32, 20)
         val expected = arrayOf<Long>(
             0, 1, // eq, ne
             0, 0, // ugt, uge
@@ -171,7 +166,9 @@ internal class ConstantIntTest : Spek({
     }
 
     test("get this shifted left of another integer") {
-        val (lhs, rhs) = constIntPairOf(10, 20)
+        val i32 = context.getIntType(32)
+        val lhs = ConstantInt(i32, 10)
+        val rhs = ConstantInt(i32, 20)
 
         val res = lhs.getShl(rhs).getSignedValue()
 
@@ -179,7 +176,9 @@ internal class ConstantIntTest : Spek({
     }
 
     test("get this shifted right of another integer") {
-        val (lhs, rhs) = constIntPairOf(10, 20)
+        val i32 = context.getIntType(32)
+        val lhs = ConstantInt(i32, 10)
+        val rhs = ConstantInt(i32, 20)
 
         val res = lhs.getLShr(rhs).getSignedValue()
 
@@ -187,7 +186,9 @@ internal class ConstantIntTest : Spek({
     }
 
     test("get this arithmetically shifted right of another integer") {
-        val (lhs, rhs) = constIntPairOf(10, 20)
+        val i32 = context.getIntType(32)
+        val lhs = ConstantInt(i32, 10)
+        val rhs = ConstantInt(i32, 20)
 
         val res = lhs.getAShr(rhs).getSignedValue()
 
@@ -195,28 +196,35 @@ internal class ConstantIntTest : Spek({
     }
 
     test("truncating to a tinier integer type") {
-        val lhs = ConstantInt(IntType(8), 64)
+        val i8 = context.getIntType(8)
+        val i1 = context.getIntType(1)
+        val lhs = ConstantInt(i8, 64)
 
-        val trunc = lhs.getTrunc(IntType(1))
+        val trunc = lhs.getTrunc(i1)
 
         assertEquals(0, trunc.getUnsignedValue())
     }
 
     test("zero or sign-extend to a larger integer type") {
-        val lhs = ConstantInt(IntType(8), 64)
+        val i8 = context.getIntType(8)
+        val i16 = context.getIntType(16)
+        val lhs = ConstantInt(i8, 64)
 
-        val sext = lhs.getSExt(IntType(16))
-        val zext = lhs.getZExt(IntType(16))
+        val sext = lhs.getSExt(i16)
+        val zext = lhs.getZExt(i16)
 
         assertEquals(64, sext.getSignedValue())
         assertEquals(64, zext.getUnsignedValue())
     }
 
     test("cast to floating point type") {
-        val lhs = ConstantInt(IntType(64), 64)
+        val i64 = context.getIntType(64)
+        val float = context.getFloatType(TypeKind.Float)
+        val double = context.getFloatType(TypeKind.Double)
+        val lhs = ConstantInt(i64, 64)
 
-        val si = lhs.getSIToFP(FloatType(TypeKind.Float))
-        val ui = lhs.getUIToFP(FloatType(TypeKind.Double))
+        val si = lhs.getSIToFP(float)
+        val ui = lhs.getUIToFP(double)
 
         assertEquals(64.0, si.getDouble())
         assertEquals(64.0, ui.getDouble())
@@ -225,9 +233,9 @@ internal class ConstantIntTest : Spek({
     }
 
     test("cast into pointer type") {
-        val ty = IntType(64)
+        val ty = context.getIntType(64)
         val lhs = ConstantInt(ty, 100)
-        val ptr = lhs.getIntToPtr(PointerType(ty))
+        val ptr = lhs.getIntToPtr(ty.intoPointerType())
 
         assertTrue { ptr.isConstant() }
 
@@ -237,8 +245,9 @@ internal class ConstantIntTest : Spek({
     }
 
     test("cast to different int type") {
-        val targetTy = IntType(128)
-        val lhs = ConstantInt(IntType(32), 100000)
+        val i32 = context.getIntType(32)
+        val targetTy = context.getIntType(128)
+        val lhs = ConstantInt(i32, 100000)
 
         val second = lhs.getIntCast(targetTy, true)
 
@@ -246,16 +255,19 @@ internal class ConstantIntTest : Spek({
     }
 
     test("casting to its own type does nothing") {
-        val lhs = ConstantInt(IntType(32), 100000)
+        val i32 = context.getIntType(32)
+        val lhs = ConstantInt(i32, 100000)
 
-        lhs.getIntCast(IntType(32), true)
+        lhs.getIntCast(i32, true)
     }
 
     test("selecting between two values on a condition") {
-        // true
-        val cond = ConstantInt(IntType(1), 1)
+        val i1 = context.getIntType(1)
+        val cond = ConstantInt(i1, 1)
 
-        val (lhs, rhs) = constIntPairOf(10, 20)
+        val i32 = context.getIntType(32)
+        val lhs = ConstantInt(i32, 10)
+        val rhs = ConstantInt(i32, 20)
 
         val res = cond.getSelect(lhs, rhs)
 

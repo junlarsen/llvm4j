@@ -1,6 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.instructions
 
 import io.vexelabs.bitbuilder.llvm.ir.Builder
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
@@ -13,16 +14,12 @@ internal class IndirectBrInstructionTest : Spek({
 
     val module: Module by memoized()
     val builder: Builder by memoized()
+    val context: Context by memoized()
 
     test("create indirect branch") {
-        val function = module.createFunction(
-            "test",
-            FunctionType(
-                IntType(32),
-                listOf(),
-                false
-            )
-        )
+        val i32 = context.getIntType(32)
+        val fnTy = context.getFunctionType(i32, variadic = false)
+        val function = module.createFunction("test", fnTy)
         val base = function.createBlock("Entry").toValue()
         val instr = builder.createIndirectBr(base)
 

@@ -23,6 +23,7 @@ internal object ModuleTest : Spek({
     setup()
 
     val module: Module by memoized()
+    val context: Context by memoized()
     val utils: TestUtils by memoized()
 
     group("module source file names") {
@@ -91,7 +92,8 @@ internal object ModuleTest : Spek({
 
     group("module flag entries") {
         test("setting a metadata flag and finding it") {
-            val md = MetadataString("example")
+            val md = context.createMetadataString("example")
+
             module.addModuleFlag(ModuleFlagBehavior.Override, "example", md)
 
             val subject = module.getModuleFlag("example")
@@ -100,7 +102,8 @@ internal object ModuleTest : Spek({
         }
 
         test("retrieving all the module flags") {
-            val md = MetadataString("example")
+            val md = context.createMetadataString("example")
+
             module.addModuleFlag(ModuleFlagBehavior.Override, "example", md)
 
             val subject = module.getModuleFlags()
@@ -150,17 +153,9 @@ internal object ModuleTest : Spek({
         assertEquals(expected, module.getInlineAssembly())
     }
 
-    test("retrieving the context of the module") {
-        // Our Spek memoized value uses the global Context
-        val ctx = module.getContext()
-        val global = Context.getGlobalContext()
-
-        assertEquals(global.ref, ctx.ref)
-    }
-
     test("finding types inside a module") {
         // Both uses global Context
-        val type = StructType("EmptyType")
+        val type = context.getOpaqueStructType("EmptyType")
         val subject = module.getTypeByName("EmptyType")
 
         assertEquals(type.ref, subject?.ref)
@@ -174,8 +169,11 @@ internal object ModuleTest : Spek({
         }
 
         test("using an invalid module") {
-            module.addGlobal("Nothing", VoidType()).apply {
-                setInitializer(ConstantInt(IntType(32), 100))
+            val i32 = context.getIntType(32)
+            val void = context.getVoidType()
+
+            module.addGlobal("Nothing", void).apply {
+                setInitializer(ConstantInt(i32, 100))
             }
 
             val success = module.verify(VerifierFailureAction.ReturnStatus)

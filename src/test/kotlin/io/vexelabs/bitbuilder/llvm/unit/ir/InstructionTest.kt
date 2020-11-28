@@ -31,10 +31,11 @@ internal object InstructionTest : Spek({
         }
 
         test("retrieving metadata from an instruction") {
+            val metadata = context.createMetadataString("yes")
             val inst = builder.createRetVoid().apply {
                 setMetadata(
                     "range",
-                    MetadataString("yes").toValue(context)
+                    metadata.toValue(context)
                 )
             }
             val subject = inst.getMetadata("range")
@@ -44,10 +45,11 @@ internal object InstructionTest : Spek({
         }
 
         test("metadata bucket contains our metadata") {
+            val metadata = context.createMetadataString("yes")
             val inst = builder.createRetVoid().apply {
                 setMetadata(
                     "range",
-                    MetadataString("yes").toValue(context)
+                    metadata.toValue(context)
                 )
             }
             val bucket = inst.getAllMetadataExceptDebugLocations()
@@ -67,14 +69,9 @@ internal object InstructionTest : Spek({
         }
 
         test("retrieving the residing block") {
-            val function = module.createFunction(
-                "test",
-                FunctionType(
-                    VoidType(),
-                    listOf(),
-                    false
-                )
-            )
+            val void = context.getVoidType()
+            val fnTy = context.getFunctionType(void, variadic = false)
+            val function = module.createFunction("test", fnTy)
             val block = function.createBlock("entry")
 
             builder.setPositionAtEnd(block)
@@ -112,14 +109,9 @@ internal object InstructionTest : Spek({
 
     group("cloning an instruction") {
         test("cloning creates an instruction without a parent") {
-            val function = module.createFunction(
-                "test",
-                FunctionType(
-                    VoidType(),
-                    listOf(),
-                    false
-                )
-            )
+            val void = context.getVoidType()
+            val fnTy = context.getFunctionType(void, variadic = false)
+            val function = module.createFunction("test", fnTy)
             val block = function.createBlock("entry")
 
             builder.setPositionAtEnd(block)

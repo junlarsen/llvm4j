@@ -1,6 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.instructions
 
 import io.vexelabs.bitbuilder.llvm.ir.Builder
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.Opcode
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
@@ -19,6 +20,7 @@ internal class RetInstructionTest : Spek({
 
     val module: Module by memoized()
     val builder: Builder by memoized()
+    val context: Context by memoized()
 
     test("create void return") {
         val inst = builder.createRetVoid()
@@ -30,7 +32,8 @@ internal class RetInstructionTest : Spek({
     }
 
     test("create a value return") {
-        val value = ConstantInt(IntType(32), 0)
+        val i32 = context.getIntType(32)
+        val value = ConstantInt(i32, 0)
         val inst = builder.createRet(value)
 
         assertTrue { inst.isTerminator() }
@@ -39,19 +42,15 @@ internal class RetInstructionTest : Spek({
     }
 
     test("create aggregate return") {
-        val function = module.createFunction(
-            "test",
-            FunctionType(
-                StructType(listOf(IntType(1), IntType(1)), false),
-                listOf(),
-                false
-            )
-        )
+        val i1 = context.getIntType(1)
+        val struct = context.getStructType(i1, i1, packed = false)
+        val fnTy = context.getFunctionType(struct, variadic = false)
+        val function = module.createFunction("test", fnTy)
         val block = function.createBlock("entry")
         builder.setPositionAtEnd(block)
 
-        val left = ConstantInt(IntType(1), 1)
-        val right = ConstantInt(IntType(1), 0)
+        val left = ConstantInt(i1, 1)
+        val right = ConstantInt(i1, 0)
         val inst = builder.createAggregateRet(listOf(left, right))
 
         val ir = "  ret { i1, i1 } { i1 true, i1 false }"

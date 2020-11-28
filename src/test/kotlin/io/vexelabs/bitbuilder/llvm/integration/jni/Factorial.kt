@@ -3,6 +3,7 @@ package io.vexelabs.bitbuilder.llvm.integration.jni
 import io.vexelabs.bitbuilder.llvm.executionengine.GenericValue
 import io.vexelabs.bitbuilder.llvm.ir.Builder
 import io.vexelabs.bitbuilder.llvm.ir.CallConvention
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.IntPredicate
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.PassManager
@@ -23,11 +24,14 @@ internal object Factorial : Spek({
         LLVM.LLVMInitializeNativeDisassembler()
         LLVM.LLVMInitializeNativeTarget()
 
-        val module = Module("factorial")
+        val ctx = Context()
+        val module = ctx.createModule("factorial")
+        val builder = ctx.createBuilder()
+        val i32 = ctx.getIntType(32)
 
-        val factorialType = FunctionType(
-            returns = IntType(32),
-            types = listOf(IntType(32)),
+        val factorialType = ctx.getFunctionType(
+            i32,
+            i32,
             variadic = false
         )
         val factorial = module.createFunction("factorial", factorialType).apply {
@@ -40,17 +44,17 @@ internal object Factorial : Spek({
         val otherwise = factorial.createBlock("otherwise")
         val exit = factorial.createBlock("exit")
 
-        Builder().apply {
+        builder.apply {
             setPositionAtEnd(entry) // enter function
 
             val condition = createICmp(
                 lhs = n,
                 predicate = IntPredicate.EQ,
-                rhs = ConstantInt(IntType(32), 0),
+                rhs = ConstantInt(i32, 0),
                 variable = "n == 0"
             ) // compare param n with 0
 
-            val resultIfTrue = ConstantInt(IntType(32), 1)
+            val resultIfTrue = ConstantInt(i32, 1)
 
             // jump based on condition
             createCondBr(condition, then, otherwise)
@@ -60,7 +64,7 @@ internal object Factorial : Spek({
 
             val nMinusOne = createSub(
                 lhs = n,
-                rhs = ConstantInt(IntType(32), 1),
+                rhs = ConstantInt(i32, 1),
                 variable = "n - 1"
             ) // subtract 1 from n
             val recursiveCall = createCall(
@@ -78,7 +82,7 @@ internal object Factorial : Spek({
             setPositionAtEnd(exit)
 
             val result = createPhi(
-                incoming = IntType(32),
+                incoming = i32,
                 variable = "result"
             ).apply {
                 addIncoming(
@@ -104,7 +108,7 @@ internal object Factorial : Spek({
         LLVM.LLVMRunPassManager(pass.ref, module.ref)
 
         val args = GenericValue(
-            type = IntType(32),
+            type = i32,
             number = 10L, // factorial(10),
             isSigned = false
         )

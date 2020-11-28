@@ -1,6 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.values
 
 import io.vexelabs.bitbuilder.internal.cast
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
@@ -13,16 +14,17 @@ internal class GlobalAliasTest : Spek({
     setup()
 
     val module: Module by memoized()
+    val context: Context by memoized()
 
     test("a module alias copies any globals from the original module") {
-        val ty = IntType(32)
+        val ty = context.getIntType(32)
         val v = ConstantInt(ty, 32L, true)
 
         val global = module.addGlobal("value_1", ty).apply {
             setInitializer(v)
         }
 
-        val alias = module.addAlias(ty.toPointerType(), global, "value_2")
+        val alias = module.addAlias(ty.intoPointerType(), global, "value_2")
         val aliasValue = alias.getAliasOf()
 
         assertEquals(
@@ -38,7 +40,7 @@ internal class GlobalAliasTest : Spek({
     }
 
     test("pulling the alias") {
-        val ty = IntType(32).toPointerType()
+        val ty = context.getIntType(32).intoPointerType()
         val global = module.addGlobal("value_1", ty)
         val alias = module.addAlias(ty, global, "alias_1")
         val aliasOf = module.getAlias("alias_1")

@@ -1,5 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.unit.internal
 
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
@@ -14,6 +15,7 @@ import kotlin.test.assertTrue
 internal object IteratorTest : Spek({
     setup()
 
+    val context: Context by memoized()
     val module: Module by memoized()
 
     test("iterators are null if no elements are found") {
@@ -23,7 +25,8 @@ internal object IteratorTest : Spek({
     }
 
     test("non null iterators will always yield an item") {
-        val fnTy = FunctionType(IntType(32), listOf(), false)
+        val i32 = context.getIntType(32)
+        val fnTy = context.getFunctionType(i32, variadic = false)
         val fn = module.createFunction("Test", fnTy)
         val iter = module.getFunctionIterator()
 
@@ -37,7 +40,8 @@ internal object IteratorTest : Spek({
     }
 
     test("you may iterate over elements in a for loop") {
-        val fnTy = FunctionType(IntType(32), listOf(), false)
+        val i32 = context.getIntType(32)
+        val fnTy = context.getFunctionType(i32, variadic = false)
 
         module.apply {
             createFunction("A", fnTy)
