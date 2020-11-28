@@ -14,8 +14,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Run ktlint
-        run: bash ./gradlew ktlintCheck
+        run: |
+          mvn -f .dependencies/dependencies.pom.xml -U compile
+          bash ./gradlew ktlintCheck
   test:
     name: Test Suite
     strategy:
@@ -24,16 +27,23 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v2
+
       - name: Log and prepare environment information
         run: java -version
+
       - name: Fetch Gradle dependencies
-        run: bash ./gradlew clean --refresh-dependencies
+        run: |
+          mvn -f .dependencies/dependencies.pom.xml -U compile
+          bash ./gradlew clean --refresh-dependencies
+
       - name: Build project from source
         run: bash ./gradlew build
+
       - uses: actions/upload-artifact@v2
         with:
           name: main-project-build
           path: build/
+
       - name: Execute Kotlin tests
         run: bash ./gradlew test
   samples:
@@ -42,7 +52,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Build parent project
-        run: bash ./gradlew build --refresh-dependencies
+        run: |
+          mvn -f .dependencies/dependencies.pom.xml -U compile
+          bash ./gradlew build --refresh-dependencies
+
       - name: FactorialJIT Example
         run: bash samples/run.sh factorial-jit
