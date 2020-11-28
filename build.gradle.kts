@@ -20,6 +20,7 @@ val isSnapshot = version.toString().endsWith("SNAPSHOT")
 
 repositories {
     mavenCentral()
+    mavenLocal()
     maven("https://jitpack.io")
     maven("https://jcenter.bintray.com")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
