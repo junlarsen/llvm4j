@@ -13,12 +13,12 @@ jobs:
     name: Style-check codebase
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Install Dependencies
         run: |
           mvn -f .dependencies/dependencies.pom.xml -U compile
           bash ./gradlew clean build --refresh-dependencies
 
-      - uses: actions/checkout@v2
       - name: Run ktlint
         run: bash ./gradlew ktlintCheck
 
@@ -29,12 +29,12 @@ jobs:
         operating-system: [macos-latest, windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.operating-system }}
     steps:
+      - uses: actions/checkout@v2
       - name: Install Dependencies
         run: |
           mvn -f .dependencies/dependencies.pom.xml -U compile
           bash ./gradlew clean build --refresh-dependencies
 
-      - uses: actions/checkout@v2
       - name: Log system information
         run: |
           bash --version
@@ -49,12 +49,11 @@ jobs:
     name: Ensure sample projects run
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Install Dependencies
         run: |
           mvn -f .dependencies/dependencies.pom.xml -U compile
           bash ./gradlew clean build --refresh-dependencies
-
-      - uses: actions/checkout@v2
 
       - name: FactorialJIT Example
         run: bash samples/run.sh factorial-jit
