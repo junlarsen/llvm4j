@@ -10,53 +10,51 @@ env:
   GRADLE_OPTS: -Dorg.gradle.caching=true
 jobs:
   lint:
-    name: Ensure code style follows ktlint guidelines
+    name: Style-check codebase
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Run ktlint
+      - name: Install Dependencies
         run: |
           mvn -f .dependencies/dependencies.pom.xml -U compile
-          bash ./gradlew ktlintCheck
+          bash ./gradlew clean build --refresh-dependencies
+
+      - uses: actions/checkout@v2
+      - name: Run ktlint
+        run: bash ./gradlew ktlintCheck
+
   test:
-    name: Test Suite
+    name: Execute test suite
     strategy:
       matrix:
         operating-system: [macos-latest, windows-latest, ubuntu-latest]
     runs-on: ${{ matrix.operating-system }}
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Log and prepare environment information
-        run: java -version
-
-      - name: Fetch Gradle dependencies
+      - name: Install Dependencies
         run: |
           mvn -f .dependencies/dependencies.pom.xml -U compile
-          bash ./gradlew clean --refresh-dependencies
+          bash ./gradlew clean build --refresh-dependencies
 
-      - name: Build project from source
-        run: bash ./gradlew build
+      - uses: actions/checkout@v2
+      - name: Log system information
+        run: |
+          bash --version
+          bash ./gradlew --verion
+          java -version
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: main-project-build
-          path: build/
-
-      - name: Execute Kotlin tests
+      - name: Execute kotlin test suite
         run: bash ./gradlew test
+
   samples:
     needs: [test]
     name: Ensure sample projects run
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Build parent project
+      - name: Install Dependencies
         run: |
           mvn -f .dependencies/dependencies.pom.xml -U compile
-          bash ./gradlew build --refresh-dependencies
+          bash ./gradlew clean build --refresh-dependencies
+
+      - uses: actions/checkout@v2
 
       - name: FactorialJIT Example
         run: bash samples/run.sh factorial-jit
