@@ -38,7 +38,7 @@ jobs:
       - name: Log system information
         run: |
           bash --version
-          bash ./gradlew --verion
+          bash ./gradlew --version
           java -version
 
       - name: Execute kotlin test suite
