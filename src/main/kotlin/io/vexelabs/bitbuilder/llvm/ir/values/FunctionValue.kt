@@ -3,14 +3,14 @@ package io.vexelabs.bitbuilder.llvm.ir.values
 import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
+import io.vexelabs.bitbuilder.llvm.ir.Attribute
 import io.vexelabs.bitbuilder.llvm.ir.AttributeIndex
 import io.vexelabs.bitbuilder.llvm.ir.BasicBlock
 import io.vexelabs.bitbuilder.llvm.ir.CallConvention
 import io.vexelabs.bitbuilder.llvm.ir.Context
+import io.vexelabs.bitbuilder.llvm.ir.EnumAttribute
+import io.vexelabs.bitbuilder.llvm.ir.StringAttribute
 import io.vexelabs.bitbuilder.llvm.ir.Value
-import io.vexelabs.bitbuilder.llvm.ir.attributes.Attribute
-import io.vexelabs.bitbuilder.llvm.ir.attributes.AttributeEnum
-import io.vexelabs.bitbuilder.llvm.ir.attributes.AttributeString
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.DebugLocationValue
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
 import org.bytedeco.javacpp.PointerPointer
@@ -268,7 +268,7 @@ public open class FunctionValue internal constructor() :
      * @see LLVM.LLVMAddAttributeAtIndex
      */
     public fun addAttribute(index: AttributeIndex, attribute: Attribute) {
-        addAttribute(index.value.toInt(), attribute)
+        addAttribute(index.value, attribute)
     }
 
     /**
@@ -288,7 +288,7 @@ public open class FunctionValue internal constructor() :
      * @see LLVM.LLVMGetAttributeCountAtIndex
      */
     public fun getAttributeCount(index: AttributeIndex): Int {
-        return getAttributeCount(index.value.toInt())
+        return getAttributeCount(index.value)
     }
 
     /**
@@ -312,7 +312,7 @@ public open class FunctionValue internal constructor() :
 
         LLVM.LLVMGetAttributesAtIndex(ref, index.value, ptr)
 
-        return ptr.map { Attribute.create(it) }.also {
+        return ptr.map { Attribute.fromRef(it) }.also {
             ptr.deallocate()
         }
     }
@@ -327,7 +327,7 @@ public open class FunctionValue internal constructor() :
     public fun getEnumAttribute(
         index: AttributeIndex,
         kind: Int
-    ): AttributeEnum? = getEnumAttribute(index.value, kind)
+    ): EnumAttribute? = getEnumAttribute(index.value, kind)
 
     /**
      * Pull the attribute value from an [index] with a [kind]
@@ -337,14 +337,14 @@ public open class FunctionValue internal constructor() :
     public fun getEnumAttribute(
         index: Int,
         kind: Int
-    ): AttributeEnum? {
+    ): EnumAttribute? {
         val ref = LLVM.LLVMGetEnumAttributeAtIndex(
             ref,
             index,
             kind
         )
 
-        return ref?.let { AttributeEnum(it) }
+        return ref?.let { EnumAttribute(it) }
     }
 
     /**
@@ -357,7 +357,7 @@ public open class FunctionValue internal constructor() :
     public fun getStringAttribute(
         index: AttributeIndex,
         kind: String
-    ): AttributeString? = getStringAttribute(index.value.toInt(), kind)
+    ): StringAttribute? = getStringAttribute(index.value, kind)
 
     /**
      * Pull the attribute value from an [index] with a [kind]
@@ -367,7 +367,7 @@ public open class FunctionValue internal constructor() :
     public fun getStringAttribute(
         index: Int,
         kind: String
-    ): AttributeString? {
+    ): StringAttribute? {
         val ref = LLVM.LLVMGetStringAttributeAtIndex(
             ref,
             index,
@@ -375,7 +375,7 @@ public open class FunctionValue internal constructor() :
             kind.length
         )
 
-        return ref?.let { AttributeString(it) }
+        return ref?.let { StringAttribute(it) }
     }
 
     /**
@@ -388,7 +388,7 @@ public open class FunctionValue internal constructor() :
     public fun removeEnumAttribute(
         index: AttributeIndex,
         kind: Int
-    ): Unit = removeEnumAttribute(index.value.toInt(), kind)
+    ): Unit = removeEnumAttribute(index.value, kind)
 
     /**
      * Removes an attribute at the given index
@@ -410,7 +410,7 @@ public open class FunctionValue internal constructor() :
     public fun removeStringAttribute(
         index: AttributeIndex,
         kind: String
-    ): Unit = removeStringAttribute(index.value.toInt(), kind)
+    ): Unit = removeStringAttribute(index.value, kind)
 
     /**
      * Removes an attribute at the given index
