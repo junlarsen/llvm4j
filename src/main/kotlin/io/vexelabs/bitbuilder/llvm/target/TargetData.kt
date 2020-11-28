@@ -40,15 +40,6 @@ public class TargetData internal constructor() :
     }
 
     /**
-     * Create a target data layout from a target machine
-     *
-     * @see LLVM.LLVMCreateTargetDataLayout
-     */
-    public constructor(machine: TargetMachine) : this() {
-        ref = LLVM.LLVMCreateTargetDataLayout(machine.ref)
-    }
-
-    /**
      * Get the string representation of this target
      *
      * This string must be manually de-allocated by the user

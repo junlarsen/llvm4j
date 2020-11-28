@@ -7,7 +7,6 @@ import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.internal.contracts.PointerIterator
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
-import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMNamedMDNodeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -25,10 +24,14 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @see LLVMNamedMDNodeRef
  */
-public class NamedMetadataNode public constructor(
-    public override val ref: LLVMNamedMDNodeRef,
-    public val owner: LLVMModuleRef
-) : ContainsReference<LLVMNamedMDNodeRef> {
+public class NamedMetadataNode internal constructor() :
+    ContainsReference<LLVMNamedMDNodeRef> {
+    public override lateinit var ref: LLVMNamedMDNodeRef
+
+    public constructor(llvmRef: LLVMNamedMDNodeRef) : this() {
+        ref = llvmRef
+    }
+
     /**
      * Get the name of this named metadata node
      *
@@ -62,11 +65,11 @@ public class NamedMetadataNode public constructor(
      *
      * @see LLVM.LLVMGetNamedMetadataOperands
      */
-    public fun getOperands(): List<Metadata> {
-        val size = getOperandCount()
+    public fun getOperands(inModule: Module): List<Metadata> {
+        val size = getOperandCount(inModule)
         val ptr = PointerPointer<LLVMValueRef>(size.toLong())
 
-        LLVM.LLVMGetNamedMetadataOperands(owner, name, ptr)
+        LLVM.LLVMGetNamedMetadataOperands(inModule.ref, name, ptr)
 
         return ptr.map { Metadata.fromValue(Value(it)) }.also {
             ptr.deallocate()
@@ -78,8 +81,8 @@ public class NamedMetadataNode public constructor(
      *
      * @see LLVM.LLVMGetNamedMetadataNumOperands
      */
-    public fun getOperandCount(): Int {
-        return LLVM.LLVMGetNamedMetadataNumOperands(owner, name)
+    public fun getOperandCount(inModule: Module): Int {
+        return LLVM.LLVMGetNamedMetadataNumOperands(inModule.ref, name)
     }
 
     /**
@@ -94,11 +97,14 @@ public class NamedMetadataNode public constructor(
      *
      * @see LLVM.LLVMAddNamedMetadataOperand
      */
-    public fun addOperand(metadata: Metadata, withContext: Context? = null) {
-        val ctx = withContext ?: Module(owner).getContext()
-        val value = metadata.toValue(ctx)
+    public fun addOperand(
+        metadata: Metadata,
+        inModule: Module,
+        withContext: Context = inModule.getContext()
+    ) {
+        val value = metadata.toValue(withContext)
 
-        LLVM.LLVMAddNamedMetadataOperand(owner, name, value.ref)
+        LLVM.LLVMAddNamedMetadataOperand(inModule.ref, name, value.ref)
     }
 
     /**
@@ -106,10 +112,10 @@ public class NamedMetadataNode public constructor(
      *
      * @see [PointerIterator]
      */
-    public class Iterator(owner: Module, ref: LLVMNamedMDNodeRef) :
+    public class Iterator(ref: LLVMNamedMDNodeRef) :
         PointerIterator<NamedMetadataNode, LLVMNamedMDNodeRef>(
             start = ref,
             yieldNext = { LLVM.LLVMGetNextNamedMetadata(it) },
-            apply = { NamedMetadataNode(it, owner.ref) }
+            apply = { NamedMetadataNode(it) }
         )
 }

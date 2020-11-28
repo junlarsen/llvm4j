@@ -126,6 +126,57 @@ public class Context public constructor(
     }
 
     /**
+     * Create a new metadata node.
+     *
+     * A metadata node is a list of other metadata items.
+     *
+     * @see LLVM.LLVMMDNodeInContext2
+     */
+    public fun createMetadataNode(values: List<Metadata>): MetadataNode {
+        val ptr = values.map { it.ref }.toPointerPointer()
+        val ref = LLVM.LLVMMDNodeInContext2(
+            ref,
+            ptr,
+            values.size.toLong()
+        )
+
+        ptr.deallocate()
+
+        return MetadataNode(ref)
+    }
+
+    /**
+     * Create a new metadata string
+     *
+     * A metadata string is a single tagged string value.
+     *
+     * @see LLVM.LLVMMDStringInContext2
+     */
+    public fun createMetadataString(value: String): MetadataString {
+        val ref = LLVM.LLVMMDStringInContext2(
+            ref,
+            value,
+            value.length.toLong()
+        )
+
+        return MetadataString(ref)
+    }
+
+    /**
+     * Create a new module with a file name
+     *
+     * Optionally pass a [context] which this module will reside in. If no
+     * context is passed, the global llvm context is used.
+     *
+     * @see LLVM.LLVMModuleCreateWithNameInContext
+     */
+    public fun createModule(sourceFileName: String): Module {
+        val ref = LLVM.LLVMModuleCreateWithNameInContext(sourceFileName, ref)
+
+        return Module(ref)
+    }
+
+    /**
      * Get a floating point type
      *
      * This function will create a fp types of the provided [kind].
@@ -352,6 +403,28 @@ public class Context public constructor(
         val ref = LLVM.LLVMCreateEnumAttribute(ref, kind, value)
 
         return EnumAttribute(ref)
+    }
+
+    /**
+     * Create a new basic block without inserting it into a function
+     *
+     * @see LLVM.LLVMCreateBasicBlockInContext
+     */
+    public fun createBasicBlock(name: String? = null): BasicBlock {
+        val ref = LLVM.LLVMCreateBasicBlockInContext(ref, name)
+
+        return BasicBlock(ref)
+    }
+
+    /**
+     * Create a new IR builder
+     *
+     * @see LLVM.LLVMCreateBuilderInContext
+     */
+    public fun createBuilder(): Builder {
+        val ref = LLVM.LLVMCreateBuilderInContext(ref)
+
+        return Builder(ref)
     }
 
     public companion object {

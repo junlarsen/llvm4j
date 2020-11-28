@@ -12,7 +12,7 @@ import org.bytedeco.llvm.global.LLVM
  * Every function which accepts a [ModuleProvider] optionally accepts a
  * [Module] as well.
  */
-@Deprecated("Deprecated, use Module instead")
+@Deprecated("Deprecated, llvm.Module instead")
 public class ModuleProvider internal constructor() :
     Disposable,
     ContainsReference<LLVMModuleProviderRef> {
@@ -21,18 +21,8 @@ public class ModuleProvider internal constructor() :
     public override lateinit var ref: LLVMModuleProviderRef
         internal set
 
-    /**
-     * Create a Module provider from a module
-     *
-     * @see LLVMModuleProviderRef
-     */
-    public constructor(parent: Module) : this() {
-        require(parent.valid) {
-            "Cannot retrieve Module Provider of deleted " +
-                "module"
-        }
-        module = parent
-        ref = LLVM.LLVMCreateModuleProviderForExistingModule(parent.ref)
+    public constructor(llvmRef: LLVMModuleProviderRef) : this() {
+        ref = llvmRef
     }
 
     public override fun dispose() {

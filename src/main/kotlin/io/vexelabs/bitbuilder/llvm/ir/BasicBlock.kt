@@ -34,15 +34,6 @@ public class BasicBlock internal constructor() :
     }
 
     /**
-     * Create a new basic block without inserting it into a function
-     *
-     * @see LLVM.LLVMCreateBasicBlockInContext
-     */
-    public constructor(context: Context, name: String) : this() {
-        ref = LLVM.LLVMCreateBasicBlockInContext(context.ref, name)
-    }
-
-    /**
      * Converts this value into a Value
      *
      * This is done by unwrapping the instance into a Value

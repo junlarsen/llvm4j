@@ -47,7 +47,7 @@ public open class Metadata internal constructor() :
      * @see LLVM.LLVMMetadataAsValue
      */
     public fun toValue(
-        withContext: Context = Context.getGlobalContext()
+        withContext: Context
     ): MetadataAsValue {
         val md = LLVM.LLVMMetadataAsValue(withContext.ref, ref)
 
@@ -78,7 +78,7 @@ public open class Metadata internal constructor() :
          */
         public fun toValue(
             metadata: Metadata,
-            withContext: Context = Context.getGlobalContext()
+            withContext: Context
         ): MetadataAsValue = metadata.toValue(withContext)
     }
 
@@ -92,7 +92,7 @@ public open class Metadata internal constructor() :
      * @see LLVM.LLVMIsAMDNode
      */
     public fun isString(
-        withContext: Context = Context.getGlobalContext()
+        withContext: Context
     ): Boolean {
         return LLVM.LLVMIsAMDString(toValue(withContext).ref) != null
     }
@@ -107,7 +107,7 @@ public open class Metadata internal constructor() :
      * @see LLVM.LLVMIsAMDNode
      */
     public fun isNode(
-        withContext: Context = Context.getGlobalContext()
+        withContext: Context
     ): Boolean {
         return LLVM.LLVMIsAMDNode(toValue(withContext).ref) != null
     }
@@ -118,24 +118,13 @@ public class MetadataString internal constructor() : Metadata() {
         ref = llvmRef
     }
 
-    public constructor(
-        data: String,
-        context: Context = Context.getGlobalContext()
-    ) : this() {
-        ref = LLVM.LLVMMDStringInContext2(
-            context.ref,
-            data,
-            data.length.toLong()
-        )
-    }
-
     /**
      * Get the string from a MDString node
      *
      * @see LLVM.LLVMGetMDString
      */
     public fun getString(
-        context: Context = Context.getGlobalContext()
+        context: Context
     ): String {
         val len = IntPointer(1).toResource()
 
@@ -156,21 +145,6 @@ public open class MetadataNode internal constructor() : Metadata() {
         ref = llvmRef
     }
 
-    public constructor(
-        values: List<Metadata>,
-        context: Context = Context.getGlobalContext()
-    ) : this() {
-        val ptr = values.map { it.ref }.toPointerPointer()
-
-        ref = LLVM.LLVMMDNodeInContext2(
-            context.ref,
-            ptr,
-            values.size.toLong()
-        )
-
-        ptr.deallocate()
-    }
-
     /**
      * Get the amount of operands in a metadata node
      *
@@ -181,7 +155,7 @@ public open class MetadataNode internal constructor() : Metadata() {
      * @see LLVM.LLVMGetMDNodeNumOperands
      */
     public fun getOperandCount(
-        withContext: Context = Context.getGlobalContext()
+        withContext: Context
     ): Int {
         return LLVM.LLVMGetMDNodeNumOperands(toValue(withContext).ref)
     }
@@ -196,9 +170,9 @@ public open class MetadataNode internal constructor() : Metadata() {
      * @see LLVM.LLVMGetMDNodeOperands
      */
     public fun getOperands(
-        withContext: Context = Context.getGlobalContext()
+        withContext: Context
     ): List<Value> {
-        val count = getOperandCount().toLong()
+        val count = getOperandCount(withContext).toLong()
         val ptr = PointerPointer<LLVMValueRef>(count)
 
         LLVM.LLVMGetMDNodeOperands(
