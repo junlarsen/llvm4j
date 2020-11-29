@@ -2,9 +2,6 @@ package io.vexelabs.bitbuilder.llvm.unit.ir.types
 
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
-import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.types.VectorType
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
@@ -17,7 +14,7 @@ internal class VectorTypeTest : Spek({
 
     test("create a vector type of 1000 integers") {
         val type = context.getIntType(32)
-        val vec = type.intoVectorType(1000)
+        val vec = type.getVectorType(1000)
 
         assertEquals(TypeKind.Vector, vec.getTypeKind())
         assertEquals(1000, vec.getElementCount())
@@ -25,7 +22,7 @@ internal class VectorTypeTest : Spek({
 
     test("the element type matches the original type") {
         val type = context.getIntType(32)
-        val vec = type.intoVectorType(10)
+        val vec = type.getVectorType(10)
 
         assertEquals(10, vec.getElementCount())
         assertEquals(type.ref, vec.getElementType().ref)
@@ -33,7 +30,7 @@ internal class VectorTypeTest : Spek({
 
     test("the subtype matches the original type") {
         val type = context.getIntType(32)
-        val vec = type.intoVectorType(10)
+        val vec = type.getVectorType(10)
 
         assertEquals(10, vec.getSubtypes().size)
         assertEquals(type.ref, vec.getSubtypes().first().ref)
@@ -43,7 +40,7 @@ internal class VectorTypeTest : Spek({
         val type = context.getFloatType(TypeKind.Float)
 
         assertFailsWith<IllegalArgumentException> {
-            type.intoVectorType(-100)
+            type.getVectorType(-100)
         }
     }
 })

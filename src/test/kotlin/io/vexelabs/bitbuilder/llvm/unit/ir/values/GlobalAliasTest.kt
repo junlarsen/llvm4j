@@ -3,7 +3,6 @@ package io.vexelabs.bitbuilder.llvm.unit.ir.values
 import io.vexelabs.bitbuilder.internal.cast
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
@@ -24,7 +23,7 @@ internal class GlobalAliasTest : Spek({
             setInitializer(v)
         }
 
-        val alias = module.addAlias(ty.intoPointerType(), global, "value_2")
+        val alias = module.addAlias(ty.getPointerType(), global, "value_2")
         val aliasValue = alias.getAliasOf()
 
         assertEquals(
@@ -40,7 +39,7 @@ internal class GlobalAliasTest : Spek({
     }
 
     test("pulling the alias") {
-        val ty = context.getIntType(32).intoPointerType()
+        val ty = context.getIntType(32).getPointerType()
         val global = module.addGlobal("value_1", ty)
         val alias = module.addAlias(ty, global, "alias_1")
         val aliasOf = module.getAlias("alias_1")

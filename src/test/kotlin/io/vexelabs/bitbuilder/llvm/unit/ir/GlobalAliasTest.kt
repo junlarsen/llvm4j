@@ -2,8 +2,6 @@ package io.vexelabs.bitbuilder.llvm.unit.ir
 
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
@@ -27,7 +25,7 @@ internal object GlobalAliasTest : Spek({
             val i32 = context.getIntType(32)
             val global = module.addGlobal("item", i32)
             val alias = module.addAlias(
-                i32.intoPointerType(),
+                i32.getPointerType(),
                 global,
                 "alias"
             )
@@ -43,7 +41,7 @@ internal object GlobalAliasTest : Spek({
         val i32 = context.getIntType(32)
         val global = module.addGlobal("item", i32)
         val alias = module.addAlias(
-            i32.intoPointerType(),
+            i32.getPointerType(),
             global,
             "alias"
         )

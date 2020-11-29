@@ -115,7 +115,7 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
      *
      * @see LLVM.LLVMPointerType
      */
-    public fun intoPointerType(withAddressSpace: Int? = null): PointerType {
+    public fun getPointerType(withAddressSpace: Int? = null): PointerType {
         if (withAddressSpace != null) {
             require(withAddressSpace >= 0) { "Cannot use negative address space" }
         }
@@ -132,7 +132,7 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
      *
      * @see LLVM.LLVMArrayType
      */
-    public fun intoArrayType(size: Int): ArrayType {
+    public fun getArrayType(size: Int): ArrayType {
         require(size >= 0) { "Cannot make array of negative size" }
 
         val ref = LLVM.LLVMArrayType(ref, size)
@@ -147,7 +147,7 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
      *
      * @see LLVM.LLVMVectorType
      */
-    public fun intoVectorType(size: Int): VectorType {
+    public fun getVectorType(size: Int): VectorType {
         require(size >= 0) { "Cannot make vector of negative size" }
 
         val ref = LLVM.LLVMVectorType(ref, size)

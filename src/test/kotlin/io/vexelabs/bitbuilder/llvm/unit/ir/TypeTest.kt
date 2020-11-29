@@ -2,8 +2,6 @@ package io.vexelabs.bitbuilder.llvm.unit.ir
 
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.types.StructType
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
@@ -15,19 +13,19 @@ internal object TypeTest : Spek({
 
     group("construction of types from existing types") {
         test("creating a pointer type") {
-            val ptr = context.getIntType(32).intoPointerType()
+            val ptr = context.getIntType(32).getPointerType()
 
             assertEquals(TypeKind.Pointer, ptr.getTypeKind())
         }
 
         test("creating a vector type") {
-            val vec = context.getIntType(32).intoVectorType(100)
+            val vec = context.getIntType(32).getVectorType(100)
 
             assertEquals(TypeKind.Vector, vec.getTypeKind())
         }
 
         test("creating an array type") {
-            val arr = context.getIntType(32).intoArrayType(100)
+            val arr = context.getIntType(32).getArrayType(100)
 
             assertEquals(TypeKind.Array, arr.getTypeKind())
         }

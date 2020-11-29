@@ -235,7 +235,7 @@ internal class ConstantIntTest : Spek({
     test("cast into pointer type") {
         val ty = context.getIntType(64)
         val lhs = ConstantInt(ty, 100)
-        val ptr = lhs.getIntToPtr(ty.intoPointerType())
+        val ptr = lhs.getIntToPtr(ty.getPointerType())
 
         assertTrue { ptr.isConstant() }
 

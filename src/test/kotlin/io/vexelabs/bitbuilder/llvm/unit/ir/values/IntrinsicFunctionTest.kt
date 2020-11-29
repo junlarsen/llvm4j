@@ -1,10 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.values
 
 import io.vexelabs.bitbuilder.llvm.ir.Context
-import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.types.VectorType
 import io.vexelabs.bitbuilder.llvm.ir.values.IntrinsicFunction
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
@@ -36,7 +33,7 @@ internal class IntrinsicFunctionTest : Spek({
     }
 
     test("finding fully qualified name by overloaded arguments") {
-        val ty = context.getIntType(8).intoVectorType(4)
+        val ty = context.getIntType(8).getVectorType(4)
         val intrinsic = IntrinsicFunction("llvm.ctpop")
 
         val overloaded = intrinsic.getOverloadedName(listOf(ty))
@@ -51,7 +48,7 @@ internal class IntrinsicFunctionTest : Spek({
     }
 
     test("the function declaration can be retrieved from the intrinsic") {
-        val ty = context.getIntType(8).intoVectorType(4)
+        val ty = context.getIntType(8).getVectorType(4)
         val intrinsic = IntrinsicFunction("llvm.ctpop")
         val mod = context.createModule("utils.ll")
         val fn = intrinsic.getDeclaration(mod, listOf(ty))
@@ -61,7 +58,7 @@ internal class IntrinsicFunctionTest : Spek({
 
     test("the function type can be retrieved from intrinsic") {
         val intrinsic = IntrinsicFunction("llvm.va_start")
-        val args = context.getIntType(8).intoVectorType(4)
+        val args = context.getIntType(8).getVectorType(4)
         val types = intrinsic.getType(Context.getGlobalContext(), listOf(args))
 
         assertEquals(1, types.getParameterCount())
