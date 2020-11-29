@@ -24,38 +24,6 @@ public class ConstantArray internal constructor() :
     }
 
     /**
-     * Create an array of values of a given [type]
-     *
-     * @see LLVM.LLVMConstArray
-     */
-    public constructor(type: Type, values: List<Value>) : this() {
-        val ptr = values.map { it.ref }.toPointerPointer()
-
-        ref = LLVM.LLVMConstArray(type.ref, ptr, values.size)
-
-        ptr.deallocate()
-    }
-
-    /**
-     * Constructor to make an LLVM string
-     *
-     * A LLVM string is an array of i8's which contain the different
-     * characters the string contains
-     */
-    public constructor(
-        content: String,
-        nullTerminate: Boolean = true,
-        context: Context = Context.getGlobalContext()
-    ) : this() {
-        ref = LLVM.LLVMConstStringInContext(
-            context.ref,
-            content,
-            content.length,
-            nullTerminate.toLLVMBool()
-        )
-    }
-
-    /**
      * Determine whether this is an array of i8's
      *
      * @see LLVM.LLVMIsConstantString
@@ -81,6 +49,32 @@ public class ConstantArray internal constructor() :
             ptr.deallocate()
 
             return@resourceScope contents
+        }
+    }
+
+    public companion object {
+        /**
+         * Constructor to make an LLVM string
+         *
+         * A LLVM string is an array of i8's which contain the different
+         * characters the string contains
+         *
+         * @see LLVM.LLVMConstStringInContext
+         */
+        @JvmStatic
+        public fun fromString(
+            value: String,
+            context: Context,
+            nullTerminate: Boolean
+        ): ConstantArray {
+            val ref = LLVM.LLVMConstStringInContext(
+                context.ref,
+                value,
+                value.length,
+                nullTerminate.toLLVMBool()
+            )
+
+            return ConstantArray(ref)
         }
     }
 }

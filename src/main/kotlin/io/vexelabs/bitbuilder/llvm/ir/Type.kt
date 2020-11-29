@@ -1,11 +1,15 @@
 package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.internal.fromLLVMBool
+import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import io.vexelabs.bitbuilder.llvm.ir.types.ArrayType
 import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.ir.types.StructType
 import io.vexelabs.bitbuilder.llvm.ir.types.VectorType
+import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantArray
+import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantPointer
+import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantVector
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 
@@ -99,10 +103,43 @@ public open class Type internal constructor() : ContainsReference<LLVMTypeRef> {
      *
      * @see LLVM.LLVMConstPointerNull
      */
-    public fun getConstantNullPointer(): Value {
+    public fun getConstantNullPointer(): ConstantPointer {
         val v = LLVM.LLVMConstPointerNull(ref)
 
-        return Value(v)
+        return ConstantPointer(v)
+    }
+
+    /**
+     * Create an array of values of a given [type]
+     *
+     * @see LLVM.LLVMConstArray
+     */
+    public fun getConstantArray(
+        type: Type,
+        vararg values: Value
+    ): ConstantArray {
+        val ptr = values.map { it.ref }.toPointerPointer()
+        val ref = LLVM.LLVMConstArray(type.ref, ptr, values.size)
+
+        ptr.deallocate()
+
+        return ConstantArray(ref)
+    }
+
+    /**
+     * Create a new vector of a list of values
+     *
+     * @see LLVM.LLVMConstVector
+     */
+    public fun getConstantVector(
+        vararg values: Value
+    ): ConstantVector {
+        val ptr = values.map { it.ref }.toPointerPointer()
+        val ref = LLVM.LLVMConstVector(ptr, values.size)
+
+        ptr.deallocate()
+
+        return ConstantVector(ref)
     }
 
     /**

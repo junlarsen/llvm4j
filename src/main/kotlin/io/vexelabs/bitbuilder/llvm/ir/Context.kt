@@ -19,6 +19,7 @@ import io.vexelabs.bitbuilder.llvm.ir.types.StructType
 import io.vexelabs.bitbuilder.llvm.ir.types.TokenType
 import io.vexelabs.bitbuilder.llvm.ir.types.VoidType
 import io.vexelabs.bitbuilder.llvm.ir.types.X86MMXType
+import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantStruct
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.global.LLVM
@@ -425,6 +426,34 @@ public class Context public constructor(
         val ref = LLVM.LLVMCreateBuilderInContext(ref)
 
         return Builder(ref)
+    }
+
+    /**
+     * Create a constant struct of a list of values
+     *
+     * This is a so-called anonymous struct as its type is constructed from
+     * the [values] passed.
+     *
+     * To create a ConstantStruct of an already existing Struct Type, use
+     * [StructType.getConstant]
+     *
+     * @see LLVM.LLVMConstStructInContext
+     */
+    public fun createConstantStruct(
+        vararg values: Value,
+        packed: Boolean
+    ): ConstantStruct {
+        val ptr = values.map { it.ref }.toPointerPointer()
+        val ref = LLVM.LLVMConstStructInContext(
+            ref,
+            ptr,
+            values.size,
+            packed.toLLVMBool()
+        )
+
+        ptr.deallocate()
+
+        return ConstantStruct(ref)
     }
 
     public companion object {

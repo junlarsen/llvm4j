@@ -9,6 +9,7 @@ import io.vexelabs.bitbuilder.llvm.ir.Type
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.types.traits.CompositeType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
+import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantStruct
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
@@ -126,5 +127,22 @@ public class StructType internal constructor() :
         val ref = LLVM.LLVMAlignOf(ref)
 
         return ConstantInt(ref)
+    }
+
+    /**
+     * Create a struct of this type and initialize it with the provided [values]
+     *
+     * The types of the provided [values] must match the types of this struct
+     * type.
+     *
+     * @see LLVM.LLVMConstNamedStruct
+     */
+    public fun getConstant(vararg values: Value): ConstantStruct {
+        val ptr = values.map { it.ref }.toPointerPointer()
+        val ref = LLVM.LLVMConstNamedStruct(ref, ptr, values.size)
+
+        ptr.deallocate()
+
+        return ConstantStruct(ref)
     }
 }

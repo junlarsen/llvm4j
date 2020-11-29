@@ -20,19 +20,6 @@ public class ConstantVector internal constructor() :
     }
 
     /**
-     * Create a new vector of a list of values
-     *
-     * @see LLVM.LLVMConstVector
-     */
-    public constructor(values: List<Value>) : this() {
-        val ptr = values.map { it.ref }.toPointerPointer()
-
-        ref = LLVM.LLVMConstVector(ptr, values.size)
-
-        ptr.deallocate()
-    }
-
-    /**
      * Negate the constant value
      *
      * LLVM doesn't actually have a neg instruction, but it's implemented using
