@@ -37,7 +37,7 @@ internal class BrInstructionTest : Spek({
         val function = module.createFunction("test", fnTy)
         val then = function.createBlock("then")
         val otherwise = function.createBlock("otherwise")
-        val condition = ConstantInt(i1, 1)
+        val condition = i1.getConstant(1)
 
         val subject = builder.createCondBr(condition, then, otherwise)
         val foundCondition = cast<ConstantInt>(condition)

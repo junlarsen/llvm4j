@@ -29,7 +29,7 @@ internal object GlobalVariableTest : Spek({
 
         test("an initialized value returns") {
             val i32 = context.getIntType(32)
-            val initializer = ConstantInt(i32, 8)
+            val initializer = i32.getConstant(8)
             val global = module.addGlobal("global", i32).apply {
                 setInitializer(initializer)
             }

@@ -50,11 +50,11 @@ internal object Factorial : Spek({
             val condition = createICmp(
                 lhs = n,
                 predicate = IntPredicate.EQ,
-                rhs = ConstantInt(i32, 0),
+                rhs = i32.getConstant(0),
                 variable = "n == 0"
             ) // compare param n with 0
 
-            val resultIfTrue = ConstantInt(i32, 1)
+            val resultIfTrue = i32.getConstant(1)
 
             // jump based on condition
             createCondBr(condition, then, otherwise)
@@ -64,7 +64,7 @@ internal object Factorial : Spek({
 
             val nMinusOne = createSub(
                 lhs = n,
-                rhs = ConstantInt(i32, 1),
+                rhs = i32.getConstant(1),
                 variable = "n - 1"
             ) // subtract 1 from n
             val recursiveCall = createCall(

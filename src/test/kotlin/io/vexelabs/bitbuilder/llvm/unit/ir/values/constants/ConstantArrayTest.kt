@@ -15,7 +15,7 @@ internal class ConstantArrayTest : Spek({
     val context: Context by memoized()
 
     test("create string as constant i8 array") {
-        val str = ConstantArray("Hello")
+        val str = context.createConstantArrayFromString("Hello", true)
 
         assertTrue { str.isConstantString() }
 
@@ -26,9 +26,9 @@ internal class ConstantArrayTest : Spek({
     test("create a constant array") {
         val i8 = context.getIntType(8)
         val i32 = context.getIntType(32)
-        val lhs = ConstantInt(i32, 1)
-        val rhs = ConstantInt(i32, 2)
-        val arr = ConstantArray(i8, listOf(lhs, rhs))
+        val lhs = i32.getConstant(1)
+        val rhs = i32.getConstant(2)
+        val arr = i8.getConstantArray(i32, lhs, rhs)
 
         val first = arr.getElementAsConstant(0)
 

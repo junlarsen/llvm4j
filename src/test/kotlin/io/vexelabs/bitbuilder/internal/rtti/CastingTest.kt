@@ -19,7 +19,7 @@ internal object CastingTest : Spek({
     test("casting between valid paths") {
         // Path: Value -> ConstantInt : LLVMValueRef
         val i32 = context.getIntType(32)
-        val value: Value = ConstantInt(i32, 1)
+        val value: Value = i32.getConstant(1)
         val int = cast<ConstantInt>(value)
 
         assertEquals(1, int.getSignedValue())
@@ -29,7 +29,7 @@ internal object CastingTest : Spek({
         // Use has a constructor from LLVMValueRef, but is not a valid path
         // Path: Value -> Use : LLVMValueRef
         val i32 = context.getIntType(32)
-        val value: Value = ConstantInt(i32, 1)
+        val value: Value = i32.getConstant(1)
 
         assertFailsWith<IllegalArgumentException> {
             cast<Use>(value)

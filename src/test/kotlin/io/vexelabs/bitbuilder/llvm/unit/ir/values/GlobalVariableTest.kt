@@ -22,7 +22,7 @@ internal class GlobalVariableTest : Spek({
 
     test("create a global variable") {
         val ty = context.getIntType(32)
-        val v = ConstantInt(ty, 100L, true)
+        val v = ty.getConstant(100, true)
         val value = module.addGlobal("v", ty).apply {
             setInitializer(v)
         }
@@ -44,7 +44,7 @@ internal class GlobalVariableTest : Spek({
     // TODO: test with non-global value
     test("flagging a global as constant") {
         val ty = context.getIntType(32)
-        val v = ConstantInt(ty, 100L, true)
+        val v = ty.getConstant(100, true)
         val mod = context.createModule("utils.ll")
 
         val value = mod.addGlobal("v", ty).apply {

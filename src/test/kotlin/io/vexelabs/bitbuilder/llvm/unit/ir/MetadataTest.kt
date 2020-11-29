@@ -19,7 +19,7 @@ internal object MetadataTest : Spek({
     group("casting values to and from metadata") {
         test("any value may be used as metadata") {
             val i32 = context.getIntType(32)
-            val value = ConstantInt(i32, 1000)
+            val value = i32.getConstant(1000)
             val metadata = Metadata.fromValue(value)
 
             assertTrue { metadata.isNode(context) }

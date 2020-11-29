@@ -508,11 +508,11 @@ public class ConstantInt internal constructor() : ConstantValue() {
          * @see LLVM.LLVMConstIntOfArbitraryPrecision
          */
         @JvmStatic
-        public fun fromWords(type: IntType, words: List<Long>): ConstantInt {
+        public fun fromWords(type: IntType, vararg words: Long): ConstantInt {
             val ref = LLVM.LLVMConstIntOfArbitraryPrecision(
                 type.ref,
                 words.size,
-                words.toLongArray()
+                words
             )
 
             return ConstantInt(ref)

@@ -34,7 +34,7 @@ internal object ValueTest : Spek({
 
         test("default name is empty string") {
             val i1 = context.getIntType(1)
-            val value = ConstantInt(i1, 0)
+            val value = i1.getConstant(0)
 
             assertEquals("", value.getName())
         }
@@ -42,7 +42,7 @@ internal object ValueTest : Spek({
 
     test("finding the type of the value") {
         val type = context.getIntType(32)
-        val value = ConstantInt(type, 100)
+        val value = type.getConstant(100)
         val subject = value.getType()
 
         assertEquals(type.ref, subject.ref)
@@ -82,7 +82,7 @@ internal object ValueTest : Spek({
 
     test("context is equal to its type's context") {
         val type = context.getIntType(1)
-        val value = ConstantInt(type, 1)
+        val value = type.getConstant(1)
         val subject = value.getContext()
 
         assertEquals(type.getContext().ref, subject.ref)
@@ -90,7 +90,7 @@ internal object ValueTest : Spek({
 
     test("pulling a value in textual format") {
         val i32 = context.getIntType(32)
-        val value = ConstantInt(i32, 100)
+        val value = i32.getConstant(100)
         val ir = "i32 100"
 
         assertEquals(ir, value.getIR().toString())

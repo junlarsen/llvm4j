@@ -17,7 +17,7 @@ internal class GlobalAliasTest : Spek({
 
     test("a module alias copies any globals from the original module") {
         val ty = context.getIntType(32)
-        val v = ConstantInt(ty, 32L, true)
+        val v = ty.getConstant(1, true)
 
         val global = module.addGlobal("value_1", ty).apply {
             setInitializer(v)

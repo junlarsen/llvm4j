@@ -23,10 +23,10 @@ internal class SwitchInstructionTest : Spek({
         val fnTy = context.getFunctionType(struct, variadic = false)
         val function = module.createFunction("test", fnTy)
         val block = function.createBlock("entry")
-        val cond = ConstantInt(i1, 1)
+        val cond = i1.getConstant(1)
         val inst = builder.createSwitch(cond, block, 1)
 
-        inst.addCase(ConstantInt(i1, 1), block)
+        inst.addCase(i1.getConstant(1), block)
     }
 
     test("you may exceed the expected amount of cases") {
@@ -35,11 +35,11 @@ internal class SwitchInstructionTest : Spek({
         val fnTy = context.getFunctionType(struct, variadic = false)
         val function = module.createFunction("test", fnTy)
         val block = function.createBlock("entry")
-        val cond = ConstantInt(i1, 1)
+        val cond = i1.getConstant(1)
         val inst = builder.createSwitch(cond, block, expectedCases = 1)
 
         for (i in 0..10) {
-            inst.addCase(ConstantInt(i1, i), block)
+            inst.addCase(i1.getConstant(1), block)
         }
     }
 })

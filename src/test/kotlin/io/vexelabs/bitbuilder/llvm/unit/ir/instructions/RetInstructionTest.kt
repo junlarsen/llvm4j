@@ -33,7 +33,7 @@ internal class RetInstructionTest : Spek({
 
     test("create a value return") {
         val i32 = context.getIntType(32)
-        val value = ConstantInt(i32, 0)
+        val value = i32.getConstant(0)
         val inst = builder.createRet(value)
 
         assertTrue { inst.isTerminator() }
@@ -49,8 +49,8 @@ internal class RetInstructionTest : Spek({
         val block = function.createBlock("entry")
         builder.setPositionAtEnd(block)
 
-        val left = ConstantInt(i1, 1)
-        val right = ConstantInt(i1, 0)
+        val left = i1.getConstant(1)
+        val right = i1.getConstant(0)
         val inst = builder.createAggregateRet(listOf(left, right))
 
         val ir = "  ret { i1, i1 } { i1 true, i1 false }"

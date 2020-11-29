@@ -173,7 +173,7 @@ internal object ModuleTest : Spek({
             val void = context.getVoidType()
 
             module.addGlobal("Nothing", void).apply {
-                setInitializer(ConstantInt(i32, 100))
+                setInitializer(i32.getConstant(100))
             }
 
             val success = module.verify(VerifierFailureAction.ReturnStatus)

@@ -51,30 +51,4 @@ public class ConstantArray internal constructor() :
             return@resourceScope contents
         }
     }
-
-    public companion object {
-        /**
-         * Constructor to make an LLVM string
-         *
-         * A LLVM string is an array of i8's which contain the different
-         * characters the string contains
-         *
-         * @see LLVM.LLVMConstStringInContext
-         */
-        @JvmStatic
-        public fun fromString(
-            value: String,
-            context: Context,
-            nullTerminate: Boolean
-        ): ConstantArray {
-            val ref = LLVM.LLVMConstStringInContext(
-                context.ref,
-                value,
-                value.length,
-                nullTerminate.toLLVMBool()
-            )
-
-            return ConstantArray(ref)
-        }
-    }
 }

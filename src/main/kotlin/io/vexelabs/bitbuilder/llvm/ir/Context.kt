@@ -19,6 +19,7 @@ import io.vexelabs.bitbuilder.llvm.ir.types.StructType
 import io.vexelabs.bitbuilder.llvm.ir.types.TokenType
 import io.vexelabs.bitbuilder.llvm.ir.types.VoidType
 import io.vexelabs.bitbuilder.llvm.ir.types.X86MMXType
+import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantArray
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantStruct
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
@@ -454,6 +455,28 @@ public class Context public constructor(
         ptr.deallocate()
 
         return ConstantStruct(ref)
+    }
+
+    /**
+     * Constructor to make an LLVM string
+     *
+     * A LLVM string is an array of i8's which contain the different
+     * characters the string contains
+     *
+     * @see LLVM.LLVMConstStringInContext
+     */
+    public fun createConstantArrayFromString(
+        value: String,
+        nullTerminate: Boolean
+    ): ConstantArray {
+        val ref = LLVM.LLVMConstStringInContext(
+            ref,
+            value,
+            value.length,
+            nullTerminate.toLLVMBool()
+        )
+
+        return ConstantArray(ref)
     }
 
     public companion object {
