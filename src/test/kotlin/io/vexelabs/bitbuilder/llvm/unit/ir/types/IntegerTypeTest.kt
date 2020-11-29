@@ -2,7 +2,6 @@ package io.vexelabs.bitbuilder.llvm.unit.ir.types
 
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.llvm.utils.runAll
 import org.spekframework.spek2.Spek

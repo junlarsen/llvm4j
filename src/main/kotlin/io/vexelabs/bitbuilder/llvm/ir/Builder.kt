@@ -44,7 +44,8 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @see LLVMBuilderRef
  */
-public class Builder internal constructor() : Disposable,
+public class Builder internal constructor() :
+    Disposable,
     ContainsReference<LLVMBuilderRef> {
     public override var valid: Boolean = true
     public override lateinit var ref: LLVMBuilderRef
@@ -596,7 +597,7 @@ public class Builder internal constructor() : Disposable,
     ): ConstantValue {
         require(!(nsw && nuw)) {
             "Instruction can not declare both NUW & " +
-            "NSW"
+                "NSW"
         }
 
         val inst = when {
@@ -646,7 +647,7 @@ public class Builder internal constructor() : Disposable,
     ): ConstantValue {
         require(!(nsw && nuw)) {
             "Instruction can not declare both NUW & " +
-            "NSW"
+                "NSW"
         }
 
         val inst = when {
@@ -696,7 +697,7 @@ public class Builder internal constructor() : Disposable,
     ): ConstantValue {
         require(!(nsw && nuw)) {
             "Instruction can not declare both NUW & " +
-            "NSW"
+                "NSW"
         }
 
         val inst = when {
@@ -974,7 +975,7 @@ public class Builder internal constructor() : Disposable,
     ): ConstantValue {
         require(!(nsw && nuw)) {
             "Instruction can not declare both NUW & " +
-            "NSW"
+                "NSW"
         }
 
         val inst = when {

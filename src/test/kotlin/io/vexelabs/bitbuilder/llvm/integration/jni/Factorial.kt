@@ -1,15 +1,10 @@
 package io.vexelabs.bitbuilder.llvm.integration.jni
 
 import io.vexelabs.bitbuilder.llvm.executionengine.GenericValue
-import io.vexelabs.bitbuilder.llvm.ir.Builder
 import io.vexelabs.bitbuilder.llvm.ir.CallConvention
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.IntPredicate
-import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.PassManager
-import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
 import org.bytedeco.llvm.global.LLVM
 import org.spekframework.spek2.Spek

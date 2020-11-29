@@ -3,10 +3,6 @@ package io.vexelabs.bitbuilder.llvm.unit.ir
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.ValueKind
-import io.vexelabs.bitbuilder.llvm.ir.types.FunctionType
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.types.VoidType
-import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals

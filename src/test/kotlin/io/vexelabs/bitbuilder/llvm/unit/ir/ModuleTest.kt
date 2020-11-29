@@ -2,13 +2,8 @@ package io.vexelabs.bitbuilder.llvm.unit.ir
 
 import io.vexelabs.bitbuilder.llvm.TestUtils
 import io.vexelabs.bitbuilder.llvm.ir.Context
-import io.vexelabs.bitbuilder.llvm.ir.MetadataString
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.ModuleFlagBehavior
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.types.StructType
-import io.vexelabs.bitbuilder.llvm.ir.types.VoidType
-import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
 import org.spekframework.spek2.Spek

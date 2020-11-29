@@ -2,9 +2,6 @@ package io.vexelabs.bitbuilder.llvm.unit.ir.types
 
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
-import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.types.StructType
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals

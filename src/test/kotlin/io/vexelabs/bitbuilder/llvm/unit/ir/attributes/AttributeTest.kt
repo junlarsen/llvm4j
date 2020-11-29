@@ -1,7 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.attributes
 
-import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Attribute
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals

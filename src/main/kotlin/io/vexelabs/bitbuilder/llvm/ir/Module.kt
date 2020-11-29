@@ -683,7 +683,7 @@ public class Module internal constructor() :
      */
     @Deprecated("Use llvm.Module instead")
     public fun getModuleProvider(): ModuleProvider {
-        require(valid) { "Cannot retrieve provider from deleted module"}
+        require(valid) { "Cannot retrieve provider from deleted module" }
 
         val ref = LLVM.LLVMCreateModuleProviderForExistingModule(ref)
 

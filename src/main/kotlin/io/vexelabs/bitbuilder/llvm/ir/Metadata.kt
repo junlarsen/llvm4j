@@ -2,7 +2,6 @@ package io.vexelabs.bitbuilder.llvm.ir
 
 import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.internal.resourceScope
-import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.internal.toResource
 import io.vexelabs.bitbuilder.llvm.internal.contracts.ContainsReference
 import org.bytedeco.javacpp.IntPointer

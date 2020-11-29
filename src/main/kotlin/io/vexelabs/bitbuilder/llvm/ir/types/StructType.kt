@@ -4,7 +4,6 @@ import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.internal.toLLVMBool
 import io.vexelabs.bitbuilder.internal.toPointerPointer
-import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Type
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.types.traits.CompositeType

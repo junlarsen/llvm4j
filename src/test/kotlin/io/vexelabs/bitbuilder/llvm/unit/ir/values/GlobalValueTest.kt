@@ -7,7 +7,6 @@ import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
 import io.vexelabs.bitbuilder.llvm.ir.UnnamedAddress
 import io.vexelabs.bitbuilder.llvm.ir.Visibility
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.GlobalValue
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek

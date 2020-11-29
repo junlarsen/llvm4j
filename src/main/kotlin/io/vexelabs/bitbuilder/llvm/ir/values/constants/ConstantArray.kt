@@ -2,12 +2,7 @@ package io.vexelabs.bitbuilder.llvm.ir.values.constants
 
 import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.internal.resourceScope
-import io.vexelabs.bitbuilder.internal.toLLVMBool
-import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.internal.toResource
-import io.vexelabs.bitbuilder.llvm.ir.Context
-import io.vexelabs.bitbuilder.llvm.ir.Type
-import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.values.ConstantValue
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.AggregateValue
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.CompositeValue

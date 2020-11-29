@@ -4,7 +4,6 @@ import io.vexelabs.bitbuilder.internal.cast
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Use
 import io.vexelabs.bitbuilder.llvm.ir.Value
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek

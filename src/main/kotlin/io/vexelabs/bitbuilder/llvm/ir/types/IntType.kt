@@ -3,7 +3,6 @@ package io.vexelabs.bitbuilder.llvm.ir.types
 import io.vexelabs.bitbuilder.internal.toLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.Type
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
-import org.bytedeco.javacpp.annotation.Const
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 

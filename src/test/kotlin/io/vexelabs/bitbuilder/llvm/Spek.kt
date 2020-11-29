@@ -3,9 +3,7 @@
 
 package io.vexelabs.bitbuilder.llvm
 
-import io.vexelabs.bitbuilder.llvm.ir.Builder
 import io.vexelabs.bitbuilder.llvm.ir.Context
-import io.vexelabs.bitbuilder.llvm.ir.Module
 import org.spekframework.spek2.dsl.Root
 
 internal fun Root.setup() {

@@ -2,10 +2,7 @@ package io.vexelabs.bitbuilder.llvm.unit.ir
 
 import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Metadata
-import io.vexelabs.bitbuilder.llvm.ir.MetadataNode
 import io.vexelabs.bitbuilder.llvm.ir.MetadataString
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
