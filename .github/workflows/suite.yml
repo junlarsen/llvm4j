@@ -19,7 +19,7 @@ jobs:
       # miss certain artifacts at times.
       - name: Cache Dependencies
         id: cache-deps
-        uses: @actions/cache@v2
+        uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
@@ -47,7 +47,7 @@ jobs:
       # miss certain artifacts at times.
       - name: Cache Dependencies
         id: cache-deps
-        uses: @actions/cache@v2
+        uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
@@ -79,7 +79,7 @@ jobs:
       # miss certain artifacts at times.
       - name: Cache Dependencies
         id: cache-deps
-        uses: @actions/cache@v2
+        uses: actions/cache@v2
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
