@@ -22,19 +22,20 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
-          restore-keys: ${{ runner.os }}-hash-
+          key: mvn-hash-df754038083bf5f352298666ce1c9cfb9843b031
       # Install dependencies if git hash has changed
-      - name: Install Dependencies
+      - name: Install Maven Dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: |
-          mvn -f .dependencies/dependencies.pom.xml -U compile
-          bash ./gradlew clean build --refresh-dependencies
+        run: mvn -f .dependencies/dependencies.pom.xml -U compile
+
+      - name: Install Gradle dependencies
+        run: bash ./gradlew clean build --refresh-dependencies
 
       - name: Run ktlint
         run: bash ./gradlew ktlintCheck
 
   test:
+    needs: [lint]
     name: Execute test suite
     strategy:
       matrix:
@@ -50,14 +51,14 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
-          restore-keys: ${{ runner.os }}-hash-
+          key: mvn-hash-df754038083bf5f352298666ce1c9cfb9843b031
       # Install dependencies if git hash has changed
       - name: Install Dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: |
-          mvn -f .dependencies/dependencies.pom.xml -U compile
-          bash ./gradlew clean build --refresh-dependencies
+        run: mvn -f .dependencies/dependencies.pom.xml -U compile
+
+      - name: Install Gradle dependencies
+        run: bash ./gradlew clean build --refresh-dependencies
 
       - name: Log system information
         run: |
@@ -82,14 +83,14 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
-          restore-keys: ${{ runner.os }}-hash-
+          key: mvn-hash-df754038083bf5f352298666ce1c9cfb9843b031
       # Install dependencies if git hash has changed
       - name: Install Dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: |
-          mvn -f .dependencies/dependencies.pom.xml -U compile
-          bash ./gradlew clean build --refresh-dependencies
+        run: mvn -f .dependencies/dependencies.pom.xml -U compile
+
+      - name: Install Gradle dependencies
+        run: bash ./gradlew clean build --refresh-dependencies
 
       - name: FactorialJIT Example
         run: bash samples/run.sh factorial-jit
