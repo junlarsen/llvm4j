@@ -3,13 +3,9 @@ on:
   push:
     branches:
       - master
-  # TODO: remove this when it works
-  pull_request:
-    branches:
-      - master
 jobs:
   lint:
-    name: Style-check codebase
+    name: Deploy MkDocs Documentation to S3
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
