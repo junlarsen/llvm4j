@@ -22,7 +22,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
+          key: mvn-hash-df754038083bf5f352298666ce1c9cfb9843b031
           restore-keys: ${{ runner.os }}-hash-
       # Install dependencies if git hash has changed
       - name: Install Dependencies
@@ -35,6 +35,7 @@ jobs:
         run: bash ./gradlew ktlintCheck
 
   test:
+    needs: [lint]
     name: Execute test suite
     strategy:
       matrix:
@@ -50,7 +51,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
+          key: mvn-hash-df754038083bf5f352298666ce1c9cfb9843b031
           restore-keys: ${{ runner.os }}-hash-
       # Install dependencies if git hash has changed
       - name: Install Dependencies
@@ -82,7 +83,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
+          key: mvn-hash-df754038083bf5f352298666ce1c9cfb9843b031
           restore-keys: ${{ runner.os }}-hash-
       # Install dependencies if git hash has changed
       - name: Install Dependencies
