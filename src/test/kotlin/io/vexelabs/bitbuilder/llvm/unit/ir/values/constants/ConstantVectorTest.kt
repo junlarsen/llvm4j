@@ -13,8 +13,10 @@ internal object ConstantVectorTest : Spek({
     val vec by memoized {
         ConstantVector(
             listOf(
-                ConstantInt(int32, 1), ConstantInt(int32, 2),
-                ConstantInt(int32, 3), ConstantInt(int32, 4)
+                ConstantInt(int32, 1),
+                ConstantInt(int32, 2),
+                ConstantInt(int32, 3),
+                ConstantInt(int32, 4)
             )
         )
     }

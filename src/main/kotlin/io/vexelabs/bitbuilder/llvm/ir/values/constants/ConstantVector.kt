@@ -644,7 +644,7 @@ public class ConstantVector internal constructor() :
      * @see LLVM.LLVMConstSIToFP
      */
     public fun getSIToFP(type: FloatType): ConstantVector {
-        val ref =LLVM.LLVMConstSIToFP(ref, type.ref)
+        val ref = LLVM.LLVMConstSIToFP(ref, type.ref)
 
         return ConstantVector(ref)
     }

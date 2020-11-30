@@ -79,7 +79,7 @@ internal object ConstantFloatTest : Spek({
             0, 0, // ueq, ugt
             1, 1, // uge, ult
             0, 0, // ule, une
-            1, 1  // uno, true
+            1, 1 // uno, true
         )
 
         for ((idx, it) in RealPredicate.values().withIndex()) {
