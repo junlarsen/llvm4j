@@ -1,6 +1,6 @@
 site_name: BitBuilder Documentation
 site_url: https://docs.vexelabs.io/bitbuilder
-site_author: Vexelabs Contributors
+site_author: vexelabs contributors
 
 # Repository Config
 repo_name: vexelabs/bitbuilder
@@ -12,6 +12,9 @@ theme:
   favicon: static/vexelabs512x512.png
   icon:
     logo: material/memory
+
+extra_css:
+  - stylesheets/theme.css
 
 nav:
   - Home: index.md
