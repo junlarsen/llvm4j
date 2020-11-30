@@ -1,10 +1,9 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.values.constants
 
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.RealPredicate
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
 import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantFloat
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
@@ -13,20 +12,21 @@ import kotlin.test.assertTrue
 internal object ConstantFloatTest : Spek({
     setup()
 
-    val double by memoized { FloatType(TypeKind.Double) }
-    val rhs by memoized { ConstantFloat(double, 100.0) }
-    val lhs by memoized { ConstantFloat(double, 100.0) }
+    val context: Context by memoized()
+
+    val f64 by memoized { context.getFloatType(TypeKind.Double) }
+    val rhs by memoized { f64.getConstant(100.0) }
+    val lhs by memoized { f64.getConstant(100.0) }
 
     test("create from double value") {
-        val float = ConstantFloat(FloatType(TypeKind.Double), 100.0)
-
-        assertEquals(100.0, float.getDouble())
+        assertEquals(100.0, lhs.getDouble())
+        assertEquals(100.0, rhs.getDouble())
     }
 
     test("creating a large double will lose precision") {
-        val ty = FloatType(TypeKind.FP128)
-        val v1 = ConstantFloat(ty, Double.MAX_VALUE)
-        val v2 = ConstantFloat(ty, Double.MAX_VALUE)
+        val f128 = context.getFloatType(TypeKind.FP128)
+        val v1 = f128.getConstant(Double.MAX_VALUE)
+        val v2 = f128.getConstant(Double.MAX_VALUE)
         val value = v1.getAdd(v2)
 
         assertTrue { value.getDoubleLosesPrecision() }
@@ -68,8 +68,8 @@ internal object ConstantFloatTest : Spek({
     }
 
     test("perform comparison of two floats") {
-        val left = ConstantFloat(double, 10.9)
-        val right = ConstantFloat(double, 9.1)
+        val left = f64.getConstant(10.9)
+        val right = f64.getConstant(9.1)
 
         val expected = arrayOf<Long>(
             0, 0, // false, oeq
@@ -91,9 +91,10 @@ internal object ConstantFloatTest : Spek({
     }
 
     test("truncating to a tinier float type") {
-        val left = ConstantFloat(double, Double.MAX_VALUE)
+        val left = f64.getConstant(Double.MAX_VALUE)
+        val f32 = context.getFloatType(TypeKind.Float)
         // Double: f64, Float: f32
-        val trunc = left.getTrunc(FloatType(TypeKind.Float))
+        val trunc = left.getTrunc(f32)
 
         // See https://llvm.org/docs/LangRef.html#id252
         assertEquals(Float.POSITIVE_INFINITY, trunc.getDouble().toFloat())
@@ -101,16 +102,18 @@ internal object ConstantFloatTest : Spek({
     }
 
     test("extending to a larger float type") {
-        val ext = lhs.getExt(FloatType(TypeKind.FP128))
+        val f128 = context.getFloatType(TypeKind.FP128)
+        val ext = lhs.getExt(f128)
 
         assertEquals(100.0, ext.getDouble())
         assertEquals(TypeKind.FP128, ext.getType().getTypeKind())
     }
 
     test("casting into integer type") {
+        val i32 = context.getIntType(32)
         // 64-bit to 32-bit
-        val ui = lhs.getFPToUI(IntType(32))
-        val si = lhs.getFPToSI(IntType(32))
+        val ui = lhs.getFPToUI(i32)
+        val si = lhs.getFPToSI(i32)
 
         assertEquals(100, si.getSignedValue())
         assertEquals(100, ui.getSignedValue())
@@ -120,7 +123,8 @@ internal object ConstantFloatTest : Spek({
 
     test("cast into any other floating point type") {
         for (it in FloatType.kinds) {
-            val cast = lhs.getFPCast(FloatType(it))
+            val fx = context.getFloatType(it)
+            val cast = lhs.getFPCast(fx)
 
             assertEquals(it, cast.getType().getTypeKind())
         }

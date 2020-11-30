@@ -1,23 +1,26 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.values.constants
 
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
+import io.vexelabs.bitbuilder.internal.cast
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.types.VectorType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
-import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantVector
-import io.vexelabs.bitbuilder.rtti.cast
+import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 
 internal object ConstantVectorTest : Spek({
-    val int32 by memoized { IntType(32) }
+    setup()
+
+    val context: Context by memoized()
+    val i32 by memoized {
+        context.getIntType(32)
+    }
     val vec by memoized {
-        ConstantVector(
-            listOf(
-                ConstantInt(int32, 1),
-                ConstantInt(int32, 2),
-                ConstantInt(int32, 3),
-                ConstantInt(int32, 4)
-            )
+        i32.getConstantVector(
+            i32.getConstant(1),
+            i32.getConstant(2),
+            i32.getConstant(3),
+            i32.getConstant(4)
         )
     }
 
@@ -25,7 +28,7 @@ internal object ConstantVectorTest : Spek({
         val expected = listOf(1, 2, 3, 4)
 
         for (i in 0..3) {
-            val idx = ConstantInt(int32, i)
+            val idx = i32.getConstant(1)
             val elem = vec.getExtractElement(idx)
             val int = ConstantInt(elem.ref)
 
@@ -34,8 +37,8 @@ internal object ConstantVectorTest : Spek({
     }
 
     test("replacing elements inside a vector") {
-        val newItem = ConstantInt(int32, 100)
-        val index = ConstantInt(int32, 1)
+        val newItem = i32.getConstant(100)
+        val index = i32.getConstant(1)
         val newVec = vec.getInsertElement(newItem, index)
 
         assertEquals(4, VectorType(newVec.getType().ref).getElementCount())
@@ -43,7 +46,7 @@ internal object ConstantVectorTest : Spek({
         val expected = listOf(1, 100, 3, 4)
 
         for (i in 0..3) {
-            val idx = ConstantInt(int32, i)
+            val idx = i32.getConstant(i)
             val elem = newVec.getExtractElement(idx)
             val int = ConstantInt(elem.ref)
 
@@ -52,8 +55,8 @@ internal object ConstantVectorTest : Spek({
     }
 
     test("shuffle vector instruction") {
-        val vec2 = ConstantVector(listOf(ConstantInt(int32, 1)))
-        val mask = ConstantVector(listOf(ConstantInt(int32, 2)))
+        val vec2 = i32.getConstantVector(i32.getConstant(1))
+        val mask = i32.getConstantVector(i32.getConstant(2))
         val newVec = vec.getShuffleVector(vec2, mask)
         val vecSize = cast<VectorType>(newVec.getType()).getElementCount()
 
