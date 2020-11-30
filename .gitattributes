@@ -1,0 +1,6 @@
+.mvn/*          linguist-vendored
+.gradle/*       linguist-vendored
+
+gradle*         linguist-generated
+
+docs/*          linguist-documentation

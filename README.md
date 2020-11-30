@@ -1,7 +1,10 @@
 <br />
 <p align="center">
   <a href="https://github.com/vexelabs/bitbuilder">
-    <img src="assets/bitbuilder512x512.png" alt="Logo" width="160" height="160">
+    <img src="docs/static/bitbuilder512x512.png" 
+         alt="Logo" 
+         width="160" 
+         height="160">
   </a>
 
   <h3 align="center">Bitbuilder</h3>
