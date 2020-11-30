@@ -15,20 +15,6 @@ public class PointerType internal constructor() :
     }
 
     /**
-     * Create a pointer types
-     *
-     * Creates a pointer types of types [type]. An address space may be provided
-     * but defaults to 0.
-     *
-     * @see LLVM.LLVMPointerType
-     */
-    public constructor(type: Type, address: Int = 0) : this() {
-        require(address >= 0) { "Cannot use negative address" }
-
-        ref = LLVM.LLVMPointerType(type.ref, address)
-    }
-
-    /**
      * Get the address of this pointer
      *
      * @see LLVM.LLVMGetPointerAddressSpace

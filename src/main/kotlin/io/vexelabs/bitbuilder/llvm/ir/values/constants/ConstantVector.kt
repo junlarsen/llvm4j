@@ -1,7 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir.values.constants
 
 import io.vexelabs.bitbuilder.internal.toLLVMBool
-import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.llvm.internal.contracts.Unreachable
 import io.vexelabs.bitbuilder.llvm.ir.IntPredicate
 import io.vexelabs.bitbuilder.llvm.ir.Value
@@ -17,19 +16,6 @@ public class ConstantVector internal constructor() :
     CompositeValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
-    }
-
-    /**
-     * Create a new vector of a list of values
-     *
-     * @see LLVM.LLVMConstVector
-     */
-    public constructor(values: List<Value>) : this() {
-        val ptr = values.map { it.ref }.toPointerPointer()
-
-        ref = LLVM.LLVMConstVector(ptr, values.size)
-
-        ptr.deallocate()
     }
 
     /**

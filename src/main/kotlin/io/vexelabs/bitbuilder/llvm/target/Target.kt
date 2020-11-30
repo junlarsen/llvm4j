@@ -125,6 +125,32 @@ public class Target internal constructor() :
     }
 
     /**
+     * Create a new Target Machine for a specific Target
+     *
+     * @see LLVM.LLVMCreateTargetMachine
+     */
+    public fun createTargetMachine(
+        triple: String,
+        cpu: String,
+        features: String,
+        optimizationLevel: CodeGenOptimizationLevel,
+        relocMode: RelocMode,
+        codeModel: CodeModel
+    ): TargetMachine {
+        val ref = LLVM.LLVMCreateTargetMachine(
+            ref,
+            BytePointer(triple),
+            BytePointer(cpu),
+            BytePointer(features),
+            optimizationLevel.value,
+            relocMode.value,
+            codeModel.value
+        )
+
+        return TargetMachine(ref)
+    }
+
+    /**
      * Class to perform iteration over targets
      *
      * @see [PointerIterator]

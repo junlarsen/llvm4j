@@ -11,7 +11,9 @@ internal object AttributeTest : Spek({
     setup()
 
     val context: Context by memoized()
-    val stringAttr by memoized { context.createStringAttribute("test", "value") }
+    val stringAttr by memoized {
+        context.createStringAttribute("test", "value")
+    }
     val enumAttr by memoized { context.createEnumAttribute(0, 1L) }
 
     test("construction from either type") {

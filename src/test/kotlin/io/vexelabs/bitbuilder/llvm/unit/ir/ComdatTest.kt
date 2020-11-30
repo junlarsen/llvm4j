@@ -1,8 +1,8 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir
 
 import io.vexelabs.bitbuilder.llvm.ir.Comdat
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
@@ -13,10 +13,12 @@ internal object ComdatTest : Spek({
     setup()
 
     val module: Module by memoized()
+    val context: Context by memoized()
 
     test("creating a comdat and setting its selection kind") {
+        val i32 = context.getIntType(32)
         val comdat = module.getOrCreateComdat("hello")
-        val value = module.addGlobal("test", IntType(32))
+        val value = module.addGlobal("test", i32)
 
         assertNull(value.getComdat())
 

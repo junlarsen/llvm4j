@@ -1,47 +1,46 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.types
 
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
-import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.types.VectorType
+import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 internal class VectorTypeTest : Spek({
+    setup()
+
+    val context: Context by memoized()
+
     test("create a vector type of 1000 integers") {
-        val type = IntType(32)
-        val vec = type.toVectorType(1000)
+        val type = context.getIntType(32)
+        val vec = type.getVectorType(1000)
 
         assertEquals(TypeKind.Vector, vec.getTypeKind())
         assertEquals(1000, vec.getElementCount())
     }
 
     test("the element type matches the original type") {
-        val type = IntType(32)
-        val vec = VectorType(type, 10)
+        val type = context.getIntType(32)
+        val vec = type.getVectorType(10)
 
         assertEquals(10, vec.getElementCount())
         assertEquals(type.ref, vec.getElementType().ref)
     }
 
     test("the subtype matches the original type") {
-        val type = IntType(32)
-        val vec = VectorType(type, 10)
+        val type = context.getIntType(32)
+        val vec = type.getVectorType(10)
 
         assertEquals(10, vec.getSubtypes().size)
         assertEquals(type.ref, vec.getSubtypes().first().ref)
     }
 
     test("creating a vector of negative size fails") {
-        val type = FloatType(TypeKind.Float)
+        val type = context.getFloatType(TypeKind.Float)
 
         assertFailsWith<IllegalArgumentException> {
-            type.toVectorType(-100)
-        }
-
-        assertFailsWith<IllegalArgumentException> {
-            VectorType(type, -100)
+            type.getVectorType(-100)
         }
     }
 })

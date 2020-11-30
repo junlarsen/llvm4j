@@ -1,9 +1,9 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.values
 
 import io.vexelabs.bitbuilder.internal.cast
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.ThreadLocalMode
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import io.vexelabs.bitbuilder.llvm.setup
 import io.vexelabs.bitbuilder.llvm.utils.runAll
@@ -17,10 +17,11 @@ internal class GlobalVariableTest : Spek({
     setup()
 
     val module: Module by memoized()
+    val context: Context by memoized()
 
     test("create a global variable") {
-        val ty = IntType(32)
-        val v = ConstantInt(ty, 100L, true)
+        val ty = context.getIntType(32)
+        val v = ty.getConstant(100, true)
         val value = module.addGlobal("v", ty).apply {
             setInitializer(v)
         }
@@ -41,9 +42,9 @@ internal class GlobalVariableTest : Spek({
 
     // TODO: test with non-global value
     test("flagging a global as constant") {
-        val ty = IntType(32)
-        val v = ConstantInt(IntType(32), 100L, true)
-        val mod = Module("utils.ll")
+        val ty = context.getIntType(32)
+        val v = ty.getConstant(100, true)
+        val mod = context.createModule("utils.ll")
 
         val value = mod.addGlobal("v", ty).apply {
             setInitializer(v)
@@ -54,13 +55,14 @@ internal class GlobalVariableTest : Spek({
     }
 
     test("assigning a global to an address space") {
-        val v = module.addGlobal("v", IntType(32), 0x03f7d)
+        val i32 = context.getIntType(32)
+        val v = module.addGlobal("v", i32, 0x03f7d)
 
         assertNull(v.getInitializer())
     }
 
     test("flagging a global as thread local") {
-        val ty = IntType(32)
+        val ty = context.getIntType(32)
         val value = module.addGlobal("v", ty).apply {
             setThreadLocal(true)
         }

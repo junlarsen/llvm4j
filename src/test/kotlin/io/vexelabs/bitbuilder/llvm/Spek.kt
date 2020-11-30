@@ -3,25 +3,20 @@
 
 package io.vexelabs.bitbuilder.llvm
 
-import io.vexelabs.bitbuilder.llvm.ir.Builder
 import io.vexelabs.bitbuilder.llvm.ir.Context
-import io.vexelabs.bitbuilder.llvm.ir.Module
 import org.spekframework.spek2.dsl.Root
 
 internal fun Root.setup() {
     val context by memoized(
         factory = { Context() },
-        destructor = { it.dispose() }
     )
 
     val module by memoized(
-        factory = { Module("test") },
-        destructor = { it.dispose() }
+        factory = { context.createModule("test.ll") },
     )
 
     val builder by memoized(
-        factory = { Builder() },
-        destructor = { it.dispose() }
+        factory = { context.createBuilder() },
     )
 
     val utils by memoized(

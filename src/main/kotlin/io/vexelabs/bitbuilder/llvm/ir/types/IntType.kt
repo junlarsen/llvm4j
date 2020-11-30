@@ -1,6 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.ir.types
 
-import io.vexelabs.bitbuilder.llvm.ir.Context
+import io.vexelabs.bitbuilder.internal.toLLVMBool
 import io.vexelabs.bitbuilder.llvm.ir.Type
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
@@ -12,31 +12,32 @@ public class IntType internal constructor() : Type() {
     }
 
     /**
-     * Create an integer types
+     * Create a new integer value
      *
-     * This will create an integer types of the size [size]. If the size matches
-     * any of LLVM's preset integer sizes then that size will be returned.
-     * Otherwise an arbitrary size int types will be returned.
+     * This creates a new integer of this type with [value]. You can decide if
+     * this is unsigned with [unsigned].
+     *
+     * @see LLVM.LLVMConstInt
      */
-    public constructor(
-        size: Int,
-        ctx: Context = Context.getGlobalContext()
-    ) : this() {
-        ref = when (size) {
-            1 -> LLVM.LLVMInt1TypeInContext(ctx.ref)
-            8 -> LLVM.LLVMInt8TypeInContext(ctx.ref)
-            16 -> LLVM.LLVMInt16TypeInContext(ctx.ref)
-            32 -> LLVM.LLVMInt32TypeInContext(ctx.ref)
-            64 -> LLVM.LLVMInt64TypeInContext(ctx.ref)
-            128 -> LLVM.LLVMInt128TypeInContext(ctx.ref)
-            else -> {
-                require(size in 1..8388606) {
-                    "LLVM only supports integers of 2^23-1 bits size"
-                }
+    public fun getConstant(
+        value: Long,
+        unsigned: Boolean = false
+    ): ConstantInt {
+        val ref = LLVM.LLVMConstInt(ref, value, (!unsigned).toLLVMBool())
 
-                LLVM.LLVMIntTypeInContext(ctx.ref, size)
-            }
-        }
+        return ConstantInt(ref)
+    }
+
+    /**N
+     * Create a new integer value
+     *
+     * This creates a new integer of this type with [value]. You can decide if
+     * this is unsigned with [unsigned].
+     *
+     * @see LLVM.LLVMConstInt
+     */
+    public fun getConstant(value: Int, unsigned: Boolean = false): ConstantInt {
+        return getConstant(value.toLong(), unsigned)
     }
 
     /**

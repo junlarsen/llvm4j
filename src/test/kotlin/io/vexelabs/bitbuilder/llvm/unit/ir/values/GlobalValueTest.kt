@@ -1,12 +1,12 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir.values
 
 import io.vexelabs.bitbuilder.internal.cast
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.DLLStorageClass
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.ir.TypeKind
 import io.vexelabs.bitbuilder.llvm.ir.UnnamedAddress
 import io.vexelabs.bitbuilder.llvm.ir.Visibility
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import io.vexelabs.bitbuilder.llvm.ir.values.GlobalValue
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
@@ -18,10 +18,12 @@ internal class GlobalValueTest : Spek({
     setup()
 
     val module: Module by memoized()
+    val context: Context by memoized()
 
     group("global value flags") {
         test("modifying the binary section") {
-            val global = module.addGlobal("test", IntType(1))
+            val i1 = context.getIntType(1)
+            val global = module.addGlobal("test", i1)
 
             assertNull(global.getSection())
 
@@ -31,7 +33,8 @@ internal class GlobalValueTest : Spek({
         }
 
         test("use the symbol visibility") {
-            val global = module.addGlobal("test", IntType(1))
+            val i1 = context.getIntType(1)
+            val global = module.addGlobal("test", i1)
 
             for (it in Visibility.values()) {
                 global.setVisibility(it)
@@ -41,7 +44,8 @@ internal class GlobalValueTest : Spek({
         }
 
         test("use the storage class") {
-            val global = module.addGlobal("test", IntType(1))
+            val i1 = context.getIntType(1)
+            val global = module.addGlobal("test", i1)
 
             for (it in DLLStorageClass.values()) {
                 global.setStorageClass(it)
@@ -51,7 +55,8 @@ internal class GlobalValueTest : Spek({
         }
 
         test("use unnamed address importance") {
-            val global = module.addGlobal("test", IntType(1))
+            val i1 = context.getIntType(1)
+            val global = module.addGlobal("test", i1)
 
             for (it in UnnamedAddress.values()) {
                 global.setUnnamedAddress(it)
@@ -61,7 +66,8 @@ internal class GlobalValueTest : Spek({
         }
 
         test("defining alignment of value") {
-            val global = module.addGlobal("test", IntType(1)).apply {
+            val i1 = context.getIntType(1)
+            val global = module.addGlobal("test", i1).apply {
                 setAlignment(16)
             }
             val ir = global.getIR().toString()
@@ -72,7 +78,8 @@ internal class GlobalValueTest : Spek({
     }
 
     test("forwards declaration of global values") {
-        val global = module.addGlobal("my_external", IntType(32)).apply {
+        val i32 = context.getIntType(32)
+        val global = module.addGlobal("my_external", i32).apply {
             setExternallyInitialized(true)
         }
 
@@ -80,7 +87,8 @@ internal class GlobalValueTest : Spek({
     }
 
     test("using the value type") {
-        val global = module.addGlobal("test", IntType(32))
+        val i32 = context.getIntType(32)
+        val global = module.addGlobal("test", i32)
         val ptrType = global.getType()
 
         assertEquals(TypeKind.Pointer, ptrType.getTypeKind())
@@ -93,7 +101,8 @@ internal class GlobalValueTest : Spek({
     test("pulling the module from a global value") {
         module.setModuleIdentifier("basic")
 
-        val global = module.addGlobal("my_int", IntType(32))
+        val i32 = context.getIntType(32)
+        val global = module.addGlobal("my_int", i32)
         val globalModule = cast<GlobalValue>(global).getModule()
 
         assertEquals(

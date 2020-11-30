@@ -32,31 +32,6 @@ public class TargetMachine internal constructor() :
     }
 
     /**
-     * Create a new Target Machine for a specific Target
-     *
-     * @see LLVM.LLVMCreateTargetMachine
-     */
-    public constructor(
-        target: Target,
-        triple: String,
-        cpu: String,
-        features: String,
-        optimizationLevel: CodeGenOptimizationLevel,
-        relocMode: RelocMode,
-        codeModel: CodeModel
-    ) : this() {
-        ref = LLVM.LLVMCreateTargetMachine(
-            target.ref,
-            BytePointer(triple),
-            BytePointer(cpu),
-            BytePointer(features),
-            optimizationLevel.value,
-            relocMode.value,
-            codeModel.value
-        )
-    }
-
-    /**
      * Get the start of the target iterator
      *
      * @see LLVM.LLVMGetFirstTarget
@@ -178,6 +153,17 @@ public class TargetMachine internal constructor() :
 
             return@resourceScope MemoryBuffer(outBuf)
         }
+    }
+
+    /**
+     * Create a target data layout from a target machine
+     *
+     * @see LLVM.LLVMCreateTargetDataLayout
+     */
+    public fun createTargetData(): TargetData {
+        val ref = LLVM.LLVMCreateTargetDataLayout(ref)
+
+        return TargetData(ref)
     }
 
     public override fun dispose() {

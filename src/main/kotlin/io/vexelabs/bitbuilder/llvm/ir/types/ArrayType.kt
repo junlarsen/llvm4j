@@ -15,17 +15,6 @@ public class ArrayType internal constructor() :
     }
 
     /**
-     * Create an array types
-     *
-     * Constructs an array of types [type] with size [size].
-     */
-    public constructor(type: Type, size: Int) : this() {
-        require(size >= 0) { "Cannot make array of negative size" }
-
-        ref = LLVM.LLVMArrayType(type.ref, size)
-    }
-
-    /**
      * Get the amount of elements in this array
      *
      * @see LLVM.LLVMGetArrayLength

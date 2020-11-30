@@ -4,11 +4,11 @@ import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.internal.map
 import io.vexelabs.bitbuilder.internal.toLLVMBool
 import io.vexelabs.bitbuilder.internal.toPointerPointer
-import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Type
 import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.types.traits.CompositeType
 import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantInt
+import io.vexelabs.bitbuilder.llvm.ir.values.constants.ConstantStruct
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
@@ -18,47 +18,6 @@ public class StructType internal constructor() :
     CompositeType {
     public constructor(llvmRef: LLVMTypeRef) : this() {
         ref = llvmRef
-    }
-
-    /**
-     * Create a structure types
-     *
-     * This method creates a structure types inside the given [ctx]. Do not that
-     * this constructor cannot produce opaque types, use the secondary
-     * constructor accepting a [String] for this.
-     *
-     * The struct body will be the types provided in [types].
-     */
-    public constructor(
-        types: List<Type>,
-        packed: Boolean,
-        ctx: Context = Context.getGlobalContext()
-    ) : this() {
-        val ptr = types.map { it.ref }.toPointerPointer()
-
-        ref = LLVM.LLVMStructTypeInContext(
-            ctx.ref,
-            ptr,
-            types.size,
-            packed.toLLVMBool()
-        )
-
-        ptr.deallocate()
-    }
-
-    /**
-     * Create an opaque struct types
-     *
-     * This will create an opaque struct (a struct without a body, like C
-     * forward declaration) with the given [name].
-     *
-     * You will be able to use [setBody] to assign a body to the opaque struct.
-     */
-    public constructor(
-        name: String,
-        ctx: Context = Context.getGlobalContext()
-    ) : this() {
-        ref = LLVM.LLVMStructCreateNamed(ctx.ref, name)
     }
 
     /**
@@ -167,5 +126,22 @@ public class StructType internal constructor() :
         val ref = LLVM.LLVMAlignOf(ref)
 
         return ConstantInt(ref)
+    }
+
+    /**
+     * Create a struct of this type and initialize it with the provided [values]
+     *
+     * The types of the provided [values] must match the types of this struct
+     * type.
+     *
+     * @see LLVM.LLVMConstNamedStruct
+     */
+    public fun getConstant(vararg values: Value): ConstantStruct {
+        val ptr = values.map { it.ref }.toPointerPointer()
+        val ref = LLVM.LLVMConstNamedStruct(ref, ptr, values.size)
+
+        ptr.deallocate()
+
+        return ConstantStruct(ref)
     }
 }

@@ -17,15 +17,6 @@ public class ConstantFloat internal constructor() : ConstantValue() {
     }
 
     /**
-     * Create a new constant float of a [type] with the provided [value]
-     *
-     * @see LLVM.LLVMConstReal
-     */
-    public constructor(type: FloatType, value: Double) : this() {
-        ref = LLVM.LLVMConstReal(type.ref, value)
-    }
-
-    /**
      * Obtains the double value for a floating point const value
      *
      * @see LLVM.LLVMConstRealGetDouble

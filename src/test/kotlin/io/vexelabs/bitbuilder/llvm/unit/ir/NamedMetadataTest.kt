@@ -1,6 +1,6 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir
 
-import io.vexelabs.bitbuilder.llvm.ir.MetadataString
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
@@ -11,6 +11,7 @@ internal object NamedMetadataTest : Spek({
     setup()
 
     val module: Module by memoized()
+    val context: Context by memoized()
 
     test("the name of a node matches") {
         val metadata = module.getOrCreateNamedMetadata("test")
@@ -22,18 +23,18 @@ internal object NamedMetadataTest : Spek({
         test("a fresh node does not have any operands") {
             val metadata = module.getOrCreateNamedMetadata("test")
 
-            assertEquals(0, metadata.getOperandCount())
-            assertTrue { metadata.getOperands().isEmpty() }
+            assertEquals(0, metadata.getOperandCount(module))
+            assertTrue { metadata.getOperands(module).isEmpty() }
         }
 
         test("adding an operand to a node") {
-            val metadata = MetadataString("never")
+            val metadata = context.createMetadataString("never")
             val node = module.getOrCreateNamedMetadata("test").also {
-                it.addOperand(metadata)
+                it.addOperand(metadata, module)
             }
-            val operands = node.getOperands()
+            val operands = node.getOperands(module)
 
-            assertEquals(1, node.getOperandCount())
+            assertEquals(1, node.getOperandCount(module))
             assertEquals(1, operands.size)
         }
     }

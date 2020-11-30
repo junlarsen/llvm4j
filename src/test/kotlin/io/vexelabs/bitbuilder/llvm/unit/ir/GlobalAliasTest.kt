@@ -1,8 +1,7 @@
 package io.vexelabs.bitbuilder.llvm.unit.ir
 
+import io.vexelabs.bitbuilder.llvm.ir.Context
 import io.vexelabs.bitbuilder.llvm.ir.Module
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
-import io.vexelabs.bitbuilder.llvm.ir.types.PointerType
 import io.vexelabs.bitbuilder.llvm.setup
 import org.spekframework.spek2.Spek
 import kotlin.test.assertEquals
@@ -13,6 +12,7 @@ internal object GlobalAliasTest : Spek({
     setup()
 
     val module: Module by memoized()
+    val context: Context by memoized()
 
     group("assigning and retrieving aliases") {
         test("a global which does not exist returns null") {
@@ -22,9 +22,10 @@ internal object GlobalAliasTest : Spek({
         }
 
         test("a global which exist returns") {
-            val global = module.addGlobal("item", IntType(32))
+            val i32 = context.getIntType(32)
+            val global = module.addGlobal("item", i32)
             val alias = module.addAlias(
-                PointerType(IntType(32)),
+                i32.getPointerType(),
                 global,
                 "alias"
             )
@@ -37,16 +38,18 @@ internal object GlobalAliasTest : Spek({
     }
 
     test("reassigning the aliasee") {
-        val global = module.addGlobal("item", IntType(32))
+        val i32 = context.getIntType(32)
+        val global = module.addGlobal("item", i32)
         val alias = module.addAlias(
-            PointerType(IntType(32)),
+            i32.getPointerType(),
             global,
             "alias"
         )
 
         assertEquals(global.ref, alias.getAliasOf().ref)
 
-        val alternative = module.addGlobal("alt", IntType(1))
+        val i1 = context.getIntType(1)
+        val alternative = module.addGlobal("alt", i1)
 
         alias.setAliasOf(alternative)
 

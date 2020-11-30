@@ -17,43 +17,6 @@ public class ConstantInt internal constructor() : ConstantValue() {
     }
 
     /**
-     * Create a new integer value of types [type]
-     *
-     * This creates a new integer from [type] with [value]. You can decide if
-     * this is signed with [signExtend].
-     *
-     * @see LLVM.LLVMConstInt
-     */
-    public constructor(
-        type: IntType,
-        value: Long,
-        signExtend: Boolean = true
-    ) : this() {
-        ref = LLVM.LLVMConstInt(type.ref, value, signExtend.toLLVMBool())
-    }
-
-    public constructor(
-        type: IntType,
-        value: Int,
-        signExtend: Boolean = true
-    ) : this(type, value.toLong(), signExtend)
-
-    /**
-     * Create a constant integer of arbitrary precision
-     *
-     * TODO: Research how this constructor works
-     *
-     * @see LLVM.LLVMConstIntOfArbitraryPrecision
-     */
-    public constructor(type: IntType, words: List<Long>) : this() {
-        ref = LLVM.LLVMConstIntOfArbitraryPrecision(
-            type.ref,
-            words.size,
-            words.toLongArray()
-        )
-    }
-
-    /**
      * Get the zero extended (unsigned) value of this Constant
      *
      * @see LLVM.LLVMConstIntGetZExtValue
@@ -534,5 +497,25 @@ public class ConstantInt internal constructor() : ConstantValue() {
         val ref = LLVM.LLVMConstSelect(ref, ifTrue.ref, ifFalse.ref)
 
         return Value(ref)
+    }
+
+    public companion object {
+        /**
+         * Create a constant integer of arbitrary precision
+         *
+         * TODO: Research how this constructor works
+         *
+         * @see LLVM.LLVMConstIntOfArbitraryPrecision
+         */
+        @JvmStatic
+        public fun fromWords(type: IntType, vararg words: Long): ConstantInt {
+            val ref = LLVM.LLVMConstIntOfArbitraryPrecision(
+                type.ref,
+                words.size,
+                words
+            )
+
+            return ConstantInt(ref)
+        }
     }
 }

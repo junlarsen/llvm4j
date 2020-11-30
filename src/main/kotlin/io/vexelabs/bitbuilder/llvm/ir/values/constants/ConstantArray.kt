@@ -2,12 +2,7 @@ package io.vexelabs.bitbuilder.llvm.ir.values.constants
 
 import io.vexelabs.bitbuilder.internal.fromLLVMBool
 import io.vexelabs.bitbuilder.internal.resourceScope
-import io.vexelabs.bitbuilder.internal.toLLVMBool
-import io.vexelabs.bitbuilder.internal.toPointerPointer
 import io.vexelabs.bitbuilder.internal.toResource
-import io.vexelabs.bitbuilder.llvm.ir.Context
-import io.vexelabs.bitbuilder.llvm.ir.Type
-import io.vexelabs.bitbuilder.llvm.ir.Value
 import io.vexelabs.bitbuilder.llvm.ir.values.ConstantValue
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.AggregateValue
 import io.vexelabs.bitbuilder.llvm.ir.values.traits.CompositeValue
@@ -21,38 +16,6 @@ public class ConstantArray internal constructor() :
     CompositeValue {
     public constructor(llvmRef: LLVMValueRef) : this() {
         ref = llvmRef
-    }
-
-    /**
-     * Create an array of values of a given [type]
-     *
-     * @see LLVM.LLVMConstArray
-     */
-    public constructor(type: Type, values: List<Value>) : this() {
-        val ptr = values.map { it.ref }.toPointerPointer()
-
-        ref = LLVM.LLVMConstArray(type.ref, ptr, values.size)
-
-        ptr.deallocate()
-    }
-
-    /**
-     * Constructor to make an LLVM string
-     *
-     * A LLVM string is an array of i8's which contain the different
-     * characters the string contains
-     */
-    public constructor(
-        content: String,
-        nullTerminate: Boolean = true,
-        context: Context = Context.getGlobalContext()
-    ) : this() {
-        ref = LLVM.LLVMConstStringInContext(
-            context.ref,
-            content,
-            content.length,
-            nullTerminate.toLLVMBool()
-        )
     }
 
     /**

@@ -20,6 +20,7 @@ import io.vexelabs.bitbuilder.llvm.support.VerifierFailureAction
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMExecutionEngineRef
+import org.bytedeco.llvm.LLVM.LLVMModuleProviderRef
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -52,24 +53,6 @@ public class Module internal constructor() :
 
     public constructor(llvmRef: LLVMModuleRef) : this() {
         ref = llvmRef
-    }
-
-    /**
-     * Create a new module with a file name
-     *
-     * Optionally pass a [context] which this module will reside in. If no
-     * context is passed, the global llvm context is used.
-     *
-     * @see LLVM.LLVMModuleCreateWithNameInContext
-     */
-    public constructor(
-        sourceFileName: String,
-        context: Context = Context.getGlobalContext()
-    ) : this() {
-        ref = LLVM.LLVMModuleCreateWithNameInContext(
-            sourceFileName,
-            context.ref
-        )
     }
 
     /**
@@ -332,7 +315,7 @@ public class Module internal constructor() :
     public fun getNamedMetadataIterator(): NamedMetadataNode.Iterator? {
         val md = LLVM.LLVMGetFirstNamedMetadata(ref)
 
-        return md?.let { NamedMetadataNode.Iterator(this, it) }
+        return md?.let { NamedMetadataNode.Iterator(it) }
     }
 
     /**
@@ -343,7 +326,7 @@ public class Module internal constructor() :
     public fun getNamedMetadata(name: String): NamedMetadataNode? {
         val md = LLVM.LLVMGetNamedMetadata(ref, name, name.length.toLong())
 
-        return md?.let { NamedMetadataNode(it, ref) }
+        return md?.let { NamedMetadataNode(it) }
     }
 
     /**
@@ -359,7 +342,7 @@ public class Module internal constructor() :
             name.length.toLong()
         )
 
-        return NamedMetadataNode(md, ref)
+        return NamedMetadataNode(md)
     }
 
     /**
@@ -690,6 +673,21 @@ public class Module internal constructor() :
         val comdat = LLVM.LLVMGetOrInsertComdat(ref, name)
 
         return Comdat(comdat)
+    }
+
+    /**
+     * Create a Module provider from a module
+     *
+     * @see LLVM.LLVMCreateModuleProviderForExistingModule
+     * @see LLVMModuleProviderRef
+     */
+    @Deprecated("Use llvm.Module instead")
+    public fun getModuleProvider(): ModuleProvider {
+        require(valid) { "Cannot retrieve provider from deleted module" }
+
+        val ref = LLVM.LLVMCreateModuleProviderForExistingModule(ref)
+
+        return ModuleProvider(ref)
     }
 
     public override fun dispose() {

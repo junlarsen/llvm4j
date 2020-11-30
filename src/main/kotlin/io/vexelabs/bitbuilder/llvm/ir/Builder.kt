@@ -44,13 +44,11 @@ import org.bytedeco.llvm.global.LLVM
  *
  * @see LLVMBuilderRef
  */
-public class Builder public constructor(
-    context: Context = Context.getGlobalContext()
-) : Disposable, ContainsReference<LLVMBuilderRef> {
+public class Builder internal constructor() :
+    Disposable,
+    ContainsReference<LLVMBuilderRef> {
     public override var valid: Boolean = true
-    public override var ref: LLVMBuilderRef = LLVM.LLVMCreateBuilderInContext(
-        context.ref
-    )
+    public override lateinit var ref: LLVMBuilderRef
         internal set
 
     public constructor(llvmRef: LLVMBuilderRef) : this() {
