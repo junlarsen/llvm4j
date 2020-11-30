@@ -17,4 +17,11 @@ extra_css:
   - stylesheets/theme.css
 
 nav:
-  - Home: index.md
+  - Overview: index.md
+  - Getting Started:
+    - Downloads: downloads.md
+    - Supported Platforms: supported-platforms.md
+  - Core Concepts:
+    - Type Casting and RTTI: casting-between-types.md
+  - Advanced Recipes:
+    - Custom LLVM Binaries: custom-llvm-binaries.md
