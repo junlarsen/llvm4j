@@ -26,7 +26,7 @@ jobs:
       # Install dependencies if git hash has changed
       - name: Install Maven Dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: mvn -f .dependencies/dependencies.pom.xml -U compile
+        run: bash ./mvnw -f .dependencies/dependencies.pom.xml -U compile
 
       - name: Install Gradle dependencies
         run: bash ./gradlew clean build --refresh-dependencies
@@ -55,7 +55,7 @@ jobs:
       # Install dependencies if git hash has changed
       - name: Install Dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: mvn -f .dependencies/dependencies.pom.xml -U compile
+        run: bash ./mvnw -f .dependencies/dependencies.pom.xml -U compile
 
       - name: Install Gradle dependencies
         run: bash ./gradlew clean build --refresh-dependencies
@@ -87,7 +87,7 @@ jobs:
       # Install dependencies if git hash has changed
       - name: Install Dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: mvn -f .dependencies/dependencies.pom.xml -U compile
+        run: bash ./mvnw -f .dependencies/dependencies.pom.xml -U compile
 
       - name: Install Gradle dependencies
         run: bash ./gradlew clean build --refresh-dependencies
