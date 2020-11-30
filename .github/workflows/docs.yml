@@ -1,0 +1,25 @@
+name: MkDocs Deployment
+on:
+  push:
+    branches:
+      - master
+jobs:
+  lint:
+    name: Deploy MkDocs Documentation to S3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+      - run: pip install -r requirements.txt
+      - run: python -m mkdocs build
+      - name: Deploy to S3
+        uses: vexelabs/s3-deploy@v1-rc2
+        with:
+          aws-key-id: ${{ secrets.AWS_AUTOBOTS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_AUTOBOTS_SECRET_ACCESS_KEY }}
+          aws-bucket: ${{ secrets.AWS_DOCS_BUCKET }}
+          aws-region: ${{ secrets.AWS_DOCS_REGION }}
+          directory: site
+          empty-bucket: true
