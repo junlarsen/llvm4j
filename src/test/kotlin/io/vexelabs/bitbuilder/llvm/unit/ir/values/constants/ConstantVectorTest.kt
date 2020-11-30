@@ -28,7 +28,7 @@ internal object ConstantVectorTest : Spek({
         val expected = listOf(1, 2, 3, 4)
 
         for (i in 0..3) {
-            val idx = i32.getConstant(1)
+            val idx = i32.getConstant(i)
             val elem = vec.getExtractElement(idx)
             val int = ConstantInt(elem.ref)
 
