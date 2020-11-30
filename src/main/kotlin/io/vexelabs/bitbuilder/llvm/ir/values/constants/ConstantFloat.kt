@@ -129,10 +129,10 @@ public class ConstantFloat internal constructor() : ConstantValue() {
     public fun getFCmp(
         predicate: RealPredicate,
         rhs: ConstantFloat
-    ): ConstantFloat {
+    ): ConstantInt {
         val ref = LLVM.LLVMConstFCmp(predicate.value, ref, rhs.ref)
 
-        return ConstantFloat(ref)
+        return ConstantInt(ref)
     }
 
     /**
