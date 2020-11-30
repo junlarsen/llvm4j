@@ -14,7 +14,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      # Cache dependencies per commit hash because Sonatype OSS repo might
+      # miss certain artifacts at times.
+      - name: Cache Dependencies
+        id: cache-deps
+        uses: @actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
+          restore-keys: ${{ runner.os }}-hash-
+      # Install dependencies if git hash has changed
       - name: Install Dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: |
           mvn -f .dependencies/dependencies.pom.xml -U compile
           bash ./gradlew clean build --refresh-dependencies
@@ -30,7 +42,19 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v2
+
+      # Cache dependencies per commit hash because Sonatype OSS repo might
+      # miss certain artifacts at times.
+      - name: Cache Dependencies
+        id: cache-deps
+        uses: @actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
+          restore-keys: ${{ runner.os }}-hash-
+      # Install dependencies if git hash has changed
       - name: Install Dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: |
           mvn -f .dependencies/dependencies.pom.xml -U compile
           bash ./gradlew clean build --refresh-dependencies
@@ -50,7 +74,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
+      # Cache dependencies per commit hash because Sonatype OSS repo might
+      # miss certain artifacts at times.
+      - name: Cache Dependencies
+        id: cache-deps
+        uses: @actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-hash-df754038083bf5f352298666ce1c9cfb9843b031
+          restore-keys: ${{ runner.os }}-hash-
+      # Install dependencies if git hash has changed
       - name: Install Dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: |
           mvn -f .dependencies/dependencies.pom.xml -U compile
           bash ./gradlew clean build --refresh-dependencies
