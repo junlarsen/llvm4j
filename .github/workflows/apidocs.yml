@@ -32,7 +32,7 @@ jobs:
         run: bash ./gradlew dokkaHtml
 
       - name: Deploy to S3
-        uses: vexelabs/s3-deploy@v1-rc4-test
+        uses: vexelabs/s3-deploy@v1-rc4
         with:
           aws-key-id: ${{ secrets.AWS_AUTOBOTS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_AUTOBOTS_SECRET_ACCESS_KEY }}
