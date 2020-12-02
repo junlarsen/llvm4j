@@ -1,6 +1,6 @@
-import java.net.URL
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.dokka.Platform
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.net.URL
 
 plugins {
     id("com.github.johnrengelman.shadow") version "5.2.0"
