@@ -32,8 +32,6 @@ is a solid library for interacting with LLVM, written in idiomatic Kotlin.
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
 - [Usage](#usage)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
 
@@ -89,7 +87,8 @@ consider any of the APIs stable.
 There are samples hosted in the `/samples` directory, but some of these may not
 be up-to-date as the project has a rapid development cycle in these early
 
-Documentation for the library is automatically built on each push to master.
+Documentation for the library is automatically built on each push to master and
+automatically deployed to these endpoints:
 
 - [Project Documentation][docs]
 - [API Documentation (Dokka)][apidocs]
@@ -103,9 +102,6 @@ information.
 
 - [@supergrecko](https://twitter.com/supergrecko) - me@supergrecko.com
 
-GitHub Repository Link: [https://github.com/vexelabs/bitbuilder][repo-url]
-
-[repo-url]: https://github.com/vexelabs/bitbuilder
 [llvm-presets]: https://github.com/bytedeco/javacpp-presets/tree/master/llvm
 [apidocs]: https://apidocs.vexelabs.io/bitbuilder/index.html
-[docs]: https://docs.vexelabs.io/bitbuilder/index.html
+[docs]: https://docs.vexelabs.io/bitbuilder/-bit-builder/index.html
