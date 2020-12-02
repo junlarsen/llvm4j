@@ -1,9 +1,11 @@
+import java.net.URL
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.dokka.Platform
 
 plugins {
     id("com.github.johnrengelman.shadow") version "5.2.0"
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
-    id("org.jetbrains.dokka") version "1.4.0-rc"
+    id("org.jetbrains.dokka") version "1.4.10.2"
     id("org.jetbrains.kotlin.jvm") version "1.4.10"
     id("maven")
     id("maven-publish")
@@ -21,8 +23,8 @@ val isSnapshot = version.toString().endsWith("SNAPSHOT")
 repositories {
     mavenCentral()
     mavenLocal()
+    jcenter()
     maven("https://jitpack.io")
-    maven("https://jcenter.bintray.com")
 }
 
 dependencies {
@@ -46,16 +48,28 @@ tasks {
         }
     }
 
-    dokkaHtml {
-        outputDirectory = "$buildDir/javadoc"
+    dokkaHtml.configure {
+        outputDirectory.set(file("$buildDir/javadoc"))
+        moduleName.set("BitBuilder")
+
         dokkaSourceSets.configureEach {
-            skipDeprecated = false
-            includeNonPublic = false
-            reportUndocumented = true
-            platform = "JVM"
-            jdkVersion = 8
-            noStdlibLink = false
-            noJdkLink = false
+            skipDeprecated.set(false)
+            includeNonPublic.set(false)
+            reportUndocumented.set(true)
+            skipEmptyPackages.set(true)
+            displayName.set("JVM")
+            platform.set(Platform.jvm)
+            sourceLink {
+                localDirectory.set(file("src/main/kotlin"))
+                remoteUrl.set(URL("https://github.com/vexelabs/bitbuilder/blob/master/src/main/kotlin"))
+                remoteLineSuffix.set("#L")
+            }
+            jdkVersion.set(8)
+            noStdlibLink.set(false)
+            noJdkLink.set(false)
+            externalDocumentationLink {
+                url.set(URL("http://bytedeco.org/javacpp-presets/llvm/apidocs/"))
+            }
         }
     }
 }
