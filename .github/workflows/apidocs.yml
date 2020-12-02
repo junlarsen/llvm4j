@@ -1,0 +1,42 @@
+name: Dokka Deployment
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  lint:
+    name: Deploy Dokka Documentation to S3
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Cache dependencies per commit hash because Sonatype OSS repo might
+      # miss certain artifacts at times.
+      - name: Cache Dependencies
+        id: cache-deps
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: mvn-hash-df754038083bf5f352298666ce1c9cfb9843b031
+      # Install dependencies if git hash has changed
+      - name: Install Maven Dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: bash ./mvnw -f .dependencies/dependencies.pom.xml -U compil
+      - name: Install Gradle dependencies
+        run: bash ./gradlew clean build --refresh-dependencies
+
+      - name: Generate Documentation
+        run: bash ./gradlew dokkaHtml
+
+      - name: Deploy to S3
+        uses: vexelabs/s3-deploy@v1-rc4
+        with:
+          aws-key-id: ${{ secrets.AWS_AUTOBOTS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_AUTOBOTS_SECRET_ACCESS_KEY }}
+          aws-bucket: ${{ secrets.AWS_APIDOCS_BUCKET }}
+          aws-region: ${{ secrets.AWS_APIDOCS_REGION }}
+          directory: build/javadoc
+          empty-bucket: true
