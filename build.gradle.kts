@@ -88,7 +88,7 @@ val javadocJar by tasks.creating(Jar::class) {
 
 publishing {
     publications {
-        create<MavenPublication>("vexelabs") {
+        create<MavenPublication>("sonatype") {
             from(components["kotlin"])
             artifact(sourcesJar)
             artifact(javadocJar)
@@ -96,9 +96,9 @@ publishing {
             repositories {
                 maven {
                     url = if (isSnapshot) {
-                        uri("https://repo.vexelabs.io/snapshots/")
+                        uri("https://oss.sonatype.org/content/repositories/snapshots/")
                     } else {
-                        uri("https://repo.vexelabs.io/")
+                        uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
                     }
 
                     credentials {
@@ -140,5 +140,5 @@ publishing {
 
 signing {
     useGpgCmd()
-    sign(publishing.publications["vexelabs"])
+    sign(publishing.publications["sonatype"])
 }
