@@ -15,7 +15,7 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python -m mkdocs build
       - name: Deploy to S3
-        uses: vexelabs/s3-deploy@v1-rc2
+        uses: vexelabs/s3-deploy@v1-rc3
         with:
           aws-key-id: ${{ secrets.AWS_AUTOBOTS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_AUTOBOTS_SECRET_ACCESS_KEY }}

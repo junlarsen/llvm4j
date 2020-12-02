@@ -16,6 +16,9 @@ theme:
 extra_css:
   - stylesheets/theme.css
 
+# S3 redirects are bothersome without this disabled
+use_directory_urls: false
+
 nav:
   - Overview: index.md
   - Getting Started:
