@@ -19,6 +19,7 @@ kotlin.explicitApi()
 ktlint.debug.set(true)
 
 val isSnapshot = version.toString().endsWith("SNAPSHOT")
+val isCI = System.getenv("CI") == "true"
 
 repositories {
     mavenCentral()
@@ -86,59 +87,67 @@ val javadocJar by tasks.creating(Jar::class) {
     dependsOn(tasks.dokkaHtml)
 }
 
-publishing {
-    publications {
-        create<MavenPublication>("sonatype") {
-            from(components["kotlin"])
-            artifact(sourcesJar)
-            artifact(javadocJar)
+publishing.publications.create<MavenPublication>("sonatype") {
+    from(components["kotlin"])
+    artifact(sourcesJar)
+    artifact(javadocJar)
 
-            repositories {
-                maven {
-                    url = if (isSnapshot) {
-                        uri("https://oss.sonatype.org/content/repositories/snapshots/")
-                    } else {
-                        uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                    }
-
-                    credentials {
-                        username = project.properties.getOrDefault("publishRepository.username", "default") as? String
-                        password = project.properties.getOrDefault("publishRepository.password", "default") as? String
-                    }
+    repositories {
+        maven {
+            // Deploy all snapshots to OSSRH
+            // Releases on CI are published to vexelabs for testing
+            // Releases from user is published to Sonatype Staging
+            url = when {
+                isSnapshot -> uri("https://oss.sonatype.org/content/repositories/snapshots/")
+                else -> when {
+                    isCI -> uri("https://repo.vexelabs.io/releases/")
+                    else -> uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
                 }
             }
 
-            pom {
-                name.set("BitBuilder")
-                description.set("Kotlin interface to the LLVM APIs")
-                url.set("https://vexelabs.io/projects/bitbuilder")
-
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-
-                developers {
-                    developer {
-                        id.set("supergrecko")
-                        name.set("Mats Larsen")
-                        email.set("me@supergrecko.com")
-                    }
-                }
-
-                scm {
-                    connection.set("scm:git:ssh://github.com/vexelabs/bitbuilder.git")
-                    developerConnection.set("scm:git:ssh://git@github.com:vexelabs/bitbuilder.git")
-                    url.set("https://github.com/vexelabs/bitbuilder")
-                }
+            credentials {
+                username = System.getenv("PUBLISH_USERNAME")
+                password = System.getenv("PUBLISH_PASSWORD")
             }
+        }
+    }
+
+    pom {
+        name.set("BitBuilder")
+        description.set("Kotlin interface to the LLVM APIs")
+        url.set("https://vexelabs.io/projects/bitbuilder")
+
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+
+        developers {
+            developer {
+                id.set("supergrecko")
+                name.set("Mats Larsen")
+                email.set("me@supergrecko.com")
+            }
+        }
+
+        scm {
+            connection.set("scm:git:ssh://github.com/vexelabs/bitbuilder.git")
+            developerConnection.set("scm:git:ssh://git@github.com:vexelabs/bitbuilder.git")
+            url.set("https://github.com/vexelabs/bitbuilder")
         }
     }
 }
 
 signing {
-    useGpgCmd()
+    if (isCI) {
+        val signingKey: String? by project
+        val signingPassword: String? by project
+
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    } else {
+        useGpgCmd()
+    }
     sign(publishing.publications["sonatype"])
 }
