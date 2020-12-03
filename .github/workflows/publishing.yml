@@ -29,7 +29,9 @@ jobs:
         run: bash ./gradlew clean build --refresh-dependencies
 
       - name: Publish Project
-        run: bash ./gradlew publishSonatypePublicationToMavenRepository
+        run: bash ./gradlew publish
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
+          PUBLISH_USERNAME: ${{ secrets.SONATYPE_USER }}
+          PUBLISH_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
