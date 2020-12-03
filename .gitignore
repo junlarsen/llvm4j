@@ -1,7 +1,10 @@
 out
 build
-./target/
-.idea
+site
+target
+
 .gradle
+.mvn
+
+.idea
 *.iml
-__backup__
