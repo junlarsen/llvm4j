@@ -6,9 +6,9 @@ Kotlin.
 
 > BitBuilder is still in active and early development. There are currently no
 > release binaries available. Snapshots are available at 
-> [repo.vexelabs.io][snapshot-builds]
+> [Sonatype OSSRH][snapshot-builds]
 
 Javadoc API overviews are available at [apidocs.vexelabs.io][apidocs]
 
-[snapshot-builds]: https://repo.vexelabs.io/snapshots
+[snapshot-builds]: https://oss.sonatype.org/content/repositories/snapshots/io/vexelabs/bitbuilder/
 [apidocs]: https://apidocs.vexelabs.io/bitbuilder/index.html
