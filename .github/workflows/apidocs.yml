@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 jobs:
   lint:
     name: Deploy Dokka Documentation to S3
@@ -21,7 +24,7 @@ jobs:
       # Install dependencies if git hash has changed
       - name: Install Maven Dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: bash ./mvnw -f .dependencies/dependencies.pom.xml -U compil
+        run: bash ./mvnw -f .dependencies/dependencies.pom.xml -U compile
       - name: Install Gradle dependencies
         run: bash ./gradlew clean build --refresh-dependencies
 
