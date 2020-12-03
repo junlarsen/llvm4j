@@ -1,11 +1,11 @@
-name: Dokka Deployment
+name: Artifact Publishing
 on:
   push:
     branches:
       - master
 jobs:
   lint:
-    name: Deploy Dokka Documentation to S3
+    name: Publish Artifacts to Repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -25,15 +25,10 @@ jobs:
       - name: Install Gradle dependencies
         run: bash ./gradlew clean build --refresh-dependencies
 
-      - name: Generate Documentation
-        run: bash ./gradlew dokkaHtml
-
-      - name: Deploy to S3
-        uses: vexelabs/s3-deploy@v1-rc4
-        with:
-          aws-key-id: ${{ secrets.AWS_AUTOBOTS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_AUTOBOTS_SECRET_ACCESS_KEY }}
-          aws-bucket: ${{ secrets.AWS_APIDOCS_BUCKET }}
-          aws-region: ${{ secrets.AWS_APIDOCS_REGION }}
-          directory: build/javadoc
-          empty-bucket: true
+      - name: Publish Project
+        run: bash ./gradlew publishSonatypePublicationToMavenRepository
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
+          PUBLISH_USERNAME: ${{ secrets.SONATYPE_USER }}
+          PUBLISH_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
