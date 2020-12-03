@@ -70,7 +70,7 @@ repositories {
 }
 ```
 
-2. Add the BitBuilder artifact.
+###### Add the BitBuilder artifact.
 
 ```kotlin
 dependencies {
@@ -100,8 +100,8 @@ information.
 
 ## Contact
 
-- [@supergrecko](https://twitter.com/supergrecko) - me@supergrecko.com
+- [@supergrecko](https://twitter.com/supergrecko) - me [at] supergrecko.com
 
 [llvm-presets]: https://github.com/bytedeco/javacpp-presets/tree/master/llvm
-[apidocs]: https://apidocs.vexelabs.io/bitbuilder/index.html
-[docs]: https://docs.vexelabs.io/bitbuilder/-bit-builder/index.html
+[apidocs]: https://apidocs.vexelabs.io/bitbuilder/-bit-builder/index.html
+[docs]: https://docs.vexelabs.io/bitbuilder/index.html
