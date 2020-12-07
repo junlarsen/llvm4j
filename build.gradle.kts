@@ -29,8 +29,8 @@ repositories {
 }
 
 dependencies {
+    api("org.bytedeco:llvm-platform:11.0.0-1.5.5-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.10")
-    implementation("org.bytedeco:llvm-platform:11.0.0-1.5.5-SNAPSHOT")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.4.10")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.11")
