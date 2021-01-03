@@ -100,8 +100,12 @@ information.
 
 ## Contact
 
+Please see [our Contact page][contact] for more information. You may also
+contact the project lead using the contact points below:
+
 - [@supergrecko](https://twitter.com/supergrecko) - me [at] supergrecko.com
 
 [llvm-presets]: https://github.com/bytedeco/javacpp-presets/tree/master/llvm
 [apidocs]: https://apidocs.vexelabs.io/bitbuilder/-bit-builder/index.html
 [docs]: https://docs.vexelabs.io/bitbuilder/index.html
+[contact]: https://vexelabs.io/community/contact
