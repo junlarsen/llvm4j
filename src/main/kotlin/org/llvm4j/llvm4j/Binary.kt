@@ -8,7 +8,10 @@ public class Binary public constructor(ptr: LLVMBinaryRef) : Owner<LLVMBinaryRef
     public override val ref: LLVMBinaryRef = ptr
 }
 
-// TODO: what to do about this?
 public class ObjectFile public constructor(ptr: LLVMObjectFileRef) : Owner<LLVMObjectFileRef> {
     public override val ref: LLVMObjectFileRef = ptr
 }
+
+public class RelocationIterator
+public class SectionIterator
+public class SymbolIterator
