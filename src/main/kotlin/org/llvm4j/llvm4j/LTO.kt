@@ -3,9 +3,9 @@ package org.llvm4j.llvm4j
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.lto_code_gen_t
+import org.bytedeco.llvm.LLVM.lto_diagnostic_handler_t
 import org.bytedeco.llvm.LLVM.lto_input_t
 import org.bytedeco.llvm.LLVM.lto_module_t
-import org.bytedeco.llvm.LLVM.lto_diagnostic_handler_t
 import org.llvm4j.llvm4j.util.Callback
 import org.llvm4j.llvm4j.util.None
 import org.llvm4j.llvm4j.util.Option

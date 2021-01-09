@@ -63,7 +63,8 @@ public class MCJITMemoryManager public constructor(ptr: LLVMMCJITMemoryManagerRe
         )
     }
 
-    public class DestroyCallback(public override val closure: (Payload) -> Unit) : LLVMMemoryManagerDestroyCallback(),
+    public class DestroyCallback(public override val closure: (Payload) -> Unit) :
+        LLVMMemoryManagerDestroyCallback(),
         Callback<Unit, DestroyCallback.Payload> {
         public override fun call(p0: Pointer?) {
             val payload = p0?.let { Some(it) } ?: None

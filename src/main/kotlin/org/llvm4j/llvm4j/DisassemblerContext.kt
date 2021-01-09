@@ -13,7 +13,8 @@ import org.llvm4j.llvm4j.util.Owner
 public class DisassemblerContext public constructor(ptr: LLVMDisasmContextRef) : Owner<LLVMDisasmContextRef> {
     public override val ref: LLVMDisasmContextRef = ptr
 
-    public class OpInfoCallback(public override val closure: (Payload) -> Int) : LLVMOpInfoCallback(),
+    public class OpInfoCallback(public override val closure: (Payload) -> Int) :
+        LLVMOpInfoCallback(),
         Callback<Int, OpInfoCallback.Payload> {
         public override fun call(p0: Pointer, p1: Long, p2: Long, p3: Long, p4: Int, p5: Pointer): Int {
             val data = Payload(p0, p1, p2, p3, p4, p5)
@@ -31,7 +32,8 @@ public class DisassemblerContext public constructor(ptr: LLVMDisasmContextRef) :
         )
     }
 
-    public class SymbolLookupCallback(public override val closure: (Payload) -> BytePointer) : LLVMSymbolLookupCallback(),
+    public class SymbolLookupCallback(public override val closure: (Payload) -> BytePointer) :
+        LLVMSymbolLookupCallback(),
         Callback<BytePointer, SymbolLookupCallback.Payload> {
         public override fun call(
             p0: Pointer,

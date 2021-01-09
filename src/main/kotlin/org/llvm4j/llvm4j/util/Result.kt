@@ -12,9 +12,9 @@ package org.llvm4j.llvm4j.util
  *
  * @see Option
  */
-public sealed class Result<out T, out E : Throwable>(
+public sealed class Result<out T>(
     protected val component: T? = null,
-    protected val error: E? = null
+    protected val error: String? = null
 ) {
     /**
      * Determines if this Result is [Err]
@@ -44,17 +44,62 @@ public sealed class Result<out T, out E : Throwable>(
      *
      * @throws IllegalStateException if called on [Ok]
      */
-    public fun err(): E {
+    public fun err(): String {
         return error ?: throw IllegalStateException("Illegal result access")
     }
+
+    public class InvalidResultException(public override val message: String) : RuntimeException(message)
 }
 
-public class Err<out E : Throwable>(error: E) :
-    Result<Nothing, E>(error = error) {
+public class Err(error: String) :
+    Result<Nothing>(error = error) {
     public override fun toString(): String = "Err($error)"
 }
 
 public class Ok<out T>(component: T) :
-    Result<T, Nothing>(component = component) {
+    Result<T>(component = component) {
     public override fun toString(): String = "Ok($component)"
 }
+
+/**
+ * A receiver scope for tryWith closures.
+ *
+ * This is a class with utility methods which can be used freely within [tryWith]s closure
+ */
+public class TryWithScope {
+    public inline fun assert(condition: Boolean, error: () -> String) {
+        if (!condition) {
+            throw Result.InvalidResultException(error.invoke())
+        }
+    }
+
+    /**
+     * Short circuit and fail with the given cause
+     */
+    public fun fail(cause: String): Nothing = throw Result.InvalidResultException(cause)
+
+    /**
+     * Fail with an unreachable error
+     *
+     * Use this only when the kotlin compiler is unable to tell that something is unreachable.
+     */
+    public fun unreachable(): Nothing = throw SemanticallyUnreachable()
+}
+
+/**
+ * Try to run the provided [closure], returning [Ok] if succeeded, [Err] otherwise.
+ *
+ * Inside the [closure] you may use any of [TryWithScope]s methods.
+ */
+public inline fun <T> tryWith(closure: TryWithScope.() -> T): Result<T> = try {
+    Ok(closure.invoke(TryWithScope()))
+} catch (err: Result.InvalidResultException) {
+    Err(err.message)
+}
+
+/**
+ * An error which should semantically unreachable
+ *
+ * Use this only when the kotlin compiler is unable to tell that something is unreachable.
+ */
+public class SemanticallyUnreachable() : RuntimeException()

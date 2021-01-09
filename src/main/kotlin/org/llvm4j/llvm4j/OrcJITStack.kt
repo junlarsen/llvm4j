@@ -29,7 +29,8 @@ public class OrcJITStack public constructor(ptr: LLVMOrcJITStackRef) : Owner<LLV
         public override val ref: LLVMJITEventListenerRef = ptr
     }
 
-    public class LazyCompileCallback(public override val closure: (Payload) -> Long) : LLVMOrcLazyCompileCallbackFn(),
+    public class LazyCompileCallback(public override val closure: (Payload) -> Long) :
+        LLVMOrcLazyCompileCallbackFn(),
         Callback<Long, LazyCompileCallback.Payload> {
         public override fun call(p0: LLVMOrcJITStackRef, p1: Pointer?): Long {
             val jitStack = OrcJITStack(p0)

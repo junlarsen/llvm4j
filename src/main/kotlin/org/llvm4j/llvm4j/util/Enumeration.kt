@@ -4,6 +4,17 @@ package org.llvm4j.llvm4j.util
  * Common trait for any enum with an out-of-order ordinal (like most of LLVMs C++ enums)
  *
  * This allows conversion between the C++ integer and the Kotlin enum.
+ *
+ * To properly use this class, extend the [Enumeration] class on the companion object and
+ * use [EnumVariant] for the enum class itself.
+ *
+ * ```kotlin
+ * public enum class CodeGenFileType(public override val value: Int) : Enumeration.EnumVariant {
+ *   AssemblyFile(LLVM.LLVMAssemblyFile),
+ *   ObjectFile(LLVM.LLVMObjectFile);
+ *   public companion object : Enumeration<CodeGenFileType>(values())
+ * }
+ * ```
  */
 public abstract class Enumeration<E : Enumeration.EnumVariant>(entries: Array<E>) {
     private val associated: Map<Int, E> = entries.associateBy { it.value }
@@ -26,10 +37,22 @@ public abstract class Enumeration<E : Enumeration.EnumVariant>(entries: Array<E>
      * Trait allowing an enum to have a set of defined variants or a fallback variant which may catch all cases which
      * otherwise would result in [None]
      *
+     * To use this enum kind, create a sealed class with subclasses as the enum members. Extend this class on the
+     * companion object.
+     *
+     * ```kotlin
+     * public sealed class AttributeIndex(public override val value: Int) : Enumeration.EnumVariant {
+     *   public object Return : AttributeIndex(LLVM.LLVMAttributeReturnIndex)
+     *   public object Function : AttributeIndex(LLVM.LLVMAttributeFunctionIndex)
+     *   public class Unknown(value: Int) : AttributeIndex(value)
+     *   public companion object : Enumeration.WithFallback<AttributeIndex>({ Unknown(it) }, Return, Function)
+     * }
+     * ```
+     *
      * @property catch lambda responsible for producing the wildcard [E] given [Int]
      * @property entries all valid entries for this enum
      */
-    public abstract class Extendable<E : EnumVariant>(
+    public abstract class WithFallback<E : EnumVariant>(
         private val catch: (Int) -> E,
         private vararg val entries: E
     ) {
