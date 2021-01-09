@@ -3,6 +3,58 @@ package org.llvm4j.llvm4j
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.Enumeration
 
+public enum class TypeKind(public override val value: Int) : Enumeration.EnumVariant {
+    Void(LLVM.LLVMVoidTypeKind),
+    Integer(LLVM.LLVMIntegerTypeKind),
+    Half(LLVM.LLVMHalfTypeKind),
+    Float(LLVM.LLVMFloatTypeKind),
+    BFloat(LLVM.LLVMBFloatTypeKind),
+    Double(LLVM.LLVMDoubleTypeKind),
+    X86FP80(LLVM.LLVMX86_FP80TypeKind),
+    FP128(LLVM.LLVMFP128TypeKind),
+    PPCFP128(LLVM.LLVMFP128TypeKind),
+    Function(LLVM.LLVMFunctionTypeKind),
+    Struct(LLVM.LLVMStructTypeKind),
+    Array(LLVM.LLVMArrayTypeKind),
+    Vector(LLVM.LLVMVectorTypeKind),
+    ScalableVector(LLVM.LLVMScalableVectorTypeKind),
+    Pointer(LLVM.LLVMPointerTypeKind),
+    X86MMX(LLVM.LLVMX86_MMXTypeKind),
+    Label(LLVM.LLVMLabelTypeKind),
+    Metadata(LLVM.LLVMMetadataTypeKind),
+    Token(LLVM.LLVMTokenTypeKind);
+    public companion object : Enumeration<TypeKind>(values())
+}
+
+public enum class ValueKind(public override val value: Int) : Enumeration.EnumVariant {
+    Argument(LLVM.LLVMArgumentValueKind),
+    BasicBlock(LLVM.LLVMBasicBlockValueKind),
+    MemoryUse(LLVM.LLVMMemoryUseValueKind),
+    MemoryDef(LLVM.LLVMMemoryDefValueKind),
+    MemoryPhi(LLVM.LLVMMemoryPhiValueKind),
+    Function(LLVM.LLVMFunctionValueKind),
+    GlobalAlias(LLVM.LLVMGlobalAliasValueKind),
+    GlobalIFunc(LLVM.LLVMGlobalIFuncValueKind),
+    GlobalVariable(LLVM.LLVMGlobalVariableValueKind),
+    BlockAddress(LLVM.LLVMBlockAddressValueKind),
+    ConstantExpr(LLVM.LLVMConstantExprValueKind),
+    ConstantArray(LLVM.LLVMConstantArrayValueKind),
+    ConstantStruct(LLVM.LLVMConstantStructValueKind),
+    ConstantVector(LLVM.LLVMConstantVectorValueKind),
+    UndefValue(LLVM.LLVMUndefValueValueKind),
+    ConstantAggregateZero(LLVM.LLVMConstantAggregateZeroValueKind),
+    ConstantDataArray(LLVM.LLVMConstantDataArrayValueKind),
+    ConstantDataVector(LLVM.LLVMConstantDataVectorValueKind),
+    ConstantInt(LLVM.LLVMConstantIntValueKind),
+    ConstantFP(LLVM.LLVMConstantFPValueKind),
+    ConstantPointerNull(LLVM.LLVMConstantPointerNullValueKind),
+    ConstantTokenNone(LLVM.LLVMConstantTokenNoneValueKind),
+    MetadataAsValue(LLVM.LLVMMetadataAsValueValueKind),
+    InlineAsm(LLVM.LLVMInlineAsmValueKind),
+    Instruction(LLVM.LLVMInstructionValueKind);
+    public companion object : Enumeration<ValueKind>(values())
+}
+
 public enum class InlineAsmDialect(public override val value: Int) : Enumeration.EnumVariant {
     ATT(LLVM.LLVMInlineAsmDialectATT),
     Intel(LLVM.LLVMInlineAsmDialectIntel);
