@@ -268,8 +268,10 @@ public class ScalableVectorType public constructor(ptr: LLVMTypeRef) : Type(ptr)
  */
 @CorrespondsTo("llvm::PointerType")
 public class PointerType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Sequential {
-    public fun getAddressSpace(): Int {
-        return LLVM.LLVMGetPointerAddressSpace(ref)
+    public fun getAddressSpace(): AddressSpace {
+        val space = LLVM.LLVMGetPointerAddressSpace(ref)
+
+        return AddressSpace.from(space)
     }
 
     public override fun getElementCount(): Int {
@@ -399,7 +401,7 @@ public class FunctionType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
     }
 }
 
-public class FloatType public constructor(ptr: LLVMTypeRef) : Type(ptr)
+public class FloatingPointType public constructor(ptr: LLVMTypeRef) : Type(ptr)
 public class VoidType public constructor(ptr: LLVMTypeRef) : Type(ptr)
 public class LabelType public constructor(ptr: LLVMTypeRef) : Type(ptr)
 public class MetadataType public constructor(ptr: LLVMTypeRef) : Type(ptr)

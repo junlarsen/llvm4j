@@ -13,6 +13,8 @@ import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
 import org.llvm4j.llvm4j.util.Result
 import org.llvm4j.llvm4j.util.Some
+import org.llvm4j.llvm4j.util.toInt
+import org.llvm4j.llvm4j.util.toPointerPointer
 import org.llvm4j.llvm4j.util.tryWith
 
 /**
@@ -32,6 +34,109 @@ public class Context public constructor(
 ) : Owner<LLVMContextRef> {
     public override val ref: LLVMContextRef = ptr
 
+    public fun getIntegerType(bitWidth: Int): Result<IntegerType> = tryWith {
+        assert(bitWidth in 1..8388606) { "Invalid integer bit width" }
+
+        val intTy = LLVM.LLVMIntTypeInContext(ref, bitWidth)
+        IntegerType(intTy)
+    }
+
+    public fun getInt1Type(): IntegerType {
+        val ptr = LLVM.LLVMInt1TypeInContext(ref)
+
+        return IntegerType(ptr)
+    }
+
+    public fun getInt8Type(): IntegerType {
+        val ptr = LLVM.LLVMInt8TypeInContext(ref)
+
+        return IntegerType(ptr)
+    }
+
+    public fun getInt16Type(): IntegerType {
+        val ptr = LLVM.LLVMInt16TypeInContext(ref)
+
+        return IntegerType(ptr)
+    }
+
+    public fun getInt32Type(): IntegerType {
+        val ptr = LLVM.LLVMInt32TypeInContext(ref)
+
+        return IntegerType(ptr)
+    }
+
+    public fun getInt64Type(): IntegerType {
+        val ptr = LLVM.LLVMInt64TypeInContext(ref)
+
+        return IntegerType(ptr)
+    }
+
+    public fun getInt128Type(): IntegerType {
+        val ptr = LLVM.LLVMInt128TypeInContext(ref)
+
+        return IntegerType(ptr)
+    }
+
+    public fun getFunctionType(returnType: Type, vararg parameters: Type, variadic: Boolean): FunctionType {
+        val buffer = parameters.map { it.ref }.toPointerPointer()
+        val fnTy = LLVM.LLVMFunctionType(returnType.ref, buffer, parameters.size, variadic.toInt())
+
+        buffer.deallocate()
+
+        return FunctionType(fnTy)
+    }
+
+    public fun getStructType(vararg elements: Type, isPacked: Boolean = false): StructType {
+        val buffer = elements.map { it.ref }.toPointerPointer()
+        val struct = LLVM.LLVMStructTypeInContext(ref, buffer, elements.size, isPacked.toInt())
+
+        buffer.deallocate()
+
+        return StructType(struct)
+    }
+
+    public fun getNamedStructType(name: String): NamedStructType {
+        val struct = LLVM.LLVMStructCreateNamed(ref, name)
+
+        return NamedStructType(struct)
+    }
+
+    public fun getVoidType(): VoidType {
+        val ptr = LLVM.LLVMVoidTypeInContext(ref)
+
+        return VoidType(ptr)
+    }
+
+    public fun getFloatType(): FloatingPointType {
+        val ptr = LLVM.LLVMFloatTypeInContext(ref)
+
+        return FloatingPointType(ptr)
+    }
+
+    public fun getBFloatType(): FloatingPointType {
+        val ptr = LLVM.LLVMBFloatTypeInContext(ref)
+
+        return FloatingPointType(ptr)
+    }
+
+    public fun getDoubleType(): FloatingPointType {
+        val ptr = LLVM.LLVMFloatTypeInContext(ref)
+
+        return FloatingPointType(ptr)
+    }
+
+    public fun getX86FP80Type(): FloatingPointType {
+        val ptr = LLVM.LLVMX86FP80TypeInContext(ref)
+
+        return FloatingPointType(ptr)
+    }
+
+    public fun getPPCFP128Type(): FloatingPointType {
+        val ptr = LLVM.LLVMPPCFP128TypeInContext(ref)
+
+        return FloatingPointType(ptr)
+    }
+
     public fun getArrayType(of: Type, size: Int): Result<ArrayType> = tryWith {
         assert(size > 0) { "Element count must be greater than 0" }
         assert(of.isValidArrayElementType()) { "Invalid type for array element" }
@@ -48,18 +153,39 @@ public class Context public constructor(
         VectorType(vecTy)
     }
 
-    public fun getPointerType(of: Type, addressSpace: Option<Int> = None): Result<PointerType> = tryWith {
-        if (addressSpace.isDefined()) {
-            assert(addressSpace.get() >= 0) { "Address space must be positive or null" }
-        }
+    public fun getPointerType(
+        of: Type,
+        addressSpace: AddressSpace = AddressSpace.Generic
+    ): Result<PointerType> = tryWith {
+        assert(addressSpace.value >= 0) { "Address space must be a positive number" }
         assert(of.isValidPointerElementType()) { "Invalid type for pointer element" }
 
-        val address = when (addressSpace) {
-            is None -> 0
-            is Some -> addressSpace.get()
-        }
-        val ptrTy = LLVM.LLVMPointerType(of.ref, address)
+        val ptrTy = LLVM.LLVMPointerType(of.ref, addressSpace.value)
         PointerType(ptrTy)
+    }
+
+    public fun getX86MMXType(): X86MMXType {
+        val ptr = LLVM.LLVMX86MMXTypeInContext(ref)
+
+        return X86MMXType(ptr)
+    }
+
+    public fun getLabelType(): LabelType {
+        val ptr = LLVM.LLVMLabelTypeInContext(ref)
+
+        return LabelType(ptr)
+    }
+
+    public fun getMetadataType(): MetadataType {
+        val ptr = LLVM.LLVMMetadataTypeInContext(ref)
+
+        return MetadataType(ptr)
+    }
+
+    public fun getTokenType(): TokenType {
+        val ptr = LLVM.LLVMTokenTypeInContext(ref)
+
+        return TokenType(ptr)
     }
 
     public class DiagnosticHandler(public override val closure: (Payload) -> Unit) :
