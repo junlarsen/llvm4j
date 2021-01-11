@@ -12,7 +12,7 @@ package org.llvm4j.llvm4j.util
  *
  * @see Result
  */
-public sealed class Option<out T>(protected val component: T? = null) {
+public sealed class Option<out T>(protected open val component: T? = null) {
     /**
      * Determines if this Option is [Some]
      *
@@ -42,10 +42,10 @@ public sealed class Option<out T>(protected val component: T? = null) {
     public fun toNullable(): T? = component
 }
 
-public class Some<out T>(value: T) : Option<T>(value) {
-    override fun toString(): String = "Some($component)"
+public data class Some<out T>(public override val component: T?) : Option<T>(component) {
+    public override fun toString(): String = "Some($component)"
 }
 
 public object None : Option<Nothing>() {
-    override fun toString(): String = "None"
+    public override fun toString(): String = "None"
 }

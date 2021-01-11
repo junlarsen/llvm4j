@@ -13,8 +13,8 @@ package org.llvm4j.llvm4j.util
  * @see Option
  */
 public sealed class Result<out T>(
-    protected val component: T? = null,
-    protected val error: String? = null
+    protected open val component: T? = null,
+    protected open val error: String? = null
 ) {
     /**
      * Determines if this Result is [Err]
@@ -51,12 +51,12 @@ public sealed class Result<out T>(
     public class InvalidResultException(public override val message: String) : RuntimeException(message)
 }
 
-public class Err(error: String) :
+public data class Err(public override val error: String) :
     Result<Nothing>(error = error) {
     public override fun toString(): String = "Err($error)"
 }
 
-public class Ok<out T>(component: T) :
+public data class Ok<out T>(public override val component: T) :
     Result<T>(component = component) {
     public override fun toString(): String = "Ok($component)"
 }

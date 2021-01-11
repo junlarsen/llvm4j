@@ -66,8 +66,14 @@ public open class Context public constructor(
         return LLVM.LLVMContextSetDiscardValueNames(ref, isDiscarding.toInt())
     }
 
-    public fun getMetadataKindId(name: String): Int {
-        return LLVM.LLVMGetMDKindIDInContext(ref, name, name.length)
+    public fun getMetadataKindId(name: String): Option<Int> {
+        val id = LLVM.LLVMGetMDKindIDInContext(ref, name, name.length)
+
+        return if (id != 0) {
+            Some(id)
+        } else {
+            None
+        }
     }
 
     public fun getIntegerType(bitWidth: Int): Result<IntegerType> = tryWith {

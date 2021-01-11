@@ -2,6 +2,7 @@ package org.llvm4j.llvm4j
 
 import org.junit.jupiter.api.Test
 import org.llvm4j.llvm4j.util.None
+import org.llvm4j.llvm4j.util.Some
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -171,7 +172,7 @@ class TypeTest {
         assertTrue { subject1.getElementType(1000).isErr() }
         assertFalse { subject1.isOpaque() }
         assertFalse { subject1.isLiteral() }
-        assertEquals(2, subject1.getElementCount().get())
+        assertEquals(Some(2), subject1.getElementCount())
         assertEquals(listOf(i8.ref, f32.ref), subject1.getElementTypes().get().map { it.ref })
         assertEquals(i8.ref, subject1.getElementType(0).get().ref)
         assertEquals(f32.ref, subject1.getElementType(1).get().ref)
