@@ -17,5 +17,7 @@ public sealed class AddressSpace(public override val value: Int) : Enumeration.E
     public object Generic : AddressSpace(0)
     public class Other(value: Int) : AddressSpace(value)
 
-    public companion object : Enumeration.WithFallback<AddressSpace>({ Other(it) }, Generic)
+    public companion object : Enumeration.WithFallback<AddressSpace>({ Other(it) }) {
+        public override val entries: Array<out AddressSpace> by lazy { arrayOf(Generic) }
+    }
 }

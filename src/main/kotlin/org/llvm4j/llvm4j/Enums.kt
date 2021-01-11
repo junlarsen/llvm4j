@@ -12,7 +12,7 @@ public enum class TypeKind(public override val value: Int) : Enumeration.EnumVar
     Double(LLVM.LLVMDoubleTypeKind),
     X86FP80(LLVM.LLVMX86_FP80TypeKind),
     FP128(LLVM.LLVMFP128TypeKind),
-    PPCFP128(LLVM.LLVMFP128TypeKind),
+    PPCFP128(LLVM.LLVMPPC_FP128TypeKind),
     Function(LLVM.LLVMFunctionTypeKind),
     Struct(LLVM.LLVMStructTypeKind),
     Array(LLVM.LLVMArrayTypeKind),

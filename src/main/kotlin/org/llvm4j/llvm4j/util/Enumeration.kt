@@ -45,17 +45,23 @@ public abstract class Enumeration<E : Enumeration.EnumVariant>(entries: Array<E>
      *   public object Return : AttributeIndex(LLVM.LLVMAttributeReturnIndex)
      *   public object Function : AttributeIndex(LLVM.LLVMAttributeFunctionIndex)
      *   public class Unknown(value: Int) : AttributeIndex(value)
-     *   public companion object : Enumeration.WithFallback<AttributeIndex>({ Unknown(it) }, Return, Function)
+     *   public companion object : Enumeration.WithFallback<AttributeIndex>({ Unknown(it) }) {
+     *     public override val entries: Array<out AttributeIndex> by lazy { arrayOf(Return, Function) }
+     *   }
      * }
      * ```
+     *
+     * In the above implementation we have to use `by lazy { .. }` otherwise we may collide into a race condition in
+     * Kotlin where we try to query an object which is yet to be initialized. Failing to delegate by lazy results in
+     * null values in the [entries] array.
      *
      * @property catch lambda responsible for producing the wildcard [E] given [Int]
      * @property entries all valid entries for this enum
      */
     public abstract class WithFallback<E : EnumVariant>(
         private val catch: (Int) -> E,
-        private vararg val entries: E
     ) {
+        public abstract val entries: Array<out E>
         /**
          * Turn an integer value (from the C++ enum) into the Kotlin equivalent
          *

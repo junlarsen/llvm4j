@@ -9,7 +9,6 @@ import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
 import org.llvm4j.llvm4j.util.Result
 import org.llvm4j.llvm4j.util.Some
-import org.llvm4j.llvm4j.util.map
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
 import org.llvm4j.llvm4j.util.toPointerPointer
@@ -167,9 +166,9 @@ public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
 
             LLVM.LLVMGetSubtypes(ref, buffer)
 
-            return buffer.map(size) { AnyType(it) }.also {
-                buffer.deallocate()
-            }
+            return List(size) {
+                LLVMTypeRef(buffer.get(it.toLong()))
+            }.map(::AnyType).toTypedArray()
         }
 
         public fun getElementType(): AnyType {
@@ -252,6 +251,8 @@ public class VectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.S
 /**
  * Representation of a scalable vector type
  *
+ * TODO: LLVM 12.x - ScalableVectorType
+ *
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ScalableVectorType", "llvm::VectorType")
@@ -295,12 +296,11 @@ public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.C
         return LLVM.LLVMCountStructElementTypes(ref)
     }
 
-    public fun getElementType(index: Int): AnyType {
+    public fun getElementType(index: Int): Result<AnyType> = tryWith {
         assert(index <= getElementCount()) { "Index out of bounds" }
 
         val type = LLVM.LLVMStructGetTypeAtIndex(ref, index)
-
-        return AnyType(type)
+        AnyType(type)
     }
 
     public fun getElementTypes(): Array<AnyType> {
@@ -311,9 +311,9 @@ public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.C
 
         LLVM.LLVMGetStructElementTypes(ref, buffer)
 
-        return buffer.map(size) { AnyType(it) }.also {
-            buffer.deallocate()
-        }
+        return List(size) {
+            LLVMTypeRef(buffer.get(it.toLong()))
+        }.map(::AnyType).toTypedArray()
     }
 }
 
@@ -368,12 +368,18 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
 
         LLVM.LLVMGetStructElementTypes(ref, buffer)
 
-        buffer.map(size) { AnyType(it) }.also {
-            buffer.deallocate()
-        }
+        List(size) {
+            LLVMTypeRef(buffer.get(it.toLong()))
+        }.map(::AnyType).toTypedArray()
     }
 }
 
+/**
+ * Representation of a function type
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::FunctionType")
 public class FunctionType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
     public fun isVariadic(): Boolean {
         return LLVM.LLVMIsFunctionVarArg(ref).toBoolean()
@@ -395,9 +401,9 @@ public class FunctionType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
 
         LLVM.LLVMGetParamTypes(ref, buffer)
 
-        return buffer.map(size) { AnyType(it) }.also {
-            buffer.deallocate()
-        }
+        return List(size) {
+            LLVMTypeRef(buffer.get(it.toLong()))
+        }.map(::AnyType).toTypedArray()
     }
 }
 

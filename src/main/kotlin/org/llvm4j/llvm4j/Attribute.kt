@@ -17,5 +17,7 @@ public sealed class AttributeIndex(public override val value: Int) : Enumeration
     public object Function : AttributeIndex(LLVM.LLVMAttributeFunctionIndex)
     public class Unknown(value: Int) : AttributeIndex(value)
 
-    public companion object : Enumeration.WithFallback<AttributeIndex>({ Unknown(it) }, Return, Function)
+    public companion object : Enumeration.WithFallback<AttributeIndex>({ Unknown(it) }) {
+        public override val entries: Array<out AttributeIndex> by lazy { arrayOf(Return, Function) }
+    }
 }

@@ -77,9 +77,9 @@ public class Context public constructor(
         return IntegerType(ptr)
     }
 
-    public fun getFunctionType(returnType: Type, vararg parameters: Type, variadic: Boolean): FunctionType {
+    public fun getFunctionType(returnType: Type, vararg parameters: Type, isVariadic: Boolean = false): FunctionType {
         val buffer = parameters.map { it.ref }.toPointerPointer()
-        val fnTy = LLVM.LLVMFunctionType(returnType.ref, buffer, parameters.size, variadic.toInt())
+        val fnTy = LLVM.LLVMFunctionType(returnType.ref, buffer, parameters.size, isVariadic.toInt())
 
         buffer.deallocate()
 
@@ -119,6 +119,12 @@ public class Context public constructor(
         return FloatingPointType(ptr)
     }
 
+    public fun getHalfType(): FloatingPointType {
+        val ptr = LLVM.LLVMHalfTypeInContext(ref)
+
+        return FloatingPointType(ptr)
+    }
+
     public fun getDoubleType(): FloatingPointType {
         val ptr = LLVM.LLVMFloatTypeInContext(ref)
 
@@ -127,6 +133,12 @@ public class Context public constructor(
 
     public fun getX86FP80Type(): FloatingPointType {
         val ptr = LLVM.LLVMX86FP80TypeInContext(ref)
+
+        return FloatingPointType(ptr)
+    }
+
+    public fun getFP128Type(): FloatingPointType {
+        val ptr = LLVM.LLVMFP128TypeInContext(ref)
 
         return FloatingPointType(ptr)
     }
