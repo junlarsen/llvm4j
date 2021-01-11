@@ -183,7 +183,7 @@ public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
      *
      * @author Mats Larsen
      */
-    public interface AnyStruct : Owner<LLVMTypeRef> {
+    public interface Struct : Owner<LLVMTypeRef> {
         public fun isPacked(): Boolean {
             return LLVM.LLVMIsPackedStruct(ref).toBoolean()
         }
@@ -291,7 +291,7 @@ public class PointerType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::StructType")
-public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Composite, Type.AnyStruct {
+public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Composite, Type.Struct {
     public override fun getElementCount(): Int {
         return LLVM.LLVMCountStructElementTypes(ref)
     }
@@ -323,7 +323,7 @@ public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.C
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::StructType")
-public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.AnyStruct {
+public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Struct {
     public fun getElementCount(): Option<Int> {
         return if (isOpaque()) {
             None
