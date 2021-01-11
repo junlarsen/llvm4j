@@ -35,6 +35,7 @@ import org.llvm4j.llvm4j.util.tryWith
  * TODO: Testing - Can we reliably test callback methods? [YieldCallback], [DiagnosticHandler]
  * TODO: Testing - Test [getMetadataKindId] for Metadata
  * TODO: Testing - Ensure values are discarded in ContextTest
+ * TODO: Testing - Is [getMetadataKindId] consistently testable across platforms?
  *
  * @see GlobalContext
  */
@@ -66,14 +67,8 @@ public open class Context public constructor(
         return LLVM.LLVMContextSetDiscardValueNames(ref, isDiscarding.toInt())
     }
 
-    public fun getMetadataKindId(name: String): Option<Int> {
-        val id = LLVM.LLVMGetMDKindIDInContext(ref, name, name.length)
-
-        return if (id != 0) {
-            Some(id)
-        } else {
-            None
-        }
+    public fun getMetadataKindId(name: String): Int {
+        return LLVM.LLVMGetMDKindIDInContext(ref, name, name.length)
     }
 
     public fun getIntegerType(bitWidth: Int): Result<IntegerType> = tryWith {
@@ -240,6 +235,18 @@ public open class Context public constructor(
         val ptr = LLVM.LLVMTokenTypeInContext(ref)
 
         return TokenType(ptr)
+    }
+
+    public fun createEnumAttribute(kindId: Int, value: Long): EnumAttribute {
+        val attr = LLVM.LLVMCreateEnumAttribute(ref, kindId, value)
+
+        return EnumAttribute(attr)
+    }
+
+    public fun createStringAttribute(kindId: String, value: String): StringAttribute {
+        val attr = LLVM.LLVMCreateStringAttribute(ref, kindId, kindId.length, value, value.length)
+
+        return StringAttribute(attr)
     }
 
     public class DiagnosticHandler(public override val closure: (Payload) -> Unit) :

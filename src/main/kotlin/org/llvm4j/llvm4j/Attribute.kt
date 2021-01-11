@@ -5,7 +5,10 @@ import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Enumeration
+import org.llvm4j.llvm4j.util.None
+import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.Some
 import org.llvm4j.llvm4j.util.toBoolean
 
 /**
@@ -37,8 +40,19 @@ public sealed class Attribute constructor(ptr: LLVMAttributeRef) : Owner<LLVMAtt
 
     public companion object {
         @JvmStatic
-        public fun getLastEnumAttributeKind(): Int {
+        public fun getLastEnumKind(): Int {
             return LLVM.LLVMGetLastEnumAttributeKind()
+        }
+
+        @JvmStatic
+        public fun getEnumKindByName(name: String): Option<Int> {
+            val id = LLVM.LLVMGetEnumAttributeKindForName(name, name.length.toLong())
+
+            return if (id != 0) {
+                Some(id)
+            } else {
+                None
+            }
         }
     }
 }
@@ -66,7 +80,7 @@ public class EnumAttribute public constructor(ptr: LLVMAttributeRef) : Attribute
 public class StringAttribute public constructor(ptr: LLVMAttributeRef) : Attribute(ptr) {
     public fun getKind(): String {
         val size = IntPointer(1L)
-        val ptr = LLVM.LLVMGetStringAttributeValue(ref, size)
+        val ptr = LLVM.LLVMGetStringAttributeKind(ref, size)
         val copy = ptr.string
 
         size.deallocate()
@@ -77,7 +91,7 @@ public class StringAttribute public constructor(ptr: LLVMAttributeRef) : Attribu
 
     public fun getValue(): String {
         val size = IntPointer(1L)
-        val ptr = LLVM.LLVMGetStringAttributeKind(ref, size)
+        val ptr = LLVM.LLVMGetStringAttributeValue(ref, size)
         val copy = ptr.string
 
         size.deallocate()

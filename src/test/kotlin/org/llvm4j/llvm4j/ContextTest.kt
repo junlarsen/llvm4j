@@ -3,6 +3,7 @@ package org.llvm4j.llvm4j
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
+import org.llvm4j.llvm4j.testing.assertIsSome
 import org.llvm4j.llvm4j.util.None
 import org.llvm4j.llvm4j.util.Some
 import kotlin.test.assertEquals
@@ -19,7 +20,7 @@ class ContextTest {
 
         ctx.setDiagnosticHandler(handler, Some(payload))
 
-        assertTrue { ctx.getDiagnosticPayload().isDefined() }
+        assertIsSome(ctx.getDiagnosticPayload())
         assertEquals(Some(payload), ctx.getDiagnosticPayload())
     }
 

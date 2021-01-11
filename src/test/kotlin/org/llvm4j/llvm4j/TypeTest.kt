@@ -1,6 +1,10 @@
 package org.llvm4j.llvm4j
 
 import org.junit.jupiter.api.Test
+import org.llvm4j.llvm4j.testing.assertIsErr
+import org.llvm4j.llvm4j.testing.assertIsNone
+import org.llvm4j.llvm4j.testing.assertIsOk
+import org.llvm4j.llvm4j.testing.assertIsSome
 import org.llvm4j.llvm4j.util.None
 import org.llvm4j.llvm4j.util.Some
 import kotlin.test.assertEquals
@@ -20,8 +24,8 @@ class TypeTest {
         val subject2 = ctx.getIntegerType(256)
         val subject3 = ctx.getIntegerType(99999999)
 
-        assertTrue { subject2.isOk() }
-        assertTrue { subject3.isErr() }
+        assertIsOk(subject2)
+        assertIsErr(subject3)
 
         for (subject in listOf(i1, i8, i16, i32, i64, i128)) {
             assertTrue { subject.isIntegerType() }
@@ -63,8 +67,8 @@ class TypeTest {
         val res1 = ctx.getArrayType(i16, 32)
         val res2 = ctx.getArrayType(void, 16)
 
-        assertTrue { res1.isOk() }
-        assertTrue { res2.isErr() }
+        assertIsOk(res1)
+        assertIsErr(res2)
 
         val subject1 = res1.get()
 
@@ -86,12 +90,11 @@ class TypeTest {
         val ctx = Context()
         val i32 = ctx.getInt32Type()
         val token = ctx.getTokenType()
-
         val res1 = ctx.getVectorType(i32, 16)
         val res2 = ctx.getVectorType(token, 32)
 
-        assertTrue { res1.isOk() }
-        assertTrue { res2.isErr() }
+        assertIsOk(res1)
+        assertIsErr(res2)
 
         val subject1 = res1.get()
 
@@ -126,7 +129,7 @@ class TypeTest {
 
         assertTrue { subject1.isLiteral() }
         assertTrue { subject1.isSized() }
-        assertTrue { subject1.getElementType(1000).isErr() }
+        assertIsErr(subject1.getElementType(1000))
         assertFalse { subject1.isPacked() }
         assertFalse { subject1.isOpaque() }
         assertEquals(ctx.ref, subject1.getContext().ref)
@@ -154,9 +157,9 @@ class TypeTest {
         assertEquals("struct_t", subject1.getName())
 
         assertTrue { subject1.isOpaque() }
-        assertTrue { subject1.getElementTypes().isErr() }
-        assertTrue { subject1.getElementCount().isEmpty() }
-        assertTrue { subject1.getElementType(1000).isErr() }
+        assertIsErr(subject1.getElementTypes())
+        assertIsNone(subject1.getElementCount())
+        assertIsErr(subject1.getElementType(1000))
         assertFalse { subject1.isLiteral() }
         assertFalse { subject1.isPacked() }
         assertFalse { subject1.isSized() }
@@ -167,9 +170,9 @@ class TypeTest {
 
         assertTrue { subject1.isPacked() }
         assertTrue { subject1.isSized() }
-        assertTrue { subject1.getElementCount().isDefined() }
-        assertTrue { subject1.getElementTypes().isOk() }
-        assertTrue { subject1.getElementType(1000).isErr() }
+        assertIsSome(subject1.getElementCount())
+        assertIsOk(subject1.getElementTypes())
+        assertIsErr(subject1.getElementType(1000))
         assertFalse { subject1.isOpaque() }
         assertFalse { subject1.isLiteral() }
         assertEquals(Some(2), subject1.getElementCount())
@@ -177,8 +180,8 @@ class TypeTest {
         assertEquals(i8.ref, subject1.getElementType(0).get().ref)
         assertEquals(f32.ref, subject1.getElementType(1).get().ref)
 
-        assertTrue { subject2.isOk() }
-        assertTrue { subject3.isErr() }
+        assertIsOk(subject2)
+        assertIsErr(subject3)
     }
 
     @Test fun `Test function types`() {
@@ -213,9 +216,9 @@ class TypeTest {
         val res2 = ctx.getPointerType(i8, AddressSpace.Other(5))
         val res3 = ctx.getPointerType(void)
 
-        assertTrue { res1.isOk() }
-        assertTrue { res2.isOk() }
-        assertTrue { res3.isErr() }
+        assertIsOk(res1)
+        assertIsOk(res2)
+        assertIsErr(res3)
 
         val subject1 = res1.get()
         val subject2 = res2.get()
