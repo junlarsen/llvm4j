@@ -35,6 +35,11 @@ public sealed class Option<out T>(protected val component: T? = null) {
     public fun get(): T {
         return component ?: throw IllegalStateException("Illegal option access")
     }
+
+    /**
+     * Get the option as a nullable Kotlin type
+     */
+    public fun toNullable(): T? = component
 }
 
 public class Some<out T>(value: T) : Option<T>(value) {

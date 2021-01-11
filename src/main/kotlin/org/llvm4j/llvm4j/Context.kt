@@ -13,6 +13,7 @@ import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
 import org.llvm4j.llvm4j.util.Result
 import org.llvm4j.llvm4j.util.Some
+import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
 import org.llvm4j.llvm4j.util.toPointerPointer
 import org.llvm4j.llvm4j.util.tryWith
@@ -26,13 +27,48 @@ import org.llvm4j.llvm4j.util.tryWith
  * The context is also a "super object" of sorts. Most state you can build in the LLVM system is built from this
  * object and these constructors are available on the [Context] class as methods.
  *
- * TODO: LLVM 12.x - getScalableVectorType
+ * There is also a default, lazily initiated global context available.
+ *
+ * TODO: LLVM 12.x - getScalableVectorType / LLVMScalableVectorType
+ * TODO: LLVM 12.x - getTypeByName / LLVMGetTypeByName2
+ * TODO: Research - Can we upcast LLVMDiagnosticHandler to Context.DiagnosticHandler to implement getDiagnosticHandler?
+ * TODO: Testing - Can we reliably test callback methods? [YieldCallback], [DiagnosticHandler]
+ * TODO: Testing - Test [getMetadataKindId] for Metadata
+ * TODO: Testing - Ensure values are discarded in ContextTest
+ *
+ * @see GlobalContext
  */
 @CorrespondsTo("llvm::LLVMContext")
-public class Context public constructor(
+public open class Context public constructor(
     ptr: LLVMContextRef = LLVM.LLVMContextCreate()
 ) : Owner<LLVMContextRef> {
     public override val ref: LLVMContextRef = ptr
+
+    public fun setDiagnosticHandler(handler: DiagnosticHandler, payload: Option<Pointer>) {
+        LLVM.LLVMContextSetDiagnosticHandler(ref, handler, payload.toNullable())
+    }
+
+    public fun getDiagnosticPayload(): Option<Pointer> {
+        val payload = LLVM.LLVMContextGetDiagnosticContext(ref)
+
+        return payload?.let { Some(it) } ?: None
+    }
+
+    public fun setYieldCallback(handler: YieldCallback, payload: Option<Pointer>) {
+        LLVM.LLVMContextSetYieldCallback(ref, handler, payload.toNullable())
+    }
+
+    public fun isDiscardingValueNames(): Boolean {
+        return LLVM.LLVMContextShouldDiscardValueNames(ref).toBoolean()
+    }
+
+    public fun setDiscardingValueNames(isDiscarding: Boolean) {
+        return LLVM.LLVMContextSetDiscardValueNames(ref, isDiscarding.toInt())
+    }
+
+    public fun getMetadataKindId(name: String): Int {
+        return LLVM.LLVMGetMDKindIDInContext(ref, name, name.length)
+    }
 
     public fun getIntegerType(bitWidth: Int): Result<IntegerType> = tryWith {
         assert(bitWidth in 1..8388606) { "Invalid integer bit width" }
@@ -232,5 +268,40 @@ public class Context public constructor(
             public val context: Context,
             public val payload: Option<Pointer>
         )
+    }
+
+    public override fun deallocate() {
+        LLVM.LLVMContextDispose(ref)
+    }
+}
+
+/**
+ * The default global LLVM context
+ *
+ * @author Mats Larsen
+ */
+public object GlobalContext : Context(LLVM.LLVMGetGlobalContext())
+
+/**
+ * A diagnostic report by the LLVM backend, provided through [Context.setDiagnosticHandler]
+ *
+ * @author Mats Larsen
+ */
+public class DiagnosticInfo public constructor(ptr: LLVMDiagnosticInfoRef) : Owner<LLVMDiagnosticInfoRef> {
+    public override val ref: LLVMDiagnosticInfoRef = ptr
+
+    public fun getDescription(): String {
+        val ptr = LLVM.LLVMGetDiagInfoDescription(ref)
+        val copy = ptr.string
+
+        ptr.deallocate()
+
+        return copy
+    }
+
+    public fun getSeverity(): DiagnosticSeverity {
+        val severity = LLVM.LLVMGetDiagInfoSeverity(ref)
+
+        return DiagnosticSeverity.from(severity).get()
     }
 }

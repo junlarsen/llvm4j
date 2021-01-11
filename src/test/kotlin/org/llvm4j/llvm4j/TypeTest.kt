@@ -186,6 +186,7 @@ class TypeTest {
         val void = ctx.getVoidType()
         val subject1 = ctx.getFunctionType(void, i8, isVariadic = false)
         val subject2 = ctx.getFunctionType(void, i8, isVariadic = true)
+        val subject3 = ctx.getFunctionType(void, i8, i8, i8)
 
         assertTrue { subject1.isFunctionType() }
         assertTrue { subject1.isValidPointerElementType() }
@@ -200,6 +201,7 @@ class TypeTest {
         assertEquals(i8.ref, subject1.getParameterTypes().first().ref)
 
         assertTrue { subject2.isVariadic() }
+        assertEquals(3, subject3.getParameterCount())
     }
 
     @Test fun `Test pointer types`() {
