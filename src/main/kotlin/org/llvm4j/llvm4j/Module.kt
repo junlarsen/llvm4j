@@ -25,6 +25,8 @@ import java.io.File
  * TODO: Iterators - NamedMetadata iterator
  * TODO: Iterators - NamedFunction iterator
  * TODO: JavaCPP - Extend NamedMDNode with getOperands, getOperandCount, addOperand
+ * TODO: Testing - Test [dump] somehow?
+ * TODO: Testing - Test [addModuleFlag] when [Metadata] is implemented
  *
  * @author Mats Larsen
  */
@@ -101,6 +103,16 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
         return FlagEntry(entries, size)
     }
 
+    public fun getModuleFlag(key: String): Option<Metadata> {
+        val flag = LLVM.LLVMGetModuleFlag(ref, key, key.length.toLong())
+
+        return flag?.let { Some(Metadata(it)) } ?: None
+    }
+
+    public fun addModuleFlag(behavior: ModuleFlagBehavior, key: String, value: Metadata) {
+        LLVM.LLVMAddModuleFlag(ref, behavior.value, key, key.length.toLong(), value.ref)
+    }
+
     public fun dump(): Unit = LLVM.LLVMDumpModule(ref)
 
     public fun getAsString(): String {
@@ -113,8 +125,9 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
     }
 
     public fun dumpToFile(file: File): Result<Unit> = tryWith {
-        assert(!file.exists()) { "File $file already exists" }
-        assert(file.createNewFile()) { "Failed to create new file $file" }
+        if (!file.exists()) {
+            assert(file.createNewFile()) { "Failed to create new file $file" }
+        }
 
         val maybeError = BytePointer(512L)
         val code = LLVM.LLVMPrintModuleToFile(ref, file.absolutePath, maybeError)
@@ -182,9 +195,16 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
         return ptr?.let { Some(Function(it)) } ?: None
     }
 
+    /**
+     * Metadata flag containing information about the module as a whole
+     *
+     * TODO: Testing - Test when [Metadata] is implemented
+     *
+     * @author Mats Larsen
+     */
     public class FlagEntry public constructor(
         ptr: LLVMModuleFlagEntry,
-        public val size: SizeTPointer
+        private val size: SizeTPointer
     ) : Owner<LLVMModuleFlagEntry> {
         public override val ref: LLVMModuleFlagEntry = ptr
 

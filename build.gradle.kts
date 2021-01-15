@@ -24,6 +24,7 @@ val isCI = System.getenv("CI") == "true"
 repositories {
     mavenCentral()
     mavenLocal()
+    jcenter()
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
 }
 

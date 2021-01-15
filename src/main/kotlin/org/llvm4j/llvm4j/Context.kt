@@ -249,6 +249,12 @@ public open class Context public constructor(
         return StringAttribute(attr)
     }
 
+    public fun createModule(name: String): Module {
+        val mod = LLVM.LLVMModuleCreateWithNameInContext(name, ref)
+
+        return Module(mod)
+    }
+
     public class DiagnosticHandler(public override val closure: (Payload) -> Unit) :
         LLVMDiagnosticHandler(),
         Callback<Unit, DiagnosticHandler.Payload> {
