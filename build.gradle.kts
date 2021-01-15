@@ -24,12 +24,11 @@ val isCI = System.getenv("CI") == "true"
 repositories {
     mavenCentral()
     mavenLocal()
-    jcenter()
-    maven("https://jitpack.io")
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
-    api("org.bytedeco:llvm-platform:11.0.0-1.5.5-SNAPSHOT")
+    api("org.bytedeco:llvm-platform:11.0.1-1.5.5-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.10")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.4.10")
