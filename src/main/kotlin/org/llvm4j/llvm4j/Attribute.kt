@@ -36,7 +36,7 @@ public sealed class Attribute constructor(ptr: LLVMAttributeRef) : Owner<LLVMAtt
         return LLVM.LLVMIsEnumAttribute(ref).toBoolean()
     }
 
-    public fun toAny(): AnyAttribute = AnyAttribute(ref)
+    public fun toAnyAttribute(): AnyAttribute = AnyAttribute(ref)
 
     public companion object {
         @JvmStatic

@@ -22,17 +22,9 @@ public class ValueMetadataEntry public constructor(ptr: LLVMValueMetadataEntry) 
 }
 
 /**
- * A [Metadata] disguised as a [Value]
- *
- * @author Mats Larsen
- */
-@CorrespondsTo("llvm::MetadataAsValue")
-public class MetadataAsValue(ptr: LLVMValueRef) : Value {
-    public override val ref: LLVMValueRef = ptr
-}
-
-/**
  * A [Value] disguised as a [Metadata]
+ *
+ * @see MetadataAsValue
  *
  * @author Mats Larsen
  */

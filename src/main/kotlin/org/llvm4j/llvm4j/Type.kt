@@ -4,6 +4,7 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
+import org.llvm4j.llvm4j.util.InternalApi
 import org.llvm4j.llvm4j.util.None
 import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
@@ -20,10 +21,8 @@ import org.llvm4j.llvm4j.util.tryWith
  * Types are cached and stored at the context level. This means that all users of a [Context] share the same unique
  * types.
  *
- * Do not *return* [Type] from functions, instead use [AnyType] which is constructable publicly. Using [Type] as a
- * function parameter is fine and intended usage.
- *
  * TODO: Further research - Doxygen documents `LLVMDumpType`. This method is not present in the presets.
+ * TODO: LLVM 12.x - LLVMGetPoison
  *
  * @author Mats Larsen
  */
@@ -81,7 +80,7 @@ public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
         return UndefValue(undef)
     }
 
-    public fun getConstantNullPointer(): ConstantPointerNull {
+    public fun getConstantPointerNull(): ConstantPointerNull {
         val nullptr = LLVM.LLVMConstPointerNull(ref)
 
         return ConstantPointerNull(nullptr)
@@ -104,8 +103,6 @@ public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
 
         return ConstantVector(vec)
     }
-
-    public fun toAny(): AnyType = AnyType(ref)
 
     public fun isVoidType(): Boolean = getTypeKind() == TypeKind.Void
     public fun isX86MMXType(): Boolean = getTypeKind() == TypeKind.X86MMX
@@ -198,18 +195,10 @@ public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
             return LLVM.LLVMIsOpaqueStruct(ref).toBoolean()
         }
     }
+
+    public fun toAnyType(): AnyType = AnyType(ref)
 }
 
-/**
- * Representation of any type in a LLVM system
- *
- * To properly use an [AnyType] find its type kind with [getTypeKind] and cast/reconstruct
- * to the proper type.
- *
- * Types may also be cast back into [AnyType] with [toAny]
- *
- * @author Mats Larsen
- */
 public class AnyType public constructor(ptr: LLVMTypeRef) : Type(ptr)
 
 /**
@@ -217,12 +206,20 @@ public class AnyType public constructor(ptr: LLVMTypeRef) : Type(ptr)
  *
  * This class is also used to represent the built-in integer types LLVM provides. (i1, i8, i16, ...)
  *
+ * TODO: Testing - Test once ConstantInt is usable
+ *
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::IntegerType")
 public class IntegerType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
     public fun getTypeWidth(): Int {
         return LLVM.LLVMGetIntTypeWidth(ref)
+    }
+
+    public fun getAllOnes(): ConstantInt {
+        val constant = LLVM.LLVMConstAllOnes(ref)
+
+        return ConstantInt(constant)
     }
 }
 
@@ -240,6 +237,8 @@ public class ArrayType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Se
 
 /**
  * Representation of a fixed-size vector type
+ *
+ * TODO: Research - Implement LLVMConstAllOnes for Vector
  *
  * @author Mats Larsen
  */
@@ -415,7 +414,21 @@ public class FunctionType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
     }
 }
 
-public class FloatingPointType public constructor(ptr: LLVMTypeRef) : Type(ptr)
+/**
+ * Representation of a floating point type
+ *
+ * TODO: Testing - Test once ConstantFloat is usable
+ *
+ * @author Mats Larsen
+ */
+public class FloatingPointType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
+    public fun getAllOnes(): ConstantFloat {
+        val constant = LLVM.LLVMConstAllOnes(ref)
+
+        return ConstantFloat(constant)
+    }
+}
+
 public class VoidType public constructor(ptr: LLVMTypeRef) : Type(ptr)
 public class LabelType public constructor(ptr: LLVMTypeRef) : Type(ptr)
 public class MetadataType public constructor(ptr: LLVMTypeRef) : Type(ptr)
