@@ -3,7 +3,7 @@ package org.llvm4j.llvm4j
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.llvm4j.llvm4j.util.Owner
 
-public sealed class Instruction constructor(ptr: LLVMValueRef) : User {
+public sealed class Instruction constructor(ptr: LLVMValueRef) : User, Value.HasDebugLocation {
     public override val ref: LLVMValueRef = ptr
 
     public interface Atomic : Owner<LLVMValueRef>

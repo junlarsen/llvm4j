@@ -168,7 +168,9 @@ public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
 
             return List(size) {
                 LLVMTypeRef(buffer.get(it.toLong()))
-            }.map(::AnyType).toTypedArray()
+            }.map(::AnyType).toTypedArray().also {
+                buffer.deallocate()
+            }
         }
 
         public fun getElementType(): AnyType {
@@ -313,7 +315,9 @@ public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.C
 
         return List(size) {
             LLVMTypeRef(buffer.get(it.toLong()))
-        }.map(::AnyType).toTypedArray()
+        }.map(::AnyType).toTypedArray().also {
+            buffer.deallocate()
+        }
     }
 }
 
@@ -377,6 +381,8 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
 /**
  * Representation of a function type
  *
+ * TODO: Research - Learn how to use LLVMGetInlineAsm for FunctionType
+ *
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::FunctionType")
@@ -403,7 +409,9 @@ public class FunctionType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
 
         return List(size) {
             LLVMTypeRef(buffer.get(it.toLong()))
-        }.map(::AnyType).toTypedArray()
+        }.map(::AnyType).toTypedArray().also {
+            buffer.deallocate()
+        }
     }
 }
 

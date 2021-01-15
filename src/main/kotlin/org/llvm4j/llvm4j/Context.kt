@@ -19,7 +19,7 @@ import org.llvm4j.llvm4j.util.toPointerPointer
 import org.llvm4j.llvm4j.util.tryWith
 
 /**
- * A context keeping the state a LLVM system requires.
+ * A context keeps the state a LLVM system requires.
  *
  * The context's data is local to a single thread and the context is not thread-safe. If compilation using multiple
  * threads is required, create a [Context] for each thread.
