@@ -218,8 +218,40 @@ public class ConstantArray public constructor(ptr: LLVMValueRef) : Constant(ptr)
 public class ConstantVector public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.Aggregate
 public class ConstantStruct public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.Aggregate
 
-public class ConstantInt public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData
-public class ConstantFloat public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData
+/**
+ * Representation of a constant integer or boolean
+ *
+ * Booleans in LLVM are integers of type i1
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::ConstantInt")
+public class ConstantInt public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData {
+    public fun getZeroExtendedValue(): Long {
+        return LLVM.LLVMConstIntGetZExtValue(ref)
+    }
+
+    public fun getSignExtendedValue(): Long {
+        return LLVM.LLVMConstIntGetSExtValue(ref)
+    }
+}
+
+/**
+ * Representation of a floating point constant
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::ConstantFP")
+public class ConstantFloat public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData {
+    public fun getValue(): Pair<Double, Boolean> {
+        val ptr = IntPointer(1L)
+        val double = LLVM.LLVMConstRealGetDouble(ref, ptr)
+        val lossy = ptr.get()
+
+        return Pair(double, lossy.toBoolean())
+    }
+}
+
 public class ConstantAggregateZero public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData
 public class ConstantPointerNull public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData
 public class ConstantTokenNone public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData

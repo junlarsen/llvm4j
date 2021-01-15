@@ -221,6 +221,15 @@ public class IntegerType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
 
         return ConstantInt(constant)
     }
+
+    public fun getConstant(value: Int, unsigned: Boolean = false): ConstantInt = getConstant(value.toLong(), unsigned)
+    public fun getConstant(value: Long, unsigned: Boolean = false): ConstantInt {
+        val int = LLVM.LLVMConstInt(ref, value, (!unsigned).toInt())
+
+        return ConstantInt(int)
+    }
+
+
 }
 
 /**
@@ -426,6 +435,12 @@ public class FloatingPointType public constructor(ptr: LLVMTypeRef) : Type(ptr) 
         val constant = LLVM.LLVMConstAllOnes(ref)
 
         return ConstantFloat(constant)
+    }
+
+    public fun getConstant(value: Double): ConstantFloat {
+        val float = LLVM.LLVMConstReal(ref, value)
+
+        return ConstantFloat(float)
     }
 }
 
