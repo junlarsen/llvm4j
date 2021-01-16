@@ -24,6 +24,7 @@ import java.io.File
  * TODO: LLVM 12.x - Deprecate [getTypeByName]
  * TODO: Iterators - NamedMetadata iterator
  * TODO: Iterators - NamedFunction iterator
+ * TODO: Iterators - GlobalIndirectFunction iterator
  * TODO: JavaCPP - Extend NamedMDNode with getOperands, getOperandCount, addOperand
  * TODO: Testing - Test [dump] somehow?
  * TODO: Testing - Test [addModuleFlag] when [Metadata] is implemented
@@ -193,6 +194,27 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
         val ptr = LLVM.LLVMGetNamedFunction(ref, name)
 
         return ptr?.let { Some(Function(it)) } ?: None
+    }
+
+    public fun addGlobalIndirectFunction(
+        name: String,
+        type: FunctionType,
+        addressSpace: AddressSpace,
+        resolver: Option<Function>
+    ): GlobalIndirectFunction {
+        val resolverFn = when (resolver) {
+            is Some -> resolver.get()
+            is None -> null
+        }
+        val fn = LLVM.LLVMAddGlobalIFunc(ref, name, name.length.toLong(), type.ref, addressSpace.value, resolverFn?.ref)
+
+        return GlobalIndirectFunction(fn)
+    }
+
+    public fun getGlobalIndirectFunction(name: String): Option<GlobalIndirectFunction> {
+        val indirect = LLVM.LLVMGetNamedGlobalIFunc(ref, name, name.length.toLong())
+
+        return indirect?.let { Some(GlobalIndirectFunction(it)) } ?: None
     }
 
     /**

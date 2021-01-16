@@ -69,7 +69,9 @@ public class NamedMetadataNode public constructor(ptr: LLVMNamedMDNodeRef) : Own
 
         return List(size) {
             LLVMValueRef(buffer.get(it.toLong()))
-        }.map(::MetadataAsValue).toTypedArray()
+        }.map(::MetadataAsValue).toTypedArray().also {
+            buffer.deallocate()
+        }
     }
 
     @CustomApi

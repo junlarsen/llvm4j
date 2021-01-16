@@ -399,7 +399,9 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
 
         List(size) {
             LLVMTypeRef(buffer.get(it.toLong()))
-        }.map(::AnyType).toTypedArray()
+        }.map(::AnyType).toTypedArray().also {
+            buffer.deallocate()
+        }
     }
 }
 

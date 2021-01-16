@@ -1,7 +1,10 @@
 package org.llvm4j.llvm4j
 
 import org.bytedeco.javacpp.IntPointer
+import org.bytedeco.javacpp.Pointer
+import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
+import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
@@ -92,6 +95,8 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
      *
      * Known inheritors are [Instruction], [GlobalVariable] and [Function]
      *
+     * TODO: Testing - Test once debug metadata is stable
+     *
      * @author Mats Larsen
      */
     @InternalApi
@@ -137,7 +142,7 @@ public class AnyValue public constructor(ptr: LLVMValueRef) : Value(ptr)
  *
  * @see Use
  *
- * TODO: Testing - Test once values are more usable (see LLVM test suite)
+ * TODO: Testing - Test once values are more usable (see LLVM test suite, asmparser)
  *
  * @author Mats Larsen
  */
@@ -258,6 +263,28 @@ public class UndefValue public constructor(ptr: LLVMValueRef) : Constant(ptr)
 
 public class BlockAddress public constructor(ptr: LLVMValueRef) : Constant(ptr)
 
+@CorrespondsTo("llvm::Argument")
+public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr) {
+    public fun getParent(): Function {
+        val fn = LLVM.LLVMGetParamParent(ref)
+
+        return Function(fn)
+    }
+
+    public fun setAlignment(alignment: Int) {
+        LLVM.LLVMSetParamAlignment(ref, alignment)
+    }
+}
+
+/**
+ * Represents a single procedure in a [Module]
+ *
+ * TODO: Iterators - Parameter iterator
+ * TODO: Testing - Test attributes once Builder is stable (see Inkwell tests)
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::Function")
 public class Function public constructor(ptr: LLVMValueRef) :
     Constant(ptr),
     Constant.GlobalValue,
@@ -272,13 +299,129 @@ public class Function public constructor(ptr: LLVMValueRef) :
 
     public fun getPersonalityFunction(): Option<Function> = if (hasPersonalityFunction()) {
         val function = LLVM.LLVMGetPersonalityFn(ref)
+
         Some(Function(function))
     } else {
         None
     }
+
+    public fun setPersonalityFunction(fn: Function) {
+        LLVM.LLVMSetPersonalityFn(ref, fn.ref)
+    }
+
+    public fun getCallConvention(): CallConvention {
+        val cc = LLVM.LLVMGetFunctionCallConv(ref)
+
+        return CallConvention.from(cc).get()
+    }
+
+    public fun setCallConvention(cc: CallConvention) {
+        LLVM.LLVMSetFunctionCallConv(ref, cc.value)
+    }
+
+    public fun getGC(): Option<String> {
+        val gc = LLVM.LLVMGetGC(ref)
+
+        return if (gc != null) {
+            val copy = gc.string
+
+            gc.deallocate()
+
+            Some(copy)
+        } else {
+            None
+        }
+    }
+
+    public fun setGC(gc: String) {
+        LLVM.LLVMSetGC(ref, gc)
+    }
+
+    public fun getAttributeCount(index: AttributeIndex): Int {
+        return LLVM.LLVMGetAttributeCountAtIndex(ref, index.value)
+    }
+
+    public fun getAttributes(index: AttributeIndex): Array<AnyAttribute> {
+        val size = getAttributeCount(index)
+        val buffer = PointerPointer<LLVMAttributeRef>(size.toLong())
+
+        LLVM.LLVMGetAttributesAtIndex(ref, index.value, buffer)
+
+        return List(size) {
+            LLVMAttributeRef(buffer.get(it.toLong()))
+        }.map(::AnyAttribute).toTypedArray().also {
+            buffer.deallocate()
+        }
+    }
+
+    public fun getEnumAttribute(index: AttributeIndex, kind: Int): EnumAttribute {
+        val attr = LLVM.LLVMGetEnumAttributeAtIndex(ref, index.value, kind)
+
+        return EnumAttribute(attr)
+    }
+
+    public fun getStringAttribute(index: AttributeIndex, kind: String): StringAttribute {
+        val attr = LLVM.LLVMGetStringAttributeAtIndex(ref, index.value, kind, kind.length)
+
+        return StringAttribute(attr)
+    }
+
+    public fun addAttribute(index: AttributeIndex, attribute: Attribute) {
+        LLVM.LLVMAddAttributeAtIndex(ref, index.value, attribute.ref)
+    }
+
+    public fun addTargetDependentAttribute(kind: String, value: String) {
+        LLVM.LLVMAddTargetDependentFunctionAttr(ref, kind, value)
+    }
+
+    public fun getParameterCount(): Int {
+        return LLVM.LLVMCountParams(ref)
+    }
+
+    public fun getParameters(): Array<Argument> {
+        val size = getParameterCount()
+        val buffer = PointerPointer<LLVMValueRef>(size.toLong())
+
+        LLVM.LLVMGetParams(ref, buffer)
+
+        return List(size) {
+            LLVMValueRef(buffer.get(it.toLong()))
+        }.map(::Argument).toTypedArray().also {
+            buffer.deallocate()
+        }
+    }
+
+    public fun getParameter(index: Int): Result<Argument> = tryWith {
+        assert(index < getParameterCount()) { "Index $index out of bounds for size of ${getParameterCount()}" }
+
+        val parameter = LLVM.LLVMGetParam(ref, index)
+
+        Argument(parameter)
+    }
 }
 
-public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.GlobalValue
+public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.GlobalValue {
+    public fun getResolver(): Option<Function> {
+        val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
+
+        return resolver?.let { Some(Function(it)) } ?: None
+    }
+
+    public fun setResolver(resolver: Function) {
+        LLVM.LLVMSetGlobalIFuncResolver(ref, resolver.ref)
+    }
+
+    public fun detach() {
+        LLVM.LLVMEraseGlobalIFunc(ref)
+    }
+
+    public fun delete() {
+        LLVM.LLVMRemoveGlobalIFunc(ref)
+    }
+
+    public fun hasResolver(): Boolean = getResolver().isDefined()
+}
+
 public class GlobalAlias public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.GlobalValue
 public class GlobalVariable public constructor(ptr: LLVMValueRef) :
     Constant(ptr),
