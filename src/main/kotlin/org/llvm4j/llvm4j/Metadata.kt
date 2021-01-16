@@ -43,7 +43,7 @@ public class ValueAsMetadata(ptr: LLVMMetadataRef) : Metadata(ptr)
 @CorrespondsTo("llvm::NamedMDNode")
 public class NamedMetadataNode public constructor(ptr: LLVMNamedMDNodeRef) : Owner<LLVMNamedMDNodeRef> {
     public override val ref: LLVMNamedMDNodeRef = ptr
-
+    
     public fun getName(): String {
         val size = SizeTPointer(1L)
         val ptr = LLVM.LLVMGetNamedMetadataName(ref, size)

@@ -2,7 +2,6 @@ package org.llvm4j.llvm4j
 
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.javacpp.SizeTPointer
-import org.bytedeco.llvm.LLVM.LLVMUseRef
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
@@ -147,7 +146,7 @@ public sealed class User constructor(ptr: LLVMValueRef) : Value(ptr) {
     public fun toAnyUser(): AnyUser = AnyUser(ref)
 
     public fun getOperand(index: Int): Result<AnyValue> = tryWith {
-        assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}"}
+        assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}" }
 
         val ptr = LLVM.LLVMGetOperand(ref, index)
 
@@ -155,7 +154,7 @@ public sealed class User constructor(ptr: LLVMValueRef) : Value(ptr) {
     }
 
     public fun getOperandUse(index: Int): Result<Use> = tryWith {
-        assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}"}
+        assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}" }
 
         val use = LLVM.LLVMGetOperandUse(ref, index)
 
@@ -163,7 +162,7 @@ public sealed class User constructor(ptr: LLVMValueRef) : Value(ptr) {
     }
 
     public fun setOperand(index: Int, value: Value): Result<Unit> = tryWith {
-        assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}"}
+        assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}" }
         assert(!isConstant()) { "Cannot mutate a constant with setOperand" }
         // TODO: Api - Replace once isa<> is implemented
         assert(LLVM.LLVMIsAGlobalValue(ref) == null) { "Cannot mutate a constant with setOperand" }
@@ -259,10 +258,32 @@ public class UndefValue public constructor(ptr: LLVMValueRef) : Constant(ptr)
 
 public class BlockAddress public constructor(ptr: LLVMValueRef) : Constant(ptr)
 
-public class Function public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.GlobalValue, Value.HasDebugLocation
+public class Function public constructor(ptr: LLVMValueRef) :
+    Constant(ptr),
+    Constant.GlobalValue,
+    Value.HasDebugLocation {
+    public fun delete() {
+        LLVM.LLVMDeleteFunction(ref)
+    }
+
+    public fun hasPersonalityFunction(): Boolean {
+        return LLVM.LLVMHasPersonalityFn(ref).toBoolean()
+    }
+
+    public fun getPersonalityFunction(): Option<Function> = if (hasPersonalityFunction()) {
+        val function = LLVM.LLVMGetPersonalityFn(ref)
+        Some(Function(function))
+    } else {
+        None
+    }
+}
+
 public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.GlobalValue
 public class GlobalAlias public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.GlobalValue
-public class GlobalVariable public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.GlobalValue, Value.HasDebugLocation
+public class GlobalVariable public constructor(ptr: LLVMValueRef) :
+    Constant(ptr),
+    Constant.GlobalValue,
+    Value.HasDebugLocation
 
 public sealed class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
     public interface Atomic : Owner<LLVMValueRef>
