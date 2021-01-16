@@ -26,6 +26,7 @@ import java.nio.file.Path
  * TODO: Testing - Test [dump] somehow?
  * TODO: LLVM 12.x - LLVMIsPoison
  * TODO: Testing - Test [replace]
+ * TODO: Testing - Ensure GlobalValue names are properly set
  *
  * @author Mats Larsen
  */
@@ -209,10 +210,9 @@ public sealed class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
 
     @CorrespondsTo("llvm::GlobalValue")
     public interface GlobalValue : Owner<LLVMValueRef>
-
-    @InternalApi
-    public interface ConstantData : Owner<LLVMValueRef>
 }
+
+public class AnyConstant public constructor(ptr: LLVMValueRef) : Constant(ptr)
 
 public class ConstantArray public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.Aggregate
 public class ConstantVector public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.Aggregate
@@ -226,7 +226,7 @@ public class ConstantStruct public constructor(ptr: LLVMValueRef) : Constant(ptr
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantInt")
-public class ConstantInt public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData {
+public class ConstantInt public constructor(ptr: LLVMValueRef) : Constant(ptr) {
     public fun getZeroExtendedValue(): Long {
         return LLVM.LLVMConstIntGetZExtValue(ref)
     }
@@ -242,7 +242,7 @@ public class ConstantInt public constructor(ptr: LLVMValueRef) : Constant(ptr), 
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantFP")
-public class ConstantFloat public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData {
+public class ConstantFloat public constructor(ptr: LLVMValueRef) : Constant(ptr) {
     public fun getValue(): Pair<Double, Boolean> {
         val ptr = IntPointer(1L)
         val double = LLVM.LLVMConstRealGetDouble(ref, ptr)
@@ -252,10 +252,10 @@ public class ConstantFloat public constructor(ptr: LLVMValueRef) : Constant(ptr)
     }
 }
 
-public class ConstantAggregateZero public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData
-public class ConstantPointerNull public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData
-public class ConstantTokenNone public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData
-public class UndefValue public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.ConstantData
+public class ConstantAggregateZero public constructor(ptr: LLVMValueRef) : Constant(ptr)
+public class ConstantPointerNull public constructor(ptr: LLVMValueRef) : Constant(ptr)
+public class ConstantTokenNone public constructor(ptr: LLVMValueRef) : Constant(ptr)
+public class UndefValue public constructor(ptr: LLVMValueRef) : Constant(ptr)
 
 public class BlockAddress public constructor(ptr: LLVMValueRef) : Constant(ptr)
 

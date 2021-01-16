@@ -56,24 +56,6 @@ public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
         return copy
     }
 
-    public fun getConstantNull(): Result<Constant> = tryWith {
-        assert(!isVoidType() && !isFunctionType() && !isMetadataType() && !isLabelType() && !isTokenType()) {
-            "Unable to create constant null of this type"
-        }
-
-        val ptr = LLVM.LLVMConstNull(ref)
-
-        // See llvm::Constant::getNullValue(Type*)
-        when {
-            isIntegerType() -> ConstantInt(ptr)
-            isFloatingPointType() -> ConstantFloat(ptr)
-            isVectorType() || isArrayType() || isStructType() -> ConstantAggregateZero(ptr)
-            isPointerType() -> ConstantPointerNull(ptr)
-            isTokenType() -> ConstantTokenNone(ptr)
-            else -> unreachable()
-        }
-    }
-
     public fun getConstantUndef(): UndefValue {
         val undef = LLVM.LLVMGetUndef(ref)
 
@@ -194,6 +176,12 @@ public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
         public fun isOpaque(): Boolean {
             return LLVM.LLVMIsOpaqueStruct(ref).toBoolean()
         }
+
+        public fun getConstantNull(): ConstantStruct {
+            val ptr = LLVM.LLVMConstNull(ref)
+
+            return ConstantStruct(ptr)
+        }
     }
 
     public fun toAnyType(): AnyType = AnyType(ref)
@@ -229,7 +217,11 @@ public class IntegerType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
         return ConstantInt(int)
     }
 
+    public fun getConstantNull(): ConstantInt {
+        val ptr = LLVM.LLVMConstNull(ref)
 
+        return ConstantInt(ptr)
+    }
 }
 
 /**
@@ -241,6 +233,12 @@ public class IntegerType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
 public class ArrayType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Sequential {
     public override fun getElementCount(): Int {
         return LLVM.LLVMGetArrayLength(ref)
+    }
+
+    public fun getConstantNull(): ConstantArray {
+        val ptr = LLVM.LLVMConstNull(ref)
+
+        return ConstantArray(ptr)
     }
 }
 
@@ -256,17 +254,30 @@ public class VectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.S
     public override fun getElementCount(): Int {
         return LLVM.LLVMGetVectorSize(ref)
     }
+
+    public fun getConstantNull(): ConstantVector {
+        val ptr = LLVM.LLVMConstNull(ref)
+
+        return ConstantVector(ptr)
+    }
 }
 
 /**
  * Representation of a scalable vector type
  *
  * TODO: LLVM 12.x - ScalableVectorType
+ * TODO: LLVM 12.x - Ensure [getConstantNull] is valid here, if it is: merge with [VectorType.getConstantNull]
  *
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ScalableVectorType", "llvm::VectorType")
 public class ScalableVectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Sequential {
+    public fun getConstantNull(): ConstantVector {
+        val ptr = LLVM.LLVMConstNull(ref)
+
+        return ConstantVector(ptr)
+    }
+
     public override fun getElementCount(): Int {
         return LLVM.LLVMGetVectorSize(ref)
     }
@@ -287,6 +298,12 @@ public class PointerType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.
 
     public override fun getElementCount(): Int {
         return LLVM.LLVMGetNumContainedTypes(ref)
+    }
+
+    public fun getConstantNull(): ConstantPointerNull {
+        val ptr = LLVM.LLVMConstNull(ref)
+
+        return ConstantPointerNull(ptr)
     }
 }
 
@@ -431,6 +448,12 @@ public class FunctionType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
  * @author Mats Larsen
  */
 public class FloatingPointType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
+    public fun getConstantNull(): ConstantFloat {
+        val ptr = LLVM.LLVMConstNull(ref)
+
+        return ConstantFloat(ptr)
+    }
+
     public fun getAllOnes(): ConstantFloat {
         val constant = LLVM.LLVMConstAllOnes(ref)
 
