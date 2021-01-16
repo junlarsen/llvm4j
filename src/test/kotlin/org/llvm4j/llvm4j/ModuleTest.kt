@@ -164,4 +164,21 @@ class ModuleTest {
         assertIsSome(subject4)
         assertEquals(subject3.ref, subject4.get().ref)
     }
+
+    @Test fun `Test finding global aliases`() {
+        val ctx = Context()
+        val mod = ctx.createModule("test_module")
+        val i32 = ctx.getInt32Type()
+        val i32ptr = ctx.getPointerType(i32)
+        val value = i32.getConstantPointerNull()
+
+        assertIsOk(i32ptr)
+        assertIsNone(mod.getGlobalAlias("global_alias"))
+
+        mod.addGlobalAlias("global_alias", i32ptr.get(), value)
+
+        val subject = mod.getGlobalAlias("global_alias")
+
+        assertIsSome(subject)
+    }
 }

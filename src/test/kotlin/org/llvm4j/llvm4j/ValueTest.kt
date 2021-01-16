@@ -200,3 +200,29 @@ class FunctionTest {
     }
 }
 
+class GlobalAliasTest {
+    @Test fun `Test GlobalAlias properties`() {
+        val ctx = Context()
+        val mod = ctx.createModule("test_module")
+        val i32 = ctx.getInt32Type()
+        val i32ptr = ctx.getPointerType(i32)
+        val value1 = i32.getConstantPointerNull()
+        val value2 = i32ptr.get().getConstantUndef()
+        val subject = mod.addGlobalAlias("global_alias", i32ptr.get(), value1)
+
+        assertEquals(TypeKind.Pointer, subject.getType().getTypeKind())
+        assertEquals(ValueKind.GlobalAlias, subject.getValueKind())
+        assertEquals("@global_alias = alias i32, i32 null\n", subject.getAsString())
+        assertEquals("global_alias", subject.getName())
+        assertTrue { subject.isConstant() }
+        assertFalse { subject.isNull() }
+        assertFalse { subject.isUndef() }
+        assertEquals(value1.ref, subject.getValue().ref)
+
+        subject.setName("global_alias1")
+        subject.setValue(value2)
+
+        assertEquals("global_alias1", subject.getName())
+        assertEquals(value2.ref, subject.getValue().ref)
+    }
+}
