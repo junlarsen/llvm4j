@@ -25,6 +25,8 @@ import java.io.File
  * TODO: Iterators - NamedMetadata iterator
  * TODO: Iterators - NamedFunction iterator
  * TODO: Iterators - GlobalIndirectFunction iterator
+ * TODO: Iterators - GlobalAlias iterator
+ * TODO: Iterators - GlobalVariable iterator
  * TODO: Testing - Test [dump] somehow?
  * TODO: Testing - Test [addModuleFlag] when [Metadata] is implemented
  *
@@ -214,6 +216,18 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
         val indirect = LLVM.LLVMGetNamedGlobalIFunc(ref, name, name.length.toLong())
 
         return indirect?.let { Some(GlobalIndirectFunction(it)) } ?: None
+    }
+
+    public fun addGlobalAlias(name: String, type: PointerType, value: Constant): GlobalAlias {
+        val alias = LLVM.LLVMAddAlias(ref, type.ref, value.ref, name)
+
+        return GlobalAlias(alias)
+    }
+
+    public fun getGlobalAlias(name: String): Option<GlobalAlias> {
+        val alias = LLVM.LLVMGetNamedGlobalAlias(ref, name, name.length.toLong())
+
+        return alias?.let { Some(GlobalAlias(alias)) } ?: None
     }
 
     /**

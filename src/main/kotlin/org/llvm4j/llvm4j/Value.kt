@@ -433,7 +433,19 @@ public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : Cons
     public fun hasResolver(): Boolean = getResolver().isDefined()
 }
 
-public class GlobalAlias public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.GlobalValue
+@CorrespondsTo("llvm::GlobalAlias")
+public class GlobalAlias public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.GlobalValue {
+    public fun getValue(): AnyConstant {
+        val value = LLVM.LLVMAliasGetAliasee(ref)
+
+        return AnyConstant(value)
+    }
+
+    public fun setValue(value: Constant) {
+        LLVM.LLVMAliasSetAliasee(ref, value.ref)
+    }
+}
+
 public class GlobalVariable public constructor(ptr: LLVMValueRef) :
     Constant(ptr),
     Constant.GlobalValue,

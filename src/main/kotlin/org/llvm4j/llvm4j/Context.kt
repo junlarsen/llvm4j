@@ -35,6 +35,7 @@ import org.llvm4j.llvm4j.util.tryWith
  * TODO: Testing - Can we reliably test callback methods? [YieldCallback], [DiagnosticHandler]
  * TODO: Testing - Test [getMetadataKindId] for Metadata
  * TODO: Testing - Is [getMetadataKindId] consistently testable across platforms?
+ * TODO: Testing - Ensure [Instruction] discards value name once Instruction is stable
  *
  * @see GlobalContext
  */
