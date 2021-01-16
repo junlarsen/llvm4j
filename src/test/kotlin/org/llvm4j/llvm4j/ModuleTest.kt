@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 import org.llvm4j.llvm4j.testing.assertIsNone
 import org.llvm4j.llvm4j.testing.assertIsOk
 import org.llvm4j.llvm4j.testing.assertIsSome
+import org.llvm4j.llvm4j.util.None
 import java.io.File
 import java.nio.file.Files
 import kotlin.test.assertEquals
@@ -154,5 +155,13 @@ class ModuleTest {
 
         assertIsSome(subject2)
         assertEquals(subject1.ref, subject2.get().ref)
+
+        assertIsNone(mod.getGlobalIndirectFunction("indirect_fn"))
+
+        val subject3 = mod.addGlobalIndirectFunction("indirect_fn", fn, AddressSpace.Generic, None)
+        val subject4 = mod.getGlobalIndirectFunction("indirect_fn")
+
+        assertIsSome(subject4)
+        assertEquals(subject3.ref, subject4.get().ref)
     }
 }

@@ -1,6 +1,8 @@
 package org.llvm4j.llvm4j
 
 import org.junit.jupiter.api.Test
+import org.llvm4j.llvm4j.testing.assertIsNone
+import org.llvm4j.llvm4j.testing.assertIsSome
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -20,7 +22,7 @@ class ValueTest {
 }
 
 class ConstantIntTest {
-    @Test fun `Test ConstantInt follows specification`() {
+    @Test fun `Test ConstantInt properties`() {
         val ctx = Context()
         val i32 = ctx.getInt32Type()
         val subject1 = i32.getConstant(100)
@@ -39,13 +41,13 @@ class ConstantIntTest {
         assertTrue { subject2.isNull() }
         assertTrue { subject3.isNull() }
         assertTrue { subject4.isUndef() }
-    }
+}
 
-    @Test fun `Test get all ones`() {
-        val ctx = Context()
-        val i1 = ctx.getInt1Type()
-        val i8 = ctx.getInt8Type()
-        val i16 = ctx.getInt16Type()
+@Test fun `Test get all ones`() {
+    val ctx = Context()
+    val i1 = ctx.getInt1Type()
+    val i8 = ctx.getInt8Type()
+    val i16 = ctx.getInt16Type()
         val i32 = ctx.getInt32Type()
         val i64 = ctx.getInt64Type()
         val i128 = ctx.getInt128Type()
@@ -59,7 +61,7 @@ class ConstantIntTest {
 }
 
 class ConstantFloatTest {
-    @Test fun `Test ConstantFloat follows specification`() {
+    @Test fun `Test ConstantFloat properties`() {
         val ctx = Context()
         val float = ctx.getFloatType()
         val subject1 = float.getConstant(100.0)
@@ -106,3 +108,99 @@ class ConstantFloatTest {
         }
     }
 }
+
+class FunctionTest {
+    @Test fun `Test Function properties`() {
+        val ctx = Context()
+        val i32 = ctx.getInt32Type()
+        val void = ctx.getVoidType()
+        val fnTy = ctx.getFunctionType(void, i32, i32)
+        val mod = ctx.createModule("test_module")
+        val subject1 = mod.addFunction("test_fn", fnTy)
+
+        assertEquals(TypeKind.Pointer, subject1.getType().getTypeKind())
+        assertEquals(ValueKind.Function, subject1.getValueKind())
+        assertEquals("declare void @test_fn(i32, i32)\n", subject1.getAsString())
+        assertTrue { subject1.isConstant() }
+        assertFalse { subject1.isUndef() }
+        assertFalse { subject1.isNull() }
+
+        assertFalse { subject1.hasPersonalityFunction() }
+        assertIsNone(subject1.getPersonalityFunction())
+        assertEquals(CallConvention.C, subject1.getCallConvention())
+        assertEquals(2, subject1.getParameterCount())
+        assertIsNone(subject1.getGC())
+
+        subject1.setGC("shadow-stack")
+        subject1.setCallConvention(CallConvention.Fast)
+
+        assertIsSome(subject1.getGC())
+        assertEquals("shadow-stack", subject1.getGC().get())
+        assertEquals(CallConvention.Fast, subject1.getCallConvention())
+    }
+
+    @Test fun `Test function attributes`() {
+        val ctx = Context()
+        val i32 = ctx.getInt32Type()
+        val void = ctx.getVoidType()
+        val fnTy = ctx.getFunctionType(void, i32, i32)
+        val mod = ctx.createModule("test_module")
+        val subject1 = mod.addFunction("test_fn", fnTy)
+
+        subject1.addTargetDependentAttribute("k", "v")
+
+        assertEquals(1, subject1.getAttributeCount(AttributeIndex.Function))
+    }
+
+    @Test fun `Test function parameters`() {
+        val ctx = Context()
+        val i8 = ctx.getInt32Type()
+        val void = ctx.getVoidType()
+        val fnTy = ctx.getFunctionType(void, i8, i8)
+        val mod = ctx.createModule("test_module")
+        val subject1 = mod.addFunction("test_fn", fnTy)
+        val (subject2, subject3) = subject1.getParameters()
+
+        subject2.setAlignment(8)
+
+        assertEquals(2, subject1.getParameterCount())
+        assertEquals(subject2.ref, subject1.getParameter(0).get().ref)
+        assertEquals(subject3.ref, subject1.getParameter(1).get().ref)
+
+        assertEquals(subject1.ref, subject2.getParent().ref)
+    }
+
+    @Test fun `Test personality functions`() {
+        val ctx = Context()
+        val mod = ctx.createModule("test_module")
+        val i32 = ctx.getInt32Type()
+        val i8 = ctx.getInt8Type()
+        val personalityFnTy = ctx.getFunctionType(i32, isVariadic = true)
+        val primaryFnTy = ctx.getFunctionType(i8, i32)
+        val subject1 = mod.addFunction("test_main", primaryFnTy)
+        val subject2 = mod.addFunction("personality", personalityFnTy)
+
+        assertFalse { subject1.hasPersonalityFunction() }
+        subject1.setPersonalityFunction(subject2)
+
+        assertTrue { subject1.hasPersonalityFunction() }
+        assertEquals(subject2.ref, subject1.getPersonalityFunction().get().ref)
+    }
+
+    @Test fun `Test deleting function from module`() {
+        val ctx = Context()
+        val i32 = ctx.getInt32Type()
+        val void = ctx.getVoidType()
+        val fnTy = ctx.getFunctionType(void, i32, i32)
+        val mod = ctx.createModule("test_module")
+        val subject1 = mod.addFunction("test_fn", fnTy)
+
+        assertIsSome(mod.getFunction("test_fn"))
+        assertEquals(subject1.ref, mod.getFunction("test_fn").get().ref)
+
+        subject1.delete()
+
+        assertIsNone(mod.getFunction("test_fn"))
+    }
+}
+
