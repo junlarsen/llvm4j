@@ -34,7 +34,6 @@ import org.llvm4j.llvm4j.util.tryWith
  * TODO: Research - Can we upcast LLVMDiagnosticHandler to Context.DiagnosticHandler to implement getDiagnosticHandler?
  * TODO: Testing - Can we reliably test callback methods? [YieldCallback], [DiagnosticHandler]
  * TODO: Testing - Test [getMetadataKindId] for Metadata
- * TODO: Testing - Ensure values are discarded in ContextTest once GlobalValue is usable
  * TODO: Testing - Is [getMetadataKindId] consistently testable across platforms?
  *
  * @see GlobalContext

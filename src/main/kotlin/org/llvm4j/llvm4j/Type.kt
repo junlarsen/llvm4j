@@ -21,7 +21,7 @@ import org.llvm4j.llvm4j.util.tryWith
  * Types are cached and stored at the context level. This means that all users of a [Context] share the same unique
  * types.
  *
- * TODO: Further research - Doxygen documents `LLVMDumpType`. This method is not present in the presets.
+ * TODO: Further research - Doxygen documents `LLVMDumpType`. Ask Samuel why it's skipped in JavaCPP
  * TODO: LLVM 12.x - LLVMGetPoison
  *
  * @author Mats Larsen
@@ -193,8 +193,6 @@ public class AnyType public constructor(ptr: LLVMTypeRef) : Type(ptr)
  * Representation of a single integer type.
  *
  * This class is also used to represent the built-in integer types LLVM provides. (i1, i8, i16, ...)
- *
- * TODO: Testing - Test once ConstantInt is usable
  *
  * @author Mats Larsen
  */
@@ -444,8 +442,6 @@ public class FunctionType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
 
 /**
  * Representation of a floating point type
- *
- * TODO: Testing - Test once ConstantFloat is usable
  *
  * @author Mats Larsen
  */

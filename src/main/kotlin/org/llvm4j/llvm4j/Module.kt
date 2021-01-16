@@ -25,7 +25,6 @@ import java.io.File
  * TODO: Iterators - NamedMetadata iterator
  * TODO: Iterators - NamedFunction iterator
  * TODO: Iterators - GlobalIndirectFunction iterator
- * TODO: JavaCPP - Extend NamedMDNode with getOperands, getOperandCount, addOperand
  * TODO: Testing - Test [dump] somehow?
  * TODO: Testing - Test [addModuleFlag] when [Metadata] is implemented
  *

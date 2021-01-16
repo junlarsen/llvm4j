@@ -7,20 +7,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class ValueTest {
-    @Test fun `Test non-global may not have a name`() {
-        val ctx = Context()
-        val i32 = ctx.getInt32Type()
-        val subject = i32.getConstant(100)
-
-        assertEquals("", subject.getName())
-
-        subject.setName("test_val")
-
-        assertEquals("", subject.getName())
-    }
-}
-
 class ConstantIntTest {
     @Test fun `Test ConstantInt properties`() {
         val ctx = Context()
@@ -29,11 +15,13 @@ class ConstantIntTest {
         val subject2 = i32.getConstantNull()
         val subject3 = i32.getConstantPointerNull()
         val subject4 = i32.getConstantUndef()
+        val subject5 = i32.getConstant(-100)
 
         assertEquals(i32.ref, subject1.getType().ref)
         assertEquals(ValueKind.ConstantInt, subject1.getValueKind())
         assertEquals("i32 100", subject1.getAsString())
         assertEquals(100, subject1.getSignExtendedValue())
+        assertEquals(100, subject1.getZeroExtendedValue())
         assertTrue { subject1.isConstant() }
         assertFalse { subject1.isUndef() }
         assertFalse { subject1.isNull() }
@@ -41,6 +29,8 @@ class ConstantIntTest {
         assertTrue { subject2.isNull() }
         assertTrue { subject3.isNull() }
         assertTrue { subject4.isUndef() }
+        assertEquals(2 * (Int.MAX_VALUE.toLong() + 1) - 100, subject5.getZeroExtendedValue())
+        assertEquals(-100, subject5.getSignExtendedValue())
 }
 
 @Test fun `Test get all ones`() {
@@ -121,6 +111,7 @@ class FunctionTest {
         assertEquals(TypeKind.Pointer, subject1.getType().getTypeKind())
         assertEquals(ValueKind.Function, subject1.getValueKind())
         assertEquals("declare void @test_fn(i32, i32)\n", subject1.getAsString())
+        assertEquals("test_fn", subject1.getName())
         assertTrue { subject1.isConstant() }
         assertFalse { subject1.isUndef() }
         assertFalse { subject1.isNull() }
@@ -131,10 +122,13 @@ class FunctionTest {
         assertEquals(2, subject1.getParameterCount())
         assertIsNone(subject1.getGC())
 
+        subject1.setName("test_main")
         subject1.setGC("shadow-stack")
         subject1.setCallConvention(CallConvention.Fast)
 
         assertIsSome(subject1.getGC())
+        assertIsSome(mod.getFunction("test_main"))
+        assertEquals("test_main", subject1.getName())
         assertEquals("shadow-stack", subject1.getGC().get())
         assertEquals(CallConvention.Fast, subject1.getCallConvention())
     }
@@ -162,7 +156,9 @@ class FunctionTest {
         val (subject2, subject3) = subject1.getParameters()
 
         subject2.setAlignment(8)
+        subject2.setName("a")
 
+        assertEquals("a", subject2.getName())
         assertEquals(2, subject1.getParameterCount())
         assertEquals(subject2.ref, subject1.getParameter(0).get().ref)
         assertEquals(subject3.ref, subject1.getParameter(1).get().ref)

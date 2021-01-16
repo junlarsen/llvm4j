@@ -1,7 +1,6 @@
 package org.llvm4j.llvm4j
 
 import org.bytedeco.javacpp.IntPointer
-import org.bytedeco.javacpp.Pointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
@@ -17,6 +16,7 @@ import org.llvm4j.llvm4j.util.Some
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.tryWith
 import java.nio.file.Path
+import java.nio.file.Paths
 
 /**
  * A core object in LLVMs object model
@@ -28,7 +28,6 @@ import java.nio.file.Path
  * TODO: Testing - Test [dump] somehow?
  * TODO: LLVM 12.x - LLVMIsPoison
  * TODO: Testing - Test [replace]
- * TODO: Testing - Ensure GlobalValue names are properly set
  *
  * @author Mats Larsen
  */
@@ -46,21 +45,6 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
         val kind = LLVM.LLVMGetValueKind(ref)
 
         return ValueKind.from(kind).get()
-    }
-
-    public fun getName(): String {
-        val size = SizeTPointer(1L)
-        val ptr = LLVM.LLVMGetValueName2(ref, size)
-        val copy = ptr.string
-
-        ptr.deallocate()
-        size.deallocate()
-
-        return copy
-    }
-
-    public fun setName(name: String) {
-        LLVM.LLVMSetValueName2(ref, name, name.length.toLong())
     }
 
     public fun getAsString(): String {
@@ -117,7 +101,7 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
             ptr.deallocate()
             size.deallocate()
 
-            return Path.of(copy)
+            return Paths.get(copy)
         }
 
         public fun getDebugDirectory(): Path {
@@ -128,7 +112,33 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
             ptr.deallocate()
             size.deallocate()
 
-            return Path.of(copy)
+            return Paths.get(copy)
+        }
+    }
+
+    /**
+     * Represents a value which may have a name
+     *
+     * Known inheritors are [Constant.GlobalValue], [Argument] and [Instruction]. Function also inherits this trait
+     * implicitly through GlobalValue.
+     *
+     * @author Mats Larsen
+     */
+    @InternalApi
+    public interface Nameable : Owner<LLVMValueRef> {
+        public fun getName(): String {
+            val size = SizeTPointer(1L)
+            val ptr = LLVM.LLVMGetValueName2(ref, size)
+            val copy = ptr.string
+
+            ptr.deallocate()
+            size.deallocate()
+
+            return copy
+        }
+
+        public fun setName(name: String) {
+            LLVM.LLVMSetValueName2(ref, name, name.length.toLong())
         }
     }
 
@@ -213,7 +223,7 @@ public sealed class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
     public interface Aggregate : Owner<LLVMValueRef>
 
     @CorrespondsTo("llvm::GlobalValue")
-    public interface GlobalValue : Owner<LLVMValueRef>
+    public interface GlobalValue : Owner<LLVMValueRef>, Nameable
 }
 
 public class AnyConstant public constructor(ptr: LLVMValueRef) : Constant(ptr)
@@ -264,7 +274,7 @@ public class UndefValue public constructor(ptr: LLVMValueRef) : Constant(ptr)
 public class BlockAddress public constructor(ptr: LLVMValueRef) : Constant(ptr)
 
 @CorrespondsTo("llvm::Argument")
-public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr) {
+public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr), Value.Nameable {
     public fun getParent(): Function {
         val fn = LLVM.LLVMGetParamParent(ref)
 
@@ -288,7 +298,8 @@ public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr) {
 public class Function public constructor(ptr: LLVMValueRef) :
     Constant(ptr),
     Constant.GlobalValue,
-    Value.HasDebugLocation {
+    Value.HasDebugLocation,
+    Value.Nameable {
     public fun delete() {
         LLVM.LLVMDeleteFunction(ref)
     }

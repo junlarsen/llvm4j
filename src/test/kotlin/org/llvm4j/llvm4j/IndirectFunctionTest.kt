@@ -7,7 +7,6 @@ import org.llvm4j.llvm4j.util.None
 import org.llvm4j.llvm4j.util.Some
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class IndirectFunctionTest {
@@ -27,11 +26,15 @@ class IndirectFunctionTest {
         assertIsSome(subject2.getResolver())
         assertIsNone(subject3.getResolver())
         assertEquals(subject1.ref, subject2.getResolver().get().ref)
+        assertEquals("test_main", subject2.getName())
 
         subject3.setResolver(subject1)
+        subject2.setName("test_main1")
 
         assertTrue { subject3.hasResolver() }
         assertIsSome(subject3.getResolver())
+        assertIsSome(mod.getGlobalIndirectFunction("test_main1"))
+        assertEquals("test_main1", subject2.getName())
         assertEquals(subject1.ref, subject3.getResolver().get().ref)
     }
 
