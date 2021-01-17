@@ -15,6 +15,7 @@ import org.llvm4j.llvm4j.util.Owner
 import org.llvm4j.llvm4j.util.Result
 import org.llvm4j.llvm4j.util.Some
 import org.llvm4j.llvm4j.util.toBoolean
+import org.llvm4j.llvm4j.util.toInt
 import org.llvm4j.llvm4j.util.tryWith
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -580,7 +581,55 @@ public class GlobalAlias public constructor(ptr: LLVMValueRef) : GlobalValue(ptr
 
 public class GlobalVariable public constructor(ptr: LLVMValueRef) :
     GlobalValue(ptr),
-    Value.HasDebugLocation
+    Value.HasDebugLocation {
+    public fun delete() {
+        LLVM.LLVMDeleteGlobal(ref)
+    }
+
+    public fun getInitializer(): Option<AnyConstant> {
+        val value = LLVM.LLVMGetInitializer(ref)
+
+        return value?.let { Some(AnyConstant(it)) } ?: None
+    }
+
+    public fun setInitializer(value: Constant) {
+        LLVM.LLVMSetInitializer(ref, value.ref)
+    }
+
+    public fun isThreadLocal(): Boolean {
+        return LLVM.LLVMIsThreadLocal(ref).toBoolean()
+    }
+
+    public fun setThreadLocal(isThreadLocal: Boolean) {
+        LLVM.LLVMSetThreadLocal(ref, isThreadLocal.toInt())
+    }
+
+    public fun isImmutable(): Boolean {
+        return LLVM.LLVMIsGlobalConstant(ref).toBoolean()
+    }
+
+    public fun setImmutable(isImmutable: Boolean) {
+        LLVM.LLVMSetGlobalConstant(ref, isImmutable.toInt())
+    }
+
+    public fun getThreadLocalMode(): ThreadLocalMode {
+        val mode = LLVM.LLVMGetThreadLocalMode(ref)
+
+        return ThreadLocalMode.from(mode).get()
+    }
+
+    public fun setThreadLocalMode(mode: ThreadLocalMode) {
+        LLVM.LLVMSetThreadLocal(ref, mode.value)
+    }
+
+    public fun isExternallyInitialized(): Boolean {
+        return LLVM.LLVMIsExternallyInitialized(ref).toBoolean()
+    }
+
+    public fun setExternallyInitialized(isExternallyInitialized: Boolean) {
+        LLVM.LLVMSetExternallyInitialized(ref, isExternallyInitialized.toInt())
+    }
+}
 
 /**
  * TODO: Research - LLVMSetAlignment and GetAlignment on Alloca, Load and Store

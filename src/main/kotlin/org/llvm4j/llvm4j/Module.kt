@@ -230,6 +230,27 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
         return alias?.let { Some(GlobalAlias(alias)) } ?: None
     }
 
+    public fun addGlobalVariable(
+        name: String,
+        type: Type,
+        addressSpace: Option<AddressSpace>
+    ): Result<GlobalVariable> = tryWith {
+        assert(!type.isFunctionType() && type.isValidPointerElementType()) { "Invalid type for global variable" }
+
+        val variable = when (addressSpace) {
+            is Some -> LLVM.LLVMAddGlobalInAddressSpace(ref, type.ref, name, addressSpace.get().value)
+            is None -> LLVM.LLVMAddGlobal(ref, type.ref, name)
+        }
+
+        GlobalVariable(variable)
+    }
+
+    public fun getGlobalVariable(name: String): Option<GlobalVariable> {
+        val variable = LLVM.LLVMGetNamedGlobal(ref, name)
+
+        return variable?.let { Some(GlobalVariable(it)) } ?: None
+    }
+
     /**
      * Metadata flag containing information about the module as a whole
      *
