@@ -29,7 +29,7 @@ import java.nio.file.Paths
  *
  * TODO: Testing - Test [dump] somehow?
  * TODO: LLVM 12.x - LLVMIsPoison
- * TODO: Testing - Test [replace]
+ * TODO: Testing - Test [replace] (asmparsers)
  *
  * @author Mats Larsen
  */
@@ -81,7 +81,7 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
      *
      * Known inheritors are [Instruction], [GlobalVariable] and [Function]
      *
-     * TODO: Testing - Test once debug metadata is stable
+     * TODO: Testing - Test once debug metadata is stable (parse bc file? llvm-ir tests)
      *
      * @author Mats Larsen
      */
@@ -160,8 +160,6 @@ public class AnyValue public constructor(ptr: LLVMValueRef) : Value(ptr)
  */
 @CorrespondsTo("llvm::User")
 public sealed class User constructor(ptr: LLVMValueRef) : Value(ptr) {
-    public fun toAnyUser(): AnyUser = AnyUser(ref)
-
     public fun getOperand(index: Int): Result<AnyValue> = tryWith {
         assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}" }
 
@@ -190,6 +188,8 @@ public sealed class User constructor(ptr: LLVMValueRef) : Value(ptr) {
     public fun getOperandCount(): Int {
         return LLVM.LLVMGetNumOperands(ref)
     }
+
+    public fun toAnyUser(): AnyUser = AnyUser(ref)
 }
 
 public class AnyUser public constructor(ptr: LLVMValueRef) : User(ptr)

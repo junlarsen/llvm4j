@@ -13,7 +13,7 @@ import org.llvm4j.llvm4j.util.Some
  *
  * @see User
  *
- * TODO: Testing - Test once values are more usable (see LLVM test suite)
+ * TODO: Testing - Test once values are more usable (see LLVM test suite + asmparsers)
  * TODO: Research - Can [getUser] and [getUsedValue] return User instead of option?
  * TODO: Iterators - Use iterator
  *

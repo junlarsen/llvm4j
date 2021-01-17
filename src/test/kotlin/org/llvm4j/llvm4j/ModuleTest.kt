@@ -175,10 +175,22 @@ class ModuleTest {
         assertIsOk(i32ptr)
         assertIsNone(mod.getGlobalAlias("global_alias"))
 
-        mod.addGlobalAlias("global_alias", i32ptr.get(), value)
+        val subject1 = mod.addGlobalAlias("global_alias", i32ptr.get(), value)
 
-        val subject = mod.getGlobalAlias("global_alias")
+        assertIsSome(mod.getGlobalAlias("global_alias"))
+        assertEquals(subject1.ref, mod.getGlobalAlias("global_alias").get().ref)
+    }
 
-        assertIsSome(subject)
+    @Test fun `Test finding global variables`() {
+        val ctx = Context()
+        val mod = ctx.createModule("test_module")
+        val i32 = ctx.getInt32Type()
+
+        assertIsNone(mod.getGlobalVariable("var"))
+
+        val subject1 = mod.addGlobalVariable("var", i32, None).get()
+
+        assertIsSome(mod.getGlobalVariable("var"))
+        assertEquals(subject1.ref, mod.getGlobalVariable("var").get().ref)
     }
 }

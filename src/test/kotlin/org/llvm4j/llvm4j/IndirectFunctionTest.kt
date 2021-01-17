@@ -25,6 +25,7 @@ class IndirectFunctionTest {
         assertFalse { subject3.hasResolver() }
         assertIsSome(subject2.getResolver())
         assertIsNone(subject3.getResolver())
+        assertEquals(ValueKind.GlobalIFunc, subject2.getValueKind())
         assertEquals(subject1.ref, subject2.getResolver().get().ref)
         assertEquals("test_main", subject2.getName())
 

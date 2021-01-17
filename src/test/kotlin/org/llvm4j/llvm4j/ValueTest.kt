@@ -1,8 +1,11 @@
 package org.llvm4j.llvm4j
 
 import org.junit.jupiter.api.Test
+import org.llvm4j.llvm4j.testing.assertIsErr
 import org.llvm4j.llvm4j.testing.assertIsNone
+import org.llvm4j.llvm4j.testing.assertIsOk
 import org.llvm4j.llvm4j.testing.assertIsSome
+import org.llvm4j.llvm4j.util.None
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -247,10 +250,12 @@ class GlobalValueTest {
         // these do not make sense, but llvm allows it
         subject.setSection(".bss")
         subject.setPreferredAlignment(16)
+        subject.setLinkage(Linkage.Appending)
 
         assertIsSome(subject.getSection())
         assertEquals(".bss", subject.getSection().get())
         assertEquals(16, subject.getPreferredAlignment())
+        assertEquals(Linkage.Appending, subject.getLinkage())
 
         for (value in Visibility.entries) {
             subject.setVisibility(value)
@@ -264,5 +269,62 @@ class GlobalValueTest {
             subject.setUnnamedAddress(value)
             assertEquals(value, subject.getUnnamedAddress())
         }
+    }
+}
+
+class GlobalVariableTest {
+    @Test fun `Test GlobalVariable properties`() {
+        val ctx = Context()
+        val mod = ctx.createModule("test_module")
+        val void = ctx.getVoidType()
+        val i32 = ctx.getInt32Type()
+        val res1 = mod.addGlobalVariable("test_var1", i32, None)
+        val res2 = mod.addGlobalVariable("test_var2", void, None)
+        val value = i32.getConstant(1L)
+
+        assertIsOk(res1)
+        assertIsErr(res2)
+
+        val subject1 = res1.get()
+
+        assertEquals(TypeKind.Pointer, subject1.getType().getTypeKind())
+        assertEquals(ValueKind.GlobalVariable, subject1.getValueKind())
+        assertEquals("@test_var1 = external global i32", subject1.getAsString())
+        assertEquals("test_var1", subject1.getName())
+        assertTrue { subject1.isConstant() }
+        assertFalse { subject1.isNull() }
+        assertFalse { subject1.isUndef() }
+
+        assertFalse { subject1.isExternallyInitialized() }
+        assertFalse { subject1.isThreadLocal() }
+        assertFalse { subject1.isImmutable() }
+        assertIsNone(subject1.getInitializer())
+        assertEquals(ThreadLocalMode.NotThreadLocal, subject1.getThreadLocalMode())
+
+        subject1.setExternallyInitialized(true)
+        subject1.setThreadLocal(true)
+        subject1.setImmutable(true)
+        subject1.setInitializer(value)
+        subject1.setThreadLocalMode(ThreadLocalMode.LocalDynamic)
+
+        assertTrue { subject1.isExternallyInitialized() }
+        assertTrue { subject1.isThreadLocal() }
+        assertTrue { subject1.isImmutable() }
+        assertIsSome(subject1.getInitializer())
+        assertEquals(value.ref, subject1.getInitializer().get().ref)
+        assertEquals(ThreadLocalMode.LocalDynamic, subject1.getThreadLocalMode())
+    }
+
+    @Test fun `Test deletion from parent module`() {
+        val ctx = Context()
+        val mod = ctx.createModule("test_module")
+        val i32 = ctx.getInt32Type()
+        val subject = mod.addGlobalVariable("test_var1", i32, None).get()
+
+        assertIsSome(mod.getGlobalVariable("test_var1"))
+
+        subject.delete()
+
+        assertIsNone(mod.getGlobalVariable("test_var1"))
     }
 }
