@@ -226,3 +226,43 @@ class GlobalAliasTest {
         assertEquals(value2.ref, subject.getValue().ref)
     }
 }
+
+class GlobalValueTest {
+    @Test fun `Test GlobalValue properties`() {
+        val ctx = Context()
+        val mod = ctx.createModule("test_module")
+        val i32 = ctx.getInt32Type()
+        val fnTy = ctx.getFunctionType(i32, i32)
+        val subject = mod.addFunction("test_main", fnTy)
+
+        assertIsNone(subject.getSection())
+        assertEquals(mod.ref, subject.getModule().ref)
+        assertEquals(0, subject.getPreferredAlignment())
+        assertEquals(Linkage.External, subject.getLinkage())
+        assertEquals(Visibility.Default, subject.getVisibility())
+        assertEquals(DLLStorageClass.Default, subject.getStorageClass())
+        assertEquals(UnnamedAddress.None, subject.getUnnamedAddress())
+        assertEquals(TypeKind.Function, subject.getValueType().getTypeKind())
+
+        // these do not make sense, but llvm allows it
+        subject.setSection(".bss")
+        subject.setPreferredAlignment(16)
+
+        assertIsSome(subject.getSection())
+        assertEquals(".bss", subject.getSection().get())
+        assertEquals(16, subject.getPreferredAlignment())
+
+        for (value in Visibility.entries) {
+            subject.setVisibility(value)
+            assertEquals(value, subject.getVisibility())
+        }
+        for (value in DLLStorageClass.entries) {
+            subject.setStorageClass(value)
+            assertEquals(value, subject.getStorageClass())
+        }
+        for (value in UnnamedAddress.entries) {
+            subject.setUnnamedAddress(value)
+            assertEquals(value, subject.getUnnamedAddress())
+        }
+    }
+}
