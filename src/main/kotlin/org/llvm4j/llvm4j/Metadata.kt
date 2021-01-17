@@ -4,21 +4,18 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMMetadataRef
 import org.bytedeco.llvm.LLVM.LLVMNamedMDNodeRef
-import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.CustomApi
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.Result
+import org.llvm4j.llvm4j.util.tryWith
 
 @CorrespondsTo("llvm::Metadata")
 public open class Metadata public constructor(ptr: LLVMMetadataRef) : Owner<LLVMMetadataRef> {
     public override val ref: LLVMMetadataRef = ptr
-}
-
-public class ValueMetadataEntry public constructor(ptr: LLVMValueMetadataEntry) : Owner<LLVMValueMetadataEntry> {
-    public override val ref: LLVMValueMetadataEntry = ptr
 }
 
 /**

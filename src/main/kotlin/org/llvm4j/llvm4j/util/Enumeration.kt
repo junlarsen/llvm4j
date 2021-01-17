@@ -16,7 +16,7 @@ package org.llvm4j.llvm4j.util
  * }
  * ```
  */
-public abstract class Enumeration<E : Enumeration.EnumVariant>(entries: Array<E>) {
+public abstract class Enumeration<E : Enumeration.EnumVariant>(public val entries: Array<E>) {
     private val associated: Map<Int, E> = entries.associateBy { it.value }
     private val reverse: Map<E, Int> by lazy { associated.entries.associate { Pair(it.value, it.key) } }
     /**

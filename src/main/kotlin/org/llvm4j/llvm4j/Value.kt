@@ -4,6 +4,7 @@ import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
+import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
@@ -221,12 +222,144 @@ public sealed class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
 
     @InternalApi
     public interface Aggregate : Owner<LLVMValueRef>
-
-    @CorrespondsTo("llvm::GlobalValue")
-    public interface GlobalValue : Owner<LLVMValueRef>, Nameable
 }
 
 public class AnyConstant public constructor(ptr: LLVMValueRef) : Constant(ptr)
+
+/**
+ * Represents any value which is globally declared inside a [Module]
+ *
+ * TODO: LLVM 12.x - LLVMIsDeclaration()
+ * TODO: Testing - Test metadata once metadata is stable
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::GlobalValue", "llvm::GlobalObject")
+public sealed class GlobalValue constructor(ptr: LLVMValueRef) :
+    Constant(ptr),
+    Owner<LLVMValueRef>,
+    Value.Nameable {
+    public fun getModule(): Module {
+        val module = LLVM.LLVMGetGlobalParent(ref)
+
+        return Module(module)
+    }
+
+    public fun getLinkage(): Linkage {
+        val linkage = LLVM.LLVMGetLinkage(ref)
+
+        return Linkage.from(linkage).get()
+    }
+
+    public fun setLinkage(linkage: Linkage) {
+        LLVM.LLVMSetLinkage(ref, linkage.value)
+    }
+
+    public fun getSection(): Option<String> {
+        val ptr = LLVM.LLVMGetSection(ref)
+
+        return ptr?.let {
+            val copy = ptr.string
+            ptr.deallocate()
+            Some(copy)
+        } ?: None
+    }
+
+    public fun setSection(section: String) {
+        LLVM.LLVMSetSection(ref, section)
+    }
+
+    public fun getVisibility(): Visibility {
+        val visibility = LLVM.LLVMGetVisibility(ref)
+
+        return Visibility.from(visibility).get()
+    }
+
+    public fun setVisibility(visibility: Visibility) {
+        LLVM.LLVMSetVisibility(ref, visibility.value)
+    }
+
+    public fun getStorageClass(): DLLStorageClass {
+        val storage = LLVM.LLVMGetDLLStorageClass(ref)
+
+        return DLLStorageClass.from(storage).get()
+    }
+
+    public fun setStorageClass(storage: DLLStorageClass) {
+        LLVM.LLVMSetDLLStorageClass(ref, storage.value)
+    }
+
+    public fun getUnnamedAddress(): UnnamedAddress {
+        val addr = LLVM.LLVMGetUnnamedAddress(ref)
+
+        return UnnamedAddress.from(addr).get()
+    }
+
+    public fun setUnnamedAddress(address: UnnamedAddress) {
+        LLVM.LLVMSetUnnamedAddress(ref, address.value)
+    }
+
+    public fun getValueType(): AnyType {
+        val type = LLVM.LLVMGlobalGetValueType(ref)
+
+        return AnyType(type)
+    }
+
+    public fun getPreferredAlignment(): Int {
+        return LLVM.LLVMGetAlignment(ref)
+    }
+
+    public fun setPreferredAlignment(alignment: Int) {
+        LLVM.LLVMSetAlignment(ref, alignment)
+    }
+
+    public fun setMetadata(kind: Int, node: Metadata) {
+        LLVM.LLVMGlobalSetMetadata(ref, kind, node.ref)
+    }
+
+    public fun eraseMetadata(kind: Int) {
+        LLVM.LLVMGlobalEraseMetadata(ref, kind)
+    }
+
+    public fun clearMetadata() {
+        LLVM.LLVMGlobalClearMetadata(ref)
+    }
+
+    public fun getAllMetadata(): MetadataEntry {
+        val size = SizeTPointer(1L)
+        val entries = LLVM.LLVMGlobalCopyAllMetadata(ref, size)
+
+        return MetadataEntry(entries, size)
+    }
+
+    public class MetadataEntry public constructor(
+        ptr: LLVMValueMetadataEntry,
+        private val size: SizeTPointer
+    ) : Owner<LLVMValueMetadataEntry> {
+        public override val ref: LLVMValueMetadataEntry = ptr
+
+        public fun size(): Long = size.get()
+
+        public fun getKindId(index: Int): Result<Int> = tryWith {
+            assert(index < size()) { "Out of bounds index $index, size is ${size()}" }
+
+            LLVM.LLVMValueMetadataEntriesGetKind(ref, index)
+        }
+
+        public fun getMetadata(index: Int): Result<Metadata> = tryWith {
+            assert(index < size()) { "Out of bounds index $index, size is ${size()}" }
+
+            val node = LLVM.LLVMValueMetadataEntriesGetMetadata(ref, index)
+
+            Metadata(node)
+        }
+
+        public override fun deallocate() {
+            LLVM.LLVMDisposeValueMetadataEntries(ref)
+            size.deallocate()
+        }
+    }
+}
 
 public class ConstantArray public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.Aggregate
 public class ConstantVector public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.Aggregate
@@ -296,8 +429,7 @@ public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr), Value.
  */
 @CorrespondsTo("llvm::Function")
 public class Function public constructor(ptr: LLVMValueRef) :
-    Constant(ptr),
-    Constant.GlobalValue,
+    GlobalValue(ptr),
     Value.HasDebugLocation,
     Value.Nameable {
     public fun delete() {
@@ -411,7 +543,7 @@ public class Function public constructor(ptr: LLVMValueRef) :
     }
 }
 
-public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.GlobalValue {
+public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : GlobalValue(ptr) {
     public fun getResolver(): Option<Function> {
         val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
 
@@ -434,7 +566,7 @@ public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : Cons
 }
 
 @CorrespondsTo("llvm::GlobalAlias")
-public class GlobalAlias public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.GlobalValue {
+public class GlobalAlias public constructor(ptr: LLVMValueRef) : GlobalValue(ptr) {
     public fun getValue(): AnyConstant {
         val value = LLVM.LLVMAliasGetAliasee(ref)
 
@@ -447,10 +579,12 @@ public class GlobalAlias public constructor(ptr: LLVMValueRef) : Constant(ptr), 
 }
 
 public class GlobalVariable public constructor(ptr: LLVMValueRef) :
-    Constant(ptr),
-    Constant.GlobalValue,
+    GlobalValue(ptr),
     Value.HasDebugLocation
 
+/**
+ * TODO: Research - LLVMSetAlignment and GetAlignment on Alloca, Load and Store
+ */
 public sealed class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
     public interface Atomic : Owner<LLVMValueRef>
     public interface CallBase : Owner<LLVMValueRef>

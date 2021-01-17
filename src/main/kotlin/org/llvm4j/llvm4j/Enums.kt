@@ -333,3 +333,35 @@ public enum class RelocMode(public override val value: Int) : Enumeration.EnumVa
     ROPIRWPI(LLVM.LLVMRelocROPI_RWPI);
     public companion object : Enumeration<RelocMode>(values())
 }
+
+/**
+ * Enumeration of LLVM Linkage types
+ *
+ * This enum set does not include obsolete and old entries. The removed entries are the ones marked obsolute in the
+ * LLVM documentation and are the following:
+ *
+ * - LinkOnceODRAutoHide
+ * - DLLImport
+ * - DLLExport
+ * - Ghost
+ *
+ * TODO: Testing/Research - Which of these values do not have the same get/set?
+ *
+ * @author Mats Larsen
+ */
+public enum class Linkage(public override val value: Int) : Enumeration.EnumVariant {
+    External(LLVM.LLVMExternalLinkage),
+    AvailableExternally(LLVM.LLVMAvailableExternallyLinkage),
+    LinkOnceAny(LLVM.LLVMLinkOnceAnyLinkage),
+    LinkOnceODR(LLVM.LLVMLinkOnceODRLinkage),
+    WeakAny(LLVM.LLVMWeakAnyLinkage),
+    WeakODR(LLVM.LLVMWeakODRLinkage),
+    Appending(LLVM.LLVMAppendingLinkage),
+    Internal(LLVM.LLVMInternalLinkage),
+    Private(LLVM.LLVMPrivateLinkage),
+    ExternalWeak(LLVM.LLVMExternalWeakLinkage),
+    Common(LLVM.LLVMCommonLinkage),
+    LinkerPrivate(LLVM.LLVMLinkerPrivateLinkage),
+    LinkerPrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage);
+    public companion object : Enumeration<Linkage>(values())
+}
