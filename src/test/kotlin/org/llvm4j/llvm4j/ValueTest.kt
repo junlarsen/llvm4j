@@ -53,7 +53,7 @@ class ConstantIntTest {
     }
 }
 
-class ConstantFloatTest {
+class ConstantFPTest {
     @Test fun `Test ConstantFloat properties`() {
         val ctx = Context()
         val float = ctx.getFloatType()
@@ -236,11 +236,10 @@ class GlobalValueTest {
         val mod = ctx.createModule("test_module")
         val i32 = ctx.getInt32Type()
         val fnTy = ctx.getFunctionType(i32, i32)
-        val subject = mod.addFunction("test_main", fnTy)
+        val subject: GlobalValue = mod.addFunction("test_main", fnTy)
 
         assertIsNone(subject.getSection())
         assertEquals(mod.ref, subject.getModule().ref)
-        assertEquals(0, subject.getPreferredAlignment())
         assertEquals(Linkage.External, subject.getLinkage())
         assertEquals(Visibility.Default, subject.getVisibility())
         assertEquals(DLLStorageClass.Default, subject.getStorageClass())
@@ -249,12 +248,10 @@ class GlobalValueTest {
 
         // these do not make sense, but llvm allows it
         subject.setSection(".bss")
-        subject.setPreferredAlignment(16)
         subject.setLinkage(Linkage.Appending)
 
         assertIsSome(subject.getSection())
         assertEquals(".bss", subject.getSection().get())
-        assertEquals(16, subject.getPreferredAlignment())
         assertEquals(Linkage.Appending, subject.getLinkage())
 
         for (value in Visibility.entries) {
@@ -305,14 +302,14 @@ class GlobalVariableTest {
         subject1.setThreadLocal(true)
         subject1.setImmutable(true)
         subject1.setInitializer(value)
-        subject1.setThreadLocalMode(ThreadLocalMode.LocalDynamic)
+        subject1.setThreadLocalMode(ThreadLocalMode.GeneralDynamic)
 
         assertTrue { subject1.isExternallyInitialized() }
         assertTrue { subject1.isThreadLocal() }
         assertTrue { subject1.isImmutable() }
         assertIsSome(subject1.getInitializer())
         assertEquals(value.ref, subject1.getInitializer().get().ref)
-        assertEquals(ThreadLocalMode.LocalDynamic, subject1.getThreadLocalMode())
+        assertEquals(ThreadLocalMode.GeneralDynamic, subject1.getThreadLocalMode())
     }
 
     @Test fun `Test deletion from parent module`() {

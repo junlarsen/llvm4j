@@ -255,6 +255,12 @@ public open class Context public constructor(
         return Module(mod)
     }
 
+    public fun getConstantString(string: String, nullTerminate: Boolean): ConstantDataArray {
+        val cds = LLVM.LLVMConstStringInContext(ref, string, string.length, nullTerminate.toInt())
+
+        return ConstantDataArray(cds)
+    }
+
     public class DiagnosticHandler(public override val closure: (Payload) -> Unit) :
         LLVMDiagnosticHandler(),
         Callback<Unit, DiagnosticHandler.Payload> {

@@ -4,7 +4,6 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
-import org.llvm4j.llvm4j.util.InternalApi
 import org.llvm4j.llvm4j.util.None
 import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
@@ -16,10 +15,25 @@ import org.llvm4j.llvm4j.util.toPointerPointer
 import org.llvm4j.llvm4j.util.tryWith
 
 /**
- * Base implementation of any type in a LLVM system
+ * A single type in an LLVM system
  *
- * Types are cached and stored at the context level. This means that all users of a [Context] share the same unique
- * types.
+ * Types represent the data type a value has. Each value has a type.
+ *
+ * Inheritors in the LLVM hierarchy are:
+ *
+ * @see IntegerType
+ * @see FloatingPointType
+ * @see ArrayType
+ * @see VectorType
+ * @see ScalableVectorType
+ * @see StructType
+ * @see NamedStructType
+ * @see FunctionType
+ * @see VoidType
+ * @see LabelType
+ * @see MetadataType
+ * @see TokenType
+ * @see X86MMXType
  *
  * TODO: Further research - Doxygen documents `LLVMDumpType`. Ask Samuel why it's skipped in JavaCPP
  * TODO: LLVM 12.x - LLVMGetPoison
@@ -342,6 +356,17 @@ public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.C
             buffer.deallocate()
         }
     }
+
+    public fun getConstant(vararg elements: Constant, isPacked: Boolean): Result<ConstantStruct> = tryWith {
+        assert(elements.size == getElementCount()) { "Incorrect # of elements specified" }
+
+        val buffer = elements.map { it.ref }.toPointerPointer()
+        val struct = LLVM.LLVMConstStructInContext(getContext().ref, buffer, elements.size, isPacked.toInt())
+
+        buffer.deallocate()
+
+        ConstantStruct(struct)
+    }
 }
 
 /**
@@ -401,6 +426,18 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
             buffer.deallocate()
         }
     }
+
+    public fun getConstant(vararg elements: Constant, isPacked: Boolean): Result<ConstantStruct> = tryWith {
+        val size = getElementCount().toNullable() ?: fail("Calling getConstant on opaque struct")
+        assert(elements.size == size) { "Incorrect # of elements specified" }
+
+        val buffer = elements.map { it.ref }.toPointerPointer()
+        val struct = LLVM.LLVMConstStructInContext(getContext().ref, buffer, elements.size, isPacked.toInt())
+
+        buffer.deallocate()
+
+        ConstantStruct(struct)
+    }
 }
 
 /**
@@ -446,22 +483,22 @@ public class FunctionType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
  * @author Mats Larsen
  */
 public class FloatingPointType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
-    public fun getConstantNull(): ConstantFloat {
+    public fun getConstantNull(): ConstantFP {
         val ptr = LLVM.LLVMConstNull(ref)
 
-        return ConstantFloat(ptr)
+        return ConstantFP(ptr)
     }
 
-    public fun getAllOnes(): ConstantFloat {
+    public fun getAllOnes(): ConstantFP {
         val constant = LLVM.LLVMConstAllOnes(ref)
 
-        return ConstantFloat(constant)
+        return ConstantFP(constant)
     }
 
-    public fun getConstant(value: Double): ConstantFloat {
+    public fun getConstant(value: Double): ConstantFP {
         val float = LLVM.LLVMConstReal(ref, value)
 
-        return ConstantFloat(float)
+        return ConstantFP(float)
     }
 }
 

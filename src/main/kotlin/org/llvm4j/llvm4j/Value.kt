@@ -21,11 +21,20 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 /**
- * A core object in LLVMs object model
+ * A Value in a computed program
  *
- * This is a base implementation for all values computed by a program that may be used as operands to other values.
+ * This is a core class in the LLVM hierarchy as it is the base class of all values which may be computed and used in
+ * a program.
  *
- * All values have a [Use] list which keeps track of which other [Value]s use this value.
+ * Value is also the base class to other important classes such as [Instruction]s or [Function]s.
+ *
+ * All values have a [Type] which describes which data type the value is and a [Use] list which keeps track of which
+ * other [Value]s reference this value.
+ *
+ * @see Type
+ * @see Constant
+ * @see Instruction
+ * @see Function
  *
  * TODO: Testing - Test [dump] somehow?
  * TODO: LLVM 12.x - LLVMIsPoison
@@ -58,6 +67,11 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
         return copy
     }
 
+    /**
+     * Replaces all usages of this value with another value
+     *
+     * @param other value to replace this with
+     */
     public fun replace(other: Value) {
         LLVM.LLVMReplaceAllUsesWith(ref, other.ref)
     }
@@ -77,7 +91,10 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
     }
 
     /**
-     * Represents any [Value] which has retrievable debug locations
+     * Common implementation for any value which has a retrievable debug location at compile time.
+     *
+     * In the C++ API there are 3 different implementations for this, but the C API has thrown all of these under
+     * umbrella functions which delegate to the C++ implementations.
      *
      * Known inheritors are [Instruction], [GlobalVariable] and [Function]
      *
@@ -119,15 +136,23 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
     }
 
     /**
-     * Represents a value which may have a name
+     * Common implementation for any value which may have a name.
      *
-     * Known inheritors are [Constant.GlobalValue], [Argument] and [Instruction]. Function also inherits this trait
-     * implicitly through GlobalValue.
+     * Only a few value kinds in LLVM IR may have a name. These are limited to instructions, basic blocks, functions,
+     * global values and function arguments.
+     *
+     * Inheritors in the LLVM hierarchy are:
+     *
+     * @see Instruction
+     * @see BasicBlock
+     * @see Function
+     * @see GlobalValue
+     * @see Argument
      *
      * @author Mats Larsen
      */
     @InternalApi
-    public interface Nameable : Owner<LLVMValueRef> {
+    public interface HasName : Owner<LLVMValueRef> {
         public fun getName(): String {
             val size = SizeTPointer(1L)
             val ptr = LLVM.LLVMGetValueName2(ref, size)
@@ -150,8 +175,12 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
 public class AnyValue public constructor(ptr: LLVMValueRef) : Value(ptr)
 
 /**
- * A value which might use another value
+ * Represents any value which may use another value.
  *
+ * Each instance of [Value] keeps track of which other values use it, these values are all [User]s. Common users are
+ * instructions and constants.
+ *
+ * @see Value
  * @see Use
  *
  * TODO: Testing - Test once values are more usable (see LLVM test suite, asmparser)
@@ -198,7 +227,10 @@ public class AnyUser public constructor(ptr: LLVMValueRef) : User(ptr)
 public class BasicBlock public constructor(ptr: LLVMValueRef) : Value(ptr)
 
 /**
- * A [Metadata] disguised as a [Value]
+ * A Metadata wrapper in LLVMs Value hierarchy
+ *
+ * This allows a value to reference a metadata node, allowing intrinsics to have metadata nodes as their operands. An
+ * equivalent class exists for values wrapped as metadata.
  *
  * @see ValueAsMetadata
  *
@@ -215,31 +247,161 @@ public class MetadataAsValue(ptr: LLVMValueRef) : Value(ptr) {
     }
 }
 
+/**
+ * Base class for all constant values in an LLVM program. Constants are values which are immutable at runtime, such
+ * as numbers and other values.
+ *
+ * Constants may be complex values such as arrays or structures, basic like integers and floating points or
+ * expression based such as a the result of a computation (instructions)
+ *
+ * Functions and global variables are also constants because their addresses are immutable.
+ *
+ * @see ConstantInt
+ * @see ConstantFP
+ * @see ConstantVector
+ * @see ConstantArray
+ * @see ConstantStruct
+ * @see ConstantExpression
+ * @see Function
+ * @see GlobalValue
+ *
+ * @author Mats Larsen
+ */
 @CorrespondsTo("llvm::Constant")
 public sealed class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
     public fun isNull(): Boolean {
         return LLVM.LLVMIsNull(ref).toBoolean()
     }
-
-    @InternalApi
-    public interface Aggregate : Owner<LLVMValueRef>
 }
 
 public class AnyConstant public constructor(ptr: LLVMValueRef) : Constant(ptr)
 
 /**
- * Represents any value which is globally declared inside a [Module]
+ * Base class for composite values with operands.
  *
- * TODO: LLVM 12.x - LLVMIsDeclaration()
- * TODO: Testing - Test metadata once metadata is stable
+ * These are aggregate values, meaning they're composed of other values.
+ *
+ * Inheritors in the LLVM hierarchy are:
+ *
+ * @see ConstantStruct
+ * @see ConstantArray
+ * @see ConstantVector
  *
  * @author Mats Larsen
  */
-@CorrespondsTo("llvm::GlobalValue", "llvm::GlobalObject")
+@CorrespondsTo("llvm::ConstantAggregate")
+public sealed class ConstantAggregate constructor(ptr: LLVMValueRef) : Constant(ptr)
+
+/**
+ * Base class for constant values with no operands.
+ *
+ * Constant data are constants which represent their data directly. They can be in use by unrelated modules and
+ * because they do not have any operands it does not make sense to replace all uses of them.
+ *
+ * @see Value.replace
+ *
+ * Inheritors in the LLVM hierarchy are:
+ *
+ * @see ConstantAggregateZero
+ * @see ConstantDataSequential
+ * @see ConstantFP
+ * @see ConstantInt
+ * @see ConstantPointerNull
+ * @see ConstantTokenNone
+ * @see UndefValue
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::ConstantData")
+public sealed class ConstantData constructor(ptr: LLVMValueRef) : Constant(ptr)
+
+/**
+ * A vector or array constant whose element type is either i1, i2, i4, i8, float or double.
+ *
+ * Elements of a constant data sequential are simple data values. A constant data sequential does not have any
+ * operands because it stores all of its elements as densely packed data instead of Value instances for performance
+ * reasons.
+ *
+ * Inheritors in the LLVM hierarchy are:
+ *
+ * @see ConstantDataArray
+ * @see ConstantDataVector
+ *
+ * TODO: Research - Index out of bounds testing for [getElement]?
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::ConstantDataSequential")
+public sealed class ConstantDataSequential constructor(ptr: LLVMValueRef) : ConstantData(ptr) {
+    public fun getStringValue(): String {
+        val size = SizeTPointer(1L)
+        val ptr = LLVM.LLVMGetAsString(ref, size)
+        val copy = ptr.string
+
+        ptr.deallocate()
+        size.deallocate()
+
+        return copy
+    }
+
+    public fun getElement(index: Int): AnyConstant {
+        val elem = LLVM.LLVMGetElementAsConstant(ref, index)
+
+        return AnyConstant(elem)
+    }
+
+    public fun isString(): Boolean {
+        return LLVM.LLVMIsConstantString(ref).toBoolean()
+    }
+}
+
+/**
+ * An array constant whose element type is either i1, i2, i4, i8, float or double.
+ *
+ * @see ConstantDataSequential
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::ConstantDataArray")
+public class ConstantDataArray public constructor(ptr: LLVMValueRef) : ConstantDataSequential(ptr)
+
+/**
+ * A vector constant whose element type is either i1, i2, i4, i8, float or double.
+ *
+ * @see ConstantDataSequential
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::ConstantDataVector")
+public class ConstantDataVector public constructor(ptr: LLVMValueRef) : ConstantDataSequential(ptr)
+
+/**
+ * Base class for any globally defined object in a module.
+ *
+ * Global values are constants which are defined in a module. These values have special capabilities which other
+ * constants do not have. For example, using the address of it as a constant.
+ *
+ * Inheritors in the LLVM hierarchy are:
+ *
+ * @see GlobalAlias
+ * @see GlobalIndirectFunction
+ * @see Function
+ * @see GlobalVariable
+ *
+ * These subtypes inherit these traits through one of these sub classes:
+ *
+ * @see GlobalIndirectSymbol
+ * @see GlobalObject
+ *
+ * TODO: LLVM 12.x - LLVMIsDeclaration()
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::GlobalValue")
 public sealed class GlobalValue constructor(ptr: LLVMValueRef) :
     Constant(ptr),
     Owner<LLVMValueRef>,
-    Value.Nameable {
+    Value.HasName {
     public fun getModule(): Module {
         val module = LLVM.LLVMGetGlobalParent(ref)
 
@@ -300,12 +462,31 @@ public sealed class GlobalValue constructor(ptr: LLVMValueRef) :
         LLVM.LLVMSetUnnamedAddress(ref, address.value)
     }
 
+    /**
+     * Get the type of the underlying value. This differs from [getType] because the type of a global value is always
+     * a pointer type.
+     */
     public fun getValueType(): AnyType {
         val type = LLVM.LLVMGlobalGetValueType(ref)
 
         return AnyType(type)
     }
+}
 
+/**
+ * An independent global object, a function or a variable, but not an alias.
+ *
+ * Inheritors in the LLVM hierarchy are:
+ *
+ * @see Function
+ * @see GlobalVariable
+ *
+ * TODO: Testing - Test metadata once metadata is stable
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::GlobalObject")
+public sealed class GlobalObject constructor(ptr: LLVMValueRef) : GlobalValue(ptr) {
     public fun getPreferredAlignment(): Int {
         return LLVM.LLVMGetAlignment(ref)
     }
@@ -333,6 +514,17 @@ public sealed class GlobalValue constructor(ptr: LLVMValueRef) :
         return MetadataEntry(entries, size)
     }
 
+    /**
+     * Wrapper type for an array of metadata nodes which belong to a global object.
+     *
+     * This is a rather useless type by itself and is only used when copying all the metadata a global object has
+     * through [GlobalObject.getAllMetadata]
+     *
+     * This type is exclusive to the LLVM C API and has no equivalent in the C++ API as it's just a data transfer
+     * object.
+     *
+     * @author Mats Larsen
+     */
     public class MetadataEntry public constructor(
         ptr: LLVMValueMetadataEntry,
         private val size: SizeTPointer
@@ -362,19 +554,63 @@ public sealed class GlobalValue constructor(ptr: LLVMValueRef) :
     }
 }
 
-public class ConstantArray public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.Aggregate
-public class ConstantVector public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.Aggregate
-public class ConstantStruct public constructor(ptr: LLVMValueRef) : Constant(ptr), Constant.Aggregate
+/**
+ * An alias to a global value, either a global alias or an indirect function.
+ *
+ * Inheritors in the LLVM hierarchy are:
+ *
+ * @see GlobalIndirectFunction
+ * @see GlobalAlias
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::GlobalIndirectSymbol")
+public sealed class GlobalIndirectSymbol constructor(ptr: LLVMValueRef) : GlobalValue(ptr)
 
 /**
- * Representation of a constant integer or boolean
+ * A constant array of values with the same type.
  *
- * Booleans in LLVM are integers of type i1
+ * @see ConstantAggregate
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::ConstantArray")
+public class ConstantArray public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr)
+
+/**
+ * A constant vector of values with the same type
+ *
+ * @see ConstantAggregate
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::Vector")
+public class ConstantVector public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr)
+
+/**
+ * A constant structure aggregate consisting of values of various types.
+ *
+ * Both named structs and anonymous structs are represented as constant structs.
+ *
+ * @see ConstantAggregate
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::ConstantStruct")
+public class ConstantStruct public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr)
+
+/**
+ * A single, constant integer value
+ *
+ * This is a shared class for both integral numbers and booleans in LLVM, because LLVM represents boolean values as
+ * single bit integers.
+ *
+ * @see ConstantData
  *
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantInt")
-public class ConstantInt public constructor(ptr: LLVMValueRef) : Constant(ptr) {
+public class ConstantInt public constructor(ptr: LLVMValueRef) : ConstantData(ptr) {
     public fun getZeroExtendedValue(): Long {
         return LLVM.LLVMConstIntGetZExtValue(ref)
     }
@@ -385,12 +621,19 @@ public class ConstantInt public constructor(ptr: LLVMValueRef) : Constant(ptr) {
 }
 
 /**
- * Representation of a floating point constant
+ * A single, constant floating point value
+ *
+ * @see ConstantData
  *
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantFP")
-public class ConstantFloat public constructor(ptr: LLVMValueRef) : Constant(ptr) {
+public class ConstantFP public constructor(ptr: LLVMValueRef) : ConstantData(ptr) {
+    /**
+     * Retrieve the value as a Kotlin double.
+     *
+     * @return pair of value and boolean indicating if conversion was lossy.
+     */
     public fun getValue(): Pair<Double, Boolean> {
         val ptr = IntPointer(1L)
         val double = LLVM.LLVMConstRealGetDouble(ref, ptr)
@@ -400,15 +643,31 @@ public class ConstantFloat public constructor(ptr: LLVMValueRef) : Constant(ptr)
     }
 }
 
-public class ConstantAggregateZero public constructor(ptr: LLVMValueRef) : Constant(ptr)
-public class ConstantPointerNull public constructor(ptr: LLVMValueRef) : Constant(ptr)
-public class ConstantTokenNone public constructor(ptr: LLVMValueRef) : Constant(ptr)
-public class UndefValue public constructor(ptr: LLVMValueRef) : Constant(ptr)
+@CorrespondsTo("llvm::ConstantAggregateZero")
+public class ConstantAggregateZero public constructor(ptr: LLVMValueRef) : ConstantData(ptr)
 
+@CorrespondsTo("llvm::ConstantPointerNull")
+public class ConstantPointerNull public constructor(ptr: LLVMValueRef) : ConstantData(ptr)
+
+@CorrespondsTo("llvm::ConstantTokenNone")
+public class ConstantTokenNone public constructor(ptr: LLVMValueRef) : ConstantData(ptr)
+
+@CorrespondsTo("llvm::UndefValue")
+public class UndefValue public constructor(ptr: LLVMValueRef) : ConstantData(ptr)
+
+@CorrespondsTo("llvm::BlockAddress")
 public class BlockAddress public constructor(ptr: LLVMValueRef) : Constant(ptr)
 
+/**
+ * A single incoming formal argument to a function
+ *
+ * Because this is a "formal" value, it doesn't contain an actual value, but instead represents the type, index, name
+ * and attributes of the incoming argument.
+ *
+ * @author Mats Larsen
+ */
 @CorrespondsTo("llvm::Argument")
-public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr), Value.Nameable {
+public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr), Value.HasName {
     public fun getParent(): Function {
         val fn = LLVM.LLVMGetParamParent(ref)
 
@@ -421,7 +680,13 @@ public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr), Value.
 }
 
 /**
- * Represents a single procedure in a [Module]
+ * A single function/procedure in an LLVM program
+ *
+ * A function is a procedure consisting of a set of basic blocks which make up the control flow graph of a program.
+ * They also have a list of arguments and a local symbol table.
+ *
+ * @see Argument
+ * @see BasicBlock
  *
  * TODO: Iterators - Parameter iterator
  * TODO: Testing - Test attributes once Builder is stable (see Inkwell tests)
@@ -430,9 +695,9 @@ public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr), Value.
  */
 @CorrespondsTo("llvm::Function")
 public class Function public constructor(ptr: LLVMValueRef) :
-    GlobalValue(ptr),
+    GlobalObject(ptr),
     Value.HasDebugLocation,
-    Value.Nameable {
+    Value.HasName {
     public fun delete() {
         LLVM.LLVMDeleteFunction(ref)
     }
@@ -544,7 +809,16 @@ public class Function public constructor(ptr: LLVMValueRef) :
     }
 }
 
-public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : GlobalValue(ptr) {
+/**
+ * A single global indirect function in an LLVM program
+ *
+ * This represents an indirect function in the LLVM IR of a program. Indirect functions use ELF symbol type extension
+ * to mark that6 the address of a declaration should be resolved at runtime by calling a resolver function.
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::GlobalIFunc")
+public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : GlobalIndirectSymbol(ptr) {
     public fun getResolver(): Option<Function> {
         val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
 
@@ -566,8 +840,21 @@ public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : Glob
     public fun hasResolver(): Boolean = getResolver().isDefined()
 }
 
+/**
+ * A single global alias in an LLVM program
+ *
+ * Global aliases are essentially pointers to other global objects in an LLVM program. A global alias points to a
+ * single function or global variable.
+ *
+ * @see Function
+ * @see GlobalVariable
+ *
+ * TODO: Research - Replace getValue/setValue return type with GlobalObject?
+ *
+ * @author Mats Larsen
+ */
 @CorrespondsTo("llvm::GlobalAlias")
-public class GlobalAlias public constructor(ptr: LLVMValueRef) : GlobalValue(ptr) {
+public class GlobalAlias public constructor(ptr: LLVMValueRef) : GlobalIndirectSymbol(ptr) {
     public fun getValue(): AnyConstant {
         val value = LLVM.LLVMAliasGetAliasee(ref)
 
@@ -579,8 +866,21 @@ public class GlobalAlias public constructor(ptr: LLVMValueRef) : GlobalValue(ptr
     }
 }
 
+/**
+ * A single global variable in an LLVM program
+ *
+ * This is a single constant value which are constant pointers to a value allocated by either the VM or the linker in
+ * a static compiler.
+ *
+ * Global variables may have initial values which are then copied into the .data section of executables.
+ *
+ * Global constants must have initializers to form a well-formed program.
+ *
+ * @author Mats Larsen
+ */
+@CorrespondsTo("llvm::GlobalVariable")
 public class GlobalVariable public constructor(ptr: LLVMValueRef) :
-    GlobalValue(ptr),
+    GlobalObject(ptr),
     Value.HasDebugLocation {
     public fun delete() {
         LLVM.LLVMDeleteGlobal(ref)
@@ -632,6 +932,24 @@ public class GlobalVariable public constructor(ptr: LLVMValueRef) :
 }
 
 /**
+ * A constant value which is initialized with an expression using other constant values.
+ *
+ * This is a constant value which is the result of a computation of other constant values. The available computations
+ * are the instructions defined in LLVMs instruction set.
+ *
+ * Constant expression types can be recognized using [ConstantExpression.getOpcode].
+ *
+ * @author Mats Larsen
+ */
+public sealed class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
+    public fun getOpcode(): Opcode {
+        val opcode = LLVM.LLVMGetConstOpcode(ref)
+
+        return Opcode.from(opcode).get()
+    }
+}
+
+/**
  * TODO: Research - LLVMSetAlignment and GetAlignment on Alloca, Load and Store
  */
 public sealed class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
@@ -641,6 +959,7 @@ public sealed class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Valu
     public interface MemoryAccessor : Owner<LLVMValueRef>
     public interface Terminator : Owner<LLVMValueRef>
 }
+
 
 public class AllocaInstruction
 public class AtomicCmpXchgInstruction
