@@ -28,7 +28,6 @@ import java.io.File
  * TODO: Iterators - GlobalAlias iterator
  * TODO: Iterators - GlobalVariable iterator
  * TODO: Testing - Test [dump] somehow?
- * TODO: Testing - Test [addModuleFlag] when [Metadata] is implemented
  *
  * @author Mats Larsen
  */
@@ -105,10 +104,10 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
         return FlagEntry(entries, size)
     }
 
-    public fun getModuleFlag(key: String): Option<Metadata> {
+    public fun getModuleFlag(key: String): Option<AnyMetadata> {
         val flag = LLVM.LLVMGetModuleFlag(ref, key, key.length.toLong())
 
-        return flag?.let { Some(Metadata(it)) } ?: None
+        return flag?.let { Some(AnyMetadata(it)) } ?: None
     }
 
     public fun addModuleFlag(behavior: ModuleFlagBehavior, key: String, value: Metadata) {
@@ -254,8 +253,6 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
     /**
      * Metadata flag containing information about the module as a whole
      *
-     * TODO: Testing - Test when [Metadata] is implemented
-     *
      * @author Mats Larsen
      */
     public class FlagEntry public constructor(
@@ -287,12 +284,12 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
             ModuleFlagBehavior.from(behavior).get()
         }
 
-        public fun getMetadata(index: Int): Result<Metadata> = tryWith {
+        public fun getMetadata(index: Int): Result<AnyMetadata> = tryWith {
             assert(index < size()) { "Out of bounds index $index, size is ${size()}" }
 
             val node = LLVM.LLVMModuleFlagEntriesGetMetadata(ref, index)
 
-            Metadata(node)
+            AnyMetadata(node)
         }
 
         public override fun deallocate() {

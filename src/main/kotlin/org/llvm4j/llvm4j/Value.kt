@@ -90,6 +90,12 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
         return use?.let { Some(Use(it)) } ?: None
     }
 
+    public fun toMetadata(): ValueAsMetadata {
+        val md = LLVM.LLVMValueAsMetadata(ref)
+
+        return ValueAsMetadata(md)
+    }
+
     /**
      * Common implementation for any value which has a retrievable debug location at compile time.
      *
@@ -551,12 +557,12 @@ public sealed class GlobalObject constructor(ptr: LLVMValueRef) : GlobalValue(pt
             LLVM.LLVMValueMetadataEntriesGetKind(ref, index)
         }
 
-        public fun getMetadata(index: Int): Result<Metadata> = tryWith {
+        public fun getMetadata(index: Int): Result<AnyMetadata> = tryWith {
             assert(index < size()) { "Out of bounds index $index, size is ${size()}" }
 
             val node = LLVM.LLVMValueMetadataEntriesGetMetadata(ref, index)
 
-            Metadata(node)
+            AnyMetadata(node)
         }
 
         public override fun deallocate() {

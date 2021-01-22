@@ -261,6 +261,21 @@ public open class Context public constructor(
         return ConstantDataArray(cds)
     }
 
+    public fun getMetadataString(value: String): MetadataString {
+        val node = LLVM.LLVMMDStringInContext2(ref, value, value.length.toLong())
+
+        return MetadataString(node)
+    }
+
+    public fun getMetadataNode(vararg values: Metadata): MetadataNode {
+        val buffer = values.map { it.ref }.toPointerPointer()
+        val node = LLVM.LLVMMDNodeInContext2(ref, buffer, values.size.toLong())
+
+        buffer.deallocate()
+
+        return MetadataNode(node)
+    }
+
     public class DiagnosticHandler(private val closure: (Payload) -> Unit) :
         LLVMDiagnosticHandler(),
         Callback<Unit, DiagnosticHandler.Payload> {
