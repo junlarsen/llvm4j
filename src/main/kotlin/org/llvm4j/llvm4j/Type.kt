@@ -35,8 +35,10 @@ import org.llvm4j.llvm4j.util.tryWith
  * @see TokenType
  * @see X86MMXType
  *
- * TODO: Further research - Doxygen documents `LLVMDumpType`. Ask Samuel why it's skipped in JavaCPP
+ * TODO: Research - Ask Samuel why dump is omitted
+ * TODO: Research - [getConstantVector] and [getConstantArray] both return CDS ValueKinds ?
  * TODO: LLVM 12.x - LLVMGetPoison
+ *
  *
  * @author Mats Larsen
  */
@@ -297,6 +299,8 @@ public class ScalableVectorType public constructor(ptr: LLVMTypeRef) : Type(ptr)
 
 /**
  * Representation of a pointer type
+ *
+ * TODO: Research - Difference between LLVMConstNull and LLVMConstNullPointer for pointer types
  *
  * @author Mats Larsen
  */

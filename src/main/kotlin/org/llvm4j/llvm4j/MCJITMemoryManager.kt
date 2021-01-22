@@ -18,9 +18,11 @@ import org.llvm4j.llvm4j.util.toBoolean
 public class MCJITMemoryManager public constructor(ptr: LLVMMCJITMemoryManagerRef) : Owner<LLVMMCJITMemoryManagerRef> {
     public override val ref: LLVMMCJITMemoryManagerRef = ptr
 
-    public class AllocateCodeSectionCallback(public override val closure: (Payload) -> BytePointer) :
+    public class AllocateCodeSectionCallback(private val closure: (Payload) -> BytePointer) :
         LLVMMemoryManagerAllocateCodeSectionCallback(),
         Callback<BytePointer, AllocateCodeSectionCallback.Payload> {
+        public override fun invoke(ctx: Payload): BytePointer = closure(ctx)
+
         public override fun call(p0: Pointer?, p1: Long, p2: Int, p3: Int, p4: BytePointer): BytePointer {
             val payload = p0?.let { Some(it) } ?: None
             val sectionName = p4.string
@@ -28,7 +30,7 @@ public class MCJITMemoryManager public constructor(ptr: LLVMMCJITMemoryManagerRe
 
             p4.deallocate()
 
-            return closure.invoke(data)
+            return invoke(data)
         }
 
         public data class Payload(
@@ -40,9 +42,11 @@ public class MCJITMemoryManager public constructor(ptr: LLVMMCJITMemoryManagerRe
         )
     }
 
-    public class AllocateDataSectionCallback(public override val closure: (Payload) -> BytePointer) :
+    public class AllocateDataSectionCallback(private val closure: (Payload) -> BytePointer) :
         LLVMMemoryManagerAllocateDataSectionCallback(),
         Callback<BytePointer, AllocateDataSectionCallback.Payload> {
+        public override fun invoke(ctx: Payload): BytePointer = closure(ctx)
+
         public override fun call(p0: Pointer?, p1: Long, p2: Int, p3: Int, p4: BytePointer, p5: Int): BytePointer {
             val payload = p0?.let { Some(it) } ?: None
             val sectionName = p4.string
@@ -50,7 +54,7 @@ public class MCJITMemoryManager public constructor(ptr: LLVMMCJITMemoryManagerRe
 
             p4.deallocate()
 
-            return closure.invoke(data)
+            return invoke(data)
         }
 
         public data class Payload(
@@ -63,22 +67,26 @@ public class MCJITMemoryManager public constructor(ptr: LLVMMCJITMemoryManagerRe
         )
     }
 
-    public class DestroyCallback(public override val closure: (Payload) -> Unit) :
+    public class DestroyCallback(private val closure: (Payload) -> Unit) :
         LLVMMemoryManagerDestroyCallback(),
         Callback<Unit, DestroyCallback.Payload> {
+        public override fun invoke(ctx: Payload): Unit = closure(ctx)
+
         public override fun call(p0: Pointer?) {
             val payload = p0?.let { Some(it) } ?: None
             val data = Payload(payload)
 
-            return closure.invoke(data)
+            return invoke(data)
         }
 
         public data class Payload(public val payload: Option<Pointer>)
     }
 
-    public class FinalizeMemoryCallback(public override val closure: (Payload) -> Int) :
+    public class FinalizeMemoryCallback(private val closure: (Payload) -> Int) :
         LLVMMemoryManagerFinalizeMemoryCallback(),
         Callback<Int, FinalizeMemoryCallback.Payload> {
+        public override fun invoke(ctx: Payload): Int = closure(ctx)
+
         public override fun call(p0: Pointer?, p1: PointerPointer<*>): Int {
             val payload = p0?.let { Some(it) } ?: None
             val error = p1.getString(0)
@@ -86,7 +94,7 @@ public class MCJITMemoryManager public constructor(ptr: LLVMMCJITMemoryManagerRe
 
             p1.deallocate()
 
-            return closure.invoke(data)
+            return invoke(data)
         }
 
         public data class Payload(

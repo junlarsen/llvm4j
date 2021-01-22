@@ -29,15 +29,17 @@ public class OrcJITStack public constructor(ptr: LLVMOrcJITStackRef) : Owner<LLV
         public override val ref: LLVMJITEventListenerRef = ptr
     }
 
-    public class LazyCompileCallback(public override val closure: (Payload) -> Long) :
+    public class LazyCompileCallback(private val closure: (Payload) -> Long) :
         LLVMOrcLazyCompileCallbackFn(),
         Callback<Long, LazyCompileCallback.Payload> {
+        public override fun invoke(ctx: Payload): Long = closure(ctx)
+
         public override fun call(p0: LLVMOrcJITStackRef, p1: Pointer?): Long {
             val jitStack = OrcJITStack(p0)
             val payload = p1?.let { Some(it) } ?: None
             val data = Payload(jitStack, payload)
 
-            return closure.invoke(data)
+            return invoke(data)
         }
 
         public data class Payload(
@@ -46,9 +48,11 @@ public class OrcJITStack public constructor(ptr: LLVMOrcJITStackRef) : Owner<LLV
         )
     }
 
-    public class SymbolResolver(public override val closure: (Payload) -> Long) :
+    public class SymbolResolver(private val closure: (Payload) -> Long) :
         LLVMOrcSymbolResolverFn(),
         Callback<Long, SymbolResolver.Payload> {
+        public override fun invoke(ctx: Payload): Long = closure(ctx)
+
         public override fun call(p0: BytePointer, p1: Pointer?): Long {
             val name = p0.string
             val payload = p1?.let { Some(it) } ?: None
@@ -56,7 +60,7 @@ public class OrcJITStack public constructor(ptr: LLVMOrcJITStackRef) : Owner<LLV
 
             p0.deallocate()
 
-            return closure.invoke(data)
+            return invoke(data)
         }
 
         public data class Payload(

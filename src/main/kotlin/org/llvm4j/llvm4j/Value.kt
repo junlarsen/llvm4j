@@ -223,6 +223,18 @@ public sealed class User constructor(ptr: LLVMValueRef) : Value(ptr) {
 
 public class AnyUser public constructor(ptr: LLVMValueRef) : User(ptr)
 
+/**
+ * A single basic block in a function
+ *
+ * A basic block is a set of instructions which execute sequentially. All basic blocks end with a terminator
+ * instruction which indicates where control flow will be continued.
+ *
+ * Basic blocks are values because other instructions may reference them (branching, switch tables)
+ *
+ * TODO: API - Implement LLVMBlockAddress to get address of basic block
+ *
+ * @author Mats Larsen
+ */
 @CorrespondsTo("llvm::BasicBlock")
 public class BasicBlock public constructor(ptr: LLVMValueRef) : Value(ptr)
 
@@ -570,6 +582,8 @@ public sealed class GlobalIndirectSymbol constructor(ptr: LLVMValueRef) : Global
 /**
  * A constant array of values with the same type.
  *
+ * To create a constant array, see the [Type.getConstantArray] method
+ *
  * @see ConstantAggregate
  *
  * @author Mats Larsen
@@ -579,6 +593,8 @@ public class ConstantArray public constructor(ptr: LLVMValueRef) : ConstantAggre
 
 /**
  * A constant vector of values with the same type
+ *
+ * To create a constant vector, see the [Type.getConstantVector] method
  *
  * @see ConstantAggregate
  *
@@ -941,7 +957,7 @@ public class GlobalVariable public constructor(ptr: LLVMValueRef) :
  *
  * @author Mats Larsen
  */
-public sealed class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
+public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
     public fun getOpcode(): Opcode {
         val opcode = LLVM.LLVMGetConstOpcode(ref)
 
@@ -959,7 +975,6 @@ public sealed class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Valu
     public interface MemoryAccessor : Owner<LLVMValueRef>
     public interface Terminator : Owner<LLVMValueRef>
 }
-
 
 public class AllocaInstruction
 public class AtomicCmpXchgInstruction

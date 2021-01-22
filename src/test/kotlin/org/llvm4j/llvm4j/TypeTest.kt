@@ -234,7 +234,6 @@ class TypeTest {
         assertEquals(0, subject1.getAddressSpace().value)
         assertEquals(i8.ref, subject1.getElementType().ref)
         assertEquals(listOf(i8.ref), subject1.getSubtypes().map { it.ref })
-
         assertEquals(5, subject2.getAddressSpace().value)
     }
 

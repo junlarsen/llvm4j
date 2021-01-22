@@ -20,7 +20,11 @@ public typealias LTODiagnosticHandler = lto_diagnostic_handler_t
 public class LTOCodeGen public constructor(ptr: LTOCodeGenRef) : Owner<LTOCodeGenRef> {
     public override val ref: LTOCodeGenRef = ptr
 
-    public class DiagnosticHandler(public override val closure: (Payload) -> Unit) : LTODiagnosticHandler(), Callback<Unit, DiagnosticHandler.Payload> {
+    public class DiagnosticHandler(private val closure: (Payload) -> Unit) :
+        LTODiagnosticHandler(), Callback<Unit,
+        DiagnosticHandler.Payload> {
+        public override fun invoke(ctx: Payload): Unit = closure(ctx)
+
         public override fun call(p0: Int, p1: BytePointer, p2: Pointer?) {
             val message = p1.string
             val payload = p2?.let { Some(it) } ?: None
@@ -28,7 +32,7 @@ public class LTOCodeGen public constructor(ptr: LTOCodeGenRef) : Owner<LTOCodeGe
 
             p1.deallocate()
 
-            return closure.invoke(data)
+            return invoke(data)
         }
 
         public data class Payload(

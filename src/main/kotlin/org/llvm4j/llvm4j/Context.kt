@@ -261,15 +261,17 @@ public open class Context public constructor(
         return ConstantDataArray(cds)
     }
 
-    public class DiagnosticHandler(public override val closure: (Payload) -> Unit) :
+    public class DiagnosticHandler(private val closure: (Payload) -> Unit) :
         LLVMDiagnosticHandler(),
         Callback<Unit, DiagnosticHandler.Payload> {
+        public override fun invoke(ctx: Payload): Unit = closure(ctx)
+
         public override fun call(p0: LLVMDiagnosticInfoRef, p1: Pointer?) {
             val info = DiagnosticInfo(p0)
             val payload = p1?.let { Some(it) } ?: None
             val data = Payload(info, payload)
 
-            return closure.invoke(data)
+            return invoke(data)
         }
 
         public data class Payload(
@@ -278,15 +280,17 @@ public open class Context public constructor(
         )
     }
 
-    public class YieldCallback(public override val closure: (Payload) -> Unit) :
+    public class YieldCallback(private val closure: (Payload) -> Unit) :
         LLVMYieldCallback(),
         Callback<Unit, YieldCallback.Payload> {
+        public override fun invoke(ctx: Payload): Unit = closure(ctx)
+
         public override fun call(p0: LLVMContextRef, p1: Pointer?) {
             val context = Context(p0)
             val payload = p1?.let { Some(it) } ?: None
             val data = Payload(context, payload)
 
-            return closure.invoke(data)
+            return invoke(data)
         }
 
         public data class Payload(
