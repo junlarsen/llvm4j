@@ -115,6 +115,23 @@ class ModuleTest {
         assertEquals("", mod.getInlineAsm())
     }
 
+    @Test fun `Test module flags`() {
+        val ctx = Context()
+        val mod = ctx.createModule("test_module")
+        val md = ctx.getMetadataString("wow")
+
+        mod.addModuleFlag(ModuleFlagBehavior.Error, "test", md)
+
+        val subject1 = mod.getModuleFlag("test")
+        val subject2 = mod.getModuleFlags()
+
+        assertIsSome(subject1)
+        assertEquals(1, subject2.size())
+        assertEquals("test", subject2.getKey(0).get())
+        assertEquals(ModuleFlagBehavior.Error, subject2.getBehavior(0).get())
+        assertEquals(md.ref, subject2.getMetadata(0).get().ref)
+    }
+
     @Test fun `Test finding named types`() {
         val ctx = Context()
         val mod = ctx.createModule("test_module")
