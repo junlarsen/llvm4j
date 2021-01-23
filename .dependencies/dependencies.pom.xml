@@ -1,6 +1,6 @@
 <project>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>io.vexelabs.bitbuilder</groupId>
+    <groupId>org.llvm4j.llvm4j</groupId>
     <artifactId>dependencies</artifactId>
     <version>1.0.0</version>
     <dependencies>
