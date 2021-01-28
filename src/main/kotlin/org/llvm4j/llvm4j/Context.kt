@@ -276,6 +276,12 @@ public open class Context public constructor(
         return MetadataNode(node)
     }
 
+    public fun createBasicBlock(name: String): BasicBlock {
+        val bb = LLVM.LLVMCreateBasicBlockInContext(ref, name)
+
+        return BasicBlock(bb)
+    }
+
     public class DiagnosticHandler(private val closure: (Payload) -> Unit) :
         LLVMDiagnosticHandler(),
         Callback<Unit, DiagnosticHandler.Payload> {

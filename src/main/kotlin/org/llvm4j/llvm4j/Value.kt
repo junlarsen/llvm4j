@@ -4,6 +4,7 @@ import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
+import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
 import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -90,7 +91,13 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
         return use?.let { Some(Use(it)) } ?: None
     }
 
-    public fun toMetadata(): ValueAsMetadata {
+    public fun asBasicBlock(): BasicBlock {
+        val bb = LLVM.LLVMValueAsBasicBlock(ref)
+
+        return BasicBlock(bb)
+    }
+
+    public fun asMetadata(): ValueAsMetadata {
         val md = LLVM.LLVMValueAsMetadata(ref)
 
         return ValueAsMetadata(md)
@@ -238,11 +245,66 @@ public class AnyUser public constructor(ptr: LLVMValueRef) : User(ptr)
  * Basic blocks are values because other instructions may reference them (branching, switch tables)
  *
  * TODO: API - Implement LLVMBlockAddress to get address of basic block
+ * TODO: API - Implement LLVMValueIsBasicBlock through isa
+ * TODO: Iterators - Instruction iterator
  *
  * @author Mats Larsen
  */
-@CorrespondsTo("llvm::BasicBlock")
-public class BasicBlock public constructor(ptr: LLVMValueRef) : Value(ptr)
+public class BasicBlock public constructor(ptr: LLVMBasicBlockRef) : Owner<LLVMBasicBlockRef> {
+    public override val ref: LLVMBasicBlockRef = ptr
+
+    public fun asValue(): BasicBlockAsValue {
+        val value = LLVM.LLVMBasicBlockAsValue(ref)
+
+        return BasicBlockAsValue(value)
+    }
+
+    public fun getName(): String {
+        val ptr = LLVM.LLVMGetBasicBlockName(ref)
+        val copy = ptr.string
+
+        ptr.deallocate()
+
+        return copy
+    }
+
+    public fun getFunction(): Option<Function> {
+        val fn = LLVM.LLVMGetBasicBlockParent(ref)
+
+        return fn?.let { Some(Function(it)) } ?: None
+    }
+
+    public fun moveBefore(block: BasicBlock) {
+        LLVM.LLVMMoveBasicBlockBefore(ref, block.ref)
+    }
+
+    public fun moveAfter(block: BasicBlock) {
+        LLVM.LLVMMoveBasicBlockAfter(ref, block.ref)
+    }
+
+    public fun delete() {
+        LLVM.LLVMDeleteBasicBlock(ref)
+    }
+
+    public fun erase() {
+        LLVM.LLVMRemoveBasicBlockFromParent(ref)
+    }
+}
+
+/**
+ * Represents a basic block in the value representation.
+ *
+ * LLVM basic blocks are also values which means it can be converted to a value in the C API.
+ *
+ * @author Mats Larsen
+ */
+public class BasicBlockAsValue public constructor(ptr: LLVMValueRef) : Value(ptr) {
+    public fun getBlock(): BasicBlock {
+        val bb = LLVM.LLVMValueAsBasicBlock(ref)
+
+        return BasicBlock(bb)
+    }
+}
 
 /**
  * A Metadata wrapper in LLVMs Value hierarchy
@@ -711,6 +773,8 @@ public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr), Value.
  * @see BasicBlock
  *
  * TODO: Iterators - Parameter iterator
+ * TODO: Iterators - BasicBlock iterator
+ * TODO: Research - Are AppendBasicBlockInContext, InsertBasicBlockInContext necessary? they are alt constructors
  * TODO: Testing - Test attributes once Builder is stable (see Inkwell tests)
  *
  * @author Mats Larsen
@@ -828,6 +892,39 @@ public class Function public constructor(ptr: LLVMValueRef) :
         val parameter = LLVM.LLVMGetParam(ref, index)
 
         Argument(parameter)
+    }
+
+    public fun getBasicBlockCount(): Int {
+        return LLVM.LLVMCountBasicBlocks(ref)
+    }
+
+    public fun getBasicBlocks(): Array<BasicBlock> {
+        val size = getBasicBlockCount()
+        val buffer = PointerPointer<LLVMBasicBlockRef>(size.toLong())
+
+        LLVM.LLVMGetBasicBlocks(ref, buffer)
+
+        return List(size) {
+            LLVMBasicBlockRef(buffer.get(it.toLong()))
+        }.map(::BasicBlock).toTypedArray().also {
+            buffer.deallocate()
+        }
+    }
+
+    /**
+     * Get the entry block in a function
+     *
+     * This has some unexpected behavior; functions without basic blocks return a new empty basic block instead of
+     * null/none.
+     */
+    public fun getEntryBasicBlock(): BasicBlock {
+        val bb = LLVM.LLVMGetEntryBasicBlock(ref)
+
+        return BasicBlock(bb)
+    }
+
+    public fun addBasicBlock(block: BasicBlock) {
+        LLVM.LLVMAppendExistingBasicBlock(ref, block.ref)
     }
 }
 
@@ -980,28 +1077,62 @@ public sealed class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Valu
     public interface FuncletPad : Owner<LLVMValueRef>
     public interface MemoryAccessor : Owner<LLVMValueRef>
     public interface Terminator : Owner<LLVMValueRef>
+
+    public fun hasMetadata(): Boolean {
+        return LLVM.LLVMHasMetadata(ref).toBoolean()
+    }
+
+    public fun getMetadata(kindId: Int): Option<MetadataAsValue> {
+        val md = LLVM.LLVMGetMetadata(ref, kindId)
+
+        return md?.let { Some(MetadataAsValue(it)) } ?: None
+    }
+
+    public fun setMetadata(kindId: Int, node: MetadataAsValue) {
+        LLVM.LLVMSetMetadata(ref, kindId, node.ref)
+    }
 }
 
-public class AllocaInstruction
-public class AtomicCmpXchgInstruction
+public class AtomicCmpXchgInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class AtomicRMWInstruction
-public class BrInstruction
-public class CallBrInstruction
-public class CatchPadInstruction
-public class CatchRetInstruction
-public class CatchSwitchInstruction
-public class CleanupPadInstruction
-public class CleanupRetInstruction
-public class FenceInstruction
-public class IndirectBrInstruction
+// public class BinaryOperatorInstruction
+
+public sealed class BranchInst
 public class InvokeInstruction
+public class CallBrInstruction
+public class CallInstruction
+
+public class CatchReturnInstruction
+public class CatchSwitchInstruction
+public class CleanupReturnInstruction
+
+// @interface CmpInst
+public class ICmpInstruction
+public class FCmpInstruction
+
+public class ExtractElementInstruction
+public class FenceInstruction
+
+// @interface FuncletPadInst
+public class CatchPadInstruction
+public class CleanupPadInstruction
+
+public class GetElementPtrInstruction
+public class IndirectBrInstruction
+public class InsertElementInstruction
+public class InsertValueInstruction
 public class LandingPadInstruction
-public class LoadInstruction
 public class PhiInstruction
 public class ResumeInstruction
-public class RetInstruction
+public class ReturnInstruction
 public class SelectInstruction
+public class ShuffleVectorInstruction
 public class StoreInstruction
 public class SwitchInstruction
-public class UnreachableInstruction
+
+// @interface UnaryInstruction - UnaryOperator
+public class AllocaInstruction
+public class LoadInstruction
 public class VAArgInstruction
+
+public class UnreachableInstruction
