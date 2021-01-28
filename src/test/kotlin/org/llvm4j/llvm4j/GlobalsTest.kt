@@ -109,6 +109,28 @@ class FunctionTest {
 
         assertIsNone(mod.getFunction("test_fn"))
     }
+
+    @Test fun `Test basic block count`() {
+        val ctx = Context()
+        val void = ctx.getVoidType()
+        val fnTy = ctx.getFunctionType(void)
+        val mod = ctx.createModule("test_module")
+        val subject = mod.addFunction("test_fn", fnTy)
+        val bb1 = ctx.createBasicBlock("bb1")
+        val bb2 = ctx.createBasicBlock("bb2")
+
+        assertEquals(0, subject.getBasicBlockCount())
+
+        subject.addBasicBlock(bb1)
+
+        assertEquals(1, subject.getBasicBlockCount())
+        assertEquals(bb1.ref, subject.getBasicBlocks().first().ref)
+        assertEquals(bb1.ref, subject.getEntryBasicBlock().ref)
+
+        subject.addBasicBlock(bb2)
+
+        assertEquals(2, subject.getBasicBlockCount())
+    }
 }
 
 class GlobalAliasTest {
