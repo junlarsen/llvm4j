@@ -12,7 +12,7 @@ plugins {
     id("signing")
 }
 
-group = "io.vexelabs"
+group = "org.llvm4j"
 version = "0.1.0-SNAPSHOT"
 
 kotlin.explicitApi()
@@ -25,17 +25,20 @@ repositories {
     mavenCentral()
     mavenLocal()
     jcenter()
-    maven("https://jitpack.io")
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
-    api("org.bytedeco:llvm-platform:11.0.0-1.5.5-SNAPSHOT")
+    api("org.bytedeco:llvm-platform:11.0.1-1.5.5-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.10")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.4.10")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.11")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.11")
     testRuntimeOnly("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
+
+    testImplementation(platform("org.junit:junit-bom:5.7.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
 tasks {
@@ -44,8 +47,9 @@ tasks {
     }
 
     withType<Test>().configureEach {
-        useJUnitPlatform {
-            includeEngines("spek2")
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
         }
     }
 

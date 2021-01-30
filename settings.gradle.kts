@@ -1,4 +1,4 @@
-rootProject.name = "bitbuilder"
+rootProject.name = "llvm4j"
 
 pluginManagement {
     repositories {

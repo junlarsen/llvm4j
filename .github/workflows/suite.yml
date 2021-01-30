@@ -6,15 +6,12 @@ on:
   pull_request:
     branches:
       - master
-env:
-  GRADLE_OPTS: -Dorg.gradle.caching=true
 jobs:
   lint:
     name: Style-check codebase
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
       # Cache dependencies per commit hash because Sonatype OSS repo might
       # miss certain artifacts at times.
       - name: Cache Dependencies
@@ -22,17 +19,13 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: mvn-hash-df754038083bf5f352298666ce1c9cfb9843b031
+          key: mvn-hash-cce3d80711f15665cf1058b40cc3587c19ec9d76
       # Install dependencies if git hash has changed
       - name: Install Maven Dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: bash ./mvnw -f .dependencies/dependencies.pom.xml -U compile
-
-      - name: Install Gradle dependencies
-        run: bash ./gradlew clean build --refresh-dependencies
-
-      - name: Run ktlint
-        run: bash ./gradlew ktlintCheck
+      # Build and run lint check
+      - run: bash ./gradlew clean build ktlintCheck --refresh-dependencies
 
   test:
     needs: [lint]
@@ -43,7 +36,6 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v2
-
       # Cache dependencies per commit hash because Sonatype OSS repo might
       # miss certain artifacts at times.
       - name: Cache Dependencies
@@ -51,20 +43,14 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: mvn-hash-df754038083bf5f352298666ce1c9cfb9843b031
+          key: mvn-hash-cce3d80711f15665cf1058b40cc3587c19ec9d76
       # Install dependencies if git hash has changed
       - name: Install Dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: bash ./mvnw -f .dependencies/dependencies.pom.xml -U compile
-
-      - name: Install Gradle dependencies
-        run: bash ./gradlew clean build --refresh-dependencies
-
-      - name: Log system information
-        run: |
+      # Log system information and run tests
+      - run: |
           bash --version
           bash ./gradlew --version
           java -version
-
-      - name: Execute kotlin test suite
-        run: bash ./gradlew test
+      - run: bash ./gradlew clean build test --refresh-dependencies
