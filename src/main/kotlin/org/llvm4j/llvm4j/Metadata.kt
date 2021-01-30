@@ -36,7 +36,7 @@ import org.llvm4j.llvm4j.util.tryWith
  * TODO: Implemenent operands for [MetadataString], [MetadataNode] once javacpp-presets#1001 is merged
  */
 @CorrespondsTo("llvm::Metadata")
-public sealed class Metadata constructor(ptr: LLVMMetadataRef) : Owner<LLVMMetadataRef> {
+public open class Metadata constructor(ptr: LLVMMetadataRef) : Owner<LLVMMetadataRef> {
     public override val ref: LLVMMetadataRef = ptr
 
     public fun toValue(context: Context): MetadataAsValue {
@@ -45,8 +45,6 @@ public sealed class Metadata constructor(ptr: LLVMMetadataRef) : Owner<LLVMMetad
         return MetadataAsValue(v)
     }
 }
-
-public class AnyMetadata public constructor(ptr: LLVMMetadataRef) : Metadata(ptr)
 
 /**
  * A [Value] disguised as a [Metadata]

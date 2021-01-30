@@ -23,15 +23,15 @@ import org.llvm4j.llvm4j.util.Some
 public class Use public constructor(ptr: LLVMUseRef) : Owner<LLVMUseRef> {
     public override val ref: LLVMUseRef = ptr
 
-    public fun getUser(): Option<AnyUser> {
+    public fun getUser(): Option<User> {
         val user = LLVM.LLVMGetUser(ref)
 
-        return user?.let { Some(AnyUser(it)) } ?: None
+        return user?.let { Some(User(it)) } ?: None
     }
 
-    public fun getUsedValue(): Option<AnyValue> {
+    public fun getUsedValue(): Option<Value> {
         val value = LLVM.LLVMGetUsedValue(ref)
 
-        return value?.let { Some(AnyValue(it)) } ?: None
+        return value?.let { Some(Value(it)) } ?: None
     }
 }

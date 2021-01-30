@@ -43,7 +43,7 @@ import org.llvm4j.llvm4j.util.tryWith
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::Type")
-public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
+public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
     public override val ref: LLVMTypeRef = ptr
 
     private val memoizedTypeKind by lazy {
@@ -155,7 +155,7 @@ public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
      * @author Mats Larsen
      */
     public interface Sequential : Composite {
-        public fun getSubtypes(): Array<AnyType> {
+        public fun getSubtypes(): Array<Type> {
             val size = getElementCount()
             val buffer = PointerPointer<LLVMTypeRef>(size.toLong())
 
@@ -163,15 +163,15 @@ public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
 
             return List(size) {
                 LLVMTypeRef(buffer.get(it.toLong()))
-            }.map(::AnyType).toTypedArray().also {
+            }.map(::Type).toTypedArray().also {
                 buffer.deallocate()
             }
         }
 
-        public fun getElementType(): AnyType {
+        public fun getElementType(): Type {
             val type = LLVM.LLVMGetElementType(ref)
 
-            return AnyType(type)
+            return Type(type)
         }
     }
 
@@ -199,11 +199,7 @@ public sealed class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
             return ConstantStruct(ptr)
         }
     }
-
-    public fun toAnyType(): AnyType = AnyType(ref)
 }
-
-public class AnyType public constructor(ptr: LLVMTypeRef) : Type(ptr)
 
 /**
  * Representation of a single integer type.
@@ -339,14 +335,15 @@ public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.C
         return LLVM.LLVMCountStructElementTypes(ref)
     }
 
-    public fun getElementType(index: Int): Result<AnyType> = tryWith {
+    public fun getElementType(index: Int): Result<Type> = tryWith {
         assert(index <= getElementCount()) { "Index out of bounds" }
 
         val type = LLVM.LLVMStructGetTypeAtIndex(ref, index)
-        AnyType(type)
+
+        Type(type)
     }
 
-    public fun getElementTypes(): Array<AnyType> {
+    public fun getElementTypes(): Array<Type> {
         assert(!isOpaque()) { "Calling getElementTypes on opaque struct" }
 
         val size = getElementCount()
@@ -356,7 +353,7 @@ public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.C
 
         return List(size) {
             LLVMTypeRef(buffer.get(it.toLong()))
-        }.map(::AnyType).toTypedArray().also {
+        }.map(::Type).toTypedArray().also {
             buffer.deallocate()
         }
     }
@@ -406,17 +403,17 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
         buffer.deallocate()
     }
 
-    public fun getElementType(index: Int): Result<AnyType> = tryWith {
+    public fun getElementType(index: Int): Result<Type> = tryWith {
         assert(!isOpaque()) { "Calling getElementType on opaque struct" }
         // Safe .get as getElementCount ensures !isOpaque
         assert(index <= getElementCount().get()) { "Index out of bounds" }
 
         val type = LLVM.LLVMStructGetTypeAtIndex(ref, index)
 
-        AnyType(type)
+        Type(type)
     }
 
-    public fun getElementTypes(): Result<Array<AnyType>> = tryWith {
+    public fun getElementTypes(): Result<Array<Type>> = tryWith {
         assert(!isOpaque()) { "Calling getElementTypes on opaque struct" }
 
         val size = getElementCount().get()
@@ -426,7 +423,7 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
 
         List(size) {
             LLVMTypeRef(buffer.get(it.toLong()))
-        }.map(::AnyType).toTypedArray().also {
+        }.map(::Type).toTypedArray().also {
             buffer.deallocate()
         }
     }
@@ -457,17 +454,17 @@ public class FunctionType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
         return LLVM.LLVMIsFunctionVarArg(ref).toBoolean()
     }
 
-    public fun getReturnType(): AnyType {
+    public fun getReturnType(): Type {
         val returnType = LLVM.LLVMGetReturnType(ref)
 
-        return AnyType(returnType)
+        return Type(returnType)
     }
 
     public fun getParameterCount(): Int {
         return LLVM.LLVMCountParamTypes(ref)
     }
 
-    public fun getParameterTypes(): Array<AnyType> {
+    public fun getParameterTypes(): Array<Type> {
         val size = getParameterCount()
         val buffer = PointerPointer<LLVMTypeRef>(size.toLong())
 
@@ -475,7 +472,7 @@ public class FunctionType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
 
         return List(size) {
             LLVMTypeRef(buffer.get(it.toLong()))
-        }.map(::AnyType).toTypedArray().also {
+        }.map(::Type).toTypedArray().also {
             buffer.deallocate()
         }
     }

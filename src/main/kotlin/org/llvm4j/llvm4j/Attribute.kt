@@ -20,12 +20,10 @@ import org.llvm4j.llvm4j.util.toBoolean
  * LLVMs C API exposes two kinds of attributes, Enum attributes and String attributes. For type safety and a more
  * precise api we have split these up into [EnumAttribute] and [StringAttribute].
  *
- * If you have an unknown attribute, you can use [AnyAttribute] combined with [isEnumAttribute] or [isStringAttribute]
- *
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::Attribute")
-public sealed class Attribute constructor(ptr: LLVMAttributeRef) : Owner<LLVMAttributeRef> {
+public open class Attribute constructor(ptr: LLVMAttributeRef) : Owner<LLVMAttributeRef> {
     public override val ref: LLVMAttributeRef = ptr
 
     public fun isStringAttribute(): Boolean {
@@ -35,8 +33,6 @@ public sealed class Attribute constructor(ptr: LLVMAttributeRef) : Owner<LLVMAtt
     public fun isEnumAttribute(): Boolean {
         return LLVM.LLVMIsEnumAttribute(ref).toBoolean()
     }
-
-    public fun toAnyAttribute(): AnyAttribute = AnyAttribute(ref)
 
     public companion object {
         @JvmStatic
@@ -100,18 +96,6 @@ public class StringAttribute public constructor(ptr: LLVMAttributeRef) : Attribu
         return copy
     }
 }
-
-/**
- * Representation of any attribute
- *
- * To properly use an [AnyAttribute] find its type kind with [isStringAttribute] and [isEnumAttribute] and
- * cast/reconstruct to the proper type.
- *
- * Types may also be cast back into [AnyType] with [toAny]
- *
- * @author Mats Larsen
- */
-public class AnyAttribute(ptr: LLVMAttributeRef) : Attribute(ptr)
 
 public sealed class AttributeIndex(public override val value: Int) : Enumeration.EnumVariant {
     public object Return : AttributeIndex(LLVM.LLVMAttributeReturnIndex)

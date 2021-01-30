@@ -26,7 +26,7 @@ public typealias EnumAttribute = Attribute.Enum
  * @see Attribute.String
  * @see Attribute.Enum
  */
-public sealed class Attribute : ContainsReference<LLVMAttributeRef> {
+public open class Attribute : ContainsReference<LLVMAttributeRef> {
     public override lateinit var ref: LLVMAttributeRef
         internal set
 

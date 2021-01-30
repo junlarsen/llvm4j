@@ -44,13 +44,13 @@ import java.nio.file.Paths
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::Value")
-public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
+public open class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
     public override val ref: LLVMValueRef = ptr
 
-    public fun getType(): AnyType {
+    public fun getType(): Type {
         val type = LLVM.LLVMTypeOf(ref)
 
-        return AnyType(type)
+        return Type(type)
     }
 
     public fun getValueKind(): ValueKind {
@@ -181,11 +181,7 @@ public sealed class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
             LLVM.LLVMSetValueName2(ref, name, name.length.toLong())
         }
     }
-
-    public fun toAnyValue(): AnyValue = AnyValue(ref)
 }
-
-public class AnyValue public constructor(ptr: LLVMValueRef) : Value(ptr)
 
 /**
  * Represents any value which may use another value.
@@ -201,13 +197,13 @@ public class AnyValue public constructor(ptr: LLVMValueRef) : Value(ptr)
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::User")
-public sealed class User constructor(ptr: LLVMValueRef) : Value(ptr) {
-    public fun getOperand(index: Int): Result<AnyValue> = tryWith {
+public open class User constructor(ptr: LLVMValueRef) : Value(ptr) {
+    public fun getOperand(index: Int): Result<Value> = tryWith {
         assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}" }
 
         val ptr = LLVM.LLVMGetOperand(ref, index)
 
-        AnyValue(ptr)
+        Value(ptr)
     }
 
     public fun getOperandUse(index: Int): Result<Use> = tryWith {
@@ -230,11 +226,7 @@ public sealed class User constructor(ptr: LLVMValueRef) : Value(ptr) {
     public fun getOperandCount(): Int {
         return LLVM.LLVMGetNumOperands(ref)
     }
-
-    public fun toAnyUser(): AnyUser = AnyUser(ref)
 }
-
-public class AnyUser public constructor(ptr: LLVMValueRef) : User(ptr)
 
 /**
  * A single basic block in a function
@@ -348,13 +340,11 @@ public class MetadataAsValue(ptr: LLVMValueRef) : Value(ptr) {
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::Constant")
-public sealed class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
+public open class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
     public fun isNull(): Boolean {
         return LLVM.LLVMIsNull(ref).toBoolean()
     }
 }
-
-public class AnyConstant public constructor(ptr: LLVMValueRef) : Constant(ptr)
 
 /**
  * Base class for composite values with operands.
@@ -370,7 +360,7 @@ public class AnyConstant public constructor(ptr: LLVMValueRef) : Constant(ptr)
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantAggregate")
-public sealed class ConstantAggregate constructor(ptr: LLVMValueRef) : Constant(ptr)
+public open class ConstantAggregate constructor(ptr: LLVMValueRef) : Constant(ptr)
 
 /**
  * Base class for constant values with no operands.
@@ -393,7 +383,7 @@ public sealed class ConstantAggregate constructor(ptr: LLVMValueRef) : Constant(
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantData")
-public sealed class ConstantData constructor(ptr: LLVMValueRef) : Constant(ptr)
+public open class ConstantData constructor(ptr: LLVMValueRef) : Constant(ptr)
 
 /**
  * A vector or array constant whose element type is either i1, i2, i4, i8, float or double.
@@ -412,7 +402,7 @@ public sealed class ConstantData constructor(ptr: LLVMValueRef) : Constant(ptr)
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantDataSequential")
-public sealed class ConstantDataSequential constructor(ptr: LLVMValueRef) : ConstantData(ptr) {
+public open class ConstantDataSequential constructor(ptr: LLVMValueRef) : ConstantData(ptr) {
     public fun getStringValue(): String {
         val size = SizeTPointer(1L)
         val ptr = LLVM.LLVMGetAsString(ref, size)
@@ -424,10 +414,10 @@ public sealed class ConstantDataSequential constructor(ptr: LLVMValueRef) : Cons
         return copy
     }
 
-    public fun getElement(index: Int): AnyConstant {
+    public fun getElement(index: Int): Constant {
         val elem = LLVM.LLVMGetElementAsConstant(ref, index)
 
-        return AnyConstant(elem)
+        return Constant(elem)
     }
 
     public fun isString(): Boolean {
@@ -478,7 +468,7 @@ public class ConstantDataVector public constructor(ptr: LLVMValueRef) : Constant
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::GlobalValue")
-public sealed class GlobalValue constructor(ptr: LLVMValueRef) :
+public open class GlobalValue constructor(ptr: LLVMValueRef) :
     Constant(ptr),
     Owner<LLVMValueRef>,
     Value.HasName {
@@ -546,10 +536,10 @@ public sealed class GlobalValue constructor(ptr: LLVMValueRef) :
      * Get the type of the underlying value. This differs from [getType] because the type of a global value is always
      * a pointer type.
      */
-    public fun getValueType(): AnyType {
+    public fun getValueType(): Type {
         val type = LLVM.LLVMGlobalGetValueType(ref)
 
-        return AnyType(type)
+        return Type(type)
     }
 }
 
@@ -566,7 +556,7 @@ public sealed class GlobalValue constructor(ptr: LLVMValueRef) :
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::GlobalObject")
-public sealed class GlobalObject constructor(ptr: LLVMValueRef) : GlobalValue(ptr) {
+public open class GlobalObject constructor(ptr: LLVMValueRef) : GlobalValue(ptr) {
     public fun getPreferredAlignment(): Int {
         return LLVM.LLVMGetAlignment(ref)
     }
@@ -619,12 +609,12 @@ public sealed class GlobalObject constructor(ptr: LLVMValueRef) : GlobalValue(pt
             LLVM.LLVMValueMetadataEntriesGetKind(ref, index)
         }
 
-        public fun getMetadata(index: Int): Result<AnyMetadata> = tryWith {
+        public fun getMetadata(index: Int): Result<Metadata> = tryWith {
             assert(index < size()) { "Out of bounds index $index, size is ${size()}" }
 
             val node = LLVM.LLVMValueMetadataEntriesGetMetadata(ref, index)
 
-            AnyMetadata(node)
+            Metadata(node)
         }
 
         public override fun deallocate() {
@@ -645,7 +635,7 @@ public sealed class GlobalObject constructor(ptr: LLVMValueRef) : GlobalValue(pt
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::GlobalIndirectSymbol")
-public sealed class GlobalIndirectSymbol constructor(ptr: LLVMValueRef) : GlobalValue(ptr)
+public open class GlobalIndirectSymbol constructor(ptr: LLVMValueRef) : GlobalValue(ptr)
 
 /**
  * A constant array of values with the same type.
@@ -836,7 +826,7 @@ public class Function public constructor(ptr: LLVMValueRef) :
         return LLVM.LLVMGetAttributeCountAtIndex(ref, index.value)
     }
 
-    public fun getAttributes(index: AttributeIndex): Array<AnyAttribute> {
+    public fun getAttributes(index: AttributeIndex): Array<Attribute> {
         val size = getAttributeCount(index)
         val buffer = PointerPointer<LLVMAttributeRef>(size.toLong())
 
@@ -844,7 +834,7 @@ public class Function public constructor(ptr: LLVMValueRef) :
 
         return List(size) {
             LLVMAttributeRef(buffer.get(it.toLong()))
-        }.map(::AnyAttribute).toTypedArray().also {
+        }.map(::Attribute).toTypedArray().also {
             buffer.deallocate()
         }
     }
@@ -974,10 +964,10 @@ public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : Glob
  */
 @CorrespondsTo("llvm::GlobalAlias")
 public class GlobalAlias public constructor(ptr: LLVMValueRef) : GlobalIndirectSymbol(ptr) {
-    public fun getValue(): AnyConstant {
+    public fun getValue(): Constant {
         val value = LLVM.LLVMAliasGetAliasee(ref)
 
-        return AnyConstant(value)
+        return Constant(value)
     }
 
     public fun setValue(value: Constant) {
@@ -1005,10 +995,10 @@ public class GlobalVariable public constructor(ptr: LLVMValueRef) :
         LLVM.LLVMDeleteGlobal(ref)
     }
 
-    public fun getInitializer(): Option<AnyConstant> {
+    public fun getInitializer(): Option<Constant> {
         val value = LLVM.LLVMGetInitializer(ref)
 
-        return value?.let { Some(AnyConstant(it)) } ?: None
+        return value?.let { Some(Constant(it)) } ?: None
     }
 
     public fun setInitializer(value: Constant) {
@@ -1071,7 +1061,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
 /**
  * TODO: Research - LLVMSetAlignment and GetAlignment on Alloca, Load and Store
  */
-public sealed class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
+public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
     public interface Atomic : Owner<LLVMValueRef>
     public interface CallBase : Owner<LLVMValueRef>
     public interface FuncletPad : Owner<LLVMValueRef>
@@ -1097,7 +1087,7 @@ public class AtomicCmpXchgInstruction public constructor(ptr: LLVMValueRef) : In
 public class AtomicRMWInstruction
 // public class BinaryOperatorInstruction
 
-public sealed class BranchInst
+public open class BranchInst
 public class InvokeInstruction
 public class CallBrInstruction
 public class CallInstruction

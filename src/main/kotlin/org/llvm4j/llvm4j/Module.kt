@@ -104,10 +104,10 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
         return FlagEntry(entries, size)
     }
 
-    public fun getModuleFlag(key: String): Option<AnyMetadata> {
+    public fun getModuleFlag(key: String): Option<Metadata> {
         val flag = LLVM.LLVMGetModuleFlag(ref, key, key.length.toLong())
 
-        return flag?.let { Some(AnyMetadata(it)) } ?: None
+        return flag?.let { Some(Metadata(it)) } ?: None
     }
 
     public fun addModuleFlag(behavior: ModuleFlagBehavior, key: String, value: Metadata) {
@@ -284,12 +284,12 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
             ModuleFlagBehavior.from(behavior).get()
         }
 
-        public fun getMetadata(index: Int): Result<AnyMetadata> = tryWith {
+        public fun getMetadata(index: Int): Result<Metadata> = tryWith {
             assert(index < size()) { "Out of bounds index $index, size is ${size()}" }
 
             val node = LLVM.LLVMModuleFlagEntriesGetMetadata(ref, index)
 
-            AnyMetadata(node)
+            Metadata(node)
         }
 
         public override fun deallocate() {
