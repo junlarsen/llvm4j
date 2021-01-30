@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Test
 import org.llvm4j.llvm4j.testing.assertIsSome
 import kotlin.test.assertEquals
 
-class MetadataTest {
-
-}
+class MetadataTest
 
 class NamedMetadataNodeTest {
     @Test fun `Test NamedMetadataNode properties`() {

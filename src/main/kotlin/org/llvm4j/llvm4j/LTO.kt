@@ -21,8 +21,9 @@ public class LTOCodeGen public constructor(ptr: LTOCodeGenRef) : Owner<LTOCodeGe
     public override val ref: LTOCodeGenRef = ptr
 
     public class DiagnosticHandler(private val closure: (Payload) -> Unit) :
-        LTODiagnosticHandler(), Callback<Unit,
-        DiagnosticHandler.Payload> {
+        LTODiagnosticHandler(),
+        Callback<Unit,
+            DiagnosticHandler.Payload> {
         public override fun invoke(ctx: Payload): Unit = closure(ctx)
 
         public override fun call(p0: Int, p1: BytePointer, p2: Pointer?) {

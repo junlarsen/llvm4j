@@ -50,7 +50,6 @@ class ConstantIntTest {
     }
 }
 
-
 class ConstantFPTest {
     @Test fun `Test ConstantFloat properties`() {
         val ctx = Context()

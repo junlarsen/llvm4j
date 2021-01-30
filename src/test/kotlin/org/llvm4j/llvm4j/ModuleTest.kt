@@ -10,13 +10,15 @@ import java.nio.file.Files
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-const val MODULE_IR = """; ModuleID = 'module.ll'
+const val MODULE_IR =
+    """; ModuleID = 'module.ll'
 source_filename = "test.c"
 target datalayout = "p:64:64:64"
 target triple = "x86_64-apple-macosx10.7.0"
 """
 
-const val MODULE_ASM1 = """test_function:
+const val MODULE_ASM1 =
+    """test_function:
     pushl $10
     pushl $10
     call  sum_function
@@ -28,7 +30,8 @@ sum_function:
     ret
 """
 
-const val MODULE_ASM2 = """test_function:
+const val MODULE_ASM2 =
+    """test_function:
     pushl $10
     pushl $10
     call  sum_function
@@ -36,7 +39,8 @@ const val MODULE_ASM2 = """test_function:
     ret
 """
 
-const val MODULE_ASM3 = """sum_function:
+const val MODULE_ASM3 =
+    """sum_function:
     movl 8(%esp), %eax
     addl 4(%esp), %eax
     ret

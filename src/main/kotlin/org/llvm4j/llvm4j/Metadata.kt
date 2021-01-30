@@ -1,18 +1,14 @@
 package org.llvm4j.llvm4j
 
-import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMMetadataRef
 import org.bytedeco.llvm.LLVM.LLVMNamedMDNodeRef
-import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.CustomApi
 import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Result
-import org.llvm4j.llvm4j.util.tryWith
 
 /**
  * Metadata is program metadata which can be attached to instructions or functions in the IR which convey extra
@@ -72,7 +68,7 @@ public class MetadataString public constructor(ptr: LLVMMetadataRef) : Metadata(
 @CorrespondsTo("llvm::NamedMDNode")
 public class NamedMetadataNode public constructor(ptr: LLVMNamedMDNodeRef) : Owner<LLVMNamedMDNodeRef> {
     public override val ref: LLVMNamedMDNodeRef = ptr
-    
+
     public fun getName(): String {
         val size = SizeTPointer(1L)
         val ptr = LLVM.LLVMGetNamedMetadataName(ref, size)

@@ -5,14 +5,14 @@ import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMModuleFlagEntry
 import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
-import org.llvm4j.llvm4j.util.Enumeration
-import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Result
-import org.llvm4j.llvm4j.util.tryWith
 import org.llvm4j.llvm4j.util.CorrespondsTo
+import org.llvm4j.llvm4j.util.Enumeration
 import org.llvm4j.llvm4j.util.None
 import org.llvm4j.llvm4j.util.Option
+import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.Result
 import org.llvm4j.llvm4j.util.Some
+import org.llvm4j.llvm4j.util.tryWith
 import java.io.File
 
 /**
