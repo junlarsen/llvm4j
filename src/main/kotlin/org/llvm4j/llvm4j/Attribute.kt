@@ -8,8 +8,10 @@ import org.llvm4j.llvm4j.util.Enumeration
 import org.llvm4j.llvm4j.util.None
 import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.Result
 import org.llvm4j.llvm4j.util.Some
 import org.llvm4j.llvm4j.util.toBoolean
+import org.llvm4j.llvm4j.util.tryWith
 
 /**
  * Represents a flag/attribute for an item in the LLVM system.
@@ -19,6 +21,8 @@ import org.llvm4j.llvm4j.util.toBoolean
  *
  * LLVMs C API exposes two kinds of attributes, Enum attributes and String attributes. For type safety and a more
  * precise api we have split these up into [EnumAttribute] and [StringAttribute].
+ *
+ * TODO: Merge the subclasses together to match the LLVM C++ API
  *
  * @author Mats Larsen
  */
@@ -32,6 +36,44 @@ public open class Attribute constructor(ptr: LLVMAttributeRef) : Owner<LLVMAttri
 
     public fun isEnumAttribute(): Boolean {
         return LLVM.LLVMIsEnumAttribute(ref).toBoolean()
+    }
+
+    public fun getEnumKind(): Result<Int> = tryWith {
+        assert(isEnumAttribute()) { "Is not an enum attribute" }
+
+        LLVM.LLVMGetEnumAttributeKind(ref)
+    }
+
+    public fun getEnumValue(): Result<Long> = tryWith {
+        assert(isEnumAttribute()) { "Is not an enum attribute" }
+
+        LLVM.LLVMGetEnumAttributeValue(ref)
+    }
+
+    public fun getStringKind(): Result<String> = tryWith {
+        assert(isStringAttribute()) { "Is not a string attribute" }
+
+        val size = IntPointer(1L)
+        val ptr = LLVM.LLVMGetStringAttributeKind(ref, size)
+        val copy = ptr.string
+
+        size.deallocate()
+        ptr.deallocate()
+
+        copy
+    }
+
+    public fun getStringValue(): Result<String> = tryWith {
+        assert(isStringAttribute()) { "Is not a string attribute" }
+
+        val size = IntPointer(1L)
+        val ptr = LLVM.LLVMGetStringAttributeValue(ref, size)
+        val copy = ptr.string
+
+        size.deallocate()
+        ptr.deallocate()
+
+        copy
     }
 
     public companion object {
@@ -50,50 +92,6 @@ public open class Attribute constructor(ptr: LLVMAttributeRef) : Owner<LLVMAttri
                 None
             }
         }
-    }
-}
-
-/**
- * Represents an enum attribute
- *
- * @author Mats Larsen
- */
-public class EnumAttribute public constructor(ptr: LLVMAttributeRef) : Attribute(ptr) {
-    public fun getKind(): Int {
-        return LLVM.LLVMGetEnumAttributeKind(ref)
-    }
-
-    public fun getValue(): Long {
-        return LLVM.LLVMGetEnumAttributeValue(ref)
-    }
-}
-
-/**
- * Represents a string attribute
- *
- * @author Mats Larsen
- */
-public class StringAttribute public constructor(ptr: LLVMAttributeRef) : Attribute(ptr) {
-    public fun getKind(): String {
-        val size = IntPointer(1L)
-        val ptr = LLVM.LLVMGetStringAttributeKind(ref, size)
-        val copy = ptr.string
-
-        size.deallocate()
-        ptr.deallocate()
-
-        return copy
-    }
-
-    public fun getValue(): String {
-        val size = IntPointer(1L)
-        val ptr = LLVM.LLVMGetStringAttributeValue(ref, size)
-        val copy = ptr.string
-
-        size.deallocate()
-        ptr.deallocate()
-
-        return copy
     }
 }
 

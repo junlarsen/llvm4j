@@ -237,16 +237,16 @@ public open class Context public constructor(
         return TokenType(ptr)
     }
 
-    public fun createEnumAttribute(kindId: Int, value: Long): EnumAttribute {
+    public fun createEnumAttribute(kindId: Int, value: Long): Attribute {
         val attr = LLVM.LLVMCreateEnumAttribute(ref, kindId, value)
 
-        return EnumAttribute(attr)
+        return Attribute(attr)
     }
 
-    public fun createStringAttribute(kindId: String, value: String): StringAttribute {
+    public fun createStringAttribute(kindId: String, value: String): Attribute {
         val attr = LLVM.LLVMCreateStringAttribute(ref, kindId, kindId.length, value, value.length)
 
-        return StringAttribute(attr)
+        return Attribute(attr)
     }
 
     public fun createModule(name: String): Module {

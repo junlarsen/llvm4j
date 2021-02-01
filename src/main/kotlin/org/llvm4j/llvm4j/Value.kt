@@ -839,16 +839,16 @@ public class Function public constructor(ptr: LLVMValueRef) :
         }
     }
 
-    public fun getEnumAttribute(index: AttributeIndex, kind: Int): EnumAttribute {
+    public fun getEnumAttribute(index: AttributeIndex, kind: Int): Attribute {
         val attr = LLVM.LLVMGetEnumAttributeAtIndex(ref, index.value, kind)
 
-        return EnumAttribute(attr)
+        return Attribute(attr)
     }
 
-    public fun getStringAttribute(index: AttributeIndex, kind: String): StringAttribute {
+    public fun getStringAttribute(index: AttributeIndex, kind: String): Attribute {
         val attr = LLVM.LLVMGetStringAttributeAtIndex(ref, index.value, kind, kind.length)
 
-        return StringAttribute(attr)
+        return Attribute(attr)
     }
 
     public fun addAttribute(index: AttributeIndex, attribute: Attribute) {
