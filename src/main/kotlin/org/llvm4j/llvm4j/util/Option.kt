@@ -1,5 +1,7 @@
 package org.llvm4j.llvm4j.util
 
+import java.util.Optional
+
 /**
  * Represents a single optional value. Instances of [Option] are either an
  * instance of [Some] or [None].
@@ -8,17 +10,19 @@ package org.llvm4j.llvm4j.util
  * evil nullable type which is easy to ignore. It also allows for better
  * error handling without the use of exceptions.
  *
- * @property component the value, null if [None]
+ * @property value the value, null if [None]
  *
  * @see Result
+ *
+ * @author Mats Larsen
  */
-public sealed class Option<out T>(protected open val component: T? = null) {
+public sealed class Option<out T>(protected open val value: T? = null) {
     /**
      * Determines if this Option is [Some]
      *
      * @see Some
      */
-    public fun isDefined(): Boolean = component != null
+    public fun isDefined(): Boolean = value != null
 
     /**
      * Determines if this Option is [None]
@@ -33,19 +37,43 @@ public sealed class Option<out T>(protected open val component: T? = null) {
      * @throws IllegalStateException if called on [None]
      */
     public fun get(): T {
-        return component ?: throw IllegalStateException("Illegal option access")
+        return value ?: throw IllegalStateException("Illegal option access")
     }
 
     /**
      * Get the option as a nullable Kotlin type
      */
-    public fun toNullable(): T? = component
+    public fun toNullable(): T? = value
+
+    public companion object {
+        /**
+         * Converts a [Option] into a Java Optional.
+         *
+         * This function has to be a companion function to satisfy [Option]s `in` type parameter.
+         */
+        @JvmStatic
+        public fun <R> toJavaOptional(opt: Option<R>): Optional<R> {
+            return Optional.ofNullable(opt.toNullable())
+        }
+    }
 }
 
-public data class Some<out T>(public override val component: T?) : Option<T>(component) {
-    public override fun toString(): String = "Some($component)"
+/**
+ * Represents a value in an [Option]
+ *
+ * @param value the value which this Some wraps
+ *
+ * @author Mats Larsen
+ */
+public data class Some<out T>(public override val value: T?) : Option<T>(value) {
+    public override fun toString(): String = "Some($value)"
 }
 
+/**
+ * Represents an absent value in an [Option]
+ *
+ * @author Mats Larsen
+ */
 public object None : Option<Nothing>() {
     public override fun toString(): String = "None"
 }

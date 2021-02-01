@@ -35,7 +35,7 @@ import org.llvm4j.llvm4j.util.Owner
 public open class Metadata constructor(ptr: LLVMMetadataRef) : Owner<LLVMMetadataRef> {
     public override val ref: LLVMMetadataRef = ptr
 
-    public fun toValue(context: Context): MetadataAsValue {
+    public fun asValue(context: Context): MetadataAsValue {
         val v = LLVM.LLVMMetadataAsValue(context.ref, ref)
 
         return MetadataAsValue(v)

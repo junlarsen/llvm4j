@@ -12,6 +12,8 @@ import org.bytedeco.javacpp.Pointer
  * @param T the pointer type this object owns a reference to
  *
  * @see Pointer
+ *
+ * @author Mats Larsen
  */
 public interface Owner<T : Pointer> : AutoCloseable {
     /**
@@ -32,5 +34,5 @@ public interface Owner<T : Pointer> : AutoCloseable {
         ref.deallocate()
     }
 
-    override fun close(): Unit = deallocate()
+    public override fun close(): Unit = deallocate()
 }

@@ -22,7 +22,7 @@ class IntrinsicFunctionTest {
 
     @Test fun `Test non-overloaded intrinsics`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val subject1 = IntrinsicFunction.lookup("llvm.va_start").get()
 
         assertFalse { subject1.isOverloaded() }
@@ -46,7 +46,7 @@ class IntrinsicFunctionTest {
 
     @Test fun `Test overloaded intrinsics`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val i8 = ctx.getInt8Type()
         val v4i8 = ctx.getVectorType(i8, 4).get()
         val subject1 = IntrinsicFunction.lookup("llvm.ctpop").get()

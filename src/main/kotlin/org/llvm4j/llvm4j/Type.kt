@@ -4,6 +4,7 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
+import org.llvm4j.llvm4j.util.InternalApi
 import org.llvm4j.llvm4j.util.None
 import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
@@ -39,13 +40,13 @@ import org.llvm4j.llvm4j.util.tryWith
  * TODO: Research - [getConstantVector] and [getConstantArray] both return CDS ValueKinds ?
  * TODO: LLVM 12.x - LLVMGetPoison
  *
- *
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::Type")
 public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
     public override val ref: LLVMTypeRef = ptr
 
+    /** The type kind of a type never changes so this is safe to memoize. */
     private val memoizedTypeKind by lazy {
         val kind = LLVM.LLVMGetTypeKind(ref)
         TypeKind.from(kind).get()
@@ -115,13 +116,10 @@ public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
     public fun isFixedVectorType(): Boolean = getTypeKind() == TypeKind.Vector
     public fun isScalableVectorType(): Boolean = getTypeKind() == TypeKind.ScalableVector
     public fun isVectorType(): Boolean = isFixedVectorType() || isScalableVectorType()
-
     public fun isValidPointerElementType(): Boolean {
         return !isVoidType() && !isLabelType() && !isMetadataType() && !isTokenType()
     }
-
     public fun isValidVectorElementType(): Boolean = isIntegerType() || isFloatingPointType() || isPointerType()
-
     public fun isValidArrayElementType(): Boolean {
         return !isVoidType() && !isLabelType() && !isMetadataType() && !isFunctionType() && !isTokenType()
     }
@@ -143,7 +141,8 @@ public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
      *
      * @author Mats Larsen
      */
-    public interface Composite : Owner<LLVMTypeRef> {
+    @InternalApi
+    public interface IsComposite : Owner<LLVMTypeRef> {
         public fun getElementCount(): Int
     }
 
@@ -154,7 +153,8 @@ public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
      *
      * @author Mats Larsen
      */
-    public interface Sequential : Composite {
+    @InternalApi
+    public interface IsSequential : IsComposite {
         public fun getSubtypes(): Array<Type> {
             val size = getElementCount()
             val buffer = PointerPointer<LLVMTypeRef>(size.toLong())
@@ -180,7 +180,8 @@ public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
      *
      * @author Mats Larsen
      */
-    public interface Struct : Owner<LLVMTypeRef> {
+    @InternalApi
+    public interface IsStructure : Owner<LLVMTypeRef> {
         public fun isPacked(): Boolean {
             return LLVM.LLVMIsPackedStruct(ref).toBoolean()
         }
@@ -240,7 +241,7 @@ public class IntegerType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ArrayType")
-public class ArrayType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Sequential {
+public class ArrayType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsSequential {
     public override fun getElementCount(): Int {
         return LLVM.LLVMGetArrayLength(ref)
     }
@@ -260,7 +261,7 @@ public class ArrayType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Se
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::FixedVectorType", "llvm::VectorType")
-public class VectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Sequential {
+public class VectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsSequential {
     public override fun getElementCount(): Int {
         return LLVM.LLVMGetVectorSize(ref)
     }
@@ -281,7 +282,7 @@ public class VectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.S
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ScalableVectorType", "llvm::VectorType")
-public class ScalableVectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Sequential {
+public class ScalableVectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsSequential {
     public fun getConstantNull(): ConstantVector {
         val ptr = LLVM.LLVMConstNull(ref)
 
@@ -301,7 +302,7 @@ public class ScalableVectorType public constructor(ptr: LLVMTypeRef) : Type(ptr)
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::PointerType")
-public class PointerType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Sequential {
+public class PointerType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsSequential {
     public fun getAddressSpace(): AddressSpace {
         val space = LLVM.LLVMGetPointerAddressSpace(ref)
 
@@ -330,7 +331,7 @@ public class PointerType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::StructType")
-public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Composite, Type.Struct {
+public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsComposite, Type.IsStructure {
     public override fun getElementCount(): Int {
         return LLVM.LLVMCountStructElementTypes(ref)
     }
@@ -376,7 +377,7 @@ public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.C
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::StructType")
-public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Struct {
+public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsStructure {
     public fun getElementCount(): Option<Int> {
         return if (isOpaque()) {
             None

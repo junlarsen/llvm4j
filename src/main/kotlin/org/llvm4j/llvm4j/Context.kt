@@ -29,6 +29,14 @@ import org.llvm4j.llvm4j.util.tryWith
  *
  * There is also a default, lazily initiated global context available.
  *
+ * The context object is also a constructor to a lot of other elements in an LLVM system. These are exposed through
+ * `newT` methods. All of these create new, unique values (not cached, like the `getT` methods) and are as following:
+ *
+ * - [newModule]
+ * - [newBasicBlock]
+ * - [newEnumAttribute]
+ * - [newStringAttribute]
+ *
  * TODO: LLVM 12.x - getScalableVectorType / LLVMScalableVectorType
  * TODO: LLVM 12.x - getTypeByName / LLVMGetTypeByName2
  * TODO: Research - Can we upcast LLVMDiagnosticHandler to Context.DiagnosticHandler to implement getDiagnosticHandler?
@@ -38,6 +46,8 @@ import org.llvm4j.llvm4j.util.tryWith
  * TODO: Testing - Ensure [Instruction] discards value name once Instruction is stable
  *
  * @see GlobalContext
+ *
+ * @author Mats Larsen
  */
 @CorrespondsTo("llvm::LLVMContext")
 public open class Context public constructor(
@@ -237,19 +247,19 @@ public open class Context public constructor(
         return TokenType(ptr)
     }
 
-    public fun createEnumAttribute(kindId: Int, value: Long): Attribute {
+    public fun newEnumAttribute(kindId: Int, value: Long): Attribute {
         val attr = LLVM.LLVMCreateEnumAttribute(ref, kindId, value)
 
         return Attribute(attr)
     }
 
-    public fun createStringAttribute(kindId: String, value: String): Attribute {
+    public fun newStringAttribute(kindId: String, value: String): Attribute {
         val attr = LLVM.LLVMCreateStringAttribute(ref, kindId, kindId.length, value, value.length)
 
         return Attribute(attr)
     }
 
-    public fun createModule(name: String): Module {
+    public fun newModule(name: String): Module {
         val mod = LLVM.LLVMModuleCreateWithNameInContext(name, ref)
 
         return Module(mod)
@@ -276,7 +286,7 @@ public open class Context public constructor(
         return MetadataNode(node)
     }
 
-    public fun createBasicBlock(name: String): BasicBlock {
+    public fun newBasicBlock(name: String): BasicBlock {
         val bb = LLVM.LLVMCreateBasicBlockInContext(ref, name)
 
         return BasicBlock(bb)

@@ -125,19 +125,30 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
         return copy
     }
 
-    public fun dumpToFile(file: File): Result<Unit> = tryWith {
-        if (!file.exists()) {
-            assert(file.createNewFile()) { "Failed to create new file $file" }
-        }
+    /**
+     * Dumps the module to stdout or the given [file]
+     *
+     * If the [file] is absent, this function will dump the module IR to stdout.
+     *
+     * If the file exists, its content will be overwritten, otherwise a new file at the given path is created.
+     */
+    public fun dump(file: Option<File>): Result<Unit> = tryWith {
+        if (file.isDefined()) {
+            val fd = file.get()
+            if (!fd.exists()) {
+                assert(fd.createNewFile()) { "Failed to create new file '$file'" }
+            }
 
-        val maybeError = BytePointer(512L)
-        val code = LLVM.LLVMPrintModuleToFile(ref, file.absolutePath, maybeError)
+            val err = BytePointer(256)
+            val code = LLVM.LLVMPrintModuleToFile(ref, fd.absolutePath, err)
 
-        if (code != 0) {
-            val copy = maybeError.string
-
-            maybeError.deallocate()
-            fail(copy)
+            assert(code == 0) {
+                val copy = err.string
+                err.deallocate()
+                copy
+            }
+        } else {
+            LLVM.LLVMDumpModule(ref)
         }
     }
 

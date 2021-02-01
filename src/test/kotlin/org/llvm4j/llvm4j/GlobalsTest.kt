@@ -16,7 +16,7 @@ class FunctionTest {
         val i32 = ctx.getInt32Type()
         val void = ctx.getVoidType()
         val fnTy = ctx.getFunctionType(void, i32, i32)
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val subject1 = mod.addFunction("test_fn", fnTy)
 
         assertEquals(TypeKind.Pointer, subject1.getType().getTypeKind())
@@ -49,7 +49,7 @@ class FunctionTest {
         val i32 = ctx.getInt32Type()
         val void = ctx.getVoidType()
         val fnTy = ctx.getFunctionType(void, i32, i32)
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val subject1 = mod.addFunction("test_fn", fnTy)
 
         subject1.addTargetDependentAttribute("k", "v")
@@ -62,7 +62,7 @@ class FunctionTest {
         val i8 = ctx.getInt32Type()
         val void = ctx.getVoidType()
         val fnTy = ctx.getFunctionType(void, i8, i8)
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val subject1 = mod.addFunction("test_fn", fnTy)
         val (subject2, subject3) = subject1.getParameters()
 
@@ -79,7 +79,7 @@ class FunctionTest {
 
     @Test fun `Test personality functions`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val i32 = ctx.getInt32Type()
         val i8 = ctx.getInt8Type()
         val personalityFnTy = ctx.getFunctionType(i32, isVariadic = true)
@@ -99,7 +99,7 @@ class FunctionTest {
         val i32 = ctx.getInt32Type()
         val void = ctx.getVoidType()
         val fnTy = ctx.getFunctionType(void, i32, i32)
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val subject1 = mod.addFunction("test_fn", fnTy)
 
         assertIsSome(mod.getFunction("test_fn"))
@@ -114,10 +114,10 @@ class FunctionTest {
         val ctx = Context()
         val void = ctx.getVoidType()
         val fnTy = ctx.getFunctionType(void)
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val subject = mod.addFunction("test_fn", fnTy)
-        val bb1 = ctx.createBasicBlock("bb1")
-        val bb2 = ctx.createBasicBlock("bb2")
+        val bb1 = ctx.newBasicBlock("bb1")
+        val bb2 = ctx.newBasicBlock("bb2")
 
         assertEquals(0, subject.getBasicBlockCount())
 
@@ -136,7 +136,7 @@ class FunctionTest {
 class GlobalAliasTest {
     @Test fun `Test GlobalAlias properties`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val i32 = ctx.getInt32Type()
         val i32ptr = ctx.getPointerType(i32)
         val value1 = i32.getConstantPointerNull()
@@ -163,7 +163,7 @@ class GlobalAliasTest {
 class GlobalValueTest {
     @Test fun `Test GlobalValue properties`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val i32 = ctx.getInt32Type()
         val fnTy = ctx.getFunctionType(i32, i32)
         val subject: GlobalValue = mod.addFunction("test_main", fnTy)
@@ -202,7 +202,7 @@ class GlobalValueTest {
 class GlobalObjectTest {
     @Test fun `Test GlobalObject properties`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val i32 = ctx.getInt32Type()
         val fnTy = ctx.getFunctionType(i32, i32)
         val subject = mod.addFunction("test_main", fnTy)
@@ -218,7 +218,7 @@ class GlobalObjectTest {
 class GlobalVariableTest {
     @Test fun `Test GlobalVariable properties`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val void = ctx.getVoidType()
         val i32 = ctx.getInt32Type()
         val res1 = mod.addGlobalVariable("test_var1", i32, None)
@@ -260,7 +260,7 @@ class GlobalVariableTest {
 
     @Test fun `Test deletion from parent module`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val i32 = ctx.getInt32Type()
         val subject = mod.addGlobalVariable("test_var1", i32, None).get()
 

@@ -9,7 +9,7 @@ class MetadataTest
 class NamedMetadataNodeTest {
     @Test fun `Test NamedMetadataNode properties`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val subject = mod.getOrCreateNamedMetadata("meta")
 
         assertIsSome(mod.getNamedMetadata("meta"))
@@ -20,10 +20,10 @@ class NamedMetadataNodeTest {
 
     @Test fun `Test adding operands to the list`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val subject = mod.getOrCreateNamedMetadata("meta")
         val md1 = ctx.getMetadataString("lol")
-        val md2 = ctx.getMetadataNode(md1).toValue(ctx)
+        val md2 = ctx.getMetadataNode(md1).asValue(ctx)
 
         assertEquals(0, subject.getOperandCount())
 

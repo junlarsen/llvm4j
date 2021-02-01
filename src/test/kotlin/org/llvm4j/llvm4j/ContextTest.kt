@@ -29,7 +29,7 @@ class ContextTest {
         val i8 = ctx.getInt32Type()
         val void = ctx.getVoidType()
         val fnTy = ctx.getFunctionType(void, i8)
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val subject1 = mod.addFunction("test_fn", fnTy)
         val (subject2) = subject1.getParameters()
 

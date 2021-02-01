@@ -5,6 +5,7 @@ import org.llvm4j.llvm4j.testing.assertIsNone
 import org.llvm4j.llvm4j.testing.assertIsOk
 import org.llvm4j.llvm4j.testing.assertIsSome
 import org.llvm4j.llvm4j.util.None
+import org.llvm4j.llvm4j.util.Some
 import java.io.File
 import java.nio.file.Files
 import kotlin.test.assertEquals
@@ -49,7 +50,7 @@ const val MODULE_ASM3 =
 class ModuleTest {
     @Test fun `Test properties are consistent`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
 
         assertEquals("test_module", mod.getModuleIdentifier())
         assertEquals(ctx.ref, mod.getContext().ref)
@@ -77,12 +78,12 @@ class ModuleTest {
 
     @Test fun `Test dumping module`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val file = File.createTempFile("moduletest.kt", "ModuleTest.ll").also {
             it.deleteOnExit()
         }
 
-        assertIsOk(mod.dumpToFile(file))
+        assertIsOk(mod.dump(Some(file)))
 
         val content = Files.readAllLines(file.toPath()).joinToString("") { "$it\n" }
 
@@ -91,12 +92,15 @@ class ModuleTest {
 
         file.delete()
 
-        assertIsOk(mod.dumpToFile(file))
+        assertIsOk(mod.dump(Some(file)))
+
+        println("TEST: Should dump module IR here:")
+        mod.dump(None)
     }
 
     @Test fun `Test module metadata flags`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val subject1 = mod.getModuleFlags()
 
         assertEquals(0, subject1.size())
@@ -105,7 +109,7 @@ class ModuleTest {
 
     @Test fun `Test module inline assembler instructions`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
 
         assertEquals("", mod.getInlineAsm())
 
@@ -121,7 +125,7 @@ class ModuleTest {
 
     @Test fun `Test module flags`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val md = ctx.getMetadataString("wow")
 
         mod.addModuleFlag(ModuleFlagBehavior.Error, "test", md)
@@ -138,7 +142,7 @@ class ModuleTest {
 
     @Test fun `Test finding named types`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val i8 = ctx.getInt8Type()
 
         assertIsNone(mod.getTypeByName("struct_t"))
@@ -152,7 +156,7 @@ class ModuleTest {
 
     @Test fun `Test finding named metadata`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
 
         assertIsNone(mod.getNamedMetadata("key"))
 
@@ -167,7 +171,7 @@ class ModuleTest {
         val ctx = Context()
         val i32 = ctx.getInt32Type()
         val fn = ctx.getFunctionType(i32, i32)
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
 
         assertIsNone(mod.getFunction("factorial"))
 
@@ -188,7 +192,7 @@ class ModuleTest {
 
     @Test fun `Test finding global aliases`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val i32 = ctx.getInt32Type()
         val i32ptr = ctx.getPointerType(i32)
         val value = i32.getConstantPointerNull()
@@ -204,7 +208,7 @@ class ModuleTest {
 
     @Test fun `Test finding global variables`() {
         val ctx = Context()
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val i32 = ctx.getInt32Type()
 
         assertIsNone(mod.getGlobalVariable("var"))

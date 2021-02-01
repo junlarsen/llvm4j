@@ -10,8 +10,8 @@ import kotlin.test.assertTrue
 class AttributeTest {
     @Test fun `Test attributes are of their respective kinds`() {
         val ctx = Context()
-        val enum = ctx.createEnumAttribute(1, 0)
-        val string = ctx.createStringAttribute("key", "value")
+        val enum = ctx.newEnumAttribute(1, 0)
+        val string = ctx.newStringAttribute("key", "value")
 
         assertTrue { enum.isEnumAttribute() }
         assertTrue { string.isStringAttribute() }
@@ -29,7 +29,7 @@ class AttributeTest {
         val last = Attribute.getLastEnumKind()
         val subject1 = Attribute.getEnumKindByName("doesnt-exist-at-all")
         val subject2 = Attribute.getEnumKindByName("noinline")
-        val subject3 = ctx.createEnumAttribute(last, 0)
+        val subject3 = ctx.newEnumAttribute(last, 0)
 
         assertIsNone(subject1)
         assertIsSome(subject2)

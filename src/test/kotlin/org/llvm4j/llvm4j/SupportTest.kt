@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 
 class SupportTest {
     @Test fun `Test usage of LLVM messages`() {
-        val str = LLVMString.create("Hello World")
+        val str = LLVMString.of("Hello World")
 
         assertEquals(11, str.ref.stringBytes.size)
         assertEquals(11, str.getString().length)
@@ -28,7 +28,7 @@ class SupportTest {
         file.deleteOnExit()
         file.writeText("Hello World")
 
-        val subject = MemoryBuffer.create(file)
+        val subject = MemoryBuffer.of(file)
 
         assertIsOk(subject)
         assertEquals(11, subject.get().getSize())

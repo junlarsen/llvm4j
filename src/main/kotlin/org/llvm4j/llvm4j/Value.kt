@@ -9,6 +9,7 @@ import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
+import org.llvm4j.llvm4j.util.Enumeration
 import org.llvm4j.llvm4j.util.InternalApi
 import org.llvm4j.llvm4j.util.None
 import org.llvm4j.llvm4j.util.Option
@@ -266,12 +267,16 @@ public class BasicBlock public constructor(ptr: LLVMBasicBlockRef) : Owner<LLVMB
         return fn?.let { Some(Function(it)) } ?: None
     }
 
-    public fun moveBefore(block: BasicBlock) {
-        LLVM.LLVMMoveBasicBlockBefore(ref, block.ref)
-    }
-
-    public fun moveAfter(block: BasicBlock) {
-        LLVM.LLVMMoveBasicBlockAfter(ref, block.ref)
+    /**
+     * Moves this block relative to the other provided block. New position is based off of [order].
+     *
+     * @see MoveOrder
+     */
+    public fun move(order: MoveOrder, target: BasicBlock) {
+        when (order) {
+            MoveOrder.Before -> LLVM.LLVMMoveBasicBlockBefore(ref, target.ref)
+            MoveOrder.After -> LLVM.LLVMMoveBasicBlockAfter(ref, target.ref)
+        }
     }
 
     public fun delete() {
@@ -281,6 +286,17 @@ public class BasicBlock public constructor(ptr: LLVMBasicBlockRef) : Owner<LLVMB
     public fun erase() {
         LLVM.LLVMRemoveBasicBlockFromParent(ref)
     }
+}
+
+/**
+ * Enumeration representing where two objects are moved relative to eachother.
+ *
+ * @author Mats Larsen
+ */
+public enum class MoveOrder(public override val value: Int) : Enumeration.EnumVariant {
+    Before(0),
+    After(1);
+    public companion object : Enumeration<MoveOrder>(values())
 }
 
 /**

@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 class BasicBlockTest {
     @Test fun `Test BasicBlock properties`() {
         val ctx = Context()
-        val bb = ctx.createBasicBlock("bb")
+        val bb = ctx.newBasicBlock("bb")
         val subject1 = bb.asValue()
         val subject2 = subject1.getBlock()
         val subject3 = subject1.asBasicBlock()
@@ -23,9 +23,9 @@ class BasicBlockTest {
         val ctx = Context()
         val i8 = ctx.getInt8Type()
         val fnTy = ctx.getFunctionType(i8)
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val fn = mod.addFunction("test_fn", fnTy)
-        val bb = ctx.createBasicBlock("bb")
+        val bb = ctx.newBasicBlock("bb")
 
         fn.addBasicBlock(bb)
         assertEquals(1, fn.getBasicBlockCount())
@@ -44,20 +44,20 @@ class BasicBlockTest {
         val ctx = Context()
         val i8 = ctx.getInt8Type()
         val fnTy = ctx.getFunctionType(i8)
-        val mod = ctx.createModule("test_module")
+        val mod = ctx.newModule("test_module")
         val fn = mod.addFunction("test_fn", fnTy)
-        val bb1 = ctx.createBasicBlock("bb1")
-        val bb2 = ctx.createBasicBlock("bb2")
+        val bb1 = ctx.newBasicBlock("bb1")
+        val bb2 = ctx.newBasicBlock("bb2")
 
         fn.addBasicBlock(bb1)
         fn.addBasicBlock(bb2)
 
         assertEquals(bb1.ref, fn.getEntryBasicBlock().ref)
 
-        bb1.moveAfter(bb2)
+        bb1.move(MoveOrder.After, bb2)
         assertEquals(bb2.ref, fn.getEntryBasicBlock().ref)
 
-        bb1.moveBefore(bb2)
+        bb1.move(MoveOrder.Before, bb2)
         assertEquals(bb1.ref, fn.getEntryBasicBlock().ref)
     }
 }

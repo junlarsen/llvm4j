@@ -1,5 +1,7 @@
 package org.llvm4j.llvm4j.util
 
+import java.util.*
+
 /**
  * Represents a disjoint union of a value [T] or an error [E]. Instances of
  * [Result] are either an instance of [Err] or [Ok]
@@ -7,13 +9,13 @@ package org.llvm4j.llvm4j.util
  * This allows for possibly missing values containing further information
  * about why the value is missing.
  *
- * @property component the value, null if [Err]
+ * @property value the value, null if [Err]
  * @property error     the error, null if [Ok]
  *
  * @see Option
  */
 public sealed class Result<out T>(
-    protected open val component: T? = null,
+    protected open val value: T? = null,
     protected open val error: String? = null
 ) {
     /**
@@ -28,7 +30,7 @@ public sealed class Result<out T>(
      *
      * @see Ok
      */
-    public fun isOk(): Boolean = component != null
+    public fun isOk(): Boolean = value != null
 
     /**
      * Get the value, failing with an exception if this is an [Err]
@@ -36,7 +38,7 @@ public sealed class Result<out T>(
      * @throws IllegalStateException if called on [Err]
      */
     public fun get(): T {
-        return component ?: throw IllegalStateException("Illegal result access")
+        return value ?: throw IllegalStateException("Illegal result access")
     }
 
     /**
@@ -51,14 +53,26 @@ public sealed class Result<out T>(
     public class InvalidResultException(public override val message: String) : RuntimeException(message)
 }
 
+/**
+ * Error case in a [Result] value
+ *
+ * @author Mats Larsen
+ */
 public data class Err(public override val error: String) :
     Result<Nothing>(error = error) {
     public override fun toString(): String = "Err($error)"
 }
 
-public data class Ok<out T>(public override val component: T) :
-    Result<T>(component = component) {
-    public override fun toString(): String = "Ok($component)"
+/**
+ * Success case in a [Result] value.
+ *
+ * @param value the value to succeed with
+ *
+ * @author Mats Larsen
+ */
+public data class Ok<out T>(public override val value: T) :
+    Result<T>(value = value) {
+    public override fun toString(): String = "Ok($value)"
 }
 
 /**
@@ -102,4 +116,4 @@ public inline fun <T> tryWith(closure: TryWithScope.() -> T): Result<T> = try {
  *
  * Use this only when the kotlin compiler is unable to tell that something is unreachable.
  */
-public class SemanticallyUnreachable() : RuntimeException()
+public class SemanticallyUnreachable : RuntimeException()

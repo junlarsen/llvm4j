@@ -15,6 +15,10 @@ package org.llvm4j.llvm4j.util
  *   public companion object : Enumeration<CodeGenFileType>(values())
  * }
  * ```
+ *
+ * TODO: Find a way to make this a lot nicer to use from Java land.
+ *
+ * @author Mats Larsen
  */
 public abstract class Enumeration<E : Enumeration.EnumVariant>(public val entries: Array<E>) {
     private val associated: Map<Int, E> = entries.associateBy { it.value }
@@ -58,9 +62,7 @@ public abstract class Enumeration<E : Enumeration.EnumVariant>(public val entrie
      * @property catch lambda responsible for producing the wildcard [E] given [Int]
      * @property entries all valid entries for this enum
      */
-    public abstract class WithFallback<E : EnumVariant>(
-        private val catch: (Int) -> E,
-    ) {
+    public abstract class WithFallback<E : EnumVariant>(private val catch: (Int) -> E) {
         public abstract val entries: Array<out E>
         /**
          * Turn an integer value (from the C++ enum) into the Kotlin equivalent

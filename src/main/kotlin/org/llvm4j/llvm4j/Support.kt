@@ -13,7 +13,7 @@ import java.io.File
  * A readonly, null-terminated string owned by LLVM, known as a Message in the C API
  *
  * Do not use this constructor for [BytePointer]s which were not created as a LLVM owned string. If you need to
- * create an instance of [LLVMString], use [LLVMString.create]
+ * create an instance of [LLVMString], use [LLVMString.of]
  *
  * @author Mats Larsen
  */
@@ -31,7 +31,7 @@ public class LLVMString public constructor(ptr: BytePointer) : Owner<BytePointer
 
     public companion object {
         @JvmStatic
-        public fun create(message: String): LLVMString {
+        public fun of(message: String): LLVMString {
             val ptr = BytePointer(message)
             val string = LLVM.LLVMCreateMessage(ptr)
 
@@ -77,7 +77,7 @@ public class MemoryBuffer public constructor(ptr: LLVMMemoryBufferRef) : Owner<L
 
     public companion object {
         @JvmStatic
-        public fun create(file: File): Result<MemoryBuffer> = tryWith {
+        public fun of(file: File): Result<MemoryBuffer> = tryWith {
             assert(file.exists()) { "File '$file' does not exist" }
 
             val fp = BytePointer(file.absolutePath)
