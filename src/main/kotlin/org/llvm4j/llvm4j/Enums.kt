@@ -365,3 +365,10 @@ public enum class Linkage(public override val value: Int) : Enumeration.EnumVari
     LinkerPrivateWeak(LLVM.LLVMLinkerPrivateWeakLinkage);
     public companion object : Enumeration<Linkage>(values())
 }
+
+public enum class WrapSemantics(public override val value: Int) : Enumeration.EnumVariant {
+    NoUnsigned(0),
+    NoSigned(1),
+    Unspecified(2);
+    public companion object : Enumeration<WrapSemantics>(values())
+}
