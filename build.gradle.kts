@@ -96,16 +96,8 @@ publishing {
 
             repositories {
                 maven {
-                    // Deploy all snapshots to OSSRH
-                    // Releases on CI are published to vexelabs for testing
-                    // Releases from user is published to Sonatype Staging
-                    url = when {
-                        isSnapshot -> uri("https://oss.sonatype.org/content/repositories/snapshots/")
-                        else -> when {
-                            isCI -> uri("https://repo.vexelabs.io/releases/")
-                            else -> uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
-                        }
-                    }
+                    // TODO: Set up per-commit deployment
+                    url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
 
                     credentials {
                         username = System.getenv("PUBLISH_USERNAME")
@@ -116,7 +108,7 @@ publishing {
 
             pom {
                 name.set("llvm4j")
-                description.set("Kotlin interface to the LLVM APIs")
+                description.set("LLVM FFI bindings for the Java Platform")
                 url.set("https://github.com/llvm4j/llvm4j")
 
                 licenses {
