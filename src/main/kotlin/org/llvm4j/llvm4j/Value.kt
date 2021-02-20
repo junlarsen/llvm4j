@@ -1092,6 +1092,19 @@ public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.
     public fun setMetadata(kindId: Int, node: MetadataAsValue) {
         LLVM.LLVMSetMetadata(ref, kindId, node.ref)
     }
+
+    /**
+     * Insert the instruction at the given [builder]'s insertion point.
+     *
+     * The instruction may optionally receive a [name]
+     */
+    public fun insert(builder: IRBuilder, name: Option<String>) {
+        if (name.isDefined()) {
+            LLVM.LLVMInsertIntoBuilderWithName(builder.ref, ref, name.get())
+        } else {
+            LLVM.LLVMInsertIntoBuilder(builder.ref, ref)
+        }
+    }
 }
 
 public class BinaryOperatorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)

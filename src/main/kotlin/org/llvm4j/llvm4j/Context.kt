@@ -291,6 +291,12 @@ public open class Context public constructor(
         return BasicBlock(bb)
     }
 
+    public fun newIRBuilder(): IRBuilder {
+        val ir = LLVM.LLVMCreateBuilderInContext(ref)
+
+        return IRBuilder(ir)
+    }
+
     public class DiagnosticHandler(private val closure: (Payload) -> Unit) :
         LLVMDiagnosticHandler(),
         Callback<Unit, DiagnosticHandler.Payload> {

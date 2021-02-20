@@ -3,9 +3,103 @@ package org.llvm4j.llvm4j
 import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
 import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
+import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.None
 import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.Some
+
+public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuilderRef>, IRBuilderBase {
+    public override val ref: LLVMBuilderRef = ptr
+
+    /**
+     * Move the builder's insertion point after the given [instruction] in a basic block, [label].
+     */
+    public fun position(label: BasicBlock, instruction: Instruction) {
+        LLVM.LLVMPositionBuilder(ref, label.ref, instruction.ref)
+    }
+
+    /**
+     * Move the builder's insertion point before the given [instruction]
+     */
+    public fun positionBefore(instruction: Instruction) {
+        LLVM.LLVMPositionBuilderBefore(ref, instruction.ref)
+    }
+
+    /**
+     * Move the builder's insertion point after the given [label]
+     */
+    public fun positionAfter(label: BasicBlock) {
+        LLVM.LLVMPositionBuilderAtEnd(ref, label.ref)
+    }
+
+    /**
+     * Get the basic bloc kof the insertion point for the builder
+     *
+     * Returns [None] if the insertion point was cleared using [clear] or is yet to be set.
+     */
+    public fun getInsertionBlock(): Option<BasicBlock> {
+        val point = LLVM.LLVMGetInsertBlock(ref)
+
+        return point?.let { Some(BasicBlock(it)) } ?: None
+    }
+
+    /**
+     * Retrieve the current debug location, if set
+     *
+     * TODO: Research/DebugInfo - Find a more precise type to return (llvm::DebugLoc)
+     */
+    public fun getDebugLocation(): Option<Metadata> {
+        val debugLocation = LLVM.LLVMGetCurrentDebugLocation2(ref)
+
+        return debugLocation?.let { Some(Metadata(it)) } ?: None
+    }
+
+    /**
+     * Set the current debug location
+     *
+     * TODO: Research/DebugInfo - Find a more precise type to return (llvm::DebugLoc)
+     */
+    public fun setDebugLocation(location: Metadata) {
+        LLVM.LLVMSetCurrentDebugLocation2(ref, location.ref)
+    }
+
+    /**
+     * Attempt to use the current debug location to set the debug location for the provided instruction.
+     *
+     * TODO: Research - Does this fail if there is no debug location?
+     */
+    public fun attachDebugLocation(instruction: Instruction) {
+        LLVM.LLVMSetInstDebugLocation(ref, instruction.ref)
+    }
+
+    /**
+     * Get the default floating-point math metadata
+     *
+     * TODO: Research - Does this return null when there is no default fpmath tag set?
+     * TODO: Research - Can this type be narrowed down?
+     */
+    public fun getDefaultFPMathTag(): Metadata {
+        val flags = LLVM.LLVMBuilderGetDefaultFPMathTag(ref)
+
+        return Metadata(flags)
+    }
+
+    public fun setDefaultFPMathTag(flags: Metadata) {
+        LLVM.LLVMBuilderSetDefaultFPMathTag(ref, flags.ref)
+    }
+
+    /**
+     * Clears the insertion point of the builder
+     */
+    public fun clear() {
+        LLVM.LLVMClearInsertionPosition(ref)
+    }
+
+    public override fun deallocate() {
+        LLVM.LLVMDisposeBuilder(ref)
+    }
+}
 
 /**
  * A base implementation of a subset of the basic LLVM instruction set
@@ -47,7 +141,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      *
      * @param value value to return, returns void if [None]
      */
-    public fun buildReturn(value: Option<Value>): ReturnInstruction
+    public fun buildReturn(value: Option<Value>): ReturnInstruction = TODO()
 
     /**
      * Build an unconditional branch instruction
@@ -57,7 +151,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      *
      * @param label label to jump to
      */
-    public fun buildBranch(label: BasicBlock): BranchInstruction
+    public fun buildBranch(label: BasicBlock): BranchInstruction = TODO()
 
     /**
      * Build a conditional branch instruction
@@ -73,7 +167,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
         condition: Value,
         isTrue: BasicBlock,
         isFalse: BasicBlock
-    ): BranchInstruction
+    ): BranchInstruction = TODO()
 
     /**
      * Build a switch instruction
@@ -90,7 +184,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param default       label to jump to if none of the cases match
      * @param expectedCases expected amount of switch cases to be appended
      */
-    public fun buildSwitch(condition: Value, default: BasicBlock, expectedCases: Int): SwitchInstruction
+    public fun buildSwitch(condition: Value, default: BasicBlock, expectedCases: Int): SwitchInstruction = TODO()
 
     /**
      * Build an indirect branch instruction
@@ -104,7 +198,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param address       label to jump to
      * @param expectedCases expected amount of possible destinations to be appended
      */
-    public fun buildIndirectBranch(address: BasicBlock, expectedCases: Int): IndirectBrInstruction
+    public fun buildIndirectBranch(address: BasicBlock, expectedCases: Int): IndirectBrInstruction = TODO()
 
     /**
      * Build an unreachable instruction
@@ -113,7 +207,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * portion of the code is not reachable. This may be used to indicate that the code after a no-return function
      * cannot be reached.
      */
-    public fun buildUnreachable(): UnreachableInstruction
+    public fun buildUnreachable(): UnreachableInstruction = TODO()
 
     /**
      * Build a float negation instruction
@@ -125,7 +219,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op1  floating-point or vector-of-floating-point to negate
      * @param name optional name for the instruction
      */
-    public fun buildFloatNeg(op1: Value, name: Option<String>): Value
+    public fun buildFloatNeg(op1: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an addition instruction
@@ -140,7 +234,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param semantics wrapping semantics upon overflow
      * @param name      optional name for the instruction
      */
-    public fun buildIntAdd(op1: Value, op2: Value, semantics: WrapSemantics, name: Option<String>): Value
+    public fun buildIntAdd(op1: Value, op2: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point addition instruction
@@ -151,7 +245,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  right hand side floating-point to add
      * @param name optional name for the instruction
      */
-    public fun buildFloatAdd(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildFloatAdd(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a subtraction instruction
@@ -166,7 +260,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param semantics wrapping semantics upon overflow
      * @param name      optional name for the instruction
      */
-    public fun buildIntSub(op1: Value, op2: Value, semantics: WrapSemantics, name: Option<String>): Value
+    public fun buildIntSub(op1: Value, op2: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point subtraction instruction
@@ -177,7 +271,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  how much to subtract from [op1]
      * @param name optional name for the instruction
      */
-    public fun buildFloatSub(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildFloatSub(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a multiplication instruction
@@ -192,7 +286,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param semantics wrapping semantics upon overflow
      * @param name optional name for the instruction
      */
-    public fun buildIntMul(op1: Value, op2: Value, semantics: WrapSemantics, name: Option<String>): Value
+    public fun buildIntMul(op1: Value, op2: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point multiplication instruction
@@ -203,7 +297,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  right hand side floating-point to multiply
      * @param name optional name for the instruction
      */
-    public fun buildFloatMul(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildFloatMul(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an unsigned integer division instruction
@@ -215,7 +309,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  divisor integer value (the number dividend is being divided by)
      * @param name optional name for the instruction
      */
-    public fun buildUnsignedDiv(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildUnsignedDiv(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a signed integer division instruction
@@ -227,7 +321,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  divisor integer value (the number dividend is being divided by)
      * @param name optional name for the instruction
      */
-    public fun buildSignedDiv(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildSignedDiv(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point division instruction
@@ -238,7 +332,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  divisor floating-point value (the number divided is being divided by)
      * @param name optional name for the instruction
      */
-    public fun buildFloatDiv(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildFloatDiv(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an unsigned integer remainder instruction
@@ -250,7 +344,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  divisor integer value (the number dividend is being divided by)
      * @param name optional name for the instruction
      */
-    public fun buildUnsignedRem(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildUnsignedRem(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a signed integer remainder instruction
@@ -262,7 +356,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  divisor integer value (the number dividend is being divided by)
      * @param name optional name for the instruction
      */
-    public fun buildSignedRem(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildSignedRem(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point remainder instruction
@@ -274,7 +368,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  divisor floating-point value (the number dividend is being divided by)
      * @param name optional name for the instruction
      */
-    public fun buildFloatRem(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildFloatRem(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a left shift instruction
@@ -286,7 +380,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  number of bits to shift [op1] to the left
      * @param name optional name for the instruction
      */
-    public fun buildLeftShift(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildLeftShift(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a logical shift right instruction
@@ -298,7 +392,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  number of bits to shift [op1] to the right
      * @param name optional name for the instruction
      */
-    public fun buildLogicalShiftRight(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildLogicalShiftRight(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an arithmetic shift right instruction
@@ -310,7 +404,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  number of bits to shift [op1] to the right
      * @param name optional name for the instruction
      */
-    public fun buildArithmeticShiftRight(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildArithmeticShiftRight(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a logical and instruction
@@ -321,7 +415,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  right hand side integer
      * @param name optional name for the instruction
      */
-    public fun buildLogicalAnd(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildLogicalAnd(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a logical or instruction
@@ -332,7 +426,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  right hand side integer
      * @param name optional name for the instruction
      */
-    public fun buildLogicalOr(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildLogicalOr(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a logical xor instruction
@@ -343,7 +437,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2  right hand side integer
      * @param name optional name for the instruction
      */
-    public fun buildLogicalXor(op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildLogicalXor(op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an extract element instruction
@@ -354,7 +448,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param index  index of element to extract
      * @param name   optional name for the instruction
      */
-    public fun buildExtractElement(vector: Value, index: Value, name: Option<String>): Value
+    public fun buildExtractElement(vector: Value, index: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an insert element instruction
@@ -366,7 +460,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param index  the index to store the element
      * @param name   optional name for the instruction
      */
-    public fun buildInsertElement(vector: Value, value: Value, index: Value, name: Option<String>): Value
+    public fun buildInsertElement(vector: Value, value: Value, index: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a shuffle vector instruction
@@ -379,7 +473,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param mask the shuffle mask
      * @param name optional name for the instruction
      */
-    public fun buildShuffleVector(op1: Value, op2: Value, mask: Value, name: Option<String>): Value
+    public fun buildShuffleVector(op1: Value, op2: Value, mask: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an extract value instruction
@@ -392,7 +486,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param index     index in [aggregate] to retrieve
      * @param name      optional name for the instruction
      */
-    public fun buildExtractValue(aggregate: Value, index: Int, name: Option<String>): Value
+    public fun buildExtractValue(aggregate: Value, index: Int, name: Option<String>): Value = TODO()
 
     /**
      * Build an insert value instruction
@@ -406,7 +500,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param index     index in [aggregate] to insert element into
      * @param name      optional name for the instruction
      */
-    public fun buildInsertValue(aggregate: Value, value: Value, index: Int, name: Option<String>): Value
+    public fun buildInsertValue(aggregate: Value, value: Value, index: Int, name: Option<String>): Value = TODO()
 
     /**
      * Build an alloca instruction
@@ -418,7 +512,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type type to allocate
      * @param name optional name for the instruction
      */
-    public fun buildAlloca(type: Type, name: Option<String>): AllocaInstruction
+    public fun buildAlloca(type: Type, name: Option<String>): AllocaInstruction = TODO()
 
     /**
      * Build a load instruction
@@ -429,7 +523,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param ptr  pointer value to read from
      * @param name optional name for the instruction
      */
-    public fun buildLoad(ptr: Value, name: Option<String>): LoadInstruction
+    public fun buildLoad(ptr: Value, name: Option<String>): LoadInstruction = TODO()
 
     /**
      * Build a store instruction
@@ -443,7 +537,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param value value to write to pointer
      * @param name optional name for the instruction
      */
-    public fun buildStore(ptr: Value, value: Value, name: Option<String>): StoreInstruction
+    public fun buildStore(ptr: Value, value: Value, name: Option<String>): StoreInstruction = TODO()
 
     /**
      * Build a fence instruction
@@ -452,7 +546,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      *
      * TODO: Research - Find out what fence instruction is used for
      */
-    public fun buildFence(ordering: AtomicOrdering, singleThread: Boolean, name: Option<String>): FenceInstruction
+    public fun buildFence(ordering: AtomicOrdering, singleThread: Boolean, name: Option<String>): FenceInstruction = TODO()
 
     /**
      * Build a comparison exchange instruction
@@ -469,7 +563,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
         successOrdering: AtomicOrdering,
         failureOrdering: AtomicOrdering,
         singleThread: Boolean
-    ): AtomicCmpXchgInstruction
+    ): AtomicCmpXchgInstruction = TODO()
 
     /**
      * Build an atomic rmw instruction
@@ -484,7 +578,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
         value: Value,
         ordering: AtomicOrdering,
         singleThread: Boolean
-    ): AtomicRMWInstruction
+    ): AtomicRMWInstruction = TODO()
 
     /**
      * Build a get element pointer instruction
@@ -504,7 +598,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
         vararg indices: Value,
         isInBounds: Boolean,
         name: Option<String>
-    ) : Value
+    ) : Value = TODO()
 
     /**
      * Build an integer trunc instruction
@@ -518,7 +612,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type type to truncate down to
      * @param name optional name for the instruction
      */
-    public fun buildIntTrunc(op: Value, type: IntType, name: Option<String>): Value
+    public fun buildIntTrunc(op: Value, type: IntType, name: Option<String>): Value = TODO()
 
     /**
      * Build a zero extension instruction
@@ -531,7 +625,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type type to zero extend to
      * @param name optional name for the instruction
      */
-    public fun buildZeroExt(op: Value, type: IntType, name: Option<String>): Value
+    public fun buildZeroExt(op: Value, type: IntType, name: Option<String>): Value = TODO()
 
     /**
      * Build a sign extension instruction
@@ -544,7 +638,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type type to sign extend to
      * @param name optional name for the instruction
      */
-    public fun buildSignExt(op: Value, type: IntType, name: Option<String>): Value
+    public fun buildSignExt(op: Value, type: IntType, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point trunc instruction
@@ -557,7 +651,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type type to truncate down to
      * @param name optional name for the instruction
      */
-    public fun buildFloatTrunc(op: Value, type: FloatType, name: Option<String>): Value
+    public fun buildFloatTrunc(op: Value, type: FloatType, name: Option<String>): Value = TODO()
 
     /**
      * Build a float extension instruction
@@ -570,7 +664,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type the type to extend to
      * @param name optional name for the instruction
      */
-    public fun buildFloatExt(op: Value, type: FloatType, name: Option<String>): Value
+    public fun buildFloatExt(op: Value, type: FloatType, name: Option<String>): Value = TODO()
 
     /**
      * Build a float to unsigned int cast instruction
@@ -582,7 +676,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type integer type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildFloatToUnsignedInt(op: Value, type: IntType, name: Option<String>): Value
+    public fun buildFloatToUnsigned(op: Value, type: IntType, name: Option<String>): Value = TODO()
 
     /**
      * Build a float to signed int cast instruction
@@ -594,7 +688,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type integer type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildFloatToSignedInt(op: Value, type: IntType, name: Option<String>): Value
+    public fun buildFloatToSigned(op: Value, type: IntType, name: Option<String>): Value = TODO()
 
     /**
      * Build an unsigned int to float cast instruction
@@ -606,7 +700,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type floating-point type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildUnsignedIntToFloat(op: Value, type: FloatType, name: Option<String>): Value
+    public fun buildUnsignedToFloat(op: Value, type: FloatType, name: Option<String>): Value = TODO()
 
     /**
      * Build a signed int to float cast instruction
@@ -618,7 +712,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type floating-point type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildSignedIntToFloat(op: Value, type: FloatType, name: Option<String>): Value
+    public fun buildSignedToFloat(op: Value, type: FloatType, name: Option<String>): Value = TODO()
 
     /**
      * Build a pointer to int cast instruction
@@ -629,7 +723,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type integer type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildPointerToInt(op: Value, type: IntType, name: Option<String>): Value
+    public fun buildPointerToInt(op: Value, type: IntType, name: Option<String>): Value = TODO()
 
     /**
      * Build a int to pointer cast instruction
@@ -640,7 +734,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type pointer type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildIntToPointer(op: Value, type: PointerType, name: Option<String>): Value
+    public fun buildIntToPointer(op: Value, type: PointerType, name: Option<String>): Value = TODO()
 
     /**
      * Build a bit cast instruction
@@ -651,7 +745,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildBitCast(op: Value, type: Type, name: Option<String>): Value
+    public fun buildBitCast(op: Value, type: Type, name: Option<String>): Value = TODO()
 
     /**
      * Build an address space cast instruction
@@ -663,7 +757,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type pointer type to cast address space cast into
      * @param name optional name for the instruction
      */
-    public fun buildAddressSpaceCast(op: Value, type: PointerType, name: Option<String>): Value
+    public fun buildAddressSpaceCast(op: Value, type: PointerType, name: Option<String>): Value = TODO()
 
     /**
      * Build an integer comparison instruction
@@ -676,7 +770,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2       right hand side of comparison
      * @param name      optional name for the instruction
      */
-    public fun buildIntCompare(predicate: IntPredicate, op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildIntCompare(predicate: IntPredicate, op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point comparison instruction
@@ -689,7 +783,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2       right hand side of comparison
      * @param name      optional name for the instruction
      */
-    public fun buildFloatCompare(predicate: RealPredicate, op1: Value, op2: Value, name: Option<String>): Value
+    public fun buildFloatCompare(predicate: RealPredicate, op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a phi instruction
@@ -703,7 +797,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type the expected resolving type
      * @param name optional name for the instruction
      */
-    public fun buildPhi(type: Type, name: Option<String>): PhiInstruction
+    public fun buildPhi(type: Type, name: Option<String>): PhiInstruction = TODO()
 
     /**
      * Build a select instruction
@@ -716,7 +810,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param isFalse   value to select if [condition] is false
      * @param name      optional name for the instruction
      */
-    public fun buildSelect(condition: Value, isTrue: Value, isFalse: Value, name: Option<String>): Value
+    public fun buildSelect(condition: Value, isTrue: Value, isFalse: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a freeze instruction
@@ -726,7 +820,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op   poison or undef value
      * @param name optional name for the instruction
      */
-    public fun buildFreeze(op: Value, name: Option<String>): Value
+    public fun buildFreeze(op: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a call instruction
@@ -737,7 +831,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param arguments list of arguments to pass into function
      * @param name      optional name for the instruction
      */
-    public fun buildCall(function: Function, vararg arguments: Value, name: Option<String>): Value
+    public fun buildCall(function: Function, vararg arguments: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a variadic arguments instruction
@@ -751,9 +845,5 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type expected type of the current element
      * @param name optional name for the instruction
      */
-    public fun buildVAArg(list: Value, type: Type, name: Option<String>): Value
-}
-
-public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuilderRef> {
-    public override val ref: LLVMBuilderRef = ptr
+    public fun buildVAArg(list: Value, type: Type, name: Option<String>): Value = TODO()
 }
