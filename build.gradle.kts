@@ -29,7 +29,7 @@ repositories {
 }
 
 dependencies {
-    api("org.bytedeco:llvm-platform:11.0.1-1.5.5-SNAPSHOT")
+    api("org.bytedeco:llvm-platform:11.1.0-1.5.5-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.10")
 
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
