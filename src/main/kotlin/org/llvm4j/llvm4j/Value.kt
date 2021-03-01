@@ -360,6 +360,86 @@ public open class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
     public fun isNull(): Boolean {
         return LLVM.LLVMIsNull(ref).toBoolean()
     }
+
+    /**
+     * Common implementation for any constant value which can perform integer based constant expression operations on
+     * them.
+     *
+     * This exists because most of LLVMs instruction set operations which are performable on integers may also be
+     * used on vectors of integers.
+     *
+     * Known inheritors are [ConstantInt] and [ConstantVector]
+     *
+     * @author Mats Larsen
+     */
+    @InternalApi
+    public interface IntegerMathConstant {
+        public fun getIntNeg(rhs: Constant, semantics: WrapSemantics): Constant = TODO("helper api")
+        public fun getIntAdd(rhs: Constant, semantics: WrapSemantics): Constant = TODO()
+        public fun getIntSub(rhs: Constant, semantics: WrapSemantics): Constant = TODO()
+        public fun getIntMul(rhs: Constant, semantics: WrapSemantics): Constant = TODO()
+        public fun getUnsignedDiv(divisor: Constant): Constant = TODO()
+        public fun getSignedDiv(divisor: Constant): Constant = TODO()
+        public fun getUnsignedRem(divisor: Constant): Constant = TODO()
+        public fun getSignedRem(divisor: Constant): Constant = TODO()
+        public fun getLeftShift(bits: Constant): Constant = TODO()
+        public fun getLogicalShiftRight(bits: Constant): Constant = TODO()
+        public fun getArithmeticShiftRight(bits: Constant): Constant = TODO()
+        public fun getLogicalAnd(rhs: Constant): Constant = TODO()
+        public fun getLogicalOr(rhs: Constant): Constant = TODO()
+        public fun getLogicalXor(rhs: Constant): Constant = TODO()
+        public fun getIntCompare(predicate: IntPredicate, rhs: Constant): Constant = TODO()
+    }
+
+    /**
+     * Common implementation for any constant value which can perform floating-point based constant expression
+     * operations on them.
+     *
+     * This exists because most of LLVMs instruction set operations which are performable on floating-points may
+     * also be used on vectors of floating-points.
+     *
+     * Known inheritors are [ConstantFP] and [ConstantVector]
+     *
+     * @author Mats Larsen
+     */
+    @InternalApi
+    public interface FloatingPointMathConstant {
+        public fun getFloatNeg(rhs: Value): Constant = TODO()
+        public fun getFloatAdd(rhs: Constant): Constant = TODO()
+        public fun getFloatSub(rhs: Constant): Constant = TODO()
+        public fun getFloatMul(rhs: Constant): Constant = TODO()
+        public fun getFloatDiv(divisor: Constant): Constant = TODO()
+        public fun getFloatRem(divisor: Constant): Constant = TODO()
+        public fun getFloatCompare(predicate: RealPredicate, rhs: Constant): Constant = TODO()
+    }
+
+    /**
+     * Common implementation for any constant value which can perform aggregate constant expression operations on them.
+     *
+     * Known inheritors are [ConstantStruct] and [ConstantArray]
+     *
+     * @author Mats Larsen
+     */
+    @InternalApi
+    public interface AggregateConstant {
+        public fun getExtractValue(index: Int): Constant = TODO()
+        public fun getInsertValue(value: Constant, index: Int): Constant = TODO()
+        public fun getGetElementPtr(vararg indices: Constant, isInBounds: Boolean): Constant = TODO()
+    }
+
+    /**
+     * Common implementation for any constant value which is first-class.
+     *
+     * See LLVM documentation for first-class types https://llvm.org/docs/LangRef.html#t-firstclass
+     *
+     * Known inheritors are [ConstantInt], [ConstantFP], [ConstantVector]
+     *
+     * @author Mats Larsen
+     */
+    @InternalApi
+    public interface FirstClassConstant {
+        public fun getBitCast(type: Type): Constant = TODO()
+    }
 }
 
 /**
@@ -672,10 +752,30 @@ public class ConstantArray public constructor(ptr: LLVMValueRef) : ConstantAggre
  *
  * @see ConstantAggregate
  *
+ * TODO: Research/ConstExpr - Find out where to place getPointerToInt overload
+ *
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::Vector")
-public class ConstantVector public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr)
+public class ConstantVector public constructor(ptr: LLVMValueRef) :
+    ConstantAggregate(ptr),
+    Constant.IntegerMathConstant,
+    Constant.FloatingPointMathConstant {
+    public fun getExtractElement(index: Constant): Constant = TODO()
+    public fun getInsertElement(value: Constant, index: Constant): Constant = TODO()
+    public fun getShuffleVector(rhs: ConstantVector, mask: ConstantVector): Constant = TODO()
+    public fun getIntTrunc(type: VectorType): Constant = TODO()
+    public fun getZeroExt(type: VectorType): Constant = TODO()
+    public fun getSignExt(type: VectorType): Constant = TODO()
+    public fun getFloatTrunc(type: VectorType): Constant = TODO()
+    public fun getFloatExt(type: VectorType): Constant = TODO()
+    public fun getFloatToSigned(type: VectorType): Constant = TODO()
+    public fun getFloatToUnsigned(type: VectorType): Constant = TODO()
+    public fun getSignedToFloat(type: VectorType): Constant = TODO()
+    public fun getUnsignedToFloat(type: VectorType): Constant = TODO()
+    public fun getIntToPointer(type: VectorType): Constant = TODO()
+    public fun getPointerToInt(type: VectorType): Constant = TODO()
+}
 
 /**
  * A constant structure aggregate consisting of values of various types.
@@ -708,6 +808,14 @@ public class ConstantInt public constructor(ptr: LLVMValueRef) : ConstantData(pt
     public fun getSignExtendedValue(): Long {
         return LLVM.LLVMConstIntGetSExtValue(ref)
     }
+
+    public fun getIntTrunc(type: IntegerType): Constant = TODO()
+    public fun getZeroExt(type: IntegerType): Constant = TODO()
+    public fun getSignExt(type: IntegerType): Constant = TODO()
+    public fun getSignedToFloat(type: IntegerType): Constant = TODO()
+    public fun getUnsignedToFloat(type: IntegerType): Constant = TODO()
+    public fun getIntToPointer(type: PointerType): Constant = TODO()
+    public fun getSelect(isTrue: Constant, isFalse: Constant): Constant = TODO()
 }
 
 /**
@@ -731,6 +839,11 @@ public class ConstantFP public constructor(ptr: LLVMValueRef) : ConstantData(ptr
 
         return Pair(double, lossy.toBoolean())
     }
+
+    public fun getFloatTrunc(type: FloatingPointType): Constant = TODO()
+    public fun getFloatExt(type: FloatingPointType): Constant = TODO()
+    public fun getFloatToSigned(type: IntegerType): Constant = TODO()
+    public fun getFloatToUnsigned(type: IntegerType): Constant = TODO()
 }
 
 @CorrespondsTo("llvm::ConstantAggregateZero")
@@ -1099,7 +1212,7 @@ public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.
      * The instruction may optionally receive a [name]
      */
     public fun insert(builder: IRBuilder, name: Option<String>) {
-        if (name.isDefined()) {
+        if (name.isSome()) {
             LLVM.LLVMInsertIntoBuilderWithName(builder.ref, ref, name.get())
         } else {
             LLVM.LLVMInsertIntoBuilder(builder.ref, ref)

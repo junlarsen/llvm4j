@@ -1,7 +1,5 @@
 package org.llvm4j.llvm4j
 
-import io.vexelabs.bitbuilder.llvm.ir.types.FloatType
-import io.vexelabs.bitbuilder.llvm.ir.types.IntType
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.None
@@ -598,7 +596,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
         vararg indices: Value,
         isInBounds: Boolean,
         name: Option<String>
-    ) : Value = TODO()
+    ): Value = TODO()
 
     /**
      * Build an integer trunc instruction
@@ -612,7 +610,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type type to truncate down to
      * @param name optional name for the instruction
      */
-    public fun buildIntTrunc(op: Value, type: IntType, name: Option<String>): Value = TODO()
+    public fun buildIntTrunc(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
 
     /**
      * Build a zero extension instruction
@@ -625,7 +623,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type type to zero extend to
      * @param name optional name for the instruction
      */
-    public fun buildZeroExt(op: Value, type: IntType, name: Option<String>): Value = TODO()
+    public fun buildZeroExt(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
 
     /**
      * Build a sign extension instruction
@@ -638,7 +636,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type type to sign extend to
      * @param name optional name for the instruction
      */
-    public fun buildSignExt(op: Value, type: IntType, name: Option<String>): Value = TODO()
+    public fun buildSignExt(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point trunc instruction
@@ -651,7 +649,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type type to truncate down to
      * @param name optional name for the instruction
      */
-    public fun buildFloatTrunc(op: Value, type: FloatType, name: Option<String>): Value = TODO()
+    public fun buildFloatTrunc(op: Value, type: FloatingPointType, name: Option<String>): Value = TODO()
 
     /**
      * Build a float extension instruction
@@ -664,7 +662,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type the type to extend to
      * @param name optional name for the instruction
      */
-    public fun buildFloatExt(op: Value, type: FloatType, name: Option<String>): Value = TODO()
+    public fun buildFloatExt(op: Value, type: FloatingPointType, name: Option<String>): Value = TODO()
 
     /**
      * Build a float to unsigned int cast instruction
@@ -676,7 +674,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type integer type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildFloatToUnsigned(op: Value, type: IntType, name: Option<String>): Value = TODO()
+    public fun buildFloatToUnsigned(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
 
     /**
      * Build a float to signed int cast instruction
@@ -688,7 +686,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type integer type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildFloatToSigned(op: Value, type: IntType, name: Option<String>): Value = TODO()
+    public fun buildFloatToSigned(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
 
     /**
      * Build an unsigned int to float cast instruction
@@ -700,7 +698,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type floating-point type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildUnsignedToFloat(op: Value, type: FloatType, name: Option<String>): Value = TODO()
+    public fun buildUnsignedToFloat(op: Value, type: FloatingPointType, name: Option<String>): Value = TODO()
 
     /**
      * Build a signed int to float cast instruction
@@ -712,7 +710,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type floating-point type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildSignedToFloat(op: Value, type: FloatType, name: Option<String>): Value = TODO()
+    public fun buildSignedToFloat(op: Value, type: FloatingPointType, name: Option<String>): Value = TODO()
 
     /**
      * Build a pointer to int cast instruction
@@ -723,7 +721,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param type integer type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildPointerToInt(op: Value, type: IntType, name: Option<String>): Value = TODO()
+    public fun buildPointerToInt(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
 
     /**
      * Build a int to pointer cast instruction
