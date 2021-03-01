@@ -1,4 +1,4 @@
-name: CI Automation
+name: Automation
 on:
   push:
     branches:
@@ -7,50 +7,27 @@ on:
     branches:
       - master
 jobs:
-  lint:
-    name: Style-check codebase
-    runs-on: ubuntu-latest
+  ci:
+    name: GitHub Actions
+    strategy:
+      matrix:
+        operating-system: [ macos-latest, windows-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.operating-system }}
     steps:
       - uses: actions/checkout@v2
-      # Cache dependencies per commit hash because Sonatype OSS repo might
-      # miss certain artifacts at times.
-      - name: Cache Dependencies
+      - name: Retrieve Cached Dependencies
         id: cache-deps
         uses: actions/cache@v2
         with:
           path: ~/.m2/repository
-          key: mvn-hash-cce3d80711f15665cf1058b40cc3587c19ec9d76
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       # Install dependencies if git hash has changed
       - name: Install Maven Dependencies
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: bash ./mvnw -f .dependencies/dependencies.pom.xml -U compile
-      # Build and run lint check
-      - run: bash ./gradlew clean build ktlintCheck --refresh-dependencies
-
-  test:
-    needs: [lint]
-    name: Execute test suite
-    strategy:
-      matrix:
-        operating-system: [macos-latest, windows-latest, ubuntu-latest]
-    runs-on: ${{ matrix.operating-system }}
-    steps:
-      - uses: actions/checkout@v2
-      # Cache dependencies per commit hash because Sonatype OSS repo might
-      # miss certain artifacts at times.
-      - name: Cache Dependencies
-        id: cache-deps
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: mvn-hash-cce3d80711f15665cf1058b40cc3587c19ec9d76
-      # Install dependencies if git hash has changed
-      - name: Install Dependencies
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: bash ./mvnw -f .dependencies/dependencies.pom.xml -U compile
-      # Log system information and run tests
-      - run: |
-          bash --version
-          bash ./gradlew --version
-          java -version
-      - run: bash ./gradlew clean build test --refresh-dependencies
+      - name: Run KtLint
+        run: bash ./gradlew clean ktlintCheck --refresh-dependencies
+      - name: Run Test Suite
+        run: bash ./gradlew clean build test --refresh-dependencies
