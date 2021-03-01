@@ -32,12 +32,8 @@ dependencies {
     api("org.bytedeco:llvm-platform:11.0.1-1.5.5-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.10")
 
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.4.10")
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.11")
-    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.11")
-    testRuntimeOnly("org.jetbrains.kotlin:kotlin-reflect:1.4.10")
-
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.4.10")
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
@@ -55,7 +51,7 @@ tasks {
 
     dokkaHtml.configure {
         outputDirectory.set(file("$buildDir/javadoc"))
-        moduleName.set("BitBuilder")
+        moduleName.set("llvm4j")
 
         dokkaSourceSets.configureEach {
             skipDeprecated.set(false)
@@ -66,7 +62,7 @@ tasks {
             platform.set(Platform.jvm)
             sourceLink {
                 localDirectory.set(file("src/main/kotlin"))
-                remoteUrl.set(URL("https://github.com/vexelabs/bitbuilder/blob/master/src/main/kotlin"))
+                remoteUrl.set(URL("https://github.com/llvm4j/llvm4j/blob/master/src/main/kotlin"))
                 remoteLineSuffix.set("#L")
             }
             jdkVersion.set(8)
@@ -119,9 +115,9 @@ publishing {
             }
 
             pom {
-                name.set("BitBuilder")
+                name.set("llvm4j")
                 description.set("Kotlin interface to the LLVM APIs")
-                url.set("https://vexelabs.io/projects/bitbuilder")
+                url.set("https://github.com/llvm4j/llvm4j")
 
                 licenses {
                     license {
@@ -139,9 +135,9 @@ publishing {
                 }
 
                 scm {
-                    connection.set("scm:git:ssh://github.com/vexelabs/bitbuilder.git")
-                    developerConnection.set("scm:git:ssh://git@github.com:vexelabs/bitbuilder.git")
-                    url.set("https://github.com/vexelabs/bitbuilder")
+                    connection.set("scm:git:ssh://github.com/llvm4j/llvm4j.git")
+                    developerConnection.set("scm:git:ssh://git@github.com:llvm4j/llvm4j.git")
+                    url.set("https://github.com/llvm4j/llvm4j")
                 }
             }
         }

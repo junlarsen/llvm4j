@@ -1,7 +1,5 @@
 package org.llvm4j.llvm4j.util
 
-import java.util.*
-
 /**
  * Represents a disjoint union of a value [T] or an error [E]. Instances of
  * [Result] are either an instance of [Err] or [Ok]
