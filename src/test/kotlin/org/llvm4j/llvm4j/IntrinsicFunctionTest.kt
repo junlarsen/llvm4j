@@ -23,7 +23,7 @@ class IntrinsicFunctionTest {
     @Test fun `Test non-overloaded intrinsics`() {
         val ctx = Context()
         val mod = ctx.newModule("test_module")
-        val subject1 = IntrinsicFunction.lookup("llvm.va_start").get()
+        val subject1 = IntrinsicFunction.lookup("llvm.va_start").unwrap()
 
         assertFalse { subject1.isOverloaded() }
         assertEquals("llvm.va_start", subject1.getName())
@@ -37,8 +37,8 @@ class IntrinsicFunctionTest {
         assertIsOk(res1)
         assertIsOk(res2)
 
-        val subject2 = res1.get()
-        val subject3 = res2.get()
+        val subject2 = res1.unwrap()
+        val subject3 = res2.unwrap()
 
         assertEquals("llvm.va_start", subject2.getName())
         assertEquals(1, subject3.getParameterCount())
@@ -48,15 +48,15 @@ class IntrinsicFunctionTest {
         val ctx = Context()
         val mod = ctx.newModule("test_module")
         val i8 = ctx.getInt8Type()
-        val v4i8 = ctx.getVectorType(i8, 4).get()
-        val subject1 = IntrinsicFunction.lookup("llvm.ctpop").get()
+        val v4i8 = ctx.getVectorType(i8, 4).unwrap()
+        val subject1 = IntrinsicFunction.lookup("llvm.ctpop").unwrap()
 
         assertTrue { subject1.isOverloaded() }
         assertIsOk(subject1.getOverloadedName(v4i8))
         assertIsErr(subject1.getType(ctx))
         assertIsErr(subject1.getDeclaration(mod))
         assertEquals("llvm.ctpop", subject1.getName())
-        assertEquals("llvm.ctpop.v4i8", subject1.getOverloadedName(v4i8).get())
+        assertEquals("llvm.ctpop.v4i8", subject1.getOverloadedName(v4i8).unwrap())
 
         val res1 = subject1.getOverloadedDeclaration(mod, v4i8)
         val res2 = subject1.getOverloadedType(ctx, v4i8)
@@ -64,8 +64,8 @@ class IntrinsicFunctionTest {
         assertIsOk(res1)
         assertIsOk(res2)
 
-        val subject2 = res1.get()
-        val subject3 = res2.get()
+        val subject2 = res1.unwrap()
+        val subject3 = res2.unwrap()
 
         assertEquals("llvm.ctpop.v4i8", subject2.getName())
         assertEquals(1, subject3.getParameterCount())

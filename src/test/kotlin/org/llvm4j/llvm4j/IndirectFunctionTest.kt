@@ -26,7 +26,7 @@ class IndirectFunctionTest {
         assertIsSome(subject2.getResolver())
         assertIsNone(subject3.getResolver())
         assertEquals(ValueKind.GlobalIFunc, subject2.getValueKind())
-        assertEquals(subject1.ref, subject2.getResolver().get().ref)
+        assertEquals(subject1.ref, subject2.getResolver().unwrap().ref)
         assertEquals("test_main", subject2.getName())
 
         subject3.setResolver(subject1)
@@ -36,7 +36,7 @@ class IndirectFunctionTest {
         assertIsSome(subject3.getResolver())
         assertIsSome(mod.getGlobalIndirectFunction("test_main1"))
         assertEquals("test_main1", subject2.getName())
-        assertEquals(subject1.ref, subject3.getResolver().get().ref)
+        assertEquals(subject1.ref, subject3.getResolver().unwrap().ref)
     }
 
     @Test fun `Test deleting and erasure`() {

@@ -57,7 +57,7 @@ public open class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
     public fun getValueKind(): ValueKind {
         val kind = LLVM.LLVMGetValueKind(ref)
 
-        return ValueKind.from(kind).get()
+        return ValueKind.from(kind).unwrap()
     }
 
     public fun getAsString(): String {
@@ -497,7 +497,7 @@ public open class GlobalValue constructor(ptr: LLVMValueRef) :
     public fun getLinkage(): Linkage {
         val linkage = LLVM.LLVMGetLinkage(ref)
 
-        return Linkage.from(linkage).get()
+        return Linkage.from(linkage).unwrap()
     }
 
     public fun setLinkage(linkage: Linkage) {
@@ -521,7 +521,7 @@ public open class GlobalValue constructor(ptr: LLVMValueRef) :
     public fun getVisibility(): Visibility {
         val visibility = LLVM.LLVMGetVisibility(ref)
 
-        return Visibility.from(visibility).get()
+        return Visibility.from(visibility).unwrap()
     }
 
     public fun setVisibility(visibility: Visibility) {
@@ -531,7 +531,7 @@ public open class GlobalValue constructor(ptr: LLVMValueRef) :
     public fun getStorageClass(): DLLStorageClass {
         val storage = LLVM.LLVMGetDLLStorageClass(ref)
 
-        return DLLStorageClass.from(storage).get()
+        return DLLStorageClass.from(storage).unwrap()
     }
 
     public fun setStorageClass(storage: DLLStorageClass) {
@@ -541,7 +541,7 @@ public open class GlobalValue constructor(ptr: LLVMValueRef) :
     public fun getUnnamedAddress(): UnnamedAddress {
         val addr = LLVM.LLVMGetUnnamedAddress(ref)
 
-        return UnnamedAddress.from(addr).get()
+        return UnnamedAddress.from(addr).unwrap()
     }
 
     public fun setUnnamedAddress(address: UnnamedAddress) {
@@ -813,7 +813,7 @@ public class Function public constructor(ptr: LLVMValueRef) :
     public fun getCallConvention(): CallConvention {
         val cc = LLVM.LLVMGetFunctionCallConv(ref)
 
-        return CallConvention.from(cc).get()
+        return CallConvention.from(cc).unwrap()
     }
 
     public fun setCallConvention(cc: CallConvention) {
@@ -1040,7 +1040,7 @@ public class GlobalVariable public constructor(ptr: LLVMValueRef) :
     public fun getThreadLocalMode(): ThreadLocalMode {
         val mode = LLVM.LLVMGetThreadLocalMode(ref)
 
-        return ThreadLocalMode.from(mode).get()
+        return ThreadLocalMode.from(mode).unwrap()
     }
 
     public fun setThreadLocalMode(mode: ThreadLocalMode) {
@@ -1070,7 +1070,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
     public fun getOpcode(): Opcode {
         val opcode = LLVM.LLVMGetConstOpcode(ref)
 
-        return Opcode.from(opcode).get()
+        return Opcode.from(opcode).unwrap()
     }
 }
 

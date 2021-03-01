@@ -40,7 +40,7 @@ class FunctionTest {
         assertIsSome(subject1.getGC())
         assertIsSome(mod.getFunction("test_main"))
         assertEquals("test_main", subject1.getName())
-        assertEquals("shadow-stack", subject1.getGC().get())
+        assertEquals("shadow-stack", subject1.getGC().unwrap())
         assertEquals(CallConvention.Fast, subject1.getCallConvention())
     }
 
@@ -71,8 +71,8 @@ class FunctionTest {
 
         assertEquals("a", subject2.getName())
         assertEquals(2, subject1.getParameterCount())
-        assertEquals(subject2.ref, subject1.getParameter(0).get().ref)
-        assertEquals(subject3.ref, subject1.getParameter(1).get().ref)
+        assertEquals(subject2.ref, subject1.getParameter(0).unwrap().ref)
+        assertEquals(subject3.ref, subject1.getParameter(1).unwrap().ref)
 
         assertEquals(subject1.ref, subject2.getParent().ref)
     }
@@ -91,7 +91,7 @@ class FunctionTest {
         subject1.setPersonalityFunction(subject2)
 
         assertTrue { subject1.hasPersonalityFunction() }
-        assertEquals(subject2.ref, subject1.getPersonalityFunction().get().ref)
+        assertEquals(subject2.ref, subject1.getPersonalityFunction().unwrap().ref)
     }
 
     @Test fun `Test deleting function from module`() {
@@ -103,7 +103,7 @@ class FunctionTest {
         val subject1 = mod.addFunction("test_fn", fnTy)
 
         assertIsSome(mod.getFunction("test_fn"))
-        assertEquals(subject1.ref, mod.getFunction("test_fn").get().ref)
+        assertEquals(subject1.ref, mod.getFunction("test_fn").unwrap().ref)
 
         subject1.delete()
 
@@ -140,8 +140,8 @@ class GlobalAliasTest {
         val i32 = ctx.getInt32Type()
         val i32ptr = ctx.getPointerType(i32)
         val value1 = i32.getConstantPointerNull()
-        val value2 = i32ptr.get().getConstantUndef()
-        val subject = mod.addGlobalAlias("global_alias", i32ptr.get(), value1)
+        val value2 = i32ptr.unwrap().getConstantUndef()
+        val subject = mod.addGlobalAlias("global_alias", i32ptr.unwrap(), value1)
 
         assertEquals(TypeKind.Pointer, subject.getType().getTypeKind())
         assertEquals(ValueKind.GlobalAlias, subject.getValueKind())
@@ -181,7 +181,7 @@ class GlobalValueTest {
         subject.setLinkage(Linkage.Appending)
 
         assertIsSome(subject.getSection())
-        assertEquals(".bss", subject.getSection().get())
+        assertEquals(".bss", subject.getSection().unwrap())
         assertEquals(Linkage.Appending, subject.getLinkage())
 
         for (value in Visibility.entries) {
@@ -228,7 +228,7 @@ class GlobalVariableTest {
         assertIsOk(res1)
         assertIsErr(res2)
 
-        val subject1 = res1.get()
+        val subject1 = res1.unwrap()
 
         assertEquals(TypeKind.Pointer, subject1.getType().getTypeKind())
         assertEquals(ValueKind.GlobalVariable, subject1.getValueKind())
@@ -254,7 +254,7 @@ class GlobalVariableTest {
         assertTrue { subject1.isThreadLocal() }
         assertTrue { subject1.isImmutable() }
         assertIsSome(subject1.getInitializer())
-        assertEquals(value.ref, subject1.getInitializer().get().ref)
+        assertEquals(value.ref, subject1.getInitializer().unwrap().ref)
         assertEquals(ThreadLocalMode.GeneralDynamic, subject1.getThreadLocalMode())
     }
 
@@ -262,7 +262,7 @@ class GlobalVariableTest {
         val ctx = Context()
         val mod = ctx.newModule("test_module")
         val i32 = ctx.getInt32Type()
-        val subject = mod.addGlobalVariable("test_var1", i32, None).get()
+        val subject = mod.addGlobalVariable("test_var1", i32, None).unwrap()
 
         assertIsSome(mod.getGlobalVariable("test_var1"))
 

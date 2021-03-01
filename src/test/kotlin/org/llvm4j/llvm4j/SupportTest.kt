@@ -31,8 +31,8 @@ class SupportTest {
         val subject = MemoryBuffer.of(file)
 
         assertIsOk(subject)
-        assertEquals(11, subject.get().getSize())
-        assertEquals("Hello World", subject.get().getString())
-        assertEquals('d', subject.get().getStartPointer().getChar(10))
+        assertEquals(11, subject.unwrap().getSize())
+        assertEquals("Hello World", subject.unwrap().getString())
+        assertEquals('d', subject.unwrap().getStartPointer().getChar(10))
     }
 }

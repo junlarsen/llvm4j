@@ -103,7 +103,7 @@ class ConstantArrayTest {
     @Test fun `Test ConstantArray properties`() {
         val ctx = Context()
         val i8 = ctx.getInt8Type()
-        val a4i8 = ctx.getArrayType(i8, 4).get()
+        val a4i8 = ctx.getArrayType(i8, 4).unwrap()
         val values = (0..10).map { i8.getConstant(it) }.toTypedArray()
         val subject1 = i8.getConstantArray(*values)
         val subject2 = a4i8.getConstantNull()
@@ -124,7 +124,7 @@ class ConstantVectorTest {
     @Test fun `Test ConstantVector properties`() {
         val ctx = Context()
         val i8 = ctx.getInt8Type()
-        val v4i8 = ctx.getVectorType(i8, 4).get()
+        val v4i8 = ctx.getVectorType(i8, 4).unwrap()
         val values = (0..10).map { i8.getConstant(it) }.toTypedArray()
         val subject1 = i8.getConstantVector(*values)
         val subject2 = v4i8.getConstantNull()
@@ -145,7 +145,7 @@ class ConstantPointerNullTest {
     @Test fun `Test ConstantPointerNull properties`() {
         val ctx = Context()
         val i32 = ctx.getInt32Type()
-        val i32ptr = ctx.getPointerType(i32).get()
+        val i32ptr = ctx.getPointerType(i32).unwrap()
         val subject1 = i32.getConstantPointerNull()
         val subject2 = i32ptr.getConstantNull()
 
@@ -170,7 +170,7 @@ class ConstantStructTest {
 
         assertIsOk(res)
 
-        val subject1 = res.get()
+        val subject1 = res.unwrap()
         val subject2 = type.getConstantNull()
 
         assertEquals(ValueKind.ConstantStruct, subject1.getValueKind())
@@ -202,7 +202,7 @@ class ConstantStructTest {
 
         assertIsOk(res2)
 
-        val subject1 = res2.get()
+        val subject1 = res2.unwrap()
 
         assertEquals(ValueKind.ConstantStruct, subject1.getValueKind())
         assertEquals("{ float, i8 } { float 1.000000e+02, i8 45 }", subject1.getAsString())

@@ -18,10 +18,10 @@ class AttributeTest {
         assertFalse { enum.isStringAttribute() }
         assertFalse { string.isEnumAttribute() }
 
-        assertEquals(0, enum.getEnumValue().get())
-        assertEquals(1, enum.getEnumKind().get())
-        assertEquals("key", string.getStringKind().get())
-        assertEquals("value", string.getStringValue().get())
+        assertEquals(0, enum.getEnumValue().unwrap())
+        assertEquals(1, enum.getEnumKind().unwrap())
+        assertEquals("key", string.getStringKind().unwrap())
+        assertEquals("value", string.getStringValue().unwrap())
     }
 
     @Test fun `Test locating enum kinds`() {
@@ -35,7 +35,7 @@ class AttributeTest {
         assertIsSome(subject2)
 
         assertTrue { subject3.isEnumAttribute() }
-        assertEquals(last, subject3.getEnumKind().get())
-        assertEquals(0, subject3.getEnumValue().get())
+        assertEquals(last, subject3.getEnumKind().unwrap())
+        assertEquals(0, subject3.getEnumValue().unwrap())
     }
 }

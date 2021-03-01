@@ -135,9 +135,9 @@ class ModuleTest {
 
         assertIsSome(subject1)
         assertEquals(1, subject2.size())
-        assertEquals("test", subject2.getKey(0).get())
-        assertEquals(ModuleFlagBehavior.Error, subject2.getBehavior(0).get())
-        assertEquals(md.ref, subject2.getMetadata(0).get().ref)
+        assertEquals("test", subject2.getKey(0).unwrap())
+        assertEquals(ModuleFlagBehavior.Error, subject2.getBehavior(0).unwrap())
+        assertEquals(md.ref, subject2.getMetadata(0).unwrap().ref)
     }
 
     @Test fun `Test finding named types`() {
@@ -151,7 +151,7 @@ class ModuleTest {
         subject.setElementTypes(i8, i8)
 
         assertIsSome(mod.getTypeByName("struct_t"))
-        assertEquals(subject.ref, mod.getTypeByName("struct_t").get().ref)
+        assertEquals(subject.ref, mod.getTypeByName("struct_t").unwrap().ref)
     }
 
     @Test fun `Test finding named metadata`() {
@@ -164,7 +164,7 @@ class ModuleTest {
         val subject2 = mod.getNamedMetadata("key")
 
         assertIsSome(subject2)
-        assertEquals(subject1.ref, subject2.get().ref)
+        assertEquals(subject1.ref, subject2.unwrap().ref)
     }
 
     @Test fun `Test finding named functions`() {
@@ -179,7 +179,7 @@ class ModuleTest {
         val subject2 = mod.getFunction("factorial")
 
         assertIsSome(subject2)
-        assertEquals(subject1.ref, subject2.get().ref)
+        assertEquals(subject1.ref, subject2.unwrap().ref)
 
         assertIsNone(mod.getGlobalIndirectFunction("indirect_fn"))
 
@@ -187,7 +187,7 @@ class ModuleTest {
         val subject4 = mod.getGlobalIndirectFunction("indirect_fn")
 
         assertIsSome(subject4)
-        assertEquals(subject3.ref, subject4.get().ref)
+        assertEquals(subject3.ref, subject4.unwrap().ref)
     }
 
     @Test fun `Test finding global aliases`() {
@@ -200,10 +200,10 @@ class ModuleTest {
         assertIsOk(i32ptr)
         assertIsNone(mod.getGlobalAlias("global_alias"))
 
-        val subject1 = mod.addGlobalAlias("global_alias", i32ptr.get(), value)
+        val subject1 = mod.addGlobalAlias("global_alias", i32ptr.unwrap(), value)
 
         assertIsSome(mod.getGlobalAlias("global_alias"))
-        assertEquals(subject1.ref, mod.getGlobalAlias("global_alias").get().ref)
+        assertEquals(subject1.ref, mod.getGlobalAlias("global_alias").unwrap().ref)
     }
 
     @Test fun `Test finding global variables`() {
@@ -213,9 +213,9 @@ class ModuleTest {
 
         assertIsNone(mod.getGlobalVariable("var"))
 
-        val subject1 = mod.addGlobalVariable("var", i32, None).get()
+        val subject1 = mod.addGlobalVariable("var", i32, None).unwrap()
 
         assertIsSome(mod.getGlobalVariable("var"))
-        assertEquals(subject1.ref, mod.getGlobalVariable("var").get().ref)
+        assertEquals(subject1.ref, mod.getGlobalVariable("var").unwrap().ref)
     }
 }

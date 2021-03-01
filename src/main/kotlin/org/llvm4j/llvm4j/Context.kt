@@ -362,6 +362,6 @@ public class DiagnosticInfo public constructor(ptr: LLVMDiagnosticInfoRef) : Own
     public fun getSeverity(): DiagnosticSeverity {
         val severity = LLVM.LLVMGetDiagInfoSeverity(ref)
 
-        return DiagnosticSeverity.from(severity).get()
+        return DiagnosticSeverity.from(severity).unwrap()
     }
 }

@@ -134,7 +134,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
      */
     public fun dump(file: Option<File>): Result<Unit> = tryWith {
         if (file.isDefined()) {
-            val fd = file.get()
+            val fd = file.unwrap()
             if (!fd.exists()) {
                 assert(fd.createNewFile()) { "Failed to create new file '$file'" }
             }
@@ -214,7 +214,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
         resolver: Option<Function>
     ): GlobalIndirectFunction {
         val resolverFn = when (resolver) {
-            is Some -> resolver.get()
+            is Some -> resolver.unwrap()
             is None -> null
         }
         val fn = LLVM.LLVMAddGlobalIFunc(ref, name, name.length.toLong(), type.ref, addressSpace.value, resolverFn?.ref)
@@ -248,7 +248,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
         assert(!type.isFunctionType() && type.isValidPointerElementType()) { "Invalid type for global variable" }
 
         val variable = when (addressSpace) {
-            is Some -> LLVM.LLVMAddGlobalInAddressSpace(ref, type.ref, name, addressSpace.get().value)
+            is Some -> LLVM.LLVMAddGlobalInAddressSpace(ref, type.ref, name, addressSpace.unwrap().value)
             is None -> LLVM.LLVMAddGlobal(ref, type.ref, name)
         }
 
@@ -292,7 +292,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
 
             val behavior = LLVM.LLVMModuleFlagEntriesGetFlagBehavior(ref, index)
 
-            ModuleFlagBehavior.from(behavior).get()
+            ModuleFlagBehavior.from(behavior).unwrap()
         }
 
         public fun getMetadata(index: Int): Result<Metadata> = tryWith {

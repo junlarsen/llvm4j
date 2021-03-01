@@ -49,7 +49,7 @@ public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
     /** The type kind of a type never changes so this is safe to memoize. */
     private val memoizedTypeKind by lazy {
         val kind = LLVM.LLVMGetTypeKind(ref)
-        TypeKind.from(kind).get()
+        TypeKind.from(kind).unwrap()
     }
 
     public fun getTypeKind(): TypeKind = memoizedTypeKind
@@ -407,7 +407,7 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
     public fun getElementType(index: Int): Result<Type> = tryWith {
         assert(!isOpaque()) { "Calling getElementType on opaque struct" }
         // Safe .get as getElementCount ensures !isOpaque
-        assert(index <= getElementCount().get()) { "Index out of bounds" }
+        assert(index <= getElementCount().unwrap()) { "Index out of bounds" }
 
         val type = LLVM.LLVMStructGetTypeAtIndex(ref, index)
 
@@ -417,7 +417,7 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
     public fun getElementTypes(): Result<Array<Type>> = tryWith {
         assert(!isOpaque()) { "Calling getElementTypes on opaque struct" }
 
-        val size = getElementCount().get()
+        val size = getElementCount().unwrap()
         val buffer = PointerPointer<LLVMTypeRef>(size.toLong())
 
         LLVM.LLVMGetStructElementTypes(ref, buffer)

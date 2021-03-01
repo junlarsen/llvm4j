@@ -36,7 +36,7 @@ public sealed class Option<out T>(protected open val value: T? = null) {
      *
      * @throws IllegalStateException if called on [None]
      */
-    public fun get(): T {
+    public fun unwrap(): T {
         return value ?: throw IllegalStateException("Illegal option access")
     }
 

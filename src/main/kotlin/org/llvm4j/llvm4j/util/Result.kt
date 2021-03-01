@@ -35,7 +35,7 @@ public sealed class Result<out T>(
      *
      * @throws IllegalStateException if called on [Err]
      */
-    public fun get(): T {
+    public fun unwrap(): T {
         return value ?: throw IllegalStateException("Illegal result access")
     }
 

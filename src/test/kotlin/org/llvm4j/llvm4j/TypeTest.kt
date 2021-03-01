@@ -70,7 +70,7 @@ class TypeTest {
         assertIsOk(res1)
         assertIsErr(res2)
 
-        val subject1 = res1.get()
+        val subject1 = res1.unwrap()
 
         assertTrue { subject1.isArrayType() }
         assertTrue { subject1.isValidPointerElementType() }
@@ -96,7 +96,7 @@ class TypeTest {
         assertIsOk(res1)
         assertIsErr(res2)
 
-        val subject1 = res1.get()
+        val subject1 = res1.unwrap()
 
         assertTrue { subject1.isVectorType() }
         assertTrue { subject1.isValidPointerElementType() }
@@ -135,8 +135,8 @@ class TypeTest {
         assertEquals(ctx.ref, subject1.getContext().ref)
         assertEquals(2, subject1.getElementCount())
         assertEquals(listOf(f32.ref, i8.ref), subject1.getElementTypes().map { it.ref })
-        assertEquals(f32.ref, subject1.getElementType(0).get().ref)
-        assertEquals(i8.ref, subject1.getElementType(1).get().ref)
+        assertEquals(f32.ref, subject1.getElementType(0).unwrap().ref)
+        assertEquals(i8.ref, subject1.getElementType(1).unwrap().ref)
 
         assertTrue { subject2.isPacked() }
         assertTrue { subject2.isLiteral() }
@@ -176,9 +176,9 @@ class TypeTest {
         assertFalse { subject1.isOpaque() }
         assertFalse { subject1.isLiteral() }
         assertEquals(Some(2), subject1.getElementCount())
-        assertEquals(listOf(i8.ref, f32.ref), subject1.getElementTypes().get().map { it.ref })
-        assertEquals(i8.ref, subject1.getElementType(0).get().ref)
-        assertEquals(f32.ref, subject1.getElementType(1).get().ref)
+        assertEquals(listOf(i8.ref, f32.ref), subject1.getElementTypes().unwrap().map { it.ref })
+        assertEquals(i8.ref, subject1.getElementType(0).unwrap().ref)
+        assertEquals(f32.ref, subject1.getElementType(1).unwrap().ref)
 
         assertIsOk(subject2)
         assertIsErr(subject3)
@@ -220,8 +220,8 @@ class TypeTest {
         assertIsOk(res2)
         assertIsErr(res3)
 
-        val subject1 = res1.get()
-        val subject2 = res2.get()
+        val subject1 = res1.unwrap()
+        val subject2 = res2.unwrap()
 
         assertTrue { subject1.isPointerType() }
         assertTrue { subject1.isValidPointerElementType() }
