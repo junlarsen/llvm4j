@@ -3,10 +3,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URL
 
 plugins {
-    id("com.github.johnrengelman.shadow") version "5.2.0"
     id("org.jlleitschuh.gradle.ktlint") version "9.4.1"
     id("org.jetbrains.dokka") version "1.4.10.2"
-    id("org.jetbrains.kotlin.jvm") version "1.4.10"
+    id("org.jetbrains.kotlin.jvm") version "1.4.31"
     id("maven")
     id("maven-publish")
     id("signing")
@@ -16,7 +15,6 @@ group = "org.llvm4j"
 version = "0.1.0-SNAPSHOT"
 
 kotlin.explicitApi()
-ktlint.debug.set(true)
 
 val isSnapshot = version.toString().endsWith("SNAPSHOT")
 val isCI = System.getenv("CI") == "true"
@@ -30,10 +28,10 @@ repositories {
 
 dependencies {
     api("org.bytedeco:llvm-platform:11.1.0-1.5.5-SNAPSHOT")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.31")
 
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
-    testImplementation("org.jetbrains.kotlin:kotlin-test:1.4.10")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.4.31")
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
