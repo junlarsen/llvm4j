@@ -1,0 +1,44 @@
+name: Automation
+on:
+  push:
+    branches:
+      - master
+jobs:
+  ci:
+    name: Deployment of JavaDocs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Retrieve Cached Dependencies
+        id: cache-deps
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      # Install dependencies if git hash has changed
+      - name: Install Maven Dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: bash ./mvnw -f .dependencies/dependencies.pom.xml -U compile
+      - run: bash ./gradlew clean build dokkaHtml --refresh-dependencies
+      - name: Upload Latest version
+        uses: llvm4j/infrastructure/deploy-to-s3@0.1.0-rc1
+        with:
+          aws-access-key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-bucket: ${{ secrets.AWS_BUCKET }}
+          prefix: latest
+          directory: build/javadoc
+          delete-existing-objects: true
+      - name: Upload Commit Tagged version
+        uses: llvm4j/infrastructure/deploy-to-s3@0.1.0-rc1
+        with:
+          aws-access-key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-bucket: ${{ secrets.AWS_BUCKET }}
+          prefix: ${{ github.sha }}
+          directory: build/javadoc
+          delete-existing-objects: true
