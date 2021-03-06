@@ -39,6 +39,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
           aws-bucket: ${{ secrets.AWS_BUCKET }}
-          prefix: latest
+          prefix: ${{ github.sha }}
           directory: build/javadoc
           delete-existing-objects: true
