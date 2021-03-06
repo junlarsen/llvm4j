@@ -29,14 +29,4 @@ jobs:
       - name: Run KtLint
         run: bash ./gradlew clean ktlintCheck --refresh-dependencies
       - name: Run Test Suite
-        run: bash ./gradlew clean build dokkaHtml test --refresh-dependencies
-      - name: Upload Generated Documentation
-        uses: llvm4j/infrastructure/deploy-to-s3@0.1.0-rc1
-        with:
-          aws-access-key: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-          aws-bucket: ${{ secrets.AWS_BUCKET }}
-          prefix: ${{ github.sha }}
-          directory: build/javadoc
-          delete-existing-objects: true
+        run: bash ./gradlew clean build test --refresh-dependencies
