@@ -14,10 +14,10 @@ plugins {
 group = "org.llvm4j"
 version = "0.1.0-SNAPSHOT"
 
-kotlin.explicitApi()
-
-val isSnapshot = version.toString().endsWith("SNAPSHOT")
+val isStaging = true
 val isCI = System.getenv("CI") == "true"
+
+kotlin.explicitApi()
 
 repositories {
     mavenCentral()
@@ -94,12 +94,15 @@ publishing {
 
             repositories {
                 maven {
-                    // TODO: Set up per-commit deployment
-                    url = uri("https://oss.sonatype.org/content/repositories/snapshots/")
+                    url = if (isStaging) {
+                        uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+                    } else {
+                        uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+                    }
 
                     credentials {
-                        username = System.getenv("PUBLISH_USERNAME")
-                        password = System.getenv("PUBLISH_PASSWORD")
+                        username = System.getenv("DEPLOY_USERNAME")
+                        password = System.getenv("DEPLOY_PASSWORD")
                     }
                 }
             }
@@ -111,8 +114,8 @@ publishing {
 
                 licenses {
                     license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                        name.set("LLVM Exception, Version 2.0")
+                        url.set("https://foundation.llvm.org/relicensing/LICENSE.txt")
                     }
                 }
 

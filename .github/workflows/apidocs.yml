@@ -42,3 +42,10 @@ jobs:
           prefix: ${{ github.sha }}
           directory: build/javadoc
           delete-existing-objects: true
+      - name: Publish to Sonatype
+        run: bash ./gradlew publishSonatypePublicationToMavenRepository
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
+          DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
+          DEPLOY_USERNAME: ${{ secrets.DEPLOY_USERNAME }}
