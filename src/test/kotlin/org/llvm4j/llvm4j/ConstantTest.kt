@@ -211,3 +211,18 @@ class ConstantStructTest {
         assertFalse { subject1.isUndef() }
     }
 }
+
+class IntegerMathConstantTest {
+    @Test
+    fun `Test addition of two integers`() {
+        val ctx = Context()
+        val i32 = ctx.getInt32Type()
+        val lhs = i32.getConstant(100)
+        val rhs = i32.getConstant(256)
+
+        for (semantic in WrapSemantics.values()) {
+            // TODO: Casts - Assert value matches when casts are done
+            lhs.getIntAdd(rhs, semantic)
+        }
+    }
+}

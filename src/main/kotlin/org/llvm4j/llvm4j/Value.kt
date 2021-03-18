@@ -373,9 +373,30 @@ public open class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
      * @author Mats Larsen
      */
     @InternalApi
-    public interface IntegerMathConstant {
+    public interface IntegerMathConstant : Owner<LLVMValueRef> {
         public fun getIntNeg(rhs: Constant, semantics: WrapSemantics): Constant = TODO("helper api")
-        public fun getIntAdd(rhs: Constant, semantics: WrapSemantics): Constant = TODO()
+
+        /**
+         * Build an addition instruction
+         *
+         * The `add` instruction adds two integer or vector-of-integer operands
+         *
+         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
+         * does overflow, a poison value is returned
+         *
+         * @param rhs       right hand side integer to add
+         * @param semantics wrapping semantics upon overflow
+         */
+        public fun getIntAdd(rhs: Constant, semantics: WrapSemantics): Constant {
+            val sum = when (semantics) {
+                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWAdd(ref, rhs.ref)
+                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWAdd(ref, rhs.ref)
+                WrapSemantics.Unspecified -> LLVM.LLVMConstAdd(ref, rhs.ref)
+            }
+
+            return Constant(sum)
+        }
+
         public fun getIntSub(rhs: Constant, semantics: WrapSemantics): Constant = TODO()
         public fun getIntMul(rhs: Constant, semantics: WrapSemantics): Constant = TODO()
         public fun getUnsignedDiv(divisor: Constant): Constant = TODO()
@@ -743,7 +764,7 @@ public open class GlobalIndirectSymbol constructor(ptr: LLVMValueRef) : GlobalVa
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantArray")
-public class ConstantArray public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr)
+public class ConstantArray public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr), Constant.AggregateConstant
 
 /**
  * A constant vector of values with the same type
@@ -760,7 +781,8 @@ public class ConstantArray public constructor(ptr: LLVMValueRef) : ConstantAggre
 public class ConstantVector public constructor(ptr: LLVMValueRef) :
     ConstantAggregate(ptr),
     Constant.IntegerMathConstant,
-    Constant.FloatingPointMathConstant {
+    Constant.FloatingPointMathConstant,
+    Constant.FirstClassConstant {
     public fun getExtractElement(index: Constant): Constant = TODO()
     public fun getInsertElement(value: Constant, index: Constant): Constant = TODO()
     public fun getShuffleVector(rhs: ConstantVector, mask: ConstantVector): Constant = TODO()
@@ -787,7 +809,7 @@ public class ConstantVector public constructor(ptr: LLVMValueRef) :
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantStruct")
-public class ConstantStruct public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr)
+public class ConstantStruct public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr), Constant.AggregateConstant
 
 /**
  * A single, constant integer value
@@ -800,7 +822,10 @@ public class ConstantStruct public constructor(ptr: LLVMValueRef) : ConstantAggr
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantInt")
-public class ConstantInt public constructor(ptr: LLVMValueRef) : ConstantData(ptr) {
+public class ConstantInt public constructor(ptr: LLVMValueRef) :
+    ConstantData(ptr),
+    Constant.IntegerMathConstant,
+    Constant.FirstClassConstant {
     public fun getZeroExtendedValue(): Long {
         return LLVM.LLVMConstIntGetZExtValue(ref)
     }
@@ -826,7 +851,11 @@ public class ConstantInt public constructor(ptr: LLVMValueRef) : ConstantData(pt
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantFP")
-public class ConstantFP public constructor(ptr: LLVMValueRef) : ConstantData(ptr) {
+public class ConstantFP public constructor(ptr: LLVMValueRef) :
+    ConstantData(ptr),
+    Constant
+    .FloatingPointMathConstant,
+    Constant.FirstClassConstant {
     /**
      * Retrieve the value as a Kotlin double.
      *
