@@ -1,9 +1,14 @@
 package org.llvm4j.llvm4j
 
 import org.junit.jupiter.api.Test
+import org.llvm4j.llvm4j.testing.assertIsNone
 import org.llvm4j.llvm4j.testing.assertIsOk
+import org.llvm4j.llvm4j.testing.assertIsSome
 import java.io.File
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class SupportTest {
     @Test fun `Test usage of LLVM messages`() {
@@ -34,5 +39,22 @@ class SupportTest {
         assertEquals(11, subject.unwrap().getSize())
         assertEquals("Hello World", subject.unwrap().getString())
         assertEquals('d', subject.unwrap().getStartPointer().getChar(10))
+    }
+
+    @Test fun `Test isa conversion assertions`() {
+        val ctx = Context()
+        val i32 = ctx.getInt32Type()
+        val subject = i32.getConstant(1234)
+
+        assertTrue { isa<Constant>(subject) }
+        assertTrue { isa<ConstantInt>(subject) }
+        assertFalse { isa<Instruction>(subject) }
+
+        assertFailsWith<ClassCastException> {
+            cast<Instruction>(subject)
+        }
+
+        assertIsSome(dyncast<Constant>(subject))
+        assertIsNone(dyncast<Instruction>(subject))
     }
 }

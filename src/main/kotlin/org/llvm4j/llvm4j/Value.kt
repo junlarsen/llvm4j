@@ -1076,7 +1076,6 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
 public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
     public interface Atomic : Owner<LLVMValueRef>
     public interface CallBase : Owner<LLVMValueRef>
-    public interface FuncletPad : Owner<LLVMValueRef>
     public interface MemoryAccessor : Owner<LLVMValueRef>
     public interface Terminator : Owner<LLVMValueRef>
 
@@ -1095,46 +1094,64 @@ public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.
     }
 }
 
+public class BinaryOperatorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+public open class ComparisonInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class IntComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr)
+public class FPComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr)
+
+public open class FuncletPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class CatchPadInstruction public constructor(ptr: LLVMValueRef) : FuncletPadInstruction(ptr)
+public class CleanupPadInstruction public constructor(ptr: LLVMValueRef) : FuncletPadInstruction(ptr)
+
+public open class UnaryInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class AllocaInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+public open class CastInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+public class ExtractValueInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+public class LoadInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+public class VAArgInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+public class FreezeInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+public class UnaryOperator public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+
+public class AddrSpaceCastInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class BitCastInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class FloatExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class FloatToSignedInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class FloatToUnsignedInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class FloatTruncInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class IntToPtrInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class PtrToIntInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class SignedExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class SignedToFloatInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class IntTruncInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class UnsignedToFloatInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class ZeroExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
 public class AtomicCmpXchgInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class AtomicRMWInstruction
-// public class BinaryOperatorInstruction
+public class AtomicRMWInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
-public open class BranchInst
-public class InvokeInstruction
-public class CallBrInstruction
-public class CallInstruction
+public open class BranchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class InvokeInstruction public constructor(ptr: LLVMValueRef) : BranchInstruction(ptr)
+public class CallBrInstruction public constructor(ptr: LLVMValueRef) : BranchInstruction(ptr)
+public class CallInstruction public constructor(ptr: LLVMValueRef) : BranchInstruction(ptr)
 
-public class CatchReturnInstruction
-public class CatchSwitchInstruction
-public class CleanupReturnInstruction
+public class CatchReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class CatchSwitchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class CleanupReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
-// @interface CmpInst
-public class ICmpInstruction
-public class FCmpInstruction
+public class ExtractElementInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class FenceInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
-public class ExtractElementInstruction
-public class FenceInstruction
-
-// @interface FuncletPadInst
-public class CatchPadInstruction
-public class CleanupPadInstruction
-
-public class GetElementPtrInstruction
-public class IndirectBrInstruction
-public class InsertElementInstruction
-public class InsertValueInstruction
-public class LandingPadInstruction
-public class PhiInstruction
-public class ResumeInstruction
-public class ReturnInstruction
-public class SelectInstruction
-public class ShuffleVectorInstruction
-public class StoreInstruction
-public class SwitchInstruction
-
-// @interface UnaryInstruction - UnaryOperator
-public class AllocaInstruction
-public class LoadInstruction
-public class VAArgInstruction
-
-public class UnreachableInstruction
+public class GetElementPtrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class IndirectBrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class InsertElementInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class InsertValueInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class LandingPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class PhiInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class ResumeInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class ReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class SelectInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class ShuffleVectorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class StoreInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class SwitchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class UnreachableInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
