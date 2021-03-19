@@ -1,10 +1,12 @@
 package org.llvm4j.llvm4j
 
 import org.bytedeco.javacpp.BytePointer
+import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.optional.Option
 import org.llvm4j.optional.Result
 import org.llvm4j.optional.result
 import java.io.File
@@ -97,4 +99,53 @@ public class MemoryBuffer public constructor(ptr: LLVMMemoryBufferRef) : Owner<L
             MemoryBuffer(buf)
         }
     }
+}
+
+/**
+ * Facade for performing nice casting through Kotlin generics
+ *
+ * @author Mats Larsen
+ */
+public object TypeCasting {
+    /**
+     * Create a casting path from Owner type [F] to Pointer type [T]
+     *
+     * This is a helper function to map paths in the [directions] map
+     */
+    private inline fun <reified F, T : Pointer> path(noinline conversion: (T) -> F): Pair<Class<F>, (T) -> F> {
+        return F::class.java to conversion
+    }
+
+    public val directions: Map<Class<*>, Any> = mapOf(
+
+    )
+}
+
+/**
+ * Perform a cast from a given Owner to [T] if possible
+ *
+ * This looks through the TypeCasting facade's directions and determines whether the conversion between the two types
+ * are legal. If it is, the owner is "cast" by passing its ref into T's conversion function and Some(T) is returned.
+ *
+ * This is a Kotlin-only API.
+ *
+ * @author Mats Larsen
+ */
+@JvmSynthetic
+public inline fun <reified T> cast(from: Owner<*>): Option<T> {
+    val conversion = TypeCasting.directions[T::class.java]
+    @Suppress("UNCHECKED_CAST")
+    val result = (conversion as? (Any) -> Owner<*>)?.invoke(from.ref) as? T
+
+    return Option.of(result)
+}
+
+@JvmSynthetic
+public inline fun <reified T> cast(from: Owner<*>, default: T): T {
+    return cast<T>(from).toNullable() ?: default
+}
+
+@JvmSynthetic
+public inline fun <reified T> cast(from: Owner<*>, default: () -> T): T {
+    return cast<T>(from).toNullable() ?: default.invoke()
 }
