@@ -14,3 +14,6 @@ internal fun Int.toBoolean(): Boolean = this == 1
 internal inline fun <reified T : Pointer> List<T>.toPointerPointer(): PointerPointer<T> {
     return PointerPointer(*toTypedArray())
 }
+
+/** Represents a logic flow branch which is unreachable - use with caution */
+public class SemanticallyUnreachable : RuntimeException()

@@ -4,13 +4,13 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Option
-import org.llvm4j.llvm4j.util.Result
-import org.llvm4j.llvm4j.util.Some
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toPointerPointer
-import org.llvm4j.llvm4j.util.tryWith
+import org.llvm4j.optional.None
+import org.llvm4j.optional.Option
+import org.llvm4j.optional.Result
+import org.llvm4j.optional.Some
+import org.llvm4j.optional.result
 
 /**
  * Represents an intrinsic function in the LLVM system
@@ -37,7 +37,7 @@ public class IntrinsicFunction constructor(intrinsic: Int) {
         return copy
     }
 
-    public fun getDeclaration(target: Module): Result<Function> = tryWith {
+    public fun getDeclaration(target: Module): Result<Function, AssertionError> = result {
         assert(!isOverloaded()) { "Called getDeclaration on overloaded intrinsic" }
 
         val ptr = PointerPointer<LLVMTypeRef>(1L)
@@ -48,7 +48,7 @@ public class IntrinsicFunction constructor(intrinsic: Int) {
         Function(function)
     }
 
-    public fun getType(inContext: Context): Result<FunctionType> = tryWith {
+    public fun getType(inContext: Context): Result<FunctionType, AssertionError> = result {
         assert(!isOverloaded()) { "Called getType on overloaded intrinsic" }
 
         val ptr = PointerPointer<LLVMTypeRef>(1L)
@@ -59,7 +59,7 @@ public class IntrinsicFunction constructor(intrinsic: Int) {
         FunctionType(function)
     }
 
-    public fun getOverloadedName(vararg params: Type): Result<String> = tryWith {
+    public fun getOverloadedName(vararg params: Type): Result<String, AssertionError> = result {
         assert(isOverloaded()) { "Called getOverloadedName on regular intrinsic" }
 
         val size = SizeTPointer(1L)
@@ -72,7 +72,7 @@ public class IntrinsicFunction constructor(intrinsic: Int) {
         name
     }
 
-    public fun getOverloadedDeclaration(target: Module, vararg params: Type): Result<Function> = tryWith {
+    public fun getOverloadedDeclaration(target: Module, vararg params: Type): Result<Function, AssertionError> = result {
         assert(isOverloaded()) { "Called getOverloadedName on regular intrinsic" }
 
         val ptr = params.map { it.ref }.toPointerPointer()
@@ -83,7 +83,7 @@ public class IntrinsicFunction constructor(intrinsic: Int) {
         Function(function)
     }
 
-    public fun getOverloadedType(inContext: Context, vararg params: Type): Result<FunctionType> = tryWith {
+    public fun getOverloadedType(inContext: Context, vararg params: Type): Result<FunctionType, AssertionError> = result {
         assert(isOverloaded()) { "Called getOverloadedName on regular intrinsic" }
 
         val ptr = params.map { it.ref }.toPointerPointer()

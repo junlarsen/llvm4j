@@ -8,15 +8,14 @@ import org.bytedeco.llvm.LLVM.LLVMYieldCallback
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.Callback
 import org.llvm4j.llvm4j.util.CorrespondsTo
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Result
-import org.llvm4j.llvm4j.util.Some
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
 import org.llvm4j.llvm4j.util.toPointerPointer
-import org.llvm4j.llvm4j.util.tryWith
+import org.llvm4j.optional.Option
+import org.llvm4j.optional.Result
+import org.llvm4j.optional.result
+import kotlin.AssertionError
 
 /**
  * A context keeps the state a LLVM system requires.
@@ -62,7 +61,7 @@ public open class Context public constructor(
     public fun getDiagnosticPayload(): Option<Pointer> {
         val payload = LLVM.LLVMContextGetDiagnosticContext(ref)
 
-        return payload?.let { Some(it) } ?: None
+        return Option.of(payload).map { Pointer(it) }
     }
 
     public fun setYieldCallback(handler: YieldCallback, payload: Option<Pointer>) {
@@ -81,7 +80,7 @@ public open class Context public constructor(
         return LLVM.LLVMGetMDKindIDInContext(ref, name, name.length)
     }
 
-    public fun getIntegerType(bitWidth: Int): Result<IntegerType> = tryWith {
+    public fun getIntegerType(bitWidth: Int): Result<IntegerType, AssertionError> = result {
         assert(bitWidth in 1..8388606) { "Invalid integer bit width" }
 
         val intTy = LLVM.LLVMIntTypeInContext(ref, bitWidth)
@@ -196,7 +195,7 @@ public open class Context public constructor(
         return FloatingPointType(ptr)
     }
 
-    public fun getArrayType(of: Type, size: Int): Result<ArrayType> = tryWith {
+    public fun getArrayType(of: Type, size: Int): Result<ArrayType, AssertionError> = result {
         assert(size > 0) { "Element count must be greater than 0" }
         assert(of.isValidArrayElementType()) { "Invalid type for array element" }
 
@@ -204,7 +203,7 @@ public open class Context public constructor(
         ArrayType(arrayTy)
     }
 
-    public fun getVectorType(of: Type, size: Int): Result<VectorType> = tryWith {
+    public fun getVectorType(of: Type, size: Int): Result<VectorType, AssertionError> = result {
         assert(size > 0) { "Element count must be greater than 0" }
         assert(of.isValidVectorElementType()) { "Invalid type for vector element" }
 
@@ -215,7 +214,7 @@ public open class Context public constructor(
     public fun getPointerType(
         of: Type,
         addressSpace: AddressSpace = AddressSpace.Generic
-    ): Result<PointerType> = tryWith {
+    ): Result<PointerType, AssertionError> = result {
         assert(addressSpace.value >= 0) { "Address space must be a positive number" }
         assert(of.isValidPointerElementType()) { "Invalid type for pointer element" }
 
@@ -299,7 +298,7 @@ public open class Context public constructor(
 
         public override fun call(p0: LLVMDiagnosticInfoRef, p1: Pointer?) {
             val info = DiagnosticInfo(p0)
-            val payload = p1?.let { Some(it) } ?: None
+            val payload = Option.of(p1)
             val data = Payload(info, payload)
 
             return invoke(data)
@@ -318,7 +317,7 @@ public open class Context public constructor(
 
         public override fun call(p0: LLVMContextRef, p1: Pointer?) {
             val context = Context(p0)
-            val payload = p1?.let { Some(it) } ?: None
+            val payload = Option.of(p1)
             val data = Payload(context, payload)
 
             return invoke(data)

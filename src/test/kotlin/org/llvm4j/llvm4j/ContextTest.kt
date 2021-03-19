@@ -3,9 +3,9 @@ package org.llvm4j.llvm4j
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.llvm.global.LLVM
 import org.junit.jupiter.api.Test
+import org.llvm4j.llvm4j.testing.assertIsNone
 import org.llvm4j.llvm4j.testing.assertIsSome
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Some
+import org.llvm4j.optional.Some
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
@@ -16,7 +16,7 @@ class ContextTest {
         val handler = Context.DiagnosticHandler { }
         val payload = IntPointer(42)
 
-        assertEquals(None, ctx.getDiagnosticPayload())
+        assertIsNone(ctx.getDiagnosticPayload())
 
         ctx.setDiagnosticHandler(handler, Some(payload))
 

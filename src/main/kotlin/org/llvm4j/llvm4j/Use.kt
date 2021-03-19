@@ -3,10 +3,8 @@ package org.llvm4j.llvm4j
 import org.bytedeco.llvm.LLVM.LLVMUseRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Some
+import org.llvm4j.optional.Option
 
 /**
  * An edge between a [Value] and the [Value]s which uses this value.
@@ -26,12 +24,12 @@ public class Use public constructor(ptr: LLVMUseRef) : Owner<LLVMUseRef> {
     public fun getUser(): Option<User> {
         val user = LLVM.LLVMGetUser(ref)
 
-        return user?.let { Some(User(it)) } ?: None
+        return Option.of(user).map { User(it) }
     }
 
     public fun getUsedValue(): Option<Value> {
         val value = LLVM.LLVMGetUsedValue(ref)
 
-        return value?.let { Some(Value(it)) } ?: None
+        return Option.of(value).map { Value(it) }
     }
 }

@@ -5,8 +5,8 @@ import org.llvm4j.llvm4j.testing.assertIsErr
 import org.llvm4j.llvm4j.testing.assertIsNone
 import org.llvm4j.llvm4j.testing.assertIsOk
 import org.llvm4j.llvm4j.testing.assertIsSome
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Some
+import org.llvm4j.optional.None
+import org.llvm4j.optional.Some
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue

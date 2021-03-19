@@ -1,5 +1,7 @@
 package org.llvm4j.llvm4j.util
 
+import org.llvm4j.optional.Option
+
 /**
  * Common trait for any enum with an out-of-order ordinal (like most of LLVMs C++ enums)
  *
@@ -28,14 +30,14 @@ public abstract class Enumeration<E : Enumeration.EnumVariant>(public val entrie
      *
      * @return [Some] if enum variant was found, otherwise [None]
      */
-    public fun from(id: Int): Option<E> = associated[id]?.let { Some(it) } ?: None
+    public fun from(id: Int): Option<E> = Option.of(associated[id])
 
     /**
      * Turn an enum variant into the C++ integer form
      *
      * @return [Some] if enum variant was found, otherwise [None]
      */
-    public fun into(id: E): Option<Int> = reverse[id]?.let { Some(it) } ?: None
+    public fun into(id: E): Option<Int> = Option.of(reverse[id])
 
     /**
      * Trait allowing an enum to have a set of defined variants or a fallback variant which may catch all cases which

@@ -7,10 +7,8 @@ import org.bytedeco.llvm.LLVM.lto_diagnostic_handler_t
 import org.bytedeco.llvm.LLVM.lto_input_t
 import org.bytedeco.llvm.LLVM.lto_module_t
 import org.llvm4j.llvm4j.util.Callback
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Some
+import org.llvm4j.optional.Option
 
 public typealias LTOCodeGenRef = lto_code_gen_t
 public typealias LTOInputRef = lto_input_t
@@ -28,7 +26,7 @@ public class LTOCodeGen public constructor(ptr: LTOCodeGenRef) : Owner<LTOCodeGe
 
         public override fun call(p0: Int, p1: BytePointer, p2: Pointer?) {
             val message = p1.string
-            val payload = p2?.let { Some(it) } ?: None
+            val payload = Option.of(p2)
             val data = Payload(p0, message, payload)
 
             p1.deallocate()

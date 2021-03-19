@@ -24,10 +24,12 @@ repositories {
     mavenLocal()
     jcenter()
     maven("https://oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {
     api("org.bytedeco:llvm-platform:11.1.0-1.5.5-SNAPSHOT")
+    api("org.llvm4j:optional:0.2.0-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.31")
 
     testImplementation(platform("org.junit:junit-bom:5.7.0"))

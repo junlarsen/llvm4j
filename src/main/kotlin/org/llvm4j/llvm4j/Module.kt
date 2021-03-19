@@ -7,12 +7,12 @@ import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Enumeration
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Result
-import org.llvm4j.llvm4j.util.Some
-import org.llvm4j.llvm4j.util.tryWith
+import org.llvm4j.optional.None
+import org.llvm4j.optional.Option
+import org.llvm4j.optional.Result
+import org.llvm4j.optional.Some
+import org.llvm4j.optional.result
 import java.io.File
 
 /**
@@ -107,7 +107,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
     public fun getModuleFlag(key: String): Option<Metadata> {
         val flag = LLVM.LLVMGetModuleFlag(ref, key, key.length.toLong())
 
-        return flag?.let { Some(Metadata(it)) } ?: None
+        return Option.of(flag).map { Metadata(it) }
     }
 
     public fun addModuleFlag(behavior: ModuleFlagBehavior, key: String, value: Metadata) {
@@ -132,8 +132,8 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
      *
      * If the file exists, its content will be overwritten, otherwise a new file at the given path is created.
      */
-    public fun dump(file: Option<File>): Result<Unit> = tryWith {
-        if (file.isDefined()) {
+    public fun dump(file: Option<File>): Result<Unit, AssertionError> = result {
+        if (file.isSome()) {
             val fd = file.unwrap()
             if (!fd.exists()) {
                 assert(fd.createNewFile()) { "Failed to create new file '$file'" }
@@ -180,13 +180,13 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
     public fun getTypeByName(name: String): Option<NamedStructType> {
         val ptr = LLVM.LLVMGetTypeByName(ref, name)
 
-        return ptr?.let { Some(NamedStructType(it)) } ?: None
+        return Option.of(ptr).map { NamedStructType(it) }
     }
 
     public fun getNamedMetadata(name: String): Option<NamedMetadataNode> {
         val ptr = LLVM.LLVMGetNamedMetadata(ref, name, name.length.toLong())
 
-        return ptr?.let { Some(NamedMetadataNode(it)) } ?: None
+        return Option.of(ptr).map { NamedMetadataNode(it) }
     }
 
     public fun getOrCreateNamedMetadata(name: String): NamedMetadataNode {
@@ -204,7 +204,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
     public fun getFunction(name: String): Option<Function> {
         val ptr = LLVM.LLVMGetNamedFunction(ref, name)
 
-        return ptr?.let { Some(Function(it)) } ?: None
+        return Option.of(ptr).map { Function(it) }
     }
 
     public fun addGlobalIndirectFunction(
@@ -225,7 +225,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
     public fun getGlobalIndirectFunction(name: String): Option<GlobalIndirectFunction> {
         val indirect = LLVM.LLVMGetNamedGlobalIFunc(ref, name, name.length.toLong())
 
-        return indirect?.let { Some(GlobalIndirectFunction(it)) } ?: None
+        return Option.of(indirect).map { GlobalIndirectFunction(it) }
     }
 
     public fun addGlobalAlias(name: String, type: PointerType, value: Constant): GlobalAlias {
@@ -237,14 +237,14 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
     public fun getGlobalAlias(name: String): Option<GlobalAlias> {
         val alias = LLVM.LLVMGetNamedGlobalAlias(ref, name, name.length.toLong())
 
-        return alias?.let { Some(GlobalAlias(alias)) } ?: None
+        return Option.of(alias).map { GlobalAlias(it) }
     }
 
     public fun addGlobalVariable(
         name: String,
         type: Type,
         addressSpace: Option<AddressSpace>
-    ): Result<GlobalVariable> = tryWith {
+    ): Result<GlobalVariable, AssertionError> = result {
         assert(!type.isFunctionType() && type.isValidPointerElementType()) { "Invalid type for global variable" }
 
         val variable = when (addressSpace) {
@@ -258,7 +258,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
     public fun getGlobalVariable(name: String): Option<GlobalVariable> {
         val variable = LLVM.LLVMGetNamedGlobal(ref, name)
 
-        return variable?.let { Some(GlobalVariable(it)) } ?: None
+        return Option.of(variable).map { GlobalVariable(it) }
     }
 
     /**
@@ -274,7 +274,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
 
         public fun size(): Long = size.get()
 
-        public fun getKey(index: Int): Result<String> = tryWith {
+        public fun getKey(index: Int): Result<String, AssertionError> = result {
             assert(index < size()) { "Out of bounds index $index, size is ${size()}" }
 
             val intptr = SizeTPointer(1L)
@@ -287,7 +287,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
             copy
         }
 
-        public fun getBehavior(index: Int): Result<ModuleFlagBehavior> = tryWith {
+        public fun getBehavior(index: Int): Result<ModuleFlagBehavior, AssertionError> = result {
             assert(index < size()) { "Out of bounds index $index, size is ${size()}" }
 
             val behavior = LLVM.LLVMModuleFlagEntriesGetFlagBehavior(ref, index)
@@ -295,7 +295,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
             ModuleFlagBehavior.from(behavior).unwrap()
         }
 
-        public fun getMetadata(index: Int): Result<Metadata> = tryWith {
+        public fun getMetadata(index: Int): Result<Metadata, AssertionError> = result {
             assert(index < size()) { "Out of bounds index $index, size is ${size()}" }
 
             val node = LLVM.LLVMModuleFlagEntriesGetMetadata(ref, index)

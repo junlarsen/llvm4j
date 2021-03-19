@@ -11,14 +11,14 @@ import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Enumeration
 import org.llvm4j.llvm4j.util.InternalApi
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Result
-import org.llvm4j.llvm4j.util.Some
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
-import org.llvm4j.llvm4j.util.tryWith
+import org.llvm4j.optional.None
+import org.llvm4j.optional.Option
+import org.llvm4j.optional.Result
+import org.llvm4j.optional.Some
+import org.llvm4j.optional.result
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -89,7 +89,7 @@ public open class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
     public fun getFirstUse(): Option<Use> {
         val use = LLVM.LLVMGetFirstUse(ref)
 
-        return use?.let { Some(Use(it)) } ?: None
+        return Option.of(use).map { Use(it) }
     }
 
     public fun asBasicBlock(): BasicBlock {
@@ -199,7 +199,7 @@ public open class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
  */
 @CorrespondsTo("llvm::User")
 public open class User constructor(ptr: LLVMValueRef) : Value(ptr) {
-    public fun getOperand(index: Int): Result<Value> = tryWith {
+    public fun getOperand(index: Int): Result<Value, AssertionError> = result {
         assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}" }
 
         val ptr = LLVM.LLVMGetOperand(ref, index)
@@ -207,7 +207,7 @@ public open class User constructor(ptr: LLVMValueRef) : Value(ptr) {
         Value(ptr)
     }
 
-    public fun getOperandUse(index: Int): Result<Use> = tryWith {
+    public fun getOperandUse(index: Int): Result<Use, AssertionError> = result {
         assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}" }
 
         val use = LLVM.LLVMGetOperandUse(ref, index)
@@ -215,7 +215,7 @@ public open class User constructor(ptr: LLVMValueRef) : Value(ptr) {
         Use(use)
     }
 
-    public fun setOperand(index: Int, value: Value): Result<Unit> = tryWith {
+    public fun setOperand(index: Int, value: Value): Result<Unit, AssertionError> = result {
         assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}" }
         assert(!isConstant()) { "Cannot mutate a constant with setOperand" }
         // TODO: Api - Replace once isa<> is implemented
@@ -264,7 +264,7 @@ public class BasicBlock public constructor(ptr: LLVMBasicBlockRef) : Owner<LLVMB
     public fun getFunction(): Option<Function> {
         val fn = LLVM.LLVMGetBasicBlockParent(ref)
 
-        return fn?.let { Some(Function(it)) } ?: None
+        return Option.of(fn).map { Function(it) }
     }
 
     /**
@@ -507,11 +507,11 @@ public open class GlobalValue constructor(ptr: LLVMValueRef) :
     public fun getSection(): Option<String> {
         val ptr = LLVM.LLVMGetSection(ref)
 
-        return ptr?.let {
-            val copy = ptr.string
-            ptr.deallocate()
-            Some(copy)
-        } ?: None
+        return Option.of(ptr).map {
+            val copy = it.string
+            it.deallocate()
+            copy
+        }
     }
 
     public fun setSection(section: String) {
@@ -619,13 +619,13 @@ public open class GlobalObject constructor(ptr: LLVMValueRef) : GlobalValue(ptr)
 
         public fun size(): Long = size.get()
 
-        public fun getKindId(index: Int): Result<Int> = tryWith {
+        public fun getKindId(index: Int): Result<Int, AssertionError> = result {
             assert(index < size()) { "Out of bounds index $index, size is ${size()}" }
 
             LLVM.LLVMValueMetadataEntriesGetKind(ref, index)
         }
 
-        public fun getMetadata(index: Int): Result<Metadata> = tryWith {
+        public fun getMetadata(index: Int): Result<Metadata, AssertionError> = result {
             assert(index < size()) { "Out of bounds index $index, size is ${size()}" }
 
             val node = LLVM.LLVMValueMetadataEntriesGetMetadata(ref, index)
@@ -823,14 +823,10 @@ public class Function public constructor(ptr: LLVMValueRef) :
     public fun getGC(): Option<String> {
         val gc = LLVM.LLVMGetGC(ref)
 
-        return if (gc != null) {
+        return Option.of(gc).map {
             val copy = gc.string
-
             gc.deallocate()
-
-            Some(copy)
-        } else {
-            None
+            copy
         }
     }
 
@@ -892,7 +888,7 @@ public class Function public constructor(ptr: LLVMValueRef) :
         }
     }
 
-    public fun getParameter(index: Int): Result<Argument> = tryWith {
+    public fun getParameter(index: Int): Result<Argument, AssertionError> = result {
         assert(index < getParameterCount()) { "Index $index out of bounds for size of ${getParameterCount()}" }
 
         val parameter = LLVM.LLVMGetParam(ref, index)
@@ -947,7 +943,7 @@ public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : Glob
     public fun getResolver(): Option<Function> {
         val resolver = LLVM.LLVMGetGlobalIFuncResolver(ref)
 
-        return resolver?.let { Some(Function(it)) } ?: None
+        return Option.of(resolver).map { Function(it) }
     }
 
     public fun setResolver(resolver: Function) {
@@ -962,7 +958,7 @@ public class GlobalIndirectFunction public constructor(ptr: LLVMValueRef) : Glob
         LLVM.LLVMRemoveGlobalIFunc(ref)
     }
 
-    public fun hasResolver(): Boolean = getResolver().isDefined()
+    public fun hasResolver(): Boolean = getResolver().isSome()
 }
 
 /**
@@ -1014,7 +1010,7 @@ public class GlobalVariable public constructor(ptr: LLVMValueRef) :
     public fun getInitializer(): Option<Constant> {
         val value = LLVM.LLVMGetInitializer(ref)
 
-        return value?.let { Some(Constant(it)) } ?: None
+        return Option.of(value).map { Constant(it) }
     }
 
     public fun setInitializer(value: Constant) {
@@ -1091,7 +1087,7 @@ public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.
     public fun getMetadata(kindId: Int): Option<MetadataAsValue> {
         val md = LLVM.LLVMGetMetadata(ref, kindId)
 
-        return md?.let { Some(MetadataAsValue(it)) } ?: None
+        return Option.of(md).map { MetadataAsValue(it) }
     }
 
     public fun setMetadata(kindId: Int, node: MetadataAsValue) {

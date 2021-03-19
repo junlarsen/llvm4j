@@ -5,8 +5,8 @@ import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Result
-import org.llvm4j.llvm4j.util.tryWith
+import org.llvm4j.optional.Result
+import org.llvm4j.optional.result
 import java.io.File
 
 /**
@@ -77,7 +77,7 @@ public class MemoryBuffer public constructor(ptr: LLVMMemoryBufferRef) : Owner<L
 
     public companion object {
         @JvmStatic
-        public fun of(file: File): Result<MemoryBuffer> = tryWith {
+        public fun of(file: File): Result<MemoryBuffer, AssertionError> = result {
             assert(file.exists()) { "File '$file' does not exist" }
 
             val fp = BytePointer(file.absolutePath)

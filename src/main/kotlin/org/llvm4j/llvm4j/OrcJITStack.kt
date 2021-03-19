@@ -9,10 +9,8 @@ import org.bytedeco.llvm.LLVM.LLVMOrcJITStackRef
 import org.bytedeco.llvm.LLVM.LLVMOrcLazyCompileCallbackFn
 import org.bytedeco.llvm.LLVM.LLVMOrcSymbolResolverFn
 import org.llvm4j.llvm4j.util.Callback
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Some
+import org.llvm4j.optional.Option
 
 public class OrcJITStack public constructor(ptr: LLVMOrcJITStackRef) : Owner<LLVMOrcJITStackRef> {
     public override val ref: LLVMOrcJITStackRef = ptr
@@ -36,7 +34,7 @@ public class OrcJITStack public constructor(ptr: LLVMOrcJITStackRef) : Owner<LLV
 
         public override fun call(p0: LLVMOrcJITStackRef, p1: Pointer?): Long {
             val jitStack = OrcJITStack(p0)
-            val payload = p1?.let { Some(it) } ?: None
+            val payload = Option.of(p1)
             val data = Payload(jitStack, payload)
 
             return invoke(data)
@@ -55,7 +53,7 @@ public class OrcJITStack public constructor(ptr: LLVMOrcJITStackRef) : Owner<LLV
 
         public override fun call(p0: BytePointer, p1: Pointer?): Long {
             val name = p0.string
-            val payload = p1?.let { Some(it) } ?: None
+            val payload = Option.of(p1)
             val data = Payload(name, payload)
 
             p0.deallocate()

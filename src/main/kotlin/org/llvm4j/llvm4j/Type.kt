@@ -5,15 +5,15 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.InternalApi
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Result
-import org.llvm4j.llvm4j.util.Some
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
 import org.llvm4j.llvm4j.util.toPointerPointer
-import org.llvm4j.llvm4j.util.tryWith
+import org.llvm4j.optional.None
+import org.llvm4j.optional.Option
+import org.llvm4j.optional.Result
+import org.llvm4j.optional.Some
+import org.llvm4j.optional.result
 
 /**
  * A single type in an LLVM system
@@ -47,10 +47,7 @@ public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
     public override val ref: LLVMTypeRef = ptr
 
     /** The type kind of a type never changes so this is safe to memoize. */
-    private val memoizedTypeKind by lazy {
-        val kind = LLVM.LLVMGetTypeKind(ref)
-        TypeKind.from(kind).unwrap()
-    }
+    private val memoizedTypeKind by lazy { TypeKind.from(LLVM.LLVMGetTypeKind(ref)).unwrap() }
 
     public fun getTypeKind(): TypeKind = memoizedTypeKind
 
@@ -119,6 +116,7 @@ public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
     public fun isValidPointerElementType(): Boolean {
         return !isVoidType() && !isLabelType() && !isMetadataType() && !isTokenType()
     }
+
     public fun isValidVectorElementType(): Boolean = isIntegerType() || isFloatingPointType() || isPointerType()
     public fun isValidArrayElementType(): Boolean {
         return !isVoidType() && !isLabelType() && !isMetadataType() && !isFunctionType() && !isTokenType()
@@ -336,7 +334,7 @@ public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.I
         return LLVM.LLVMCountStructElementTypes(ref)
     }
 
-    public fun getElementType(index: Int): Result<Type> = tryWith {
+    public fun getElementType(index: Int): Result<Type, AssertionError> = result {
         assert(index <= getElementCount()) { "Index out of bounds" }
 
         val type = LLVM.LLVMStructGetTypeAtIndex(ref, index)
@@ -359,16 +357,17 @@ public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.I
         }
     }
 
-    public fun getConstant(vararg elements: Constant, isPacked: Boolean): Result<ConstantStruct> = tryWith {
-        assert(elements.size == getElementCount()) { "Incorrect # of elements specified" }
+    public fun getConstant(vararg elements: Constant, isPacked: Boolean): Result<ConstantStruct, AssertionError> =
+        result {
+            assert(elements.size == getElementCount()) { "Incorrect # of elements specified" }
 
-        val buffer = elements.map { it.ref }.toPointerPointer()
-        val struct = LLVM.LLVMConstStructInContext(getContext().ref, buffer, elements.size, isPacked.toInt())
+            val buffer = elements.map { it.ref }.toPointerPointer()
+            val struct = LLVM.LLVMConstStructInContext(getContext().ref, buffer, elements.size, isPacked.toInt())
 
-        buffer.deallocate()
+            buffer.deallocate()
 
-        ConstantStruct(struct)
-    }
+            ConstantStruct(struct)
+        }
 }
 
 /**
@@ -395,7 +394,7 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
         return copy
     }
 
-    public fun setElementTypes(vararg elements: Type, isPacked: Boolean = false): Result<Unit> = tryWith {
+    public fun setElementTypes(vararg elements: Type, isPacked: Boolean = false): Result<Unit, AssertionError> = result {
         assert(isOpaque()) { "Struct body has already been set" }
 
         val buffer = elements.map { it.ref }.toPointerPointer()
@@ -404,7 +403,7 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
         buffer.deallocate()
     }
 
-    public fun getElementType(index: Int): Result<Type> = tryWith {
+    public fun getElementType(index: Int): Result<Type, AssertionError> = result {
         assert(!isOpaque()) { "Calling getElementType on opaque struct" }
         // Safe .get as getElementCount ensures !isOpaque
         assert(index <= getElementCount().unwrap()) { "Index out of bounds" }
@@ -414,7 +413,7 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
         Type(type)
     }
 
-    public fun getElementTypes(): Result<Array<Type>> = tryWith {
+    public fun getElementTypes(): Result<Array<Type>, AssertionError> = result {
         assert(!isOpaque()) { "Calling getElementTypes on opaque struct" }
 
         val size = getElementCount().unwrap()
@@ -429,8 +428,9 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
         }
     }
 
-    public fun getConstant(vararg elements: Constant, isPacked: Boolean): Result<ConstantStruct> = tryWith {
-        val size = getElementCount().toNullable() ?: fail("Calling getConstant on opaque struct")
+    public fun getConstant(vararg elements: Constant, isPacked: Boolean): Result<ConstantStruct, AssertionError> = result {
+        assert(!isOpaque()) { "Calling getConstant on opaque struct" }
+        val size = getElementCount().unwrap()
         assert(elements.size == size) { "Incorrect # of elements specified" }
 
         val buffer = elements.map { it.ref }.toPointerPointer()

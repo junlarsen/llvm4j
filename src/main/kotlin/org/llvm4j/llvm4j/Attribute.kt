@@ -5,13 +5,13 @@ import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Enumeration
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Result
-import org.llvm4j.llvm4j.util.Some
 import org.llvm4j.llvm4j.util.toBoolean
-import org.llvm4j.llvm4j.util.tryWith
+import org.llvm4j.optional.None
+import org.llvm4j.optional.Option
+import org.llvm4j.optional.Result
+import org.llvm4j.optional.Some
+import org.llvm4j.optional.result
 
 /**
  * Represents a flag/attribute for an item in the LLVM system.
@@ -38,19 +38,19 @@ public open class Attribute constructor(ptr: LLVMAttributeRef) : Owner<LLVMAttri
         return LLVM.LLVMIsEnumAttribute(ref).toBoolean()
     }
 
-    public fun getEnumKind(): Result<Int> = tryWith {
+    public fun getEnumKind(): Result<Int, AssertionError> = result {
         assert(isEnumAttribute()) { "Is not an enum attribute" }
 
         LLVM.LLVMGetEnumAttributeKind(ref)
     }
 
-    public fun getEnumValue(): Result<Long> = tryWith {
+    public fun getEnumValue(): Result<Long, AssertionError> = result {
         assert(isEnumAttribute()) { "Is not an enum attribute" }
 
         LLVM.LLVMGetEnumAttributeValue(ref)
     }
 
-    public fun getStringKind(): Result<String> = tryWith {
+    public fun getStringKind(): Result<String, AssertionError> = result {
         assert(isStringAttribute()) { "Is not a string attribute" }
 
         val size = IntPointer(1L)
@@ -63,7 +63,7 @@ public open class Attribute constructor(ptr: LLVMAttributeRef) : Owner<LLVMAttri
         copy
     }
 
-    public fun getStringValue(): Result<String> = tryWith {
+    public fun getStringValue(): Result<String, AssertionError> = result {
         assert(isStringAttribute()) { "Is not a string attribute" }
 
         val size = IntPointer(1L)
