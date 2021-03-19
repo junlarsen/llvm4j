@@ -3,6 +3,8 @@ package org.llvm4j.llvm4j
 import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMMemoryBufferRef
+import org.bytedeco.llvm.LLVM.LLVMTypeRef
+import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Owner
@@ -117,7 +119,106 @@ public object TypeCasting {
     }
 
     public val directions: Map<Class<*>, Any> = mapOf(
+        path<Type, LLVMTypeRef>(::Type),
+        path<IntegerType, LLVMTypeRef>(::IntegerType),
+    )
 
+    private inline fun <reified F> assertion(
+        noinline assertion: (LLVMValueRef) -> LLVMValueRef?
+    ): Pair<Class<F>, (LLVMValueRef) -> LLVMValueRef?> {
+        return F::class.java to assertion
+    }
+
+    public val assertions: Map<Class<*>, (LLVMValueRef) -> LLVMValueRef?> = mapOf(
+        assertion<Argument> { LLVM.LLVMIsAArgument(it) },
+        assertion<BasicBlock> { LLVM.LLVMIsABasicBlock(it) },
+        // InlineAsm
+        assertion<User> { LLVM.LLVMIsAUser(it) },
+        assertion<Constant> { LLVM.LLVMIsAConstant(it) },
+        assertion<BlockAddress> { LLVM.LLVMIsABlockAddress(it) },
+        assertion<ConstantAggregateZero> { LLVM.LLVMIsAConstantAggregateZero(it) },
+        assertion<ConstantArray> { LLVM.LLVMIsAConstantArray(it) },
+        assertion<ConstantDataSequential> { LLVM.LLVMIsAConstantDataSequential(it) },
+        assertion<ConstantDataArray> { LLVM.LLVMIsAConstantDataArray(it) },
+        assertion<ConstantDataVector> { LLVM.LLVMIsAConstantDataVector(it) },
+        assertion<ConstantExpression> { LLVM.LLVMIsAConstantExpr(it) },
+        assertion<ConstantFP> { LLVM.LLVMIsAConstantFP(it) },
+        assertion<ConstantInt> { LLVM.LLVMIsAConstantInt(it) },
+        assertion<ConstantPointerNull> { LLVM.LLVMIsAConstantPointerNull(it) },
+        assertion<ConstantStruct> { LLVM.LLVMIsAConstantStruct(it) },
+        assertion<ConstantTokenNone> { LLVM.LLVMIsAConstantTokenNone(it) },
+        assertion<ConstantVector> { LLVM.LLVMIsAConstantVector(it) },
+        assertion<GlobalValue> { LLVM.LLVMIsAGlobalValue(it) },
+        assertion<GlobalAlias> { LLVM.LLVMIsAGlobalAlias(it) },
+        assertion<GlobalIndirectFunction> { LLVM.LLVMIsAGlobalIFunc(it) },
+        assertion<GlobalObject> { LLVM.LLVMIsAGlobalObject(it) },
+        assertion<Function> { LLVM.LLVMIsAFunction(it) },
+        assertion<GlobalVariable> { LLVM.LLVMIsAGlobalVariable(it) },
+        assertion<UndefValue> { LLVM.LLVMIsAUndefValue(it) },
+        assertion<Instruction> { LLVM.LLVMIsAInstruction(it) },
+        assertion<UnaryOperator> { LLVM.LLVMIsAUnaryOperator(it) },
+        assertion<BinaryOperatorInstruction> { LLVM.LLVMIsABinaryOperator(it) },
+        assertion<CallInstruction> { LLVM.LLVMIsACallInst(it) },
+        // IntrinsicInst
+        // DebugInfoIntrinsic
+        // DebugVariableIntrinsic
+        // DebugDeclareInst
+        // DebugLabelInst
+        // MemIntrinsic
+        // MemCpyInst
+        // MemMoveInst
+        // MemSetInst
+        assertion<ComparisonInstruction> { LLVM.LLVMIsACmpInst(it) },
+        assertion<FPComparisonInstruction> { LLVM.LLVMIsAFCmpInst(it) },
+        assertion<IntComparisonInstruction> { LLVM.LLVMIsAICmpInst(it) },
+        assertion<ExtractElementInstruction> { LLVM.LLVMIsAExtractElementInst(it) },
+        assertion<GetElementPtrInstruction> { LLVM.LLVMIsAGetElementPtrInst(it) },
+        assertion<InsertElementInstruction> { LLVM.LLVMIsAInsertElementInst(it) },
+        assertion<InsertValueInstruction> { LLVM.LLVMIsAInsertValueInst(it) },
+        assertion<LandingPadInstruction> { LLVM.LLVMIsALandingPadInst(it) },
+        assertion<PhiInstruction> { LLVM.LLVMIsAPHINode(it) },
+        assertion<SelectInstruction> { LLVM.LLVMIsASelectInst(it) },
+        assertion<ShuffleVectorInstruction> { LLVM.LLVMIsAShuffleVectorInst(it) },
+        assertion<StoreInstruction> { LLVM.LLVMIsAStoreInst(it) },
+        assertion<BranchInstruction> { LLVM.LLVMIsABranchInst(it) },
+        assertion<IndirectBrInstruction> { LLVM.LLVMIsAIndirectBrInst(it) },
+        assertion<InvokeInstruction> { LLVM.LLVMIsAInvokeInst(it) },
+        assertion<ReturnInstruction> { LLVM.LLVMIsAReturnInst(it) },
+        assertion<SwitchInstruction> { LLVM.LLVMIsASwitchInst(it) },
+        assertion<UnreachableInstruction> { LLVM.LLVMIsAUnreachableInst(it) },
+        assertion<ResumeInstruction> { LLVM.LLVMIsAResumeInst(it) },
+        assertion<CleanupReturnInstruction> { LLVM.LLVMIsACleanupReturnInst(it) },
+        assertion<CatchReturnInstruction> { LLVM.LLVMIsACatchReturnInst(it) },
+        assertion<CatchSwitchInstruction> { LLVM.LLVMIsACatchSwitchInst(it) },
+        assertion<CallBrInstruction> { LLVM.LLVMIsACallBrInst(it) },
+        assertion<FuncletPadInstruction> { LLVM.LLVMIsAFuncletPadInst(it) },
+        assertion<CatchPadInstruction> { LLVM.LLVMIsACatchPadInst(it) },
+        assertion<CleanupPadInstruction> { LLVM.LLVMIsACleanupPadInst(it) },
+        assertion<UnaryInstruction> { LLVM.LLVMIsAUnaryInstruction(it) },
+        assertion<AllocaInstruction> { LLVM.LLVMIsAAllocaInst(it) },
+        assertion<CastInstruction> { LLVM.LLVMIsACastInst(it) },
+        assertion<AddrSpaceCastInstruction> { LLVM.LLVMIsAAddrSpaceCastInst(it) },
+        assertion<BitCastInstruction> { LLVM.LLVMIsABitCastInst(it) },
+        assertion<FloatExtInstruction> { LLVM.LLVMIsAFPExtInst(it) },
+        assertion<FloatToSignedInstruction> { LLVM.LLVMIsAFPToSIInst(it) },
+        assertion<FloatToUnsignedInstruction> { LLVM.LLVMIsAFPToUIInst(it) },
+        assertion<FloatTruncInstruction> { LLVM.LLVMIsAFPTruncInst(it) },
+        assertion<IntToPtrInstruction> { LLVM.LLVMIsAIntToPtrInst(it) },
+        assertion<PtrToIntInstruction> { LLVM.LLVMIsAPtrToIntInst(it) },
+        assertion<SignedExtInstruction> { LLVM.LLVMIsASExtInst(it) },
+        assertion<SignedToFloatInstruction> { LLVM.LLVMIsASIToFPInst(it) },
+        assertion<IntTruncInstruction> { LLVM.LLVMIsATruncInst(it) },
+        assertion<UnsignedToFloatInstruction> { LLVM.LLVMIsAUIToFPInst(it) },
+        assertion<ZeroExtInstruction> { LLVM.LLVMIsAZExtInst(it) },
+        assertion<ExtractValueInstruction> { LLVM.LLVMIsAExtractElementInst(it) },
+        assertion<LoadInstruction> { LLVM.LLVMIsALoadInst(it) },
+        assertion<VAArgInstruction> { LLVM.LLVMIsAVAArgInst(it) },
+        assertion<FreezeInstruction> { LLVM.LLVMIsAFreezeInst(it) },
+        assertion<AtomicCmpXchgInstruction> { LLVM.LLVMIsAAtomicCmpXchgInst(it) },
+        assertion<AtomicRMWInstruction> { LLVM.LLVMIsAAtomicRMWInst(it) },
+        assertion<FenceInstruction> { LLVM.LLVMIsAFenceInst(it) },
+        assertion<MetadataNode> { LLVM.LLVMIsAMDNode(it) },
+        assertion<MetadataString> { LLVM.LLVMIsAMDString(it) }
     )
 }
 
@@ -134,6 +235,7 @@ public object TypeCasting {
 @JvmSynthetic
 public inline fun <reified T> cast(from: Owner<*>): Option<T> {
     val conversion = TypeCasting.directions[T::class.java]
+
     @Suppress("UNCHECKED_CAST")
     val result = (conversion as? (Any) -> Owner<*>)?.invoke(from.ref) as? T
 
@@ -148,4 +250,13 @@ public inline fun <reified T> cast(from: Owner<*>, default: T): T {
 @JvmSynthetic
 public inline fun <reified T> cast(from: Owner<*>, default: () -> T): T {
     return cast<T>(from).toNullable() ?: default.invoke()
+}
+
+@JvmSynthetic
+public inline fun <reified T> isa(from: Owner<LLVMValueRef>): Boolean {
+    val assertion = TypeCasting.assertions[T::class.java]
+
+    return assertion?.let {
+        it(from.ref) != null
+    } ?: false
 }
