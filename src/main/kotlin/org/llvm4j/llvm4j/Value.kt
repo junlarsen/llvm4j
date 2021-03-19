@@ -218,8 +218,7 @@ public open class User constructor(ptr: LLVMValueRef) : Value(ptr) {
     public fun setOperand(index: Int, value: Value): Result<Unit, AssertionError> = result {
         assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}" }
         assert(!isConstant()) { "Cannot mutate a constant with setOperand" }
-        // TODO: Api - Replace once isa<> is implemented
-        assert(LLVM.LLVMIsAGlobalValue(ref) == null) { "Cannot mutate a constant with setOperand" }
+        assert(isa<GlobalValue>(this)) { "Cannot mutate a constant with setOperand" }
 
         LLVM.LLVMSetOperand(ref, index, value.ref)
     }
@@ -377,7 +376,7 @@ public open class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
         public fun getIntNeg(rhs: Constant, semantics: WrapSemantics): Constant = TODO("helper api")
 
         /**
-         * Build an addition instruction
+         * Create an addition constexpr
          *
          * The `add` instruction adds two integer or vector-of-integer operands
          *
@@ -388,28 +387,218 @@ public open class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
          * @param semantics wrapping semantics upon overflow
          */
         public fun getIntAdd(rhs: Constant, semantics: WrapSemantics): Constant {
-            val sum = when (semantics) {
+            val res = when (semantics) {
                 WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWAdd(ref, rhs.ref)
                 WrapSemantics.NoSigned -> LLVM.LLVMConstNSWAdd(ref, rhs.ref)
                 WrapSemantics.Unspecified -> LLVM.LLVMConstAdd(ref, rhs.ref)
             }
 
-            return Constant(sum)
+            return Constant(res)
         }
 
-        public fun getIntSub(rhs: Constant, semantics: WrapSemantics): Constant = TODO()
-        public fun getIntMul(rhs: Constant, semantics: WrapSemantics): Constant = TODO()
-        public fun getUnsignedDiv(divisor: Constant): Constant = TODO()
-        public fun getSignedDiv(divisor: Constant): Constant = TODO()
-        public fun getUnsignedRem(divisor: Constant): Constant = TODO()
-        public fun getSignedRem(divisor: Constant): Constant = TODO()
-        public fun getLeftShift(bits: Constant): Constant = TODO()
-        public fun getLogicalShiftRight(bits: Constant): Constant = TODO()
-        public fun getArithmeticShiftRight(bits: Constant): Constant = TODO()
-        public fun getLogicalAnd(rhs: Constant): Constant = TODO()
-        public fun getLogicalOr(rhs: Constant): Constant = TODO()
-        public fun getLogicalXor(rhs: Constant): Constant = TODO()
-        public fun getIntCompare(predicate: IntPredicate, rhs: Constant): Constant = TODO()
+        /**
+         * Create a subtraction constexpr
+         *
+         * The `sub` instruction subtracts to integer or vector-of-integer operands
+         *
+         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
+         * does overflow, a poison value is returned
+         *
+         * @param rhs       how much to subtract
+         * @param semantics wrapping semantics upon overflow
+         */
+        public fun getIntSub(rhs: Constant, semantics: WrapSemantics): Constant {
+            val res = when (semantics) {
+                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWSub(ref, rhs.ref)
+                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWSub(ref, rhs.ref)
+                WrapSemantics.Unspecified -> LLVM.LLVMConstSub(ref, rhs.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a multiplication constexpr
+         *
+         * The `mul` instruction multiplies two integer or vector-of-integer operands
+         *
+         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
+         * does overflow, a poison value is returned
+         *
+         * @param rhs       right hand side integer to multiply
+         * @param semantics wrapping semantics upon overflow
+         */
+        public fun getIntMul(rhs: Constant, semantics: WrapSemantics): Constant {
+            val res = when (semantics) {
+                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWMul(ref, rhs.ref)
+                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWMul(ref, rhs.ref)
+                WrapSemantics.Unspecified -> LLVM.LLVMConstMul(ref, rhs.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an unsigned integer division constexpr
+         *
+         * The `udiv` instruction divides two integer or vector-of-integer operands. The `udiv` instruction yields the
+         * unsigned quotient of the two operands. Signed division is done with [getSignedDiv]
+         *
+         * @param divisor divisor integer value (the number dividend is being divided by)
+         * @param exact   use llvm "exact" division (see language reference)
+         */
+        public fun getUnsignedDiv(divisor: Constant, exact: Boolean): Constant {
+            val res = if (exact) {
+                LLVM.LLVMConstExactUDiv(ref, divisor.ref)
+            } else {
+                LLVM.LLVMConstUDiv(ref, divisor.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a signed integer division constexpr
+         *
+         * The `sdiv` instruction divides the two integer or vector-of-integer operands. The `sdiv` instruction yields
+         * the signed quotient of the two operands. Unsigned division is done with [getUnsignedDiv]
+         *
+         * @param divisor divisor integer value (the number dividend is being divided by)
+         * @param exact   use llvm "exact" division (see language reference)
+         */
+        public fun getSignedDiv(divisor: Constant, exact: Boolean): Constant {
+            val res = if (exact) {
+                LLVM.LLVMConstExactSDiv(ref, divisor.ref)
+            } else {
+                LLVM.LLVMConstSDiv(ref, divisor.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an unsigned integer remainder constexpr
+         *
+         * The `urem` instruction returns the remainder from the unsigned division of its two integer or
+         * vector-of-integer operands.
+         *
+         * @param divisor  divisor integer value (the number dividend is being divided by)
+         */
+        public fun getUnsignedRem(divisor: Constant): Constant {
+            val res = LLVM.LLVMConstURem(ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a signed integer remainder constexpr
+         *
+         * The `srem` instruction returns the remainder from the signed division of its two integer or vector-of-integer
+         * operands.
+         *
+         * @param divisor divisor integer value (the number dividend is being divided by)
+         */
+        public fun getSignedRem(divisor: Constant): Constant {
+            val res = LLVM.LLVMConstSRem(ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a left shift constexpr
+         *
+         * The `shl` instruction shifts its first integer or vector-of-integer operand to the left a specified number of
+         * bits
+         *
+         * @param bits number of bits to shift this to the left
+         */
+        public fun getLeftShift(bits: Constant): Constant {
+            val res = LLVM.LLVMConstShl(ref, bits.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical shift right constexpr
+         *
+         * The `lshr` instruction logically shifts its first integer or vector-of-integer operand to the right a
+         * specified number of bits with zero fill.
+         *
+         * @param bits number of bits to shift this to the right
+         */
+        public fun getLogicalShiftRight(bits: Constant): Constant {
+            val res = LLVM.LLVMConstLShr(ref, bits.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an arithmetic shift right constexpr
+         *
+         * The `ashr` instruction arithmetically shifts its first integer or vector-of-integer operand to the right a
+         * specified number of bits with sign extension.
+         *
+         * @param bits number of bits to shift this to the right
+         */
+        public fun getArithmeticShiftRight(bits: Constant): Constant {
+            val res = LLVM.LLVMConstAShr(ref, bits.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical and constexpr
+         *
+         * The `and` instruction returns the bitwise logical and of its two integer or vector-of-integer operands.
+         *
+         * @param rhs right hand side integer
+         */
+        public fun getLogicalAnd(rhs: Constant): Constant {
+            val res = LLVM.LLVMConstAnd(ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical or constexpr
+         *
+         * The `or` instruction returns the bitwise logical or of its two integer or vector-of-integer operands.
+         *
+         * @param rhs right hand side integer
+         */
+        public fun getLogicalOr(rhs: Constant): Constant {
+            val res = LLVM.LLVMConstOr(ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical xor constexpr
+         *
+         * The `xor` instruction returns the bitwise logical xor of its two integer or vector-of-integer operands.
+         *
+         * @param rhs right hand side integer
+         */
+        public fun getLogicalXor(rhs: Constant): Constant {
+            val res = LLVM.LLVMConstXor(ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an integer comparison constexpr
+         *
+         * The `icmp` instruction returns a boolean (i1) value based on comparison of two integer, vector-of-integer,
+         * pointer or vector-of-pointer operands.
+         *
+         * @param predicate comparison operator to use
+         * @param rhs       right hand side of comparison
+         */
+        public fun getIntCompare(predicate: IntPredicate, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstICmp(predicate.value, ref, rhs.ref)
+
+            return Constant(res)
+        }
     }
 
     /**
@@ -1241,10 +1430,9 @@ public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.
      * The instruction may optionally receive a [name]
      */
     public fun insert(builder: IRBuilder, name: Option<String>) {
-        if (name.isSome()) {
-            LLVM.LLVMInsertIntoBuilderWithName(builder.ref, ref, name.get())
-        } else {
-            LLVM.LLVMInsertIntoBuilder(builder.ref, ref)
+        when (name) {
+            is Some -> LLVM.LLVMInsertIntoBuilderWithName(builder.ref, ref, name.unwrap())
+            is None -> LLVM.LLVMInsertIntoBuilder(builder.ref, ref)
         }
     }
 }

@@ -2,10 +2,8 @@ package org.llvm4j.llvm4j
 
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.global.LLVM
-import org.llvm4j.llvm4j.util.None
-import org.llvm4j.llvm4j.util.Option
 import org.llvm4j.llvm4j.util.Owner
-import org.llvm4j.llvm4j.util.Some
+import org.llvm4j.optional.Option
 
 public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuilderRef>, IRBuilderBase {
     public override val ref: LLVMBuilderRef = ptr
@@ -39,7 +37,7 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
     public fun getInsertionBlock(): Option<BasicBlock> {
         val point = LLVM.LLVMGetInsertBlock(ref)
 
-        return point?.let { Some(BasicBlock(it)) } ?: None
+        return Option.of(point).map { BasicBlock(it) }
     }
 
     /**
@@ -50,7 +48,7 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
     public fun getDebugLocation(): Option<Metadata> {
         val debugLocation = LLVM.LLVMGetCurrentDebugLocation2(ref)
 
-        return debugLocation?.let { Some(Metadata(it)) } ?: None
+        return Option.of(debugLocation).map { Metadata(it) }
     }
 
     /**
@@ -279,10 +277,10 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
      * does overflow, a poison value is returned
      *
-     * @param op1  left hand side integer to multiply
-     * @param op2  right hand side integer to multiply
+     * @param op1       left hand side integer to multiply
+     * @param op2       right hand side integer to multiply
      * @param semantics wrapping semantics upon overflow
-     * @param name optional name for the instruction
+     * @param name      optional name for the instruction
      */
     public fun buildIntMul(op1: Value, op2: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
 
@@ -303,11 +301,12 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * The `udiv` instruction divides two integer or vector-of-integer operands. The `udiv` instruction yields the
      * unsigned quotient of the two operands. Signed division is done with [buildSignedDiv]
      *
-     * @param op1  dividend integer value (value being divided)
-     * @param op2  divisor integer value (the number dividend is being divided by)
-     * @param name optional name for the instruction
+     * @param op1   dividend integer value (value being divided)
+     * @param op2   divisor integer value (the number dividend is being divided by)
+     * @param exact use llvm "exact" division (see language reference)
+     * @param name  optional name for the instruction
      */
-    public fun buildUnsignedDiv(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildUnsignedDiv(op1: Value, op2: Value, exact: Boolean, name: Option<String>): Value = TODO()
 
     /**
      * Build a signed integer division instruction
@@ -315,11 +314,12 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * The `sdiv` instruction divides the two integer or vector-of-integer operands. The `sdiv` instruction yields
      * the signed quotient of the two operands. Unsigned division is done with [buildUnsignedDiv]
      *
-     * @param op1  dividend integer value (value being divided)
-     * @param op2  divisor integer value (the number dividend is being divided by)
-     * @param name optional name for the instruction
+     * @param op1   dividend integer value (value being divided)
+     * @param op2   divisor integer value (the number dividend is being divided by)
+     * @param exact use llvm "exact" division (see language reference)
+     * @param name  optional name for the instruction
      */
-    public fun buildSignedDiv(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildSignedDiv(op1: Value, op2: Value, exact: Boolean, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point division instruction

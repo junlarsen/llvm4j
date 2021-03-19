@@ -44,8 +44,71 @@ class ConstantIntTest {
 
         for (type in listOf(i1, i8, i16, i32, i64, i128)) {
             val subject = type.getAllOnes()
-
             assertEquals(-1, subject.getSignExtendedValue())
+        }
+    }
+
+    @Test fun `Test integer math constant expressions`() {
+        val ctx = Context()
+        val i32 = ctx.getInt32Type()
+        val lhs = i32.getConstant(20)
+        val rhs = i32.getConstant(10)
+
+        for (semantic in WrapSemantics.values()) {
+            val res = cast<ConstantInt>(lhs.getIntAdd(rhs, semantic))
+            assertEquals(30, res.getZeroExtendedValue())
+        }
+
+        for (semantic in WrapSemantics.values()) {
+            val res = cast<ConstantInt>(lhs.getIntSub(rhs, semantic))
+            assertEquals(10, res.getZeroExtendedValue())
+        }
+
+        for (semantic in WrapSemantics.values()) {
+            val res = cast<ConstantInt>(lhs.getIntMul(rhs, semantic))
+            assertEquals(200, res.getZeroExtendedValue())
+        }
+
+        for (exact in listOf(true, false)) {
+            val res1 = cast<ConstantInt>(lhs.getUnsignedDiv(rhs, exact))
+            val res2 = cast<ConstantInt>(lhs.getSignedDiv(rhs, exact))
+            assertEquals(2, res1.getZeroExtendedValue())
+            assertEquals(2, res2.getZeroExtendedValue())
+        }
+
+        val res1 = cast<ConstantInt>(lhs.getUnsignedRem(rhs))
+        val res2 = cast<ConstantInt>(lhs.getSignedRem(rhs))
+        val res3 = cast<ConstantInt>(lhs.getLeftShift(rhs))
+        val res4 = cast<ConstantInt>(lhs.getLogicalShiftRight(rhs))
+        val res5 = cast<ConstantInt>(lhs.getArithmeticShiftRight(rhs))
+        val res6 = cast<ConstantInt>(lhs.getLogicalAnd(rhs))
+        val res7 = cast<ConstantInt>(lhs.getLogicalOr(rhs))
+        val res8 = cast<ConstantInt>(lhs.getLogicalXor(rhs))
+
+        assertEquals(0, res1.getZeroExtendedValue())
+        assertEquals(0, res2.getZeroExtendedValue())
+        assertEquals(20 shl 10, res3.getZeroExtendedValue())
+        assertEquals(20 shr 10, res4.getZeroExtendedValue())
+        assertEquals(20 ushr 10, res5.getZeroExtendedValue())
+        assertEquals(20 and 10, res6.getZeroExtendedValue())
+        assertEquals(20 or 10, res7.getZeroExtendedValue())
+        assertEquals(20 xor 10, res8.getZeroExtendedValue())
+
+        val expected = mapOf<IntPredicate, Long>(
+            IntPredicate.Equal to 0,
+            IntPredicate.NotEqual to 1,
+            IntPredicate.UnsignedGreaterThan to 1,
+            IntPredicate.UnsignedGreaterEqual to 1,
+            IntPredicate.UnsignedLessThan to 0,
+            IntPredicate.UnsignedLessEqual to 0,
+            IntPredicate.SignedGreaterThan to 1,
+            IntPredicate.SignedGreaterEqual to 1,
+            IntPredicate.SignedLessThan to 0,
+            IntPredicate.SignedLessEqual to 0
+        )
+        for ((k, v) in expected) {
+            val res = cast<ConstantInt>(lhs.getIntCompare(k, rhs))
+            assertEquals(v, res.getZeroExtendedValue())
         }
     }
 }
@@ -209,20 +272,5 @@ class ConstantStructTest {
         assertTrue { subject1.isConstant() }
         assertFalse { subject1.isNull() }
         assertFalse { subject1.isUndef() }
-    }
-}
-
-class IntegerMathConstantTest {
-    @Test
-    fun `Test addition of two integers`() {
-        val ctx = Context()
-        val i32 = ctx.getInt32Type()
-        val lhs = i32.getConstant(100)
-        val rhs = i32.getConstant(256)
-
-        for (semantic in WrapSemantics.values()) {
-            // TODO: Casts - Assert value matches when casts are done
-            lhs.getIntAdd(rhs, semantic)
-        }
     }
 }
