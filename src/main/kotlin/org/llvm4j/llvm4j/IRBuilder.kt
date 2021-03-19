@@ -781,7 +781,7 @@ public interface IRBuilderBase : Owner<LLVMBuilderRef> {
      * @param op2       right hand side of comparison
      * @param name      optional name for the instruction
      */
-    public fun buildFloatCompare(predicate: RealPredicate, op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatCompare(predicate: FloatPredicate, op1: Value, op2: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a phi instruction

@@ -160,6 +160,50 @@ class ConstantFPTest {
             assertEquals(lossy, subject.second)
         }
     }
+
+    @Test fun `Test floating point math constant expressions`() {
+        val ctx = Context()
+        val float = ctx.getFloatType()
+        val lhs = float.getConstant(20.0)
+        val rhs = float.getConstant(10.0)
+
+        val res1 = cast<ConstantFP>(lhs.getFloatNeg())
+        val res2 = cast<ConstantFP>(lhs.getFloatAdd(rhs))
+        val res3 = cast<ConstantFP>(lhs.getFloatSub(rhs))
+        val res4 = cast<ConstantFP>(lhs.getFloatMul(rhs))
+        val res5 = cast<ConstantFP>(lhs.getFloatDiv(rhs))
+        val res6 = cast<ConstantFP>(lhs.getFloatRem(rhs))
+
+        assertEquals(-20.0, res1.getValue().first)
+        assertEquals(30.0, res2.getValue().first)
+        assertEquals(10.0, res3.getValue().first)
+        assertEquals(200.0, res4.getValue().first)
+        assertEquals(2.0, res5.getValue().first)
+        assertEquals(0.0, res6.getValue().first)
+
+        val expected = mapOf<FloatPredicate, Long>(
+            FloatPredicate.True to 1,
+            FloatPredicate.False to 0,
+            FloatPredicate.OrderedEqual to 0,
+            FloatPredicate.OrderedGreaterThan to 1,
+            FloatPredicate.OrderedGreaterEqual to 1,
+            FloatPredicate.OrderedLessThan to 0,
+            FloatPredicate.OrderedLessEqual to 0,
+            FloatPredicate.OrderedNotEqual to 1,
+            FloatPredicate.Ordered to 1,
+            FloatPredicate.Unordered to 0,
+            FloatPredicate.UnorderedEqual to 0,
+            FloatPredicate.UnorderedGreaterThan to 1,
+            FloatPredicate.UnorderedGreaterEqual to 1,
+            FloatPredicate.UnorderedLessThan to 0,
+            FloatPredicate.UnorderedLessEqual to 0,
+            FloatPredicate.UnorderedNotEqual to 1
+        )
+        for ((k, v) in expected) {
+            val res = cast<ConstantInt>(lhs.getFloatCompare(k, rhs))
+            assertEquals(v, res.getZeroExtendedValue())
+        }
+    }
 }
 
 class ConstantArrayTest {

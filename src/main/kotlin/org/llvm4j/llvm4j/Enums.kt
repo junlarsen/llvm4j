@@ -257,6 +257,14 @@ public enum class ModuleFlagBehavior(public override val value: Int) : Enumerati
     public companion object : Enumeration<ModuleFlagBehavior>(values())
 }
 
+/**
+ * Enumeration for integer comparison operators
+ *
+ * @see Constant.IntegerMathConstant.getIntCompare
+ * @see IRBuilder.buildIntCompare
+ *
+ * @author Mats Larsen
+ */
 public enum class IntPredicate(public override val value: Int) : Enumeration.EnumVariant {
     Equal(LLVM.LLVMIntEQ),
     NotEqual(LLVM.LLVMIntNE),
@@ -271,7 +279,15 @@ public enum class IntPredicate(public override val value: Int) : Enumeration.Enu
     public companion object : Enumeration<IntPredicate>(values())
 }
 
-public enum class RealPredicate(public override val value: Int) : Enumeration.EnumVariant {
+/**
+ * Enumeration for floating point comparison operators
+ *
+ * @see Constant.FloatingPointMathConstant.getFloatCompare
+ * @see IRBuilder.buildFloatCompare
+ *
+ * @author Mats Larsen
+ */
+public enum class FloatPredicate(public override val value: Int) : Enumeration.EnumVariant {
     True(LLVM.LLVMRealPredicateTrue),
     False(LLVM.LLVMRealPredicateFalse),
     OrderedEqual(LLVM.LLVMRealOEQ),
@@ -288,7 +304,7 @@ public enum class RealPredicate(public override val value: Int) : Enumeration.En
     UnorderedLessThan(LLVM.LLVMRealULT),
     UnorderedLessEqual(LLVM.LLVMRealULE),
     UnorderedNotEqual(LLVM.LLVMRealUNE);
-    public companion object : Enumeration<RealPredicate>(values())
+    public companion object : Enumeration<FloatPredicate>(values())
 }
 
 public enum class VerifierFailureAction(public override val value: Int) : Enumeration.EnumVariant {

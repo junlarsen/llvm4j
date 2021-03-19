@@ -613,14 +613,100 @@ public open class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
      * @author Mats Larsen
      */
     @InternalApi
-    public interface FloatingPointMathConstant {
-        public fun getFloatNeg(rhs: Value): Constant = TODO()
-        public fun getFloatAdd(rhs: Constant): Constant = TODO()
-        public fun getFloatSub(rhs: Constant): Constant = TODO()
-        public fun getFloatMul(rhs: Constant): Constant = TODO()
-        public fun getFloatDiv(divisor: Constant): Constant = TODO()
-        public fun getFloatRem(divisor: Constant): Constant = TODO()
-        public fun getFloatCompare(predicate: RealPredicate, rhs: Constant): Constant = TODO()
+    public interface FloatingPointMathConstant : Owner<LLVMValueRef> {
+        /**
+         * Create a float negation constexpr
+         *
+         * The `fneg` instruction negates a floating-point or a vector-of-floating-point operand
+         *
+         * The produced value is a copy of its operand with the sign bit flipped.
+         */
+        public fun getFloatNeg(): Constant {
+            val res = LLVM.LLVMConstFNeg(ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point addition constexpr
+         *
+         * The `fadd` instruction adds two floating-point or vector-of-floating-point operands
+         *
+         * @param rhs right hand side floating-point to add
+         */
+        public fun getFloatAdd(rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFAdd(ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point subtraction constexpr
+         *
+         * The `fsub` instruction subtracts two floating-point or vector-of-floating-point operands
+         *
+         * @param rhs how much to subtract
+         */
+        public fun getFloatSub(rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFSub(ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point multiplication constexpr
+         *
+         * The `fmul` instruction multiplies two floating-point or vector-of-floating-point operands
+         *
+         * @param rhs right hand side floating-point to multiply
+         */
+        public fun getFloatMul(rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFMul(ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point division constexpr
+         *
+         * The `fdiv` instruction divides the two floating-point or vector-of-floating-point operands.
+         *
+         * @param divisor divisor floating-point value (the number divided is being divided by)
+         */
+        public fun getFloatDiv(divisor: Constant): Constant {
+            val res = LLVM.LLVMConstFDiv(ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point remainder constexpr
+         *
+         * The `frem` instruction returns the remainder from the division of its floating-point or
+         * vector-of-floating-point operands.
+         *
+         * @param divisor divisor floating-point value (the number dividend is being divided by)
+         */
+        public fun getFloatRem(divisor: Constant): Constant {
+            val res = LLVM.LLVMConstFRem(ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point comparison constexpr
+         *
+         * The `fcmp` instruction returns a boolean (i1) value based on comparison of two floating-point or
+         * vector-of-floating-point operands.
+         *
+         * @param predicate comparison operator to use
+         * @param rhs       right hand side of comparison
+         */
+        public fun getFloatCompare(predicate: FloatPredicate, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFCmp(predicate.value, ref, rhs.ref)
+
+            return Constant(res)
+        }
     }
 
     /**
@@ -1042,8 +1128,7 @@ public class ConstantInt public constructor(ptr: LLVMValueRef) :
 @CorrespondsTo("llvm::ConstantFP")
 public class ConstantFP public constructor(ptr: LLVMValueRef) :
     ConstantData(ptr),
-    Constant
-    .FloatingPointMathConstant,
+    Constant.FloatingPointMathConstant,
     Constant.FirstClassConstant {
     /**
      * Retrieve the value as a Kotlin double.
