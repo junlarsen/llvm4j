@@ -11,7 +11,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class SupportTest {
-    @Test fun `Test usage of LLVM messages`() {
+    @Test
+    fun `Test usage of LLVM messages`() {
         val str = LLVMString.of("Hello World")
 
         assertEquals(11, str.ref.stringBytes.size)

@@ -1,3 +1,4 @@
+
 import org.jetbrains.dokka.Platform
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URL
@@ -14,7 +15,7 @@ plugins {
 group = "org.llvm4j"
 version = "0.1.0-SNAPSHOT"
 
-val isStaging = true
+val isRelease = !version.toString().endsWith("-SNAPSHOT")
 val isCI = System.getenv("CI") == "true"
 
 kotlin.explicitApi()
@@ -32,9 +33,8 @@ dependencies {
     api("org.llvm4j:optional:0.2.0-SNAPSHOT")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.4.31")
 
-    testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.jetbrains.kotlin:kotlin-test:1.4.31")
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
 }
 
 tasks {
@@ -45,7 +45,13 @@ tasks {
     withType<Test>().configureEach {
         useJUnitPlatform()
         testLogging {
-            events("passed", "skipped", "failed")
+            afterTest(
+                KotlinClosure2<TestDescriptor, TestResult, Unit>({ desc, result ->
+                    val resultText = result.resultType.name.padEnd(7, ' ')
+                    val timeText = (result.endTime - result.startTime).toString().padStart(4, '0')
+                    println("$resultText | ($timeText ms) | ${desc.className} :: ${desc.name}")
+                })
+            )
         }
     }
 
@@ -96,7 +102,7 @@ publishing {
 
             repositories {
                 maven {
-                    url = if (isStaging) {
+                    url = if (isCI || !isRelease) {
                         uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
                     } else {
                         uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")

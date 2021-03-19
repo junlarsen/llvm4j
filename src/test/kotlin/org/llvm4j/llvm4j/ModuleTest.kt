@@ -93,9 +93,6 @@ class ModuleTest {
         file.delete()
 
         assertIsOk(mod.dump(Some(file)))
-
-        println("TEST: Should dump module IR here:")
-        mod.dump(None)
     }
 
     @Test fun `Test module metadata flags`() {
