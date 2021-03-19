@@ -5,7 +5,29 @@ import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.Owner
 import org.llvm4j.optional.Option
 
-public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuilderRef>, IRBuilderBase {
+/**
+ * LLVM IR Builder interface for generating LLVM IR
+ *
+ * The instructions which are not implemented are the oddly specific `callbr` and exception handling ones:
+ *
+ * - callbr
+ * - cleanuppad
+ * - catchpad
+ * - landingpad
+ * - cleanupret
+ * - catchret
+ * - catchswitch
+ * - resume
+ * - invoke
+ *
+ * **Note:** A lot of the functions return [Value] instead of instruction types. This goes for all the
+ * constant expression values which are not guaranteed to become add instructions as the constant folder and optimizer
+ * may fold them for optimization purposes. There are also plenty of instructions which accept both scalars and
+ * vectors as their arguments.
+ *
+ * @author Mats Larsen
+ */
+public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuilderRef> {
     public override val ref: LLVMBuilderRef = ptr
 
     /**
@@ -95,38 +117,7 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
     public override fun deallocate() {
         LLVM.LLVMDisposeBuilder(ref)
     }
-}
 
-/**
- * A base implementation of a subset of the basic LLVM instruction set
- *
- * The instructions which are not implemented are the oddly specific `callbr` and exception handling ones:
- *
- * - callbr
- * - cleanuppad
- * - catchpad
- * - landingpad
- * - cleanupret
- * - catchret
- * - catchswitch
- * - resume
- * - invoke
- *
- * This implementation does not implement most of the helper functions the LLVM C API provide, this is a lower level
- * interface implementing the instructions defined in the language reference.
- *
- * Any parent implementors are free to implement the helper functions or exception handling instructions mentioned.
- *
- * This class does not directly correspond to LLVMs IRBuilderBase, but is almost analogous as they have a lot of
- * similarities.
- *
- * **Note:** A lot of the functions return [Value] instead of instruction types. This goes for all the
- * constant expression values which are not guaranteed to become add instructions as the constant folder and optimizer
- * may fold them for optimization purposes.
- *
- * @author Mats Larsen
- */
-public interface IRBuilderBase : Owner<LLVMBuilderRef> {
     /**
      * Build a return instruction
      *
