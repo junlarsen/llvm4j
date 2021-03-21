@@ -50,71 +50,6 @@ class ConstantIntTest {
             assertEquals(-1, subject.getSignExtendedValue())
         }
     }
-
-    @Test
-    fun `Test integer math constant expressions`() {
-        val ctx = Context()
-        val i32 = ctx.getInt32Type()
-        val lhs = i32.getConstant(20)
-        val rhs = i32.getConstant(10)
-
-        for (semantic in WrapSemantics.values()) {
-            val res = cast<ConstantInt>(lhs.getIntAdd(rhs, semantic))
-            assertEquals(30, res.getZeroExtendedValue())
-        }
-
-        for (semantic in WrapSemantics.values()) {
-            val res = cast<ConstantInt>(lhs.getIntSub(rhs, semantic))
-            assertEquals(10, res.getZeroExtendedValue())
-        }
-
-        for (semantic in WrapSemantics.values()) {
-            val res = cast<ConstantInt>(lhs.getIntMul(rhs, semantic))
-            assertEquals(200, res.getZeroExtendedValue())
-        }
-
-        for (exact in listOf(true, false)) {
-            val res1 = cast<ConstantInt>(lhs.getUnsignedDiv(rhs, exact))
-            val res2 = cast<ConstantInt>(lhs.getSignedDiv(rhs, exact))
-            assertEquals(2, res1.getZeroExtendedValue())
-            assertEquals(2, res2.getZeroExtendedValue())
-        }
-
-        val res1 = cast<ConstantInt>(lhs.getUnsignedRem(rhs))
-        val res2 = cast<ConstantInt>(lhs.getSignedRem(rhs))
-        val res3 = cast<ConstantInt>(lhs.getLeftShift(rhs))
-        val res4 = cast<ConstantInt>(lhs.getLogicalShiftRight(rhs))
-        val res5 = cast<ConstantInt>(lhs.getArithmeticShiftRight(rhs))
-        val res6 = cast<ConstantInt>(lhs.getLogicalAnd(rhs))
-        val res7 = cast<ConstantInt>(lhs.getLogicalOr(rhs))
-        val res8 = cast<ConstantInt>(lhs.getLogicalXor(rhs))
-
-        assertEquals(0, res1.getZeroExtendedValue())
-        assertEquals(0, res2.getZeroExtendedValue())
-        assertEquals(20 shl 10, res3.getZeroExtendedValue())
-        assertEquals(20 shr 10, res4.getZeroExtendedValue())
-        assertEquals(20 ushr 10, res5.getZeroExtendedValue())
-        assertEquals(20 and 10, res6.getZeroExtendedValue())
-        assertEquals(20 or 10, res7.getZeroExtendedValue())
-        assertEquals(20 xor 10, res8.getZeroExtendedValue())
-
-        val expected = mapOf<IntPredicate, Long>(
-            IntPredicate.Equal to 0,
-            IntPredicate.NotEqual to 1,
-            IntPredicate.UnsignedGreaterThan to 1,
-            IntPredicate.UnsignedGreaterEqual to 1,
-            IntPredicate.UnsignedLessThan to 0,
-            IntPredicate.UnsignedLessEqual to 0,
-            IntPredicate.SignedGreaterThan to 1,
-            IntPredicate.SignedGreaterEqual to 1,
-            IntPredicate.SignedLessThan to 0,
-            IntPredicate.SignedLessEqual to 0
-        )
-        for ((k, v) in expected) {
-            val res = cast<ConstantInt>(lhs.getIntCompare(k, rhs))
-            assertEquals(v, res.getZeroExtendedValue())
-        }
-    }
 }
 
 class ConstantFPTest {
@@ -164,51 +99,6 @@ class ConstantFPTest {
 
             assertEquals(value, subject.first)
             assertEquals(lossy, subject.second)
-        }
-    }
-
-    @Test
-    fun `Test floating point math constant expressions`() {
-        val ctx = Context()
-        val float = ctx.getFloatType()
-        val lhs = float.getConstant(20.0)
-        val rhs = float.getConstant(10.0)
-
-        val res1 = cast<ConstantFP>(lhs.getFloatNeg())
-        val res2 = cast<ConstantFP>(lhs.getFloatAdd(rhs))
-        val res3 = cast<ConstantFP>(lhs.getFloatSub(rhs))
-        val res4 = cast<ConstantFP>(lhs.getFloatMul(rhs))
-        val res5 = cast<ConstantFP>(lhs.getFloatDiv(rhs))
-        val res6 = cast<ConstantFP>(lhs.getFloatRem(rhs))
-
-        assertEquals(-20.0, res1.getValuePair().first)
-        assertEquals(30.0, res2.getValuePair().first)
-        assertEquals(10.0, res3.getValuePair().first)
-        assertEquals(200.0, res4.getValuePair().first)
-        assertEquals(2.0, res5.getValuePair().first)
-        assertEquals(0.0, res6.getValuePair().first)
-
-        val expected = mapOf<FloatPredicate, Long>(
-            FloatPredicate.True to 1,
-            FloatPredicate.False to 0,
-            FloatPredicate.OrderedEqual to 0,
-            FloatPredicate.OrderedGreaterThan to 1,
-            FloatPredicate.OrderedGreaterEqual to 1,
-            FloatPredicate.OrderedLessThan to 0,
-            FloatPredicate.OrderedLessEqual to 0,
-            FloatPredicate.OrderedNotEqual to 1,
-            FloatPredicate.Ordered to 1,
-            FloatPredicate.Unordered to 0,
-            FloatPredicate.UnorderedEqual to 0,
-            FloatPredicate.UnorderedGreaterThan to 1,
-            FloatPredicate.UnorderedGreaterEqual to 1,
-            FloatPredicate.UnorderedLessThan to 0,
-            FloatPredicate.UnorderedLessEqual to 0,
-            FloatPredicate.UnorderedNotEqual to 1
-        )
-        for ((k, v) in expected) {
-            val res = cast<ConstantInt>(lhs.getFloatCompare(k, rhs))
-            assertEquals(v, res.getZeroExtendedValue())
         }
     }
 }
@@ -328,40 +218,5 @@ class ConstantStructTest {
         assertTrue { subject1.isConstant() }
         assertFalse { subject1.isNull() }
         assertFalse { subject1.isUndef() }
-    }
-
-    @Test
-    fun `Test struct constant expressions`() {
-        val ctx = Context()
-        val i32 = ctx.getInt32Type()
-        val i8 = ctx.getInt8Type()
-        val f32 = ctx.getFloatType()
-        val type = ctx.getStructType(f32, i8)
-        val f32v = f32.getConstant(100.0)
-        val i8v = i8.getConstant(45)
-        val struct = type.getConstant(f32v, i8v, isPacked = false).unwrap()
-        val subject1 = struct.getExtractValue(0)
-
-        assertTrue { isa<ConstantFP>(subject1) }
-        assertEquals(100.0, cast<ConstantFP>(subject1).getValuePair().first)
-
-        val f32v2 = f32.getConstant(42.0)
-        val new = cast<ConstantStruct>(struct.getInsertValue(f32v2, 0))
-
-        assertEquals(42.0, cast<ConstantFP>(new.getExtractValue(0)).getValuePair().first)
-    }
-
-    @Test
-    fun `Test getelementptr constexpr`() {
-        val ctx = Context()
-        val mod = ctx.newModule("test_module")
-        val i32 = ctx.getInt32Type()
-        val st = ctx.getStructType(i32, i32, isPacked = false)
-        val init = st.getConstant(i32.getConstant(1), i32.getConstant(0), isPacked = false)
-        val v = mod.addGlobalVariable("struct", st, None).unwrap().also {
-            it.setInitializer(init.unwrap())
-        }
-
-        val x = v
     }
 }
