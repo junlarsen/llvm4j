@@ -203,10 +203,10 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      *
      * The produced value is a copy of its operand with the sign bit flipped.
      *
-     * @param op1  floating-point or vector-of-floating-point to negate
+     * @param self floating-point or vector-of-floating-point to negate
      * @param name optional name for the instruction
      */
-    public fun buildFloatNeg(op1: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatNeg(self: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an addition instruction
@@ -216,23 +216,23 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
      * does overflow, a poison value is returned
      *
-     * @param op1       left hand side integer to add
-     * @param op2       right hand side integer to add
+     * @param lhs       left hand side integer to add
+     * @param rhs       right hand side integer to add
      * @param semantics wrapping semantics upon overflow
      * @param name      optional name for the instruction
      */
-    public fun buildIntAdd(op1: Value, op2: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
+    public fun buildIntAdd(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point addition instruction
      *
      * The `fadd` instruction adds two floating-point or vector-of-floating-point operands
      *
-     * @param op1  left hand side floating-point to add
-     * @param op2  right hand side floating-point to add
+     * @param lhs left hand side floating-point
+     * @param rhs right hand side floating-point to add to [lhs]
      * @param name optional name for the instruction
      */
-    public fun buildFloatAdd(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatAdd(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a subtraction instruction
@@ -242,23 +242,23 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
      * does overflow, a poison value is returned
      *
-     * @param op1       integer to subtract from
-     * @param op2       how much to subtract from [op1]
+     * @param lhs       integer to subtract from
+     * @param rhs       how much to subtract from [lhs]
      * @param semantics wrapping semantics upon overflow
      * @param name      optional name for the instruction
      */
-    public fun buildIntSub(op1: Value, op2: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
+    public fun buildIntSub(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point subtraction instruction
      *
      * The `fsub` instruction subtracts two floating-point or vector-of-floating-point operands
      *
-     * @param op1  floating-point to subtract from
-     * @param op2  how much to subtract from [op1]
+     * @param lhs  floating-point to subtract from
+     * @param rhs  how much to subtract from [lhs]
      * @param name optional name for the instruction
      */
-    public fun buildFloatSub(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatSub(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a multiplication instruction
@@ -268,23 +268,23 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
      * does overflow, a poison value is returned
      *
-     * @param op1       left hand side integer to multiply
-     * @param op2       right hand side integer to multiply
+     * @param lhs       left hand side integer to multiply
+     * @param rhs       right hand side integer to multiply
      * @param semantics wrapping semantics upon overflow
      * @param name      optional name for the instruction
      */
-    public fun buildIntMul(op1: Value, op2: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
+    public fun buildIntMul(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point multiplication instruction
      *
      * The `fmul` instruction multiplies two floating-point or vector-of-floating-point operands
      *
-     * @param op1  left hand side floating-point to multiply
-     * @param op2  right hand side floating-point to multiply
+     * @param lhs  left hand side floating-point to multiply
+     * @param rhs  right hand side floating-point to multiply
      * @param name optional name for the instruction
      */
-    public fun buildFloatMul(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatMul(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an unsigned integer division instruction
@@ -292,12 +292,12 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The `udiv` instruction divides two integer or vector-of-integer operands. The `udiv` instruction yields the
      * unsigned quotient of the two operands. Signed division is done with [buildSignedDiv]
      *
-     * @param op1   dividend integer value (value being divided)
-     * @param op2   divisor integer value (the number dividend is being divided by)
-     * @param exact use llvm "exact" division (see language reference)
-     * @param name  optional name for the instruction
+     * @param dividend dividend integer value (value being divided)
+     * @param divisor  divisor integer value (the number dividend is being divided by)
+     * @param exact    use llvm "exact" division (see language reference)
+     * @param name     optional name for the instruction
      */
-    public fun buildUnsignedDiv(op1: Value, op2: Value, exact: Boolean, name: Option<String>): Value = TODO()
+    public fun buildUnsignedDiv(dividend: Value, divisor: Value, exact: Boolean, name: Option<String>): Value = TODO()
 
     /**
      * Build a signed integer division instruction
@@ -305,23 +305,23 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The `sdiv` instruction divides the two integer or vector-of-integer operands. The `sdiv` instruction yields
      * the signed quotient of the two operands. Unsigned division is done with [buildUnsignedDiv]
      *
-     * @param op1   dividend integer value (value being divided)
-     * @param op2   divisor integer value (the number dividend is being divided by)
-     * @param exact use llvm "exact" division (see language reference)
-     * @param name  optional name for the instruction
+     * @param dividend dividend integer value (value being divided)
+     * @param divisor  divisor integer value (the number dividend is being divided by)
+     * @param exact    use llvm "exact" division (see language reference)
+     * @param name     optional name for the instruction
      */
-    public fun buildSignedDiv(op1: Value, op2: Value, exact: Boolean, name: Option<String>): Value = TODO()
+    public fun buildSignedDiv(dividend: Value, divisor: Value, exact: Boolean, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point division instruction
      *
      * The `fdiv` instruction divides the two floating-point or vector-of-floating-point operands.
      *
-     * @param op1  dividend floating-point value (value being divided)
-     * @param op2  divisor floating-point value (the number divided is being divided by)
-     * @param name optional name for the instruction
+     * @param dividend dividend floating-point value (value being divided)
+     * @param divisor  divisor floating-point value (the number divided is being divided by)
+     * @param name     optional name for the instruction
      */
-    public fun buildFloatDiv(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatDiv(dividend: Value, divisor: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an unsigned integer remainder instruction
@@ -329,11 +329,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The `urem` instruction returns the remainder from the unsigned division of its two integer or
      * vector-of-integer operands.
      *
-     * @param op1  dividend integer value (value being divided)
-     * @param op2  divisor integer value (the number dividend is being divided by)
-     * @param name optional name for the instruction
+     * @param dividend dividend integer value (value being divided)
+     * @param divisor  divisor integer value (the number dividend is being divided by)
+     * @param name     optional name for the instruction
      */
-    public fun buildUnsignedRem(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildUnsignedRem(dividend: Value, divisor: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a signed integer remainder instruction
@@ -341,11 +341,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The `srem` instruction returns the remainder from the signed division of its two integer or vector-of-integer
      * operands.
      *
-     * @param op1  dividend integer value (value being divided)
-     * @param op2  divisor integer value (the number dividend is being divided by)
-     * @param name optional name for the instruction
+     * @param dividend dividend integer value (value being divided)
+     * @param divisor  divisor integer value (the number dividend is being divided by)
+     * @param name     optional name for the instruction
      */
-    public fun buildSignedRem(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildSignedRem(dividend: Value, divisor: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point remainder instruction
@@ -353,11 +353,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The `frem` instruction returns the remainder from the division of its floating-point or
      * vector-of-floating-point operands.
      *
-     * @param op1  dividend floating-point value (value being divided)
-     * @param op2  divisor floating-point value (the number dividend is being divided by)
-     * @param name optional name for the instruction
+     * @param dividend dividend floating-point value (value being divided)
+     * @param divisor  divisor floating-point value (the number dividend is being divided by)
+     * @param name     optional name for the instruction
      */
-    public fun buildFloatRem(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatRem(dividend: Value, divisor: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a left shift instruction
@@ -365,11 +365,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The `shl` instruction shifts its first integer or vector-of-integer operand to the left a specified number of
      * bits
      *
-     * @param op1  integer value to shift left
-     * @param op2  number of bits to shift [op1] to the left
+     * @param lhs  integer value to shift left
+     * @param rhs  number of bits to shift [lhs] to the left
      * @param name optional name for the instruction
      */
-    public fun buildLeftShift(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildLeftShift(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a logical shift right instruction
@@ -377,11 +377,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The `lshr` instruction logically shifts its first integer or vector-of-integer operand to the right a
      * specified number of bits with zero fill.
      *
-     * @param op1  integer value to logically shift right
-     * @param op2  number of bits to shift [op1] to the right
+     * @param lhs  integer value to logically shift right
+     * @param rhs  number of bits to shift [lhs] to the right
      * @param name optional name for the instruction
      */
-    public fun buildLogicalShiftRight(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildLogicalShiftRight(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an arithmetic shift right instruction
@@ -389,44 +389,44 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The `ashr` instruction arithmetically shifts its first integer or vector-of-integer operand to the right a
      * specified number of bits with sign extension.
      *
-     * @param op1  integer value to arithmetically shift right
-     * @param op2  number of bits to shift [op1] to the right
+     * @param lhs  integer value to arithmetically shift right
+     * @param rhs  number of bits to shift [lhs] to the right
      * @param name optional name for the instruction
      */
-    public fun buildArithmeticShiftRight(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildArithmeticShiftRight(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a logical and instruction
      *
      * The `and` instruction returns the bitwise logical and of its two integer or vector-of-integer operands.
      *
-     * @param op1  left hand side integer
-     * @param op2  right hand side integer
+     * @param lhs  left hand side integer
+     * @param rhs  right hand side integer
      * @param name optional name for the instruction
      */
-    public fun buildLogicalAnd(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildLogicalAnd(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a logical or instruction
      *
      * The `or` instruction returns the bitwise logical or of its two integer or vector-of-integer operands.
      *
-     * @param op1  left hand side integer
-     * @param op2  right hand side integer
+     * @param lhs  left hand side integer
+     * @param rhs  right hand side integer
      * @param name optional name for the instruction
      */
-    public fun buildLogicalOr(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildLogicalOr(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a logical xor instruction
      *
      * The `xor` instruction returns the bitwise logical xor of its two integer or vector-of-integer operands.
      *
-     * @param op1  left hand side integer
-     * @param op2  right hand side integer
+     * @param lhs  left hand side integer
+     * @param rhs  right hand side integer
      * @param name optional name for the instruction
      */
-    public fun buildLogicalXor(op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildLogicalXor(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build an extract element instruction
@@ -575,17 +575,17 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The `getelementptr` instruction is used to calculate the address of a sub-element of an aggregate data
      * structure. This is just a calculation and it does not access memory.
      *
-     * If [isInBounds] is true, the instruction will yield a poison value if one of the following rules are violated:
+     * If [inBounds] is true, the instruction will yield a poison value if one of the following rules are violated:
      * See semantics for instruction: https://llvm.org/docs/LangRef.html#id233
      *
-     * @param aggregate  struct or array type to calculate element address of
-     * @param indices    directions/indices in the aggregate value to navigate through to find wanted element
-     * @param isInBounds whether
+     * @param aggregate struct or array value to extract value from
+     * @param indices   directions/indices in the aggregate value to navigate through to find wanted element
+     * @param inBounds  whether the getelementptr is in bounds
      */
     public fun buildGetElementPtr(
         aggregate: Value,
         vararg indices: Value,
-        isInBounds: Boolean,
+        inBounds: Boolean,
         name: Option<String>
     ): Value = TODO()
 
@@ -755,11 +755,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * pointer or vector-of-pointer operands.
      *
      * @param predicate comparison operator to use
-     * @param op1       left hand side of comparison
-     * @param op2       right hand side of comparison
+     * @param lhs       left hand side of comparison
+     * @param rhs       right hand side of comparison
      * @param name      optional name for the instruction
      */
-    public fun buildIntCompare(predicate: IntPredicate, op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildIntCompare(predicate: IntPredicate, lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a floating-point comparison instruction
@@ -768,11 +768,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * vector-of-floating-point operands.
      *
      * @param predicate comparison operator to use
-     * @param op1       left hand side of comparison
-     * @param op2       right hand side of comparison
+     * @param lhs       left hand side of comparison
+     * @param rhs       right hand side of comparison
      * @param name      optional name for the instruction
      */
-    public fun buildFloatCompare(predicate: FloatPredicate, op1: Value, op2: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatCompare(predicate: FloatPredicate, lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
 
     /**
      * Build a phi instruction

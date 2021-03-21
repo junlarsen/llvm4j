@@ -1,5 +1,6 @@
 package org.llvm4j.llvm4j
 
+import com.sun.jdi.FloatType
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
@@ -359,383 +360,6 @@ public open class Constant constructor(ptr: LLVMValueRef) : User(ptr) {
     public fun isNull(): Boolean {
         return LLVM.LLVMIsNull(ref).toBoolean()
     }
-
-    /**
-     * Common implementation for any constant value which can perform integer based constant expression operations on
-     * them.
-     *
-     * This exists because most of LLVMs instruction set operations which are performable on integers may also be
-     * used on vectors of integers.
-     *
-     * Known inheritors are [ConstantInt] and [ConstantVector]
-     *
-     * @author Mats Larsen
-     */
-    @InternalApi
-    public interface IntegerMathConstant : Owner<LLVMValueRef> {
-        public fun getIntNeg(rhs: Constant, semantics: WrapSemantics): Constant = TODO("helper api")
-
-        /**
-         * Create an addition constexpr
-         *
-         * The `add` instruction adds two integer or vector-of-integer operands
-         *
-         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
-         * does overflow, a poison value is returned
-         *
-         * @param rhs       right hand side integer to add
-         * @param semantics wrapping semantics upon overflow
-         */
-        public fun getIntAdd(rhs: Constant, semantics: WrapSemantics): Constant {
-            val res = when (semantics) {
-                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWAdd(ref, rhs.ref)
-                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWAdd(ref, rhs.ref)
-                WrapSemantics.Unspecified -> LLVM.LLVMConstAdd(ref, rhs.ref)
-            }
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a subtraction constexpr
-         *
-         * The `sub` instruction subtracts to integer or vector-of-integer operands
-         *
-         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
-         * does overflow, a poison value is returned
-         *
-         * @param rhs       how much to subtract
-         * @param semantics wrapping semantics upon overflow
-         */
-        public fun getIntSub(rhs: Constant, semantics: WrapSemantics): Constant {
-            val res = when (semantics) {
-                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWSub(ref, rhs.ref)
-                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWSub(ref, rhs.ref)
-                WrapSemantics.Unspecified -> LLVM.LLVMConstSub(ref, rhs.ref)
-            }
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a multiplication constexpr
-         *
-         * The `mul` instruction multiplies two integer or vector-of-integer operands
-         *
-         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
-         * does overflow, a poison value is returned
-         *
-         * @param rhs       right hand side integer to multiply
-         * @param semantics wrapping semantics upon overflow
-         */
-        public fun getIntMul(rhs: Constant, semantics: WrapSemantics): Constant {
-            val res = when (semantics) {
-                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWMul(ref, rhs.ref)
-                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWMul(ref, rhs.ref)
-                WrapSemantics.Unspecified -> LLVM.LLVMConstMul(ref, rhs.ref)
-            }
-
-            return Constant(res)
-        }
-
-        /**
-         * Create an unsigned integer division constexpr
-         *
-         * The `udiv` instruction divides two integer or vector-of-integer operands. The `udiv` instruction yields the
-         * unsigned quotient of the two operands. Signed division is done with [getSignedDiv]
-         *
-         * @param divisor divisor integer value (the number dividend is being divided by)
-         * @param exact   use llvm "exact" division (see language reference)
-         */
-        public fun getUnsignedDiv(divisor: Constant, exact: Boolean): Constant {
-            val res = if (exact) {
-                LLVM.LLVMConstExactUDiv(ref, divisor.ref)
-            } else {
-                LLVM.LLVMConstUDiv(ref, divisor.ref)
-            }
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a signed integer division constexpr
-         *
-         * The `sdiv` instruction divides the two integer or vector-of-integer operands. The `sdiv` instruction yields
-         * the signed quotient of the two operands. Unsigned division is done with [getUnsignedDiv]
-         *
-         * @param divisor divisor integer value (the number dividend is being divided by)
-         * @param exact   use llvm "exact" division (see language reference)
-         */
-        public fun getSignedDiv(divisor: Constant, exact: Boolean): Constant {
-            val res = if (exact) {
-                LLVM.LLVMConstExactSDiv(ref, divisor.ref)
-            } else {
-                LLVM.LLVMConstSDiv(ref, divisor.ref)
-            }
-
-            return Constant(res)
-        }
-
-        /**
-         * Create an unsigned integer remainder constexpr
-         *
-         * The `urem` instruction returns the remainder from the unsigned division of its two integer or
-         * vector-of-integer operands.
-         *
-         * @param divisor  divisor integer value (the number dividend is being divided by)
-         */
-        public fun getUnsignedRem(divisor: Constant): Constant {
-            val res = LLVM.LLVMConstURem(ref, divisor.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a signed integer remainder constexpr
-         *
-         * The `srem` instruction returns the remainder from the signed division of its two integer or vector-of-integer
-         * operands.
-         *
-         * @param divisor divisor integer value (the number dividend is being divided by)
-         */
-        public fun getSignedRem(divisor: Constant): Constant {
-            val res = LLVM.LLVMConstSRem(ref, divisor.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a left shift constexpr
-         *
-         * The `shl` instruction shifts its first integer or vector-of-integer operand to the left a specified number of
-         * bits
-         *
-         * @param bits number of bits to shift this to the left
-         */
-        public fun getLeftShift(bits: Constant): Constant {
-            val res = LLVM.LLVMConstShl(ref, bits.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a logical shift right constexpr
-         *
-         * The `lshr` instruction logically shifts its first integer or vector-of-integer operand to the right a
-         * specified number of bits with zero fill.
-         *
-         * @param bits number of bits to shift this to the right
-         */
-        public fun getLogicalShiftRight(bits: Constant): Constant {
-            val res = LLVM.LLVMConstLShr(ref, bits.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create an arithmetic shift right constexpr
-         *
-         * The `ashr` instruction arithmetically shifts its first integer or vector-of-integer operand to the right a
-         * specified number of bits with sign extension.
-         *
-         * @param bits number of bits to shift this to the right
-         */
-        public fun getArithmeticShiftRight(bits: Constant): Constant {
-            val res = LLVM.LLVMConstAShr(ref, bits.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a logical and constexpr
-         *
-         * The `and` instruction returns the bitwise logical and of its two integer or vector-of-integer operands.
-         *
-         * @param rhs right hand side integer
-         */
-        public fun getLogicalAnd(rhs: Constant): Constant {
-            val res = LLVM.LLVMConstAnd(ref, rhs.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a logical or constexpr
-         *
-         * The `or` instruction returns the bitwise logical or of its two integer or vector-of-integer operands.
-         *
-         * @param rhs right hand side integer
-         */
-        public fun getLogicalOr(rhs: Constant): Constant {
-            val res = LLVM.LLVMConstOr(ref, rhs.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a logical xor constexpr
-         *
-         * The `xor` instruction returns the bitwise logical xor of its two integer or vector-of-integer operands.
-         *
-         * @param rhs right hand side integer
-         */
-        public fun getLogicalXor(rhs: Constant): Constant {
-            val res = LLVM.LLVMConstXor(ref, rhs.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create an integer comparison constexpr
-         *
-         * The `icmp` instruction returns a boolean (i1) value based on comparison of two integer, vector-of-integer,
-         * pointer or vector-of-pointer operands.
-         *
-         * @param predicate comparison operator to use
-         * @param rhs       right hand side of comparison
-         */
-        public fun getIntCompare(predicate: IntPredicate, rhs: Constant): Constant {
-            val res = LLVM.LLVMConstICmp(predicate.value, ref, rhs.ref)
-
-            return Constant(res)
-        }
-    }
-
-    /**
-     * Common implementation for any constant value which can perform floating-point based constant expression
-     * operations on them.
-     *
-     * This exists because most of LLVMs instruction set operations which are performable on floating-points may
-     * also be used on vectors of floating-points.
-     *
-     * Known inheritors are [ConstantFP] and [ConstantVector]
-     *
-     * @author Mats Larsen
-     */
-    @InternalApi
-    public interface FloatingPointMathConstant : Owner<LLVMValueRef> {
-        /**
-         * Create a float negation constexpr
-         *
-         * The `fneg` instruction negates a floating-point or a vector-of-floating-point operand
-         *
-         * The produced value is a copy of its operand with the sign bit flipped.
-         */
-        public fun getFloatNeg(): Constant {
-            val res = LLVM.LLVMConstFNeg(ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a floating-point addition constexpr
-         *
-         * The `fadd` instruction adds two floating-point or vector-of-floating-point operands
-         *
-         * @param rhs right hand side floating-point to add
-         */
-        public fun getFloatAdd(rhs: Constant): Constant {
-            val res = LLVM.LLVMConstFAdd(ref, rhs.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a floating-point subtraction constexpr
-         *
-         * The `fsub` instruction subtracts two floating-point or vector-of-floating-point operands
-         *
-         * @param rhs how much to subtract
-         */
-        public fun getFloatSub(rhs: Constant): Constant {
-            val res = LLVM.LLVMConstFSub(ref, rhs.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a floating-point multiplication constexpr
-         *
-         * The `fmul` instruction multiplies two floating-point or vector-of-floating-point operands
-         *
-         * @param rhs right hand side floating-point to multiply
-         */
-        public fun getFloatMul(rhs: Constant): Constant {
-            val res = LLVM.LLVMConstFMul(ref, rhs.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a floating-point division constexpr
-         *
-         * The `fdiv` instruction divides the two floating-point or vector-of-floating-point operands.
-         *
-         * @param divisor divisor floating-point value (the number divided is being divided by)
-         */
-        public fun getFloatDiv(divisor: Constant): Constant {
-            val res = LLVM.LLVMConstFDiv(ref, divisor.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a floating-point remainder constexpr
-         *
-         * The `frem` instruction returns the remainder from the division of its floating-point or
-         * vector-of-floating-point operands.
-         *
-         * @param divisor divisor floating-point value (the number dividend is being divided by)
-         */
-        public fun getFloatRem(divisor: Constant): Constant {
-            val res = LLVM.LLVMConstFRem(ref, divisor.ref)
-
-            return Constant(res)
-        }
-
-        /**
-         * Create a floating-point comparison constexpr
-         *
-         * The `fcmp` instruction returns a boolean (i1) value based on comparison of two floating-point or
-         * vector-of-floating-point operands.
-         *
-         * @param predicate comparison operator to use
-         * @param rhs       right hand side of comparison
-         */
-        public fun getFloatCompare(predicate: FloatPredicate, rhs: Constant): Constant {
-            val res = LLVM.LLVMConstFCmp(predicate.value, ref, rhs.ref)
-
-            return Constant(res)
-        }
-    }
-
-    /**
-     * Common implementation for any constant value which can perform aggregate constant expression operations on them.
-     *
-     * Known inheritors are [ConstantStruct] and [ConstantArray]
-     *
-     * @author Mats Larsen
-     */
-    @InternalApi
-    public interface AggregateConstant {
-        public fun getExtractValue(index: Int): Constant = TODO()
-        public fun getInsertValue(value: Constant, index: Int): Constant = TODO()
-        public fun getGetElementPtr(vararg indices: Constant, isInBounds: Boolean): Constant = TODO()
-    }
-
-    /**
-     * Common implementation for any constant value which is first-class.
-     *
-     * See LLVM documentation for first-class types https://llvm.org/docs/LangRef.html#t-firstclass
-     *
-     * Known inheritors are [ConstantInt], [ConstantFP], [ConstantVector]
-     *
-     * @author Mats Larsen
-     */
-    @InternalApi
-    public interface FirstClassConstant {
-        public fun getBitCast(type: Type): Constant = TODO()
-    }
 }
 
 /**
@@ -1039,7 +663,7 @@ public open class GlobalIndirectSymbol constructor(ptr: LLVMValueRef) : GlobalVa
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantArray")
-public class ConstantArray public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr), Constant.AggregateConstant
+public class ConstantArray public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr)
 
 /**
  * A constant vector of values with the same type
@@ -1053,26 +677,7 @@ public class ConstantArray public constructor(ptr: LLVMValueRef) : ConstantAggre
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::Vector")
-public class ConstantVector public constructor(ptr: LLVMValueRef) :
-    ConstantAggregate(ptr),
-    Constant.IntegerMathConstant,
-    Constant.FloatingPointMathConstant,
-    Constant.FirstClassConstant {
-    public fun getExtractElement(index: Constant): Constant = TODO()
-    public fun getInsertElement(value: Constant, index: Constant): Constant = TODO()
-    public fun getShuffleVector(rhs: ConstantVector, mask: ConstantVector): Constant = TODO()
-    public fun getIntTrunc(type: VectorType): Constant = TODO()
-    public fun getZeroExt(type: VectorType): Constant = TODO()
-    public fun getSignExt(type: VectorType): Constant = TODO()
-    public fun getFloatTrunc(type: VectorType): Constant = TODO()
-    public fun getFloatExt(type: VectorType): Constant = TODO()
-    public fun getFloatToSigned(type: VectorType): Constant = TODO()
-    public fun getFloatToUnsigned(type: VectorType): Constant = TODO()
-    public fun getSignedToFloat(type: VectorType): Constant = TODO()
-    public fun getUnsignedToFloat(type: VectorType): Constant = TODO()
-    public fun getIntToPointer(type: VectorType): Constant = TODO()
-    public fun getPointerToInt(type: VectorType): Constant = TODO()
-}
+public class ConstantVector public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr)
 
 /**
  * A constant structure aggregate consisting of values of various types.
@@ -1084,7 +689,7 @@ public class ConstantVector public constructor(ptr: LLVMValueRef) :
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantStruct")
-public class ConstantStruct public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr), Constant.AggregateConstant
+public class ConstantStruct public constructor(ptr: LLVMValueRef) : ConstantAggregate(ptr)
 
 /**
  * A single, constant integer value
@@ -1097,10 +702,7 @@ public class ConstantStruct public constructor(ptr: LLVMValueRef) : ConstantAggr
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantInt")
-public class ConstantInt public constructor(ptr: LLVMValueRef) :
-    ConstantData(ptr),
-    Constant.IntegerMathConstant,
-    Constant.FirstClassConstant {
+public class ConstantInt public constructor(ptr: LLVMValueRef) : ConstantData(ptr) {
     public fun getZeroExtendedValue(): Long {
         return LLVM.LLVMConstIntGetZExtValue(ref)
     }
@@ -1108,14 +710,6 @@ public class ConstantInt public constructor(ptr: LLVMValueRef) :
     public fun getSignExtendedValue(): Long {
         return LLVM.LLVMConstIntGetSExtValue(ref)
     }
-
-    public fun getIntTrunc(type: IntegerType): Constant = TODO()
-    public fun getZeroExt(type: IntegerType): Constant = TODO()
-    public fun getSignExt(type: IntegerType): Constant = TODO()
-    public fun getSignedToFloat(type: IntegerType): Constant = TODO()
-    public fun getUnsignedToFloat(type: IntegerType): Constant = TODO()
-    public fun getIntToPointer(type: PointerType): Constant = TODO()
-    public fun getSelect(isTrue: Constant, isFalse: Constant): Constant = TODO()
 }
 
 /**
@@ -1126,16 +720,13 @@ public class ConstantInt public constructor(ptr: LLVMValueRef) :
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ConstantFP")
-public class ConstantFP public constructor(ptr: LLVMValueRef) :
-    ConstantData(ptr),
-    Constant.FloatingPointMathConstant,
-    Constant.FirstClassConstant {
+public class ConstantFP public constructor(ptr: LLVMValueRef) : ConstantData(ptr) {
     /**
      * Retrieve the value as a Kotlin double.
      *
      * @return pair of value and boolean indicating if conversion was lossy.
      */
-    public fun getValue(): Pair<Double, Boolean> {
+    public fun getValuePair(): Pair<Double, Boolean> {
         val ptr = IntPointer(1L)
         val double = LLVM.LLVMConstRealGetDouble(ref, ptr)
         val lossy = ptr.get()
@@ -1143,10 +734,14 @@ public class ConstantFP public constructor(ptr: LLVMValueRef) :
         return Pair(double, lossy.toBoolean())
     }
 
-    public fun getFloatTrunc(type: FloatingPointType): Constant = TODO()
-    public fun getFloatExt(type: FloatingPointType): Constant = TODO()
-    public fun getFloatToSigned(type: IntegerType): Constant = TODO()
-    public fun getFloatToUnsigned(type: IntegerType): Constant = TODO()
+    /**
+     * Retrieve the possibly lossy value as a Kotlin double
+     *
+     * If you need to know if the value was lossy, use [getValuePair]
+     */
+    public fun getLossyValue(): Double {
+        return getValuePair().first
+    }
 }
 
 @CorrespondsTo("llvm::ConstantAggregateZero")
@@ -1476,6 +1071,9 @@ public class GlobalVariable public constructor(ptr: LLVMValueRef) :
  *
  * Constant expression types can be recognized using [ConstantExpression.getOpcode].
  *
+ * The [ConstantExpression.Companion] contains the constantexpr operations you may use on constants. Notice that none
+ * of these operations are checked so usage is "unsafe".
+ *
  * @author Mats Larsen
  */
 public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
@@ -1483,6 +1081,450 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
         val opcode = LLVM.LLVMGetConstOpcode(ref)
 
         return Opcode.from(opcode).unwrap()
+    }
+
+    public companion object {
+        @JvmStatic
+        public fun getIntNeg(rhs: Constant, semantics: WrapSemantics): Constant = TODO("helper api")
+
+        /**
+         * Create a float negation constexpr
+         *
+         * The `fneg` instruction negates a floating-point or a vector-of-floating-point operand
+         *
+         * The produced value is a copy of its operand with the sign bit flipped.
+         *
+         * @param self floating-point or vector-of-floating-point to negate
+         */
+        @JvmStatic
+        public fun getFloatNeg(self: Constant): Constant {
+            val res = LLVM.LLVMConstFNeg(self.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an addition constexpr
+         *
+         * The `add` instruction adds two integer or vector-of-integer operands
+         *
+         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
+         * does overflow, a poison value is returned
+         *
+         * @param lhs       left hand side integer to add
+         * @param rhs       right hand side integer to add
+         * @param semantics wrapping semantics upon overflow
+         */
+        @JvmStatic
+        public fun getIntAdd(lhs: Constant, rhs: Constant, semantics: WrapSemantics): Constant {
+            val res = when (semantics) {
+                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWAdd(lhs.ref, rhs.ref)
+                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWAdd(lhs.ref, rhs.ref)
+                WrapSemantics.Unspecified -> LLVM.LLVMConstAdd(lhs.ref, rhs.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point addition constexpr
+         *
+         * The `fadd` instruction adds two floating-point or vector-of-floating-point operands
+         *
+         * @param lhs left hand side floating-point to add
+         * @param rhs right hand side floating-point to add
+         */
+        @JvmStatic
+        public fun getFloatAdd(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFAdd(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a subtraction constexpr
+         *
+         * The `sub` instruction subtracts to integer or vector-of-integer operands
+         *
+         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
+         * does overflow, a poison value is returned
+         *
+         * @param lhs       integer to subtract from
+         * @param rhs       how much to subtract from [lhs]
+         * @param semantics wrapping semantics upon overflow
+         */
+        @JvmStatic
+        public fun getIntSub(lhs: Constant, rhs: Constant, semantics: WrapSemantics): Constant {
+            val res = when (semantics) {
+                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWSub(lhs.ref, rhs.ref)
+                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWSub(lhs.ref, rhs.ref)
+                WrapSemantics.Unspecified -> LLVM.LLVMConstSub(lhs.ref, rhs.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point subtraction constexpr
+         *
+         * The `fsub` instruction subtracts two floating-point or vector-of-floating-point operands
+         *
+         * @param lhs  floating-point to subtract from
+         * @param rhs  how much to subtract from [lhs]
+         */
+        public fun getFloatSub(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFSub(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a multiplication constexpr
+         *
+         * The `mul` instruction multiplies two integer or vector-of-integer operands
+         *
+         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
+         * does overflow, a poison value is returned
+         *
+         * @param lhs       left hand side integer to multiply
+         * @param rhs       right hand side integer to multiply
+         * @param semantics wrapping semantics upon overflow
+         */
+        @JvmStatic
+        public fun getIntMul(lhs: Constant, rhs: Constant, semantics: WrapSemantics): Constant {
+            val res = when (semantics) {
+                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWMul(lhs.ref, rhs.ref)
+                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWMul(lhs.ref, rhs.ref)
+                WrapSemantics.Unspecified -> LLVM.LLVMConstMul(lhs.ref, rhs.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point multiplication constexpr
+         *
+         * The `fmul` instruction multiplies two floating-point or vector-of-floating-point operands
+         *
+         * @param lhs left hand side floating-point to multiply
+         * @param rhs right hand side floating-point to multiply
+         */
+        public fun getFloatMul(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFMul(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an unsigned integer division constexpr
+         *
+         * The `udiv` instruction divides two integer or vector-of-integer operands. The `udiv` instruction yields the
+         * unsigned quotient of the two operands. Signed division is done with [getSignedDiv]
+         *
+         * @param dividend dividend integer value (value being divided)
+         * @param divisor  divisor integer value (the number dividend is being divided by)
+         * @param exact    use llvm "exact" division (see language reference)
+         */
+        @JvmStatic
+        public fun getUnsignedDiv(dividend: Constant, divisor: Constant, exact: Boolean): Constant {
+            val res = if (exact) {
+                LLVM.LLVMConstExactUDiv(dividend.ref, divisor.ref)
+            } else {
+                LLVM.LLVMConstUDiv(dividend.ref, divisor.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a signed integer division constexpr
+         *
+         * The `sdiv` instruction divides the two integer or vector-of-integer operands. The `sdiv` instruction yields
+         * the signed quotient of the two operands. Unsigned division is done with [getUnsignedDiv]
+         *
+         * @param dividend dividend integer value (value being divided)
+         * @param divisor divisor integer value (the number dividend is being divided by)
+         * @param exact   use llvm "exact" division (see language reference)
+         */
+        @JvmStatic
+        public fun getSignedDiv(dividend: Constant, divisor: Constant, exact: Boolean): Constant {
+            val res = if (exact) {
+                LLVM.LLVMConstExactSDiv(dividend.ref, divisor.ref)
+            } else {
+                LLVM.LLVMConstSDiv(dividend.ref, divisor.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point division constexpr
+         *
+         * The `fdiv` instruction divides the two floating-point or vector-of-floating-point operands.
+         *
+         * @param dividend dividend floating-point value (value being divided)
+         * @param divisor divisor floating-point value (the number divided is being divided by)
+         */
+        public fun getFloatDiv(dividend: Constant, divisor: Constant): Constant {
+            val res = LLVM.LLVMConstFDiv(dividend.ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an unsigned integer remainder constexpr
+         *
+         * The `urem` instruction returns the remainder from the unsigned division of its two integer or
+         * vector-of-integer operands.
+         *
+         * @param dividend dividend integer value (value being divided)
+         * @param divisor  divisor integer value (the number dividend is being divided by)
+         */
+        @JvmStatic
+        public fun getUnsignedRem(dividend: Constant, divisor: Constant): Constant {
+            val res = LLVM.LLVMConstURem(dividend.ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a signed integer remainder constexpr
+         *
+         * The `srem` instruction returns the remainder from the signed division of its two integer or vector-of-integer
+         * operands.
+         *
+         * @param dividend dividend integer value (value being divided)
+         * @param divisor  divisor integer value (the number dividend is being divided by)
+         */
+        @JvmStatic
+        public fun getSignedRem(dividend: Constant, divisor: Constant): Constant {
+            val res = LLVM.LLVMConstSRem(dividend.ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point remainder constexpr
+         *
+         * The `frem` instruction returns the remainder from the division of its floating-point or
+         * vector-of-floating-point operands.
+         *
+         * @param dividend dividend floating-point value (value being divided)
+         * @param divisor  divisor floating-point value (the number dividend is being divided by)
+         */
+        public fun getFloatRem(dividend: Constant, divisor: Constant): Constant {
+            val res = LLVM.LLVMConstFRem(dividend.ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a left shift constexpr
+         *
+         * The `shl` instruction shifts its first integer or vector-of-integer operand to the left a specified number of
+         * bits
+         *
+         * @param lhs integer value to shift left
+         * @param rhs number of bits to shift [lhs] to the left
+         */
+        @JvmStatic
+        public fun getLeftShift(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstShl(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical shift right constexpr
+         *
+         * The `lshr` instruction logically shifts its first integer or vector-of-integer operand to the right a
+         * specified number of bits with zero fill.
+         *
+         * @param lhs integer value to logically shift right
+         * @param rhs number of bits to shift [lhs] to the right
+         */
+        @JvmStatic
+        public fun getLogicalShiftRight(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstLShr(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an arithmetic shift right constexpr
+         *
+         * The `ashr` instruction arithmetically shifts its first integer or vector-of-integer operand to the right a
+         * specified number of bits with sign extension.
+         *
+         * @param lhs integer value to arithmetically shift right
+         * @param rhs number of bits to shift [lhs] to the right
+         */
+        @JvmStatic
+        public fun getArithmeticShiftRight(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstAShr(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical and constexpr
+         *
+         * The `and` instruction returns the bitwise logical and of its two integer or vector-of-integer operands.
+         *
+         * @param lhs left hand side integer
+         * @param rhs right hand side integer
+         */
+        @JvmStatic
+        public fun getLogicalAnd(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstAnd(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical or constexpr
+         *
+         * The `or` instruction returns the bitwise logical or of its two integer or vector-of-integer operands.
+         *
+         * @param lhs left hand side integer
+         * @param rhs right hand side integer
+         */
+        @JvmStatic
+        public fun getLogicalOr(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstOr(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical xor constexpr
+         *
+         * The `xor` instruction returns the bitwise logical xor of its two integer or vector-of-integer operands.
+         *
+         * @param lhs left hand side integer
+         * @param rhs right hand side integer
+         */
+        @JvmStatic
+        public fun getLogicalXor(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstXor(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        public fun getExtractElement(vector: Constant, index: Constant): Constant = TODO()
+        public fun getInsertElement(vector: Constant, value: Constant, index: Constant): Constant = TODO()
+        public fun getShuffleVector(vec1: Constant, vec2: Constant, mask: Constant): Constant = TODO()
+
+        /**
+         * Build an extract value instruction
+         *
+         * The `extractvalue` instruction extracts the value of a member field from an aggregate value.
+         *
+         * The LLVM C API only allows for a single index to be used.
+         *
+         * @param aggregate struct or array value to extract value from
+         * @param indices   indices in [aggregate] to retrieve
+         */
+        public fun getExtractValue(aggregate: Constant, vararg indices: Int): Constant {
+            val indexPtr = IntPointer(*indices)
+            val res = LLVM.LLVMConstExtractValue(aggregate.ref, indexPtr, indices.size)
+            indexPtr.deallocate()
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an insert value constexpr
+         *
+         * The `insertvalue` instruction sets the value of a member field of an aggregate value.
+         *
+         * The LLVM C API only allows for a single index to be used.
+         *
+         * @param aggregate struct or array value to extract value from
+         * @param value     value to insert at index
+         * @param indices   indices in this to insert element into
+         */
+        public fun getInsertValue(aggregate: Constant, value: Constant, vararg indices: Int): Constant {
+            val indexPtr = IntPointer(*indices)
+            val res = LLVM.LLVMConstInsertValue(aggregate.ref, value.ref, indexPtr, indices.size)
+            indexPtr.deallocate()
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a get element pointer constexpr
+         *
+         * The `getelementptr` instruction is used to calculate the address of a sub-element of an aggregate data
+         * structure. This is just a calculation and it does not access memory.
+         *
+         * If [inBounds] is true, the instruction will yield a poison value if one of the following rules are violated:
+         * See semantics for instruction: https://llvm.org/docs/LangRef.html#id233
+         *
+         * @param aggregate struct or array value to extract value from
+         * @param indices   directions/indices in the aggregate value to navigate through to find wanted element
+         * @param inBounds  whether the getelementptr is in bounds
+         */
+        public fun getGetElementPtr(aggregate: Constant, vararg indices: Constant, inBounds: Boolean): Constant {
+            val indexPtr = PointerPointer(*indices.map { it.ref }.toTypedArray())
+            val res = if (inBounds) {
+                LLVM.LLVMConstInBoundsGEP(aggregate.ref, indexPtr, indices.size)
+            } else {
+                LLVM.LLVMConstGEP(aggregate.ref, indexPtr, indices.size)
+            }
+            indexPtr.deallocate()
+
+            return Constant(res)
+        }
+
+        public fun getIntTrunc(value: Constant, type: IntegerType): Constant = TODO()
+        public fun getZeroExt(value: Constant, type: IntegerType): Constant = TODO()
+        public fun getSignExt(value: Constant, type: IntegerType): Constant = TODO()
+        public fun getFloatTrunc(value: Constant, type: FloatType): Constant = TODO()
+        public fun getFloatExt(value: Constant, type: FloatType): Constant = TODO()
+        public fun getFloatToUnsigned(value: Constant, type: IntegerType): Constant = TODO()
+        public fun getFloatToSigned(value: Constant, type: IntegerType): Constant = TODO()
+        public fun getUnsignedToFloat(value: Constant, type: FloatType): Constant = TODO()
+        public fun getSignedToFloat(value: Constant, type: FloatType): Constant = TODO()
+        public fun getPointerToInt(value: Constant, type: IntegerType): Constant = TODO()
+        public fun getIntToPointer(value: Constant, type: PointerType): Constant = TODO()
+        public fun getBitCast(value: Constant, type: Type): Constant = TODO()
+        public fun getAddrSpaceCast(value: Constant, type: PointerType): Constant = TODO()
+
+        /**
+         * Create an integer comparison constexpr
+         *
+         * The `icmp` instruction returns a boolean (i1) value based on comparison of two integer, vector-of-integer,
+         * pointer or vector-of-pointer operands.
+         *
+         * @param predicate comparison operator to use
+         * @param lhs       left hand side of comparison
+         * @param rhs       right hand side of comparison
+         */
+        @JvmStatic
+        public fun getIntCompare(predicate: IntPredicate, lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstICmp(predicate.value, lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point comparison constexpr
+         *
+         * The `fcmp` instruction returns a boolean (i1) value based on comparison of two floating-point or
+         * vector-of-floating-point operands.
+         *
+         * @param predicate comparison operator to use
+         * @param lhs       left hand side of comparison
+         * @param rhs       right hand side of comparison
+         */
+        public fun getFloatCompare(predicate: FloatPredicate, lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFCmp(predicate.value, lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        public fun getSelect(condition: Constant, isTrue: Constant, isFalse: Constant): Constant = TODO()
     }
 }
 
