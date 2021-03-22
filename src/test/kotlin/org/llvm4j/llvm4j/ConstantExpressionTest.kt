@@ -56,7 +56,7 @@ class ConstantExpressionTest {
         val lhs = i32.getConstant(20)
         val rhs = i32.getConstant(10)
 
-        val res0 = cast<ConstantInt>( ConstantExpression.getIntNeg(lhs))
+        val res0 = cast<ConstantInt>(ConstantExpression.getIntNeg(lhs))
         assertEquals(-20, res0.getSignExtendedValue())
 
         for (semantic in WrapSemantics.values()) {

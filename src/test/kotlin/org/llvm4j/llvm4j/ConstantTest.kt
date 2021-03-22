@@ -3,7 +3,6 @@ package org.llvm4j.llvm4j
 import org.junit.jupiter.api.Test
 import org.llvm4j.llvm4j.testing.assertIsErr
 import org.llvm4j.llvm4j.testing.assertIsOk
-import org.llvm4j.optional.None
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
