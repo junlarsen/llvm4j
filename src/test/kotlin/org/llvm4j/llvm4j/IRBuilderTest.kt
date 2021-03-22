@@ -145,7 +145,7 @@ class IRBuilderTest {
         assertTrue { isa<UnaryOperatorInstruction>(res) }
     }
 
-    @Test fun `Test integer binary instructions`() {
+    @Test fun `Test integer binary operator instructions`() {
         val ctx = Context()
         val mod = ctx.newModule("test")
         val i32 = ctx.getInt32Type()
@@ -290,5 +290,63 @@ class IRBuilderTest {
         builder.buildReturn(Some(xorRes))
         xorFunction.addBasicBlock(xorBlock)
         assertTrue { isa<BinaryOperatorInstruction>(xorRes) }
+    }
+    
+    @Test fun `Test float binary operator instructions`() {
+        val ctx = Context()
+        val mod = ctx.newModule("test")
+        val float = ctx.getFloatType()
+        val builder = ctx.newIRBuilder()
+        val fn = ctx.getFunctionType(float, float, float)
+
+        val faddFunction = mod.addFunction("test_fadd", fn)
+        val faddBlock = ctx.newBasicBlock("entry")
+        builder.positionAfter(faddBlock)
+        val faddLhs = faddFunction.getParameter(0).unwrap()
+        val faddRhs = faddFunction.getParameter(1).unwrap()
+        val faddRes = builder.buildFloatAdd(faddLhs, faddRhs, None)
+        builder.buildReturn(Some(faddRes))
+        faddFunction.addBasicBlock(faddBlock)
+        assertTrue { isa<BinaryOperatorInstruction>(faddRes) }
+
+        val fsubFunction = mod.addFunction("test_fsub", fn)
+        val fsubBlock = ctx.newBasicBlock("entry")
+        builder.positionAfter(fsubBlock)
+        val fsubLhs = fsubFunction.getParameter(0).unwrap()
+        val fsubRhs = fsubFunction.getParameter(1).unwrap()
+        val fsubRes = builder.buildFloatSub(fsubLhs, fsubRhs, None)
+        builder.buildReturn(Some(fsubRes))
+        fsubFunction.addBasicBlock(fsubBlock)
+        assertTrue { isa<BinaryOperatorInstruction>(fsubRes) }
+
+        val fmulFunction = mod.addFunction("test_fmul", fn)
+        val fmulBlock = ctx.newBasicBlock("entry")
+        builder.positionAfter(fmulBlock)
+        val fmulLhs = fmulFunction.getParameter(0).unwrap()
+        val fmulRhs = fmulFunction.getParameter(1).unwrap()
+        val fmulRes = builder.buildFloatMul(fmulLhs, fmulRhs, None)
+        builder.buildReturn(Some(fmulRes))
+        fmulFunction.addBasicBlock(fmulBlock)
+        assertTrue { isa<BinaryOperatorInstruction>(fmulRes) }
+
+        val fdivFunction = mod.addFunction("test_fdiv", fn)
+        val fdivBlock = ctx.newBasicBlock("entry")
+        builder.positionAfter(fdivBlock)
+        val fdivLhs = fdivFunction.getParameter(0).unwrap()
+        val fdivRhs = fdivFunction.getParameter(1).unwrap()
+        val fdivRes = builder.buildFloatDiv(fdivLhs, fdivRhs, None)
+        builder.buildReturn(Some(fdivRes))
+        fdivFunction.addBasicBlock(fdivBlock)
+        assertTrue { isa<BinaryOperatorInstruction>(fdivRes) }
+
+        val fremFunction = mod.addFunction("test_frem", fn)
+        val fremBlock = ctx.newBasicBlock("entry")
+        builder.positionAfter(fremBlock)
+        val fremLhs = fremFunction.getParameter(0).unwrap()
+        val fremRhs = fremFunction.getParameter(1).unwrap()
+        val fremRes = builder.buildFloatRem(fremLhs, fremRhs, None)
+        builder.buildReturn(Some(fremRes))
+        fremFunction.addBasicBlock(fremBlock)
+        assertTrue { isa<BinaryOperatorInstruction>(fremRes) }
     }
 }
