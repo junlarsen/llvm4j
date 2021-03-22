@@ -23,6 +23,7 @@ import org.llvm4j.optional.Some
  * - invoke
  *
  * TODO: APIs - Implement the remaining instructions
+ * TODO: Testing - Test debug/fpmathtags once metadata is done
  *
  * @author Mats Larsen
  */
@@ -93,13 +94,12 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
     /**
      * Get the default floating-point math metadata
      *
-     * TODO: Research - Does this return null when there is no default fpmath tag set?
      * TODO: Research - Can this type be narrowed down?
      */
-    public fun getDefaultFPMathTag(): Metadata {
+    public fun getDefaultFPMathTag(): Option<Metadata> {
         val flags = LLVM.LLVMBuilderGetDefaultFPMathTag(ref)
 
-        return Metadata(flags)
+        return Option.of(flags).map { Metadata(it) }
     }
 
     public fun setDefaultFPMathTag(flags: Metadata) {
@@ -144,7 +144,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      *
      * @param label label to jump to
      */
-    public fun buildBranch(label: BasicBlock): BranchInstruction = TODO()
+    public fun buildBranch(label: BasicBlock): BranchInstruction {
+        val res = LLVM.LLVMBuildBr(ref, label.ref)
+
+        return BranchInstruction(res)
+    }
 
     /**
      * Build a conditional branch instruction
@@ -160,7 +164,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
         condition: Value,
         isTrue: BasicBlock,
         isFalse: BasicBlock
-    ): BranchInstruction = TODO()
+    ): BranchInstruction {
+        val res = LLVM.LLVMBuildCondBr(ref, condition.ref, isTrue.ref, isFalse.ref)
+
+        return BranchInstruction(res)
+    }
 
     /**
      * Build a switch instruction

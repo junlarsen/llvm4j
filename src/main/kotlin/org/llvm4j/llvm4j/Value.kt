@@ -14,7 +14,9 @@ import org.llvm4j.llvm4j.util.InternalApi
 import org.llvm4j.llvm4j.util.Owner
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
+import org.llvm4j.optional.Err
 import org.llvm4j.optional.None
+import org.llvm4j.optional.Ok
 import org.llvm4j.optional.Option
 import org.llvm4j.optional.Result
 import org.llvm4j.optional.Some
@@ -1805,10 +1807,62 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
  * TODO: Research - LLVMSetAlignment and GetAlignment on Alloca, Load and Store
  */
 public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
-    public interface Atomic : Owner<LLVMValueRef>
-    public interface CallBase : Owner<LLVMValueRef>
-    public interface MemoryAccessor : Owner<LLVMValueRef>
-    public interface Terminator : Owner<LLVMValueRef>
+    public interface AtomicInstructionImpl : Owner<LLVMValueRef>
+    public interface CallBaseInstructionImpl : Owner<LLVMValueRef>
+    public interface MemoryAccessorInstructionImpl : Owner<LLVMValueRef>
+
+    /**
+     * Common shared implementation for any LLVM instruction which is a terminator
+     *
+     * @see ReturnInstruction
+     * @see BranchInstruction
+     * @see SwitchInstruction
+     * @see IndirectBrInstruction
+     * @see InvokeInstruction
+     * @see CallBrInstruction
+     * @see ResumeInstruction
+     * @see CatchSwitchInstruction
+     * @see CatchReturnInstruction
+     * @see CleanupReturnInstruction
+     * @see UnreachableInstruction
+     *
+     * @author Mats Larsen
+     */
+    public interface TerminatorInstructionImpl : Owner<LLVMValueRef> {
+        public fun getSuccessorCount(): Int {
+            return LLVM.LLVMGetNumSuccessors(ref)
+        }
+
+        /**
+         * Get the successor at [index] in the successors list
+         *
+         * @return block if it exists, [IndexOutOfBoundsException] if index is larger or equal to size.
+         */
+        public fun getSuccessor(index: Int): Result<BasicBlock, IndexOutOfBoundsException> {
+            val size = getSuccessorCount()
+            return if (index < size) {
+                val block = LLVM.LLVMGetSuccessor(ref, index)
+                Ok(block).map { BasicBlock(it) }
+            } else {
+                Err(IndexOutOfBoundsException("Index $index out of bounds for size $size"))
+            }
+        }
+
+        /**
+         * Set the successor at [index] in the successors list
+         *
+         * @return block if it exists, [IndexOutOfBoundsException] if index is larger or equal to size.
+         */
+        public fun setSuccessor(block: BasicBlock, index: Int): Result<Unit, IndexOutOfBoundsException> {
+            val size = getSuccessorCount()
+            return if (index < size) {
+                LLVM.LLVMSetSuccessor(ref, index, block.ref)
+                Ok(Unit)
+            } else {
+                Err(IndexOutOfBoundsException("Index $index out of bounds for size $size"))
+            }
+        }
+    }
 
     public fun hasMetadata(): Boolean {
         return LLVM.LLVMHasMetadata(ref).toBoolean()
@@ -1873,28 +1927,61 @@ public class ZeroExtInstruction public constructor(ptr: LLVMValueRef) : CastInst
 public class AtomicCmpXchgInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class AtomicRMWInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
-public open class BranchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class InvokeInstruction public constructor(ptr: LLVMValueRef) : BranchInstruction(ptr)
-public class CallBrInstruction public constructor(ptr: LLVMValueRef) : BranchInstruction(ptr)
-public class CallInstruction public constructor(ptr: LLVMValueRef) : BranchInstruction(ptr)
+@CorrespondsTo("llvm::BranchInst")
+public class BranchInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl {
+    public fun isConditional(): Boolean {
+        return LLVM.LLVMIsConditional(ref).toBoolean()
+    }
 
-public class CatchReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class CatchSwitchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class CleanupReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+    /**
+     * Get the condition of this branching instruction
+     *
+     * @return the condition if the instruction is conditional, [None] otherwise
+     */
+    public fun getCondition(): Option<Value> {
+        return if (isConditional()) {
+            val res = LLVM.LLVMGetCondition(ref)
+            Some(res).map { Value(it) }
+        } else {
+            None
+        }
+    }
+
+    /**
+     * Set the condition of this branching instruction
+     *
+     * If the branch isn't conditional, this is a no-op
+     */
+    public fun setCondition(condition: Value) {
+        if (isConditional()) {
+            LLVM.LLVMSetCondition(ref, condition.ref)
+        }
+    }
+}
+
+public class InvokeInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+public class CallBrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+public class CallInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+public class CatchReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+public class CatchSwitchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+public class CleanupReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
 
 public class ExtractElementInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class FenceInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
 public class GetElementPtrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class IndirectBrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class IndirectBrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
 public class InsertElementInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class InsertValueInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class LandingPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class PhiInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class ResumeInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class ReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class ResumeInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+public class ReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
 public class SelectInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class ShuffleVectorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class StoreInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class SwitchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class UnreachableInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class SwitchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+public class UnreachableInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
