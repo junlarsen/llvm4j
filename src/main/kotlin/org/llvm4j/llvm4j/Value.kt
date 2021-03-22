@@ -2022,7 +2022,24 @@ public class ResumeInstruction public constructor(ptr: LLVMValueRef) : Instructi
 @CorrespondsTo("llvm::ReturnInst")
 public class ReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
 public class SelectInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class ShuffleVectorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::ShuffleVectorInst")
+public class ShuffleVectorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr) {
+    public fun getMaskElementCount(): Int {
+        return LLVM.LLVMGetNumMaskElements(ref)
+    }
+
+    public fun getMaskElement(index: Int): Int {
+        return LLVM.LLVMGetMaskValue(ref, index)
+    }
+
+    public companion object {
+        @JvmStatic
+        public fun getUndefMaskElement(): Int {
+            return LLVM.LLVMGetUndefMaskElem()
+        }
+    }
+}
 public class StoreInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
 @CorrespondsTo("llvm::SwitchInst")

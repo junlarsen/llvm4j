@@ -349,4 +349,32 @@ class IRBuilderTest {
         fremFunction.addBasicBlock(fremBlock)
         assertTrue { isa<BinaryOperatorInstruction>(fremRes) }
     }
+
+    @Test fun `Test vector instructions`() {
+        val ctx = Context()
+        val void = ctx.getVoidType()
+        val mod = ctx.newModule("test")
+        val i32 = ctx.getInt32Type()
+        val vecTy = ctx.getVectorType(i32, 4).unwrap()
+        val builder = ctx.newIRBuilder()
+        val block = ctx.newBasicBlock("entry")
+        val function = mod.addFunction("test", ctx.getFunctionType(void, vecTy, vecTy, i32))
+
+        builder.positionAfter(block)
+        val lhs = function.getParameter(0).unwrap()
+        val rhs = function.getParameter(1).unwrap()
+        val mask = i32.getConstantVector(i32.getConstantUndef(), i32.getConstantUndef())
+        val index = function.getParameter(2).unwrap()
+        val extract = builder.buildExtractElement(lhs, index, None)
+        val insert = builder.buildInsertElement(lhs, index, index, None)
+        val shuffle = builder.buildShuffleVector(lhs, rhs, mask, None)
+        builder.buildReturn(None)
+        function.addBasicBlock(block)
+
+        assertEquals(Opcode.ExtractElement, cast<Instruction>(extract).getOpcode())
+        assertEquals(Opcode.InsertElement, cast<Instruction>(insert).getOpcode())
+        assertEquals(Opcode.ShuffleVector, cast<Instruction>(shuffle).getOpcode())
+        assertEquals(2, cast<ShuffleVectorInstruction>(shuffle).getMaskElementCount())
+        assertEquals(ShuffleVectorInstruction.getUndefMaskElement(), cast<ShuffleVectorInstruction>(shuffle).getMaskElement(0))
+    }
 }

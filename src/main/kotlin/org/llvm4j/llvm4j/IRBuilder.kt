@@ -562,7 +562,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param index  index of element to extract
      * @param name   optional name for the instruction
      */
-    public fun buildExtractElement(vector: Value, index: Value, name: Option<String>): Value = TODO()
+    public fun buildExtractElement(vector: Value, index: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildExtractElement(ref, vector.ref, index.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an insert element instruction
@@ -574,7 +578,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param index  the index to store the element
      * @param name   optional name for the instruction
      */
-    public fun buildInsertElement(vector: Value, value: Value, index: Value, name: Option<String>): Value = TODO()
+    public fun buildInsertElement(vector: Value, value: Value, index: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildInsertElement(ref, vector.ref, value.ref, index.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a shuffle vector instruction
@@ -587,7 +595,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param mask the shuffle mask
      * @param name optional name for the instruction
      */
-    public fun buildShuffleVector(op1: Value, op2: Value, mask: Value, name: Option<String>): Value = TODO()
+    public fun buildShuffleVector(op1: Value, op2: Value, mask: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildShuffleVector(ref, op1.ref, op2.ref, mask.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an extract value instruction
