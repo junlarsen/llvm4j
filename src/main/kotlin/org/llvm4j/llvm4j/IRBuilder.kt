@@ -218,7 +218,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * portion of the code is not reachable. This may be used to indicate that the code after a no-return function
      * cannot be reached.
      */
-    public fun buildUnreachable(): UnreachableInstruction = TODO()
+    public fun buildUnreachable(): UnreachableInstruction {
+        val res = LLVM.LLVMBuildUnreachable(ref)
+
+        return UnreachableInstruction(res)
+    }
 
     /**
      * Build a float negation instruction

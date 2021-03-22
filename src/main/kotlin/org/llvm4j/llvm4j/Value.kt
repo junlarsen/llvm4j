@@ -1831,6 +1831,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
 /**
  * TODO: Research - LLVMSetAlignment and GetAlignment on Alloca, Load and Store
  */
+@CorrespondsTo("llvm::Instruction")
 public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
     public interface AtomicInstructionImpl : Owner<LLVMValueRef>
     public interface CallBaseInstructionImpl : Owner<LLVMValueRef>
@@ -2013,6 +2014,7 @@ public class InsertValueInstruction public constructor(ptr: LLVMValueRef) : Inst
 public class LandingPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class PhiInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class ResumeInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+@CorrespondsTo("llvm::ReturnInst")
 public class ReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
 public class SelectInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class ShuffleVectorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
@@ -2038,4 +2040,5 @@ public class SwitchInstruction public constructor(ptr: LLVMValueRef) :
     }
 }
 
+@CorrespondsTo("llvm::UnreachableInst")
 public class UnreachableInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl

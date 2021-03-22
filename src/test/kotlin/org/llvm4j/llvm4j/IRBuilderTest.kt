@@ -115,4 +115,15 @@ class IRBuilderTest {
         indirect.addCase(bb3)
         assertEquals(2, indirect.getSuccessorCount())
     }
+
+    @Test fun `Test unreachable instructions`() {
+        val ctx = Context()
+        val bb1 = ctx.newBasicBlock("bb1")
+        val builder = ctx.newIRBuilder()
+
+        builder.positionAfter(bb1)
+        val unreachable = builder.buildUnreachable()
+
+        assertEquals(0, unreachable.getSuccessorCount())
+    }
 }
