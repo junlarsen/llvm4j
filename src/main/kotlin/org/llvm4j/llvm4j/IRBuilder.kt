@@ -3,7 +3,9 @@ package org.llvm4j.llvm4j
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.optional.None
 import org.llvm4j.optional.Option
+import org.llvm4j.optional.Some
 
 /**
  * LLVM IR Builder interface for generating LLVM IR
@@ -20,10 +22,7 @@ import org.llvm4j.optional.Option
  * - resume
  * - invoke
  *
- * **Note:** A lot of the functions return [Value] instead of instruction types. This goes for all the
- * constant expression values which are not guaranteed to become add instructions as the constant folder and optimizer
- * may fold them for optimization purposes. There are also plenty of instructions which accept both scalars and
- * vectors as their arguments.
+ * TODO: APIs - Implement the remaining instructions
  *
  * @author Mats Larsen
  */
@@ -128,7 +127,14 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      *
      * @param value value to return, returns void if [None]
      */
-    public fun buildReturn(value: Option<Value>): ReturnInstruction = TODO()
+    public fun buildReturn(value: Option<Value>): ReturnInstruction {
+        val res = when (value) {
+            is Some -> LLVM.LLVMBuildRet(ref, value.unwrap().ref)
+            is None -> LLVM.LLVMBuildRetVoid(ref)
+        }
+
+        return ReturnInstruction(res)
+    }
 
     /**
      * Build an unconditional branch instruction
