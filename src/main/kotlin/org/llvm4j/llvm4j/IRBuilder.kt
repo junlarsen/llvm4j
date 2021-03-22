@@ -185,7 +185,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param default       label to jump to if none of the cases match
      * @param expectedCases expected amount of switch cases to be appended
      */
-    public fun buildSwitch(condition: Value, default: BasicBlock, expectedCases: Int): SwitchInstruction = TODO()
+    public fun buildSwitch(condition: Value, default: BasicBlock, expectedCases: Int): SwitchInstruction {
+        val res = LLVM.LLVMBuildSwitch(ref, condition.ref, default.ref, expectedCases)
+
+        return SwitchInstruction(res)
+    }
 
     /**
      * Build an indirect branch instruction
@@ -198,8 +202,14 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      *
      * @param address       label to jump to
      * @param expectedCases expected amount of possible destinations to be appended
+     *
+     * TODO: Research - Is BlockAddress the correct type or should we accept Value?
      */
-    public fun buildIndirectBranch(address: BasicBlock, expectedCases: Int): IndirectBrInstruction = TODO()
+    public fun buildIndirectBranch(address: BlockAddress, expectedCases: Int): IndirectBrInstruction {
+        val res = LLVM.LLVMBuildIndirectBr(ref, address.ref, expectedCases)
+
+        return IndirectBrInstruction(res)
+    }
 
     /**
      * Build an unreachable instruction

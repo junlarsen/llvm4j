@@ -26,7 +26,7 @@ class IRBuilderTest {
         assertNone(builder.getDebugLocation())
     }
 
-    @Test fun `Test return instructions`() {
+    @Test fun `Test ret instructions`() {
         val ctx = Context()
         val i32 = ctx.getInt32Type()
         val i32V = i32.getConstant(1)
@@ -44,7 +44,7 @@ class IRBuilderTest {
         assertEquals("  ret i32 1", ret2.getAsString())
     }
 
-    @Test fun `Test branch instructions`() {
+    @Test fun `Test br instructions`() {
         val ctx = Context()
         val i1 = ctx.getInt1Type()
         val builder = ctx.newIRBuilder()
@@ -72,5 +72,47 @@ class IRBuilderTest {
 
         br2.setCondition(replace)
         assertEquals(replace.ref, br2.getCondition().unwrap().ref)
+    }
+
+    @Test fun `Test switch instructions`() {
+        val ctx = Context()
+        val i32 = ctx.getInt32Type()
+        val builder = ctx.newIRBuilder()
+        val entry = ctx.newBasicBlock("entry")
+        val default = ctx.newBasicBlock("default")
+        val bb1 = ctx.newBasicBlock("bb1")
+        val cond = i32.getConstant(14)
+
+        builder.positionAfter(entry)
+        val switch = builder.buildSwitch(cond, default, 1)
+
+        assertEquals(1, switch.getSuccessorCount())
+        assertEquals(default.ref, switch.getDefaultDestination().ref)
+
+        switch.addCase(i32.getConstant(1), bb1)
+        assertEquals(2, switch.getSuccessorCount())
+    }
+
+    @Test fun `Test indirectbr instructions`() {
+        val ctx = Context()
+        val void = ctx.getVoidType()
+        val mod = ctx.newModule("test")
+        val func = mod.addFunction("test", ctx.getFunctionType(void))
+        val bb1 = ctx.newBasicBlock("bb1")
+        val bb2 = ctx.newBasicBlock("bb2")
+        val bb3 = ctx.newBasicBlock("bb3")
+        val builder = ctx.newIRBuilder()
+
+        func.addBasicBlock(bb1)
+        func.addBasicBlock(bb2)
+        func.addBasicBlock(bb3)
+        builder.positionAfter(bb1)
+        val addr = func.getBlockAddress(bb2).unwrap()
+        val indirect = builder.buildIndirectBranch(addr, 2)
+
+        assertEquals(0, indirect.getSuccessorCount())
+        indirect.addCase(bb2)
+        indirect.addCase(bb3)
+        assertEquals(2, indirect.getSuccessorCount())
     }
 }

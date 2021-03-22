@@ -94,12 +94,18 @@ public open class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
         return Option.of(use).map { Use(it) }
     }
 
+    /**
+     * TODO: Research - What is legal in this cast?
+     */
     public fun asBasicBlock(): BasicBlock {
         val bb = LLVM.LLVMValueAsBasicBlock(ref)
 
         return BasicBlock(bb)
     }
 
+    /**
+     * TODO: Research - What is legal in this cast?
+     */
     public fun asMetadata(): ValueAsMetadata {
         val md = LLVM.LLVMValueAsMetadata(ref)
 
@@ -939,6 +945,25 @@ public class Function public constructor(ptr: LLVMValueRef) :
 
     public fun addBasicBlock(block: BasicBlock) {
         LLVM.LLVMAppendExistingBasicBlock(ref, block.ref)
+    }
+
+    /**
+     * Get the block address of a basic block in this function
+     *
+     * If the given block does not have an owner, or it is owned by someone else, an error is returned.
+     */
+    public fun getBlockAddress(block: BasicBlock): Result<BlockAddress, AssertionError> {
+        return when (val blockOwner = block.getFunction()) {
+            is Some -> {
+                if (ref == blockOwner.unwrap().ref) {
+                    val addr = LLVM.LLVMBlockAddress(ref, block.ref)
+                    Ok(addr).map { BlockAddress(it) }
+                } else {
+                    Err(AssertionError("This function does not own the provided block"))
+                }
+            }
+            is None -> Err(AssertionError("Provided block does not have owning function"))
+        }
     }
 }
 
@@ -1973,7 +1998,16 @@ public class ExtractElementInstruction public constructor(ptr: LLVMValueRef) : I
 public class FenceInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
 public class GetElementPtrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class IndirectBrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::IndirectBrInst")
+public class IndirectBrInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl {
+    public fun addCase(block: BasicBlock) {
+        LLVM.LLVMAddDestination(ref, block.ref)
+    }
+}
+
 public class InsertElementInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class InsertValueInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class LandingPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
@@ -1983,5 +2017,25 @@ public class ReturnInstruction public constructor(ptr: LLVMValueRef) : Instructi
 public class SelectInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class ShuffleVectorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 public class StoreInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class SwitchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::SwitchInst")
+public class SwitchInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl {
+    /**
+     * Get the default destination block for this switch
+     *
+     * This is the block which control flow transfers to if none of the added cases match
+     */
+    public fun getDefaultDestination(): BasicBlock {
+        val block = LLVM.LLVMGetSwitchDefaultDest(ref)
+
+        return BasicBlock(block)
+    }
+
+    public fun addCase(case: ConstantInt, block: BasicBlock) {
+        LLVM.LLVMAddCase(ref, case.ref, block.ref)
+    }
+}
+
 public class UnreachableInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
