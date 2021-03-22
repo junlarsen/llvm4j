@@ -1411,12 +1411,53 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
             return Constant(res)
         }
 
-        public fun getExtractElement(vector: Constant, index: Constant): Constant = TODO()
-        public fun getInsertElement(vector: Constant, value: Constant, index: Constant): Constant = TODO()
-        public fun getShuffleVector(vec1: Constant, vec2: Constant, mask: Constant): Constant = TODO()
+        /**
+         * Create an extract element constexpr
+         *
+         * The `extractelement` instruction extracts a single element from a vector at a specified index.
+         *
+         * @param vector value to extract an element from
+         * @param index  index of element to extract
+         */
+        public fun getExtractElement(vector: Constant, index: Constant): Constant {
+            val res = LLVM.LLVMConstExtractElement(vector.ref, index.ref)
+
+            return Constant(res)
+        }
 
         /**
-         * Build an extract value instruction
+         * Create an insert element constexpr
+         *
+         * The `insertelement` instruction inserts a single element into a vector at a specified index.
+         *
+         * @param vector value to insert an element into
+         * @param value  the item to insert into the vector
+         * @param index  the index to store the element
+         */
+        public fun getInsertElement(vector: Constant, value: Constant, index: Constant): Constant {
+            val res = LLVM.LLVMConstInsertElement(vector.ref, value.ref, index.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a shuffle vector constexpr
+         *
+         * The `shufflevector` instruction constructs a permutation of elements from two input vectors, returning a
+         * vector with the same element type as the input and length that is the same as the shuffle mask.
+         *
+         * @param op1  first vector operand
+         * @param op2  second vector operand
+         * @param mask the shuffle mask
+         */
+        public fun getShuffleVector(vec1: Constant, vec2: Constant, mask: Constant): Constant {
+            val res = LLVM.LLVMConstShuffleVector(vec1.ref, vec2.ref, mask.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * CReate an extract value constexpr
          *
          * The `extractvalue` instruction extracts the value of a member field from an aggregate value.
          *
@@ -1525,7 +1566,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
         }
 
         /**
-         * Reate a select constexpr
+         * Create a select constexpr
          *
          * The `select` instruction is used to pick a value based on a boolean condition. It is analogous to the ternary
          * operator in C. The condition is either a 1-bit integer or a vector of 1-bit integers

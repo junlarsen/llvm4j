@@ -135,6 +135,25 @@ class ConstantExpressionTest {
     }
 
     @Test
+    fun `Test vector manipulation expressions`() {
+        val ctx = Context()
+        val i32 = ctx.getInt32Type()
+        val vec1 = i32.getConstantVector(i32.getConstant(0), i32.getConstant(1))
+        val vec2 = i32.getConstantVector(i32.getConstant(2), i32.getConstant(3))
+        val mask = i32.getConstantVector(i32.getConstant(0), i32.getConstant(4))
+        val sum = cast<ConstantVector>(ConstantExpression.getShuffleVector(vec1, vec2, mask))
+
+        assertEquals(2, sum.getOperandCount())
+
+        val subject1 = cast<ConstantInt>(ConstantExpression.getExtractElement(vec1, i32.getConstant(1)))
+        assertEquals(1, subject1.getZeroExtendedValue())
+        val vec = cast<ConstantDataVector>(ConstantExpression.getInsertElement(vec1, i32.getConstant(100), i32.getConstant
+            (1)))
+        val subject2 = cast<ConstantInt>(ConstantExpression.getExtractElement(vec, i32.getConstant(1)))
+        assertEquals(100, subject2.getZeroExtendedValue())
+    }
+
+    @Test
     fun `Test get element ptr constant expressions`() {
         val ctx = Context()
         val mod = ctx.newModule("test_module")
