@@ -56,6 +56,9 @@ class ConstantExpressionTest {
         val lhs = i32.getConstant(20)
         val rhs = i32.getConstant(10)
 
+        val res0 = cast<ConstantInt>( ConstantExpression.getIntNeg(lhs))
+        assertEquals(-20, res0.getSignExtendedValue())
+
         for (semantic in WrapSemantics.values()) {
             val res = cast<ConstantInt>(ConstantExpression.getIntAdd(lhs, rhs, semantic))
             assertEquals(30, res.getZeroExtendedValue())
@@ -147,8 +150,7 @@ class ConstantExpressionTest {
 
         val subject1 = cast<ConstantInt>(ConstantExpression.getExtractElement(vec1, i32.getConstant(1)))
         assertEquals(1, subject1.getZeroExtendedValue())
-        val vec = cast<ConstantDataVector>(ConstantExpression.getInsertElement(vec1, i32.getConstant(100), i32.getConstant
-            (1)))
+        val vec = cast<ConstantDataVector>(ConstantExpression.getInsertElement(vec1, i32.getConstant(100), i32.getConstant(1)))
         val subject2 = cast<ConstantInt>(ConstantExpression.getExtractElement(vec, i32.getConstant(1)))
         assertEquals(100, subject2.getZeroExtendedValue())
     }

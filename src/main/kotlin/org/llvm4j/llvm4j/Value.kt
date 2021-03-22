@@ -1084,11 +1084,24 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
     }
 
     public companion object {
+        /**
+         * Create a integer negation constexpr
+         *
+         * The `fneg` instruction negates a floating-point or a vector-of-floating-point operand
+         *
+         * The produced value is a copy of its operand with the sign bit flipped.
+         *
+         * @param self floating-point or vector-of-floating-point to negate
+         */
         @JvmStatic
-        public fun getIntNeg(rhs: Constant, semantics: WrapSemantics): Constant = TODO("helper api")
+        public fun getIntNeg(self: Constant): Constant {
+            val res = LLVM.LLVMConstNeg(self.ref)
+
+            return Constant(res)
+        }
 
         /**
-         * Create a float negation constexpr
+         * Create a floating point negation constexpr
          *
          * The `fneg` instruction negates a floating-point or a vector-of-floating-point operand
          *
@@ -1419,6 +1432,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
          * @param vector value to extract an element from
          * @param index  index of element to extract
          */
+        @JvmStatic
         public fun getExtractElement(vector: Constant, index: Constant): Constant {
             val res = LLVM.LLVMConstExtractElement(vector.ref, index.ref)
 
@@ -1434,6 +1448,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
          * @param value  the item to insert into the vector
          * @param index  the index to store the element
          */
+        @JvmStatic
         public fun getInsertElement(vector: Constant, value: Constant, index: Constant): Constant {
             val res = LLVM.LLVMConstInsertElement(vector.ref, value.ref, index.ref)
 
@@ -1450,6 +1465,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
          * @param op2  second vector operand
          * @param mask the shuffle mask
          */
+        @JvmStatic
         public fun getShuffleVector(vec1: Constant, vec2: Constant, mask: Constant): Constant {
             val res = LLVM.LLVMConstShuffleVector(vec1.ref, vec2.ref, mask.ref)
 
@@ -1466,6 +1482,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
          * @param aggregate struct or array value to extract value from
          * @param indices   indices in [aggregate] to retrieve
          */
+        @JvmStatic
         public fun getExtractValue(aggregate: Constant, vararg indices: Int): Constant {
             val indexPtr = IntPointer(*indices)
             val res = LLVM.LLVMConstExtractValue(aggregate.ref, indexPtr, indices.size)
@@ -1485,6 +1502,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
          * @param value     value to insert at index
          * @param indices   indices in this to insert element into
          */
+        @JvmStatic
         public fun getInsertValue(aggregate: Constant, value: Constant, vararg indices: Int): Constant {
             val indexPtr = IntPointer(*indices)
             val res = LLVM.LLVMConstInsertValue(aggregate.ref, value.ref, indexPtr, indices.size)
@@ -1506,6 +1524,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
          * @param indices   directions/indices in the aggregate value to navigate through to find wanted element
          * @param inBounds  whether the getelementptr is in bounds
          */
+        @JvmStatic
         public fun getGetElementPtr(aggregate: Constant, vararg indices: Constant, inBounds: Boolean): Constant {
             val indexPtr = PointerPointer(*indices.map { it.ref }.toTypedArray())
             val res = if (inBounds) {
@@ -1518,19 +1537,19 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
             return Constant(res)
         }
 
-        public fun getIntTrunc(value: Constant, type: IntegerType): Constant = TODO()
-        public fun getZeroExt(value: Constant, type: IntegerType): Constant = TODO()
-        public fun getSignExt(value: Constant, type: IntegerType): Constant = TODO()
-        public fun getFloatTrunc(value: Constant, type: FloatType): Constant = TODO()
-        public fun getFloatExt(value: Constant, type: FloatType): Constant = TODO()
-        public fun getFloatToUnsigned(value: Constant, type: IntegerType): Constant = TODO()
-        public fun getFloatToSigned(value: Constant, type: IntegerType): Constant = TODO()
-        public fun getUnsignedToFloat(value: Constant, type: FloatType): Constant = TODO()
-        public fun getSignedToFloat(value: Constant, type: FloatType): Constant = TODO()
-        public fun getPointerToInt(value: Constant, type: IntegerType): Constant = TODO()
-        public fun getIntToPointer(value: Constant, type: PointerType): Constant = TODO()
-        public fun getBitCast(value: Constant, type: Type): Constant = TODO()
-        public fun getAddrSpaceCast(value: Constant, type: PointerType): Constant = TODO()
+        @JvmStatic public fun getIntTrunc(value: Constant, type: IntegerType): Constant = TODO()
+        @JvmStatic public fun getZeroExt(value: Constant, type: IntegerType): Constant = TODO()
+        @JvmStatic public fun getSignExt(value: Constant, type: IntegerType): Constant = TODO()
+        @JvmStatic public fun getFloatTrunc(value: Constant, type: FloatType): Constant = TODO()
+        @JvmStatic public fun getFloatExt(value: Constant, type: FloatType): Constant = TODO()
+        @JvmStatic public fun getFloatToUnsigned(value: Constant, type: IntegerType): Constant = TODO()
+        @JvmStatic public fun getFloatToSigned(value: Constant, type: IntegerType): Constant = TODO()
+        @JvmStatic public fun getUnsignedToFloat(value: Constant, type: FloatType): Constant = TODO()
+        @JvmStatic public fun getSignedToFloat(value: Constant, type: FloatType): Constant = TODO()
+        @JvmStatic public fun getPointerToInt(value: Constant, type: IntegerType): Constant = TODO()
+        @JvmStatic public fun getIntToPointer(value: Constant, type: PointerType): Constant = TODO()
+        @JvmStatic public fun getBitCast(value: Constant, type: Type): Constant = TODO()
+        @JvmStatic public fun getAddrSpaceCast(value: Constant, type: PointerType): Constant = TODO()
 
         /**
          * Create an integer comparison constexpr
@@ -1559,6 +1578,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
          * @param lhs       left hand side of comparison
          * @param rhs       right hand side of comparison
          */
+        @JvmStatic
         public fun getFloatCompare(predicate: FloatPredicate, lhs: Constant, rhs: Constant): Constant {
             val res = LLVM.LLVMConstFCmp(predicate.value, lhs.ref, rhs.ref)
 
@@ -1576,6 +1596,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
          * @param isFalse   value to select if [condition] is false
          * @param name      optional name for the instruction
          */
+        @JvmStatic
         public fun getSelect(condition: Constant, isTrue: Constant, isFalse: Constant): Constant {
             val res = LLVM.LLVMConstSelect(condition.ref, isTrue.ref, isFalse.ref)
 
