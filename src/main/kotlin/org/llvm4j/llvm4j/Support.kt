@@ -209,7 +209,7 @@ public object TypeCasting {
         conversion(::IntTruncInstruction) { LLVM.LLVMIsATruncInst(it) },
         conversion(::UnsignedToFloatInstruction) { LLVM.LLVMIsAUIToFPInst(it) },
         conversion(::ZeroExtInstruction) { LLVM.LLVMIsAZExtInst(it) },
-        conversion(::ExtractValueInstruction) { LLVM.LLVMIsAExtractElementInst(it) },
+        conversion(::ExtractValueInstruction) { LLVM.LLVMIsAExtractValueInst(it) },
         conversion(::LoadInstruction) { LLVM.LLVMIsALoadInst(it) },
         conversion(::VAArgInstruction) { LLVM.LLVMIsAVAArgInst(it) },
         conversion(::FreezeInstruction) { LLVM.LLVMIsAFreezeInst(it) },

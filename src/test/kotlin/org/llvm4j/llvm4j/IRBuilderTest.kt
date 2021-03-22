@@ -377,4 +377,32 @@ class IRBuilderTest {
         assertEquals(2, cast<ShuffleVectorInstruction>(shuffle).getMaskElementCount())
         assertEquals(ShuffleVectorInstruction.getUndefMaskElement(), cast<ShuffleVectorInstruction>(shuffle).getMaskElement(0))
     }
+
+    @Test fun `Test extract and insert value instructions`() {
+        val ctx = Context()
+        val void = ctx.getVoidType()
+        val mod = ctx.newModule("test")
+        val i32 = ctx.getInt32Type()
+        val struct = ctx.getStructType(i32, i32)
+        val builder = ctx.newIRBuilder()
+        val block = ctx.newBasicBlock("entry")
+        val function = mod.addFunction("test", ctx.getFunctionType(void, struct, i32))
+
+        builder.positionAfter(block)
+        val structValue = function.getParameter(0).unwrap()
+        val value = function.getParameter(1).unwrap()
+        val extract = builder.buildExtractValue(structValue, 0, None)
+        val insert = builder.buildInsertValue(structValue, value, 0, None)
+        builder.buildReturn(None)
+        function.addBasicBlock(block)
+
+        val extractInst = cast<ExtractValueInstruction>(extract)
+        val insertInst = cast<InsertValueInstruction>(insert)
+        assertEquals(Opcode.ExtractValue, extractInst.getOpcode())
+        assertEquals(Opcode.InsertValue, insertInst.getOpcode())
+        assertEquals(1, extractInst.getIndexCount())
+        assertEquals(1, insertInst.getIndexCount())
+        assertEquals(0, extractInst.getIndices().first())
+        assertEquals(0, insertInst.getIndices().first())
+    }
 }

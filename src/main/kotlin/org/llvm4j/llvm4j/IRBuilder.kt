@@ -612,7 +612,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param index     index in [aggregate] to retrieve
      * @param name      optional name for the instruction
      */
-    public fun buildExtractValue(aggregate: Value, index: Int, name: Option<String>): Value = TODO()
+    public fun buildExtractValue(aggregate: Value, index: Int, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildExtractValue(ref, aggregate.ref, index, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an insert value instruction
@@ -626,7 +630,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param index     index in [aggregate] to insert element into
      * @param name      optional name for the instruction
      */
-    public fun buildInsertValue(aggregate: Value, value: Value, index: Int, name: Option<String>): Value = TODO()
+    public fun buildInsertValue(aggregate: Value, value: Value, index: Int, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildInsertValue(ref, aggregate.ref, value.ref, index, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an alloca instruction

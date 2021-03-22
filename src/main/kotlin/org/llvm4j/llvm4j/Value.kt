@@ -5,6 +5,7 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
+import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -1838,6 +1839,29 @@ public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.
     public interface MemoryAccessorInstructionImpl : Owner<LLVMValueRef>
 
     /**
+     * Common shared implementation for any LLVM instruction which modifies aggregate values
+     *
+     * @see ExtractValueInstruction
+     * @see InsertValueInstruction
+     *
+     * @author Mats Larsen
+     */
+    public interface ValueUpdatingInstructionImpl : Owner<LLVMValueRef> {
+        public fun getIndexCount(): Int {
+            return LLVM.LLVMGetNumIndices(ref)
+        }
+
+        public fun getIndices(): Array<Int> {
+            val indices = LLVM.LLVMGetIndices(ref)
+            val size = getIndexCount()
+
+            return List(size) {
+                indices.get(it.toLong())
+            }.toTypedArray()
+        }
+    }
+
+    /**
      * Common shared implementation for any LLVM instruction which is a terminator
      *
      * @see ReturnInstruction
@@ -1922,40 +1946,96 @@ public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.
     }
 }
 
+@CorrespondsTo("llvm::BinaryOperator")
 public class BinaryOperatorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
+@CorrespondsTo("llvm::CmpInst")
 public open class ComparisonInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::ICmpInst")
 public class IntComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr)
+
+@CorrespondsTo("llvm::FCmpInst")
 public class FPComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr)
 
+@CorrespondsTo("llvm::FuncletPadInst")
 public open class FuncletPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::CatchPadInst")
 public class CatchPadInstruction public constructor(ptr: LLVMValueRef) : FuncletPadInstruction(ptr)
+
+@CorrespondsTo("llvm::CleanupPadInst")
 public class CleanupPadInstruction public constructor(ptr: LLVMValueRef) : FuncletPadInstruction(ptr)
 
+@CorrespondsTo("llvm::UnaryInstruction")
 public open class UnaryInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::AllocaInst")
 public class AllocaInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+
+@CorrespondsTo("llvm::CastIsnt")
 public open class CastInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
-public class ExtractValueInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+
+@CorrespondsTo("llvm::ExtractValueInst")
+public class ExtractValueInstruction public constructor(ptr: LLVMValueRef) :
+    UnaryInstruction(ptr),
+    Instruction.ValueUpdatingInstructionImpl
+
+@CorrespondsTo("llvm::LoadInst")
 public class LoadInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+
+@CorrespondsTo("llvm::VAArgInst")
 public class VAArgInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+
+@CorrespondsTo("llvm::FreezeInst")
 public class FreezeInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+
+@CorrespondsTo("llvm::UnaryOperator")
 public class UnaryOperatorInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
 
+@CorrespondsTo("llvm::AddrSpaceCastInst")
 public class AddrSpaceCastInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::BitCastInst")
 public class BitCastInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::FPExtInst")
 public class FloatExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::FPToSIIsnt")
 public class FloatToSignedInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::FPToUIInst")
 public class FloatToUnsignedInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::FPTruncInst")
 public class FloatTruncInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::IntToPtrInst")
 public class IntToPtrInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::PtrToIntInst")
 public class PtrToIntInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::SExtInst")
 public class SignedExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::SIToFPInst")
 public class SignedToFloatInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::TruncInst")
 public class IntTruncInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::UIToFPInst")
 public class UnsignedToFloatInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::ZExtInst")
 public class ZeroExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
 
+@CorrespondsTo("llvm::AtomicCmpXchgInst")
 public class AtomicCmpXchgInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::AtmocRMWInst")
 public class AtomicRMWInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
 @CorrespondsTo("llvm::BranchInst")
@@ -1992,17 +2072,41 @@ public class BranchInstruction public constructor(ptr: LLVMValueRef) :
     }
 }
 
-public class InvokeInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
-public class CallBrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+@CorrespondsTo("llvm::InvokeInst")
+public class InvokeInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::CallBrInst")
+public class CallBrInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::CallInst")
 public class CallInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
-public class CatchReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
-public class CatchSwitchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
-public class CleanupReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+@CorrespondsTo("llvm::CatchRetInst")
+public class CatchReturnInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
 
+@CorrespondsTo("llvm::CatchSwitchInst")
+public class CatchSwitchInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::CleanupReturnInst")
+public class CleanupReturnInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::ExtractElementInst")
 public class ExtractElementInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::FenceInst")
 public class FenceInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
+@CorrespondsTo("llvm::GetElementPtrInst")
 public class GetElementPtrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
 @CorrespondsTo("llvm::IndirectBrInst")
@@ -2014,13 +2118,31 @@ public class IndirectBrInstruction public constructor(ptr: LLVMValueRef) :
     }
 }
 
+@CorrespondsTo("llvm::InsertElementInst")
 public class InsertElementInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class InsertValueInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::InsertValueInst")
+public class InsertValueInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.ValueUpdatingInstructionImpl
+
+@CorrespondsTo("llvm::LandingPadInst")
 public class LandingPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::PHINode")
 public class PhiInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class ResumeInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::ResumeInstruction")
+public class ResumeInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
+
 @CorrespondsTo("llvm::ReturnInst")
-public class ReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+public class ReturnInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::SelectInst")
 public class SelectInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
 @CorrespondsTo("llvm::ShuffleVectorInst")
@@ -2040,6 +2162,8 @@ public class ShuffleVectorInstruction public constructor(ptr: LLVMValueRef) : In
         }
     }
 }
+
+@CorrespondsTo("llvm::StoreInst")
 public class StoreInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
 @CorrespondsTo("llvm::SwitchInst")
