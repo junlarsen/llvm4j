@@ -117,7 +117,6 @@ class ConstantExpressionTest {
     @Test
     fun `Test extract and insert value constant expressions`() {
         val ctx = Context()
-        val i32 = ctx.getInt32Type()
         val i8 = ctx.getInt8Type()
         val f32 = ctx.getFloatType()
         val type = ctx.getStructType(f32, i8)
@@ -151,5 +150,18 @@ class ConstantExpressionTest {
 
             assertTrue { isa<ConstantExpression>(i32ptr) }
         }
+    }
+
+    @Test
+    fun `Test select constant expressions`() {
+        val ctx = Context()
+        val i1 = ctx.getInt1Type()
+        val i32 = ctx.getInt32Type()
+        val condition = i1.getConstant(1)
+        val ifTrue = i32.getConstant(100)
+        val ifFalse = i32.getConstant(200)
+        val res = cast<ConstantInt>(ConstantExpression.getSelect(condition, ifTrue, ifFalse))
+
+        assertEquals(100, res.getZeroExtendedValue())
     }
 }

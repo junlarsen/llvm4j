@@ -1524,7 +1524,22 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
             return Constant(res)
         }
 
-        public fun getSelect(condition: Constant, isTrue: Constant, isFalse: Constant): Constant = TODO()
+        /**
+         * Reate a select constexpr
+         *
+         * The `select` instruction is used to pick a value based on a boolean condition. It is analogous to the ternary
+         * operator in C. The condition is either a 1-bit integer or a vector of 1-bit integers
+         *
+         * @param condition boolean (i1) condition
+         * @param isTrue    value to select if [condition] is true
+         * @param isFalse   value to select if [condition] is false
+         * @param name      optional name for the instruction
+         */
+        public fun getSelect(condition: Constant, isTrue: Constant, isFalse: Constant): Constant {
+            val res = LLVM.LLVMConstSelect(condition.ref, isTrue.ref, isFalse.ref)
+
+            return Constant(res)
+        }
     }
 }
 
