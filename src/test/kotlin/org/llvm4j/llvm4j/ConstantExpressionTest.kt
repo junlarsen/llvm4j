@@ -12,19 +12,19 @@ class ConstantExpressionTest {
         val lhs = float.getConstant(20.0)
         val rhs = float.getConstant(10.0)
 
-        val res1 = cast<ConstantFP>(ConstantExpression.getFloatNeg(lhs))
-        val res2 = cast<ConstantFP>(ConstantExpression.getFloatAdd(lhs, rhs))
-        val res3 = cast<ConstantFP>(ConstantExpression.getFloatSub(lhs, rhs))
-        val res4 = cast<ConstantFP>(ConstantExpression.getFloatMul(lhs, rhs))
-        val res5 = cast<ConstantFP>(ConstantExpression.getFloatDiv(lhs, rhs))
-        val res6 = cast<ConstantFP>(ConstantExpression.getFloatRem(lhs, rhs))
+        val neg = cast<ConstantFP>(ConstantExpression.getFloatNeg(lhs))
+        val add = cast<ConstantFP>(ConstantExpression.getFloatAdd(lhs, rhs))
+        val sub = cast<ConstantFP>(ConstantExpression.getFloatSub(lhs, rhs))
+        val mul = cast<ConstantFP>(ConstantExpression.getFloatMul(lhs, rhs))
+        val div = cast<ConstantFP>(ConstantExpression.getFloatDiv(lhs, rhs))
+        val rem = cast<ConstantFP>(ConstantExpression.getFloatRem(lhs, rhs))
 
-        assertEquals(-20.0, res1.getLossyValue())
-        assertEquals(30.0, res2.getLossyValue())
-        assertEquals(10.0, res3.getLossyValue())
-        assertEquals(200.0, res4.getLossyValue())
-        assertEquals(2.0, res5.getLossyValue())
-        assertEquals(0.0, res6.getLossyValue())
+        assertEquals(-20.0, neg.getLossyValue())
+        assertEquals(30.0, add.getLossyValue())
+        assertEquals(10.0, sub.getLossyValue())
+        assertEquals(200.0, mul.getLossyValue())
+        assertEquals(2.0, div.getLossyValue())
+        assertEquals(0.0, rem.getLossyValue())
 
         val expected = mapOf<FloatPredicate, Long>(
             FloatPredicate.True to 1,
@@ -81,23 +81,23 @@ class ConstantExpressionTest {
             assertEquals(2, res2.getZeroExtendedValue())
         }
 
-        val res1 = cast<ConstantInt>(ConstantExpression.getUnsignedRem(lhs, rhs))
-        val res2 = cast<ConstantInt>(ConstantExpression.getSignedRem(lhs, rhs))
-        val res3 = cast<ConstantInt>(ConstantExpression.getLeftShift(lhs, rhs))
-        val res4 = cast<ConstantInt>(ConstantExpression.getLogicalShiftRight(lhs, rhs))
-        val res5 = cast<ConstantInt>(ConstantExpression.getArithmeticShiftRight(lhs, rhs))
-        val res6 = cast<ConstantInt>(ConstantExpression.getLogicalAnd(lhs, rhs))
-        val res7 = cast<ConstantInt>(ConstantExpression.getLogicalOr(lhs, rhs))
-        val res8 = cast<ConstantInt>(ConstantExpression.getLogicalXor(lhs, rhs))
+        val urem = cast<ConstantInt>(ConstantExpression.getUnsignedRem(lhs, rhs))
+        val srem = cast<ConstantInt>(ConstantExpression.getSignedRem(lhs, rhs))
+        val lshift = cast<ConstantInt>(ConstantExpression.getLeftShift(lhs, rhs))
+        val lshiftr = cast<ConstantInt>(ConstantExpression.getLogicalShiftRight(lhs, rhs))
+        val ashr = cast<ConstantInt>(ConstantExpression.getArithmeticShiftRight(lhs, rhs))
+        val logAnd = cast<ConstantInt>(ConstantExpression.getLogicalAnd(lhs, rhs))
+        val logOr = cast<ConstantInt>(ConstantExpression.getLogicalOr(lhs, rhs))
+        val logXor = cast<ConstantInt>(ConstantExpression.getLogicalXor(lhs, rhs))
 
-        assertEquals(0, res1.getZeroExtendedValue())
-        assertEquals(0, res2.getZeroExtendedValue())
-        assertEquals(20 shl 10, res3.getZeroExtendedValue())
-        assertEquals(20 shr 10, res4.getZeroExtendedValue())
-        assertEquals(20 ushr 10, res5.getZeroExtendedValue())
-        assertEquals(20 and 10, res6.getZeroExtendedValue())
-        assertEquals(20 or 10, res7.getZeroExtendedValue())
-        assertEquals(20 xor 10, res8.getZeroExtendedValue())
+        assertEquals(0, urem.getZeroExtendedValue())
+        assertEquals(0, srem.getZeroExtendedValue())
+        assertEquals(20 shl 10, lshift.getZeroExtendedValue())
+        assertEquals(20 shr 10, lshiftr.getZeroExtendedValue())
+        assertEquals(20 ushr 10, ashr.getZeroExtendedValue())
+        assertEquals(20 and 10, logAnd.getZeroExtendedValue())
+        assertEquals(20 or 10, logOr.getZeroExtendedValue())
+        assertEquals(20 xor 10, logXor.getZeroExtendedValue())
 
         val expected = mapOf<IntPredicate, Long>(
             IntPredicate.Equal to 0,
@@ -115,6 +115,52 @@ class ConstantExpressionTest {
             val res = cast<ConstantInt>(ConstantExpression.getIntCompare(k, lhs, rhs))
             assertEquals(v, res.getZeroExtendedValue())
         }
+    }
+
+    @Test
+    fun `Test type casting constant expressions`() {
+        val ctx = Context()
+        val iSmall = ctx.getInt32Type()
+        val iLarge = ctx.getInt64Type()
+        val fSmall = ctx.getFloatType()
+        val fLarge = ctx.getDoubleType()
+        val iPtr = ctx.getPointerType(iSmall).unwrap()
+        val iPtrAddr = ctx.getPointerType(iSmall, AddressSpace.from(1)).unwrap()
+        val iLargePtr = ctx.getPointerType(iLarge).unwrap()
+        val iSmallV = iSmall.getConstant(1)
+        val iLargeV = iLarge.getConstant(2)
+        val fSmallV = fSmall.getConstant(1.0)
+        val fLargeV = fLarge.getConstant(2.0)
+
+        val intTrunc = cast<ConstantInt>(ConstantExpression.getIntTrunc(iLargeV, iSmall))
+        assertEquals(iSmall.ref, intTrunc.getType().ref)
+        val zeroExt = cast<ConstantInt>(ConstantExpression.getZeroExt(iSmallV, iLarge))
+        assertEquals(iLarge.ref, zeroExt.getType().ref)
+        val signExt = cast<ConstantInt>(ConstantExpression.getSignExt(iSmallV, iLarge))
+        assertEquals(iLarge.ref, signExt.getType().ref)
+        val fpTrunc = cast<ConstantFP>(ConstantExpression.getFloatTrunc(fLargeV, fSmall))
+        assertEquals(fSmall.ref, fpTrunc.getType().ref)
+        val fpExt = cast<ConstantFP>(ConstantExpression.getFloatExt(fSmallV, fLarge))
+        assertEquals(fLarge.ref, fpExt.getType().ref)
+        val fpToUi = cast<ConstantInt>(ConstantExpression.getFloatToUnsigned(fSmallV, iSmall))
+        assertEquals(iSmall.ref, fpToUi.getType().ref)
+        val fpToSi = cast<ConstantInt>(ConstantExpression.getFloatToSigned(fSmallV, iSmall))
+        assertEquals(iSmall.ref, fpToSi.getType().ref)
+        val uiToFp = cast<ConstantFP>(ConstantExpression.getUnsignedToFloat(iSmallV, fSmall))
+        assertEquals(fSmall.ref, uiToFp.getType().ref)
+        val siToFp = cast<ConstantFP>(ConstantExpression.getSignedToFloat(iSmallV, fSmall))
+        assertEquals(fSmall.ref, siToFp.getType().ref)
+
+        val ptr = cast<ConstantExpression>(ConstantExpression.getIntToPointer(iSmallV, iPtr))
+        assertEquals(iPtr.ref, ptr.getType().ref)
+        assertEquals(Opcode.IntToPtr, ptr.getOpcode())
+        val int = cast<ConstantInt>(ConstantExpression.getPointerToInt(ptr, iSmall))
+        assertEquals(iSmall.ref, int.getType().ref)
+
+        val bitcast = cast<ConstantExpression>(ConstantExpression.getBitCast(ptr, iLargePtr))
+        assertEquals(iLargePtr.ref, bitcast.getType().ref)
+        val addrspacecast = cast<ConstantExpression>(ConstantExpression.getAddrSpaceCast(ptr, iPtrAddr))
+        assertEquals(1, PointerType(addrspacecast.getType().ref).getAddressSpace().value)
     }
 
     @Test

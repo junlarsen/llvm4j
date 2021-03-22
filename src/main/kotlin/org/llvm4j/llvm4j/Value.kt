@@ -1,6 +1,5 @@
 package org.llvm4j.llvm4j
 
-import com.sun.jdi.FloatType
 import org.bytedeco.javacpp.IntPointer
 import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
@@ -1537,19 +1536,216 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
             return Constant(res)
         }
 
-        @JvmStatic public fun getIntTrunc(value: Constant, type: IntegerType): Constant = TODO()
-        @JvmStatic public fun getZeroExt(value: Constant, type: IntegerType): Constant = TODO()
-        @JvmStatic public fun getSignExt(value: Constant, type: IntegerType): Constant = TODO()
-        @JvmStatic public fun getFloatTrunc(value: Constant, type: FloatType): Constant = TODO()
-        @JvmStatic public fun getFloatExt(value: Constant, type: FloatType): Constant = TODO()
-        @JvmStatic public fun getFloatToUnsigned(value: Constant, type: IntegerType): Constant = TODO()
-        @JvmStatic public fun getFloatToSigned(value: Constant, type: IntegerType): Constant = TODO()
-        @JvmStatic public fun getUnsignedToFloat(value: Constant, type: FloatType): Constant = TODO()
-        @JvmStatic public fun getSignedToFloat(value: Constant, type: FloatType): Constant = TODO()
-        @JvmStatic public fun getPointerToInt(value: Constant, type: IntegerType): Constant = TODO()
-        @JvmStatic public fun getIntToPointer(value: Constant, type: PointerType): Constant = TODO()
-        @JvmStatic public fun getBitCast(value: Constant, type: Type): Constant = TODO()
-        @JvmStatic public fun getAddrSpaceCast(value: Constant, type: PointerType): Constant = TODO()
+        /**
+         * Create an integer trunc constexpr
+         *
+         * The `trunc` instruction truncates its integer or vector-of-integer operand to the provided type.
+         *
+         * The bit size of the operand's type must be larger than the bit size of the destination type. Equal sized types
+         * are not allowed.
+         *
+         * @param value integer value to truncate
+         * @param type  type to truncate down to
+         */
+        @JvmStatic
+        public fun getIntTrunc(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstTrunc(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a zero extension constexpr
+         *
+         * The `zext` instruction zero extends its integer or vector-of-integer operand to the provided type.
+         *
+         * The bit size of the operand's type must be smaller than the bit size of the destination type.
+         *
+         * @param value integer value to zero extend
+         * @param type  type to zero extend to
+         */
+        @JvmStatic
+        public fun getZeroExt(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstZExt(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a sign extension constexpr
+         *
+         * The `sext` instruction sign extends its integer or vector-of-integer operand to the provided type.
+         *
+         * The bit size of the operand's type must be smaller than the bit size of the destination type.
+         *
+         * @param value integer value to sign extend
+         * @param type  type to sign extend to
+         */
+        @JvmStatic
+        public fun getSignExt(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstSExt(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point trunc constexpr
+         *
+         * The `fptrunc` instruction truncates its floating-point or vector-of-floating-point operand to the provided type.
+         *
+         * The size of the operand's type must be larger than the destination type. Equal sized types are not allowed.
+         *
+         * @param value floating-point value to truncate
+         * @param type  type to truncate down to
+         */
+        @JvmStatic
+        public fun getFloatTrunc(value: Constant, type: FloatingPointType): Constant {
+            val res = LLVM.LLVMConstFPTrunc(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a float extension constexpr
+         *
+         * The `fpext` instruction casts a floating-point or vector-of-floating-point operand to the provided type.
+         *
+         * The size of the operand's type must be smaller than the destination type.
+         *
+         * @param value floating-point value to extend
+         * @param type  the type to extend to
+         */
+        @JvmStatic
+        public fun getFloatExt(value: Constant, type: FloatingPointType): Constant {
+            val res = LLVM.LLVMConstFPExt(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a float to unsigned int cast constexpr
+         *
+         * The `fptoui` instruction converts a floating-point or a vector-of-floating-point operand to its unsigned
+         * integer equivalent.
+         *
+         * @param value floating-point value to cast
+         * @param type  integer type to cast to
+         */
+        @JvmStatic
+        public fun getFloatToUnsigned(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstFPToUI(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a float to signed int cast constexpr
+         *
+         * The `fptosi` instruction converts a floating-point or a vector-of-floating-point operand to its signed integer
+         * equivalent.
+         *
+         * @param value floating-point value to cast
+         * @param type  integer type to cast to
+         */
+        @JvmStatic
+        public fun getFloatToSigned(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstFPToSI(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an unsigned int to float cast constexpr
+         *
+         * The `uitofp` instruction converts an unsigned integer or vector-of-integer operand to the floating-point type
+         * equivalent.
+         *
+         * @param value integer value to cast
+         * @param type  floating-point type to cast to
+         */
+        @JvmStatic
+        public fun getUnsignedToFloat(value: Constant, type: FloatingPointType): Constant {
+            val res = LLVM.LLVMConstSIToFP(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a signed int to float cast constexpr
+         *
+         * The `sitofp` instruction converts a signed integer or vector-of-integer operand to the floating-point type
+         * equivalent.
+         *
+         * @param value integer value to cast
+         * @param type  floating-point type to cast to
+         */
+        @JvmStatic
+        public fun getSignedToFloat(value: Constant, type: FloatingPointType): Constant {
+            val res = LLVM.LLVMConstSIToFP(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a pointer to int cast constexpr
+         *
+         * The `ptrtoint` instruction converts a pointer or vector-of-pointer operand to the provided integer type.
+         *
+         * @param value pointer to cast
+         * @param type  integer type to cast to
+         */
+        @JvmStatic
+        public fun getPointerToInt(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstPtrToInt(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a int to pointer cast constexpr
+         *
+         * The `inttoptr` instruction converts an integer operand and casts it to the provided pointer type.
+         *
+         * @param value integer to cast
+         * @param type  pointer type to cast to
+         */
+        @JvmStatic
+        public fun getIntToPointer(value: Constant, type: PointerType): Constant {
+            val res = LLVM.LLVMConstIntToPtr(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a bit cast constexpr
+         *
+         * The `bitcast` instruction converts its operand to the provided type without changing any bits.
+         *
+         * @param value value to cast
+         * @param type  type to cast to
+         */
+        @JvmStatic
+        public fun getBitCast(value: Constant, type: Type): Constant {
+            val res = LLVM.LLVMConstBitCast(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an address space cast constexpr
+         *
+         * The `addrspacecast` instruction converts a pointer value with a type in address space A to a pointer type in
+         * address space B which must have a different address space.
+         *
+         * @param value pointer value to cast
+         * @param type  pointer type to cast address space cast into
+         */
+        @JvmStatic
+        public fun getAddrSpaceCast(value: Constant, type: PointerType): Constant {
+            val res = LLVM.LLVMConstAddrSpaceCast(value.ref, type.ref)
+
+            return Constant(res)
+        }
 
         /**
          * Create an integer comparison constexpr
