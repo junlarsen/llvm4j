@@ -155,7 +155,7 @@ public object TypeCasting {
         conversion(::GlobalVariable) { LLVM.LLVMIsAGlobalVariable(it) },
         conversion(::UndefValue) { LLVM.LLVMIsAUndefValue(it) },
         conversion(::Instruction) { LLVM.LLVMIsAInstruction(it) },
-        conversion(::UnaryOperator) { LLVM.LLVMIsAUnaryOperator(it) },
+        conversion(::UnaryOperatorInstruction) { LLVM.LLVMIsAUnaryOperator(it) },
         conversion(::BinaryOperatorInstruction) { LLVM.LLVMIsABinaryOperator(it) },
         conversion(::CallInstruction) { LLVM.LLVMIsACallInst(it) },
         // IntrinsicInst

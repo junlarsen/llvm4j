@@ -60,18 +60,12 @@ class ConstantExpressionTest {
         assertEquals(-20, res0.getSignExtendedValue())
 
         for (semantic in WrapSemantics.values()) {
-            val res = cast<ConstantInt>(ConstantExpression.getIntAdd(lhs, rhs, semantic))
-            assertEquals(30, res.getZeroExtendedValue())
-        }
-
-        for (semantic in WrapSemantics.values()) {
-            val res = cast<ConstantInt>(ConstantExpression.getIntSub(lhs, rhs, semantic))
-            assertEquals(10, res.getZeroExtendedValue())
-        }
-
-        for (semantic in WrapSemantics.values()) {
-            val res = cast<ConstantInt>(ConstantExpression.getIntMul(lhs, rhs, semantic))
-            assertEquals(200, res.getZeroExtendedValue())
+            val add = cast<ConstantInt>(ConstantExpression.getIntAdd(lhs, rhs, semantic))
+            assertEquals(30, add.getZeroExtendedValue())
+            val sub = cast<ConstantInt>(ConstantExpression.getIntSub(lhs, rhs, semantic))
+            assertEquals(10, sub.getZeroExtendedValue())
+            val mul = cast<ConstantInt>(ConstantExpression.getIntMul(lhs, rhs, semantic))
+            assertEquals(200, mul.getZeroExtendedValue())
         }
 
         for (exact in listOf(true, false)) {

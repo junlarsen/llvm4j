@@ -1934,7 +1934,7 @@ public class ExtractValueInstruction public constructor(ptr: LLVMValueRef) : Una
 public class LoadInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
 public class VAArgInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
 public class FreezeInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
-public class UnaryOperator public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+public class UnaryOperatorInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
 
 public class AddrSpaceCastInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
 public class BitCastInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)

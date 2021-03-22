@@ -24,6 +24,7 @@ import org.llvm4j.optional.Some
  *
  * TODO: APIs - Implement the remaining instructions
  * TODO: Testing - Test debug/fpmathtags once metadata is done
+ * TODO: Testing - Execute IRBuilderTest functions once ExecutionEngine is done
  *
  * @author Mats Larsen
  */
@@ -234,7 +235,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param self floating-point or vector-of-floating-point to negate
      * @param name optional name for the instruction
      */
-    public fun buildFloatNeg(self: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatNeg(self: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFNeg(ref, self.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an addition instruction
@@ -249,7 +254,15 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param semantics wrapping semantics upon overflow
      * @param name      optional name for the instruction
      */
-    public fun buildIntAdd(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
+    public fun buildIntAdd(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value {
+        val res = when (semantics) {
+            WrapSemantics.NoUnsigned  -> LLVM.LLVMBuildNUWAdd(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.NoSigned    -> LLVM.LLVMBuildNSWAdd(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.Unspecified -> LLVM.LLVMBuildAdd(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+        }
+
+        return Value(res)
+    }
 
     /**
      * Build a floating-point addition instruction
@@ -260,7 +273,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param rhs right hand side floating-point to add to [lhs]
      * @param name optional name for the instruction
      */
-    public fun buildFloatAdd(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatAdd(lhs: Value, rhs: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFAdd(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a subtraction instruction
@@ -275,7 +292,15 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param semantics wrapping semantics upon overflow
      * @param name      optional name for the instruction
      */
-    public fun buildIntSub(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
+    public fun buildIntSub(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value {
+        val res = when (semantics) {
+            WrapSemantics.NoUnsigned  -> LLVM.LLVMBuildNUWSub(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.NoSigned    -> LLVM.LLVMBuildNSWSub(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.Unspecified -> LLVM.LLVMBuildSub(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+        }
+
+        return Value(res)
+    }
 
     /**
      * Build a floating-point subtraction instruction
@@ -286,7 +311,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param rhs  how much to subtract from [lhs]
      * @param name optional name for the instruction
      */
-    public fun buildFloatSub(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatSub(lhs: Value, rhs: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFSub(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a multiplication instruction
@@ -301,7 +330,15 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param semantics wrapping semantics upon overflow
      * @param name      optional name for the instruction
      */
-    public fun buildIntMul(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value = TODO()
+    public fun buildIntMul(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value {
+        val res = when (semantics) {
+            WrapSemantics.NoUnsigned  -> LLVM.LLVMBuildNUWMul(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.NoSigned    -> LLVM.LLVMBuildNSWMul(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.Unspecified -> LLVM.LLVMBuildMul(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+        }
+
+        return Value(res)
+    }
 
     /**
      * Build a floating-point multiplication instruction
@@ -312,7 +349,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param rhs  right hand side floating-point to multiply
      * @param name optional name for the instruction
      */
-    public fun buildFloatMul(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatMul(lhs: Value, rhs: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFMul(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an unsigned integer division instruction
@@ -325,7 +366,15 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param exact    use llvm "exact" division (see language reference)
      * @param name     optional name for the instruction
      */
-    public fun buildUnsignedDiv(dividend: Value, divisor: Value, exact: Boolean, name: Option<String>): Value = TODO()
+    public fun buildUnsignedDiv(dividend: Value, divisor: Value, exact: Boolean, name: Option<String>): Value {
+        val res = if (exact) {
+            LLVM.LLVMBuildExactUDiv(ref, dividend.ref, divisor.ref, name.toNullable() ?: "")
+        } else {
+            LLVM.LLVMBuildUDiv(ref, dividend.ref, divisor.ref, name.toNullable() ?: "")
+        }
+
+        return Value(res)
+    }
 
     /**
      * Build a signed integer division instruction
@@ -338,7 +387,15 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param exact    use llvm "exact" division (see language reference)
      * @param name     optional name for the instruction
      */
-    public fun buildSignedDiv(dividend: Value, divisor: Value, exact: Boolean, name: Option<String>): Value = TODO()
+    public fun buildSignedDiv(dividend: Value, divisor: Value, exact: Boolean, name: Option<String>): Value {
+        val res = if (exact) {
+            LLVM.LLVMBuildExactSDiv(ref, dividend.ref, divisor.ref, name.toNullable() ?: "")
+        } else {
+            LLVM.LLVMBuildSDiv(ref, dividend.ref, divisor.ref, name.toNullable() ?: "")
+        }
+
+        return Value(res)
+    }
 
     /**
      * Build a floating-point division instruction
@@ -349,7 +406,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param divisor  divisor floating-point value (the number divided is being divided by)
      * @param name     optional name for the instruction
      */
-    public fun buildFloatDiv(dividend: Value, divisor: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatDiv(dividend: Value, divisor: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFDiv(ref, dividend.ref, divisor.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an unsigned integer remainder instruction
@@ -361,7 +422,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param divisor  divisor integer value (the number dividend is being divided by)
      * @param name     optional name for the instruction
      */
-    public fun buildUnsignedRem(dividend: Value, divisor: Value, name: Option<String>): Value = TODO()
+    public fun buildUnsignedRem(dividend: Value, divisor: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildURem(ref, dividend.ref, divisor.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a signed integer remainder instruction
@@ -373,7 +438,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param divisor  divisor integer value (the number dividend is being divided by)
      * @param name     optional name for the instruction
      */
-    public fun buildSignedRem(dividend: Value, divisor: Value, name: Option<String>): Value = TODO()
+    public fun buildSignedRem(dividend: Value, divisor: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildSRem(ref, dividend.ref, divisor.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a floating-point remainder instruction
@@ -385,7 +454,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param divisor  divisor floating-point value (the number dividend is being divided by)
      * @param name     optional name for the instruction
      */
-    public fun buildFloatRem(dividend: Value, divisor: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatRem(dividend: Value, divisor: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFRem(ref, dividend.ref, divisor.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a left shift instruction
@@ -397,7 +470,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param rhs  number of bits to shift [lhs] to the left
      * @param name optional name for the instruction
      */
-    public fun buildLeftShift(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
+    public fun buildLeftShift(lhs: Value, rhs: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildShl(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a logical shift right instruction
@@ -409,7 +486,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param rhs  number of bits to shift [lhs] to the right
      * @param name optional name for the instruction
      */
-    public fun buildLogicalShiftRight(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
+    public fun buildLogicalShiftRight(lhs: Value, rhs: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildLShr(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an arithmetic shift right instruction
@@ -421,7 +502,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param rhs  number of bits to shift [lhs] to the right
      * @param name optional name for the instruction
      */
-    public fun buildArithmeticShiftRight(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
+    public fun buildArithmeticShiftRight(lhs: Value, rhs: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildAShr(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a logical and instruction
@@ -432,7 +517,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param rhs  right hand side integer
      * @param name optional name for the instruction
      */
-    public fun buildLogicalAnd(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
+    public fun buildLogicalAnd(lhs: Value, rhs: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildAnd(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a logical or instruction
@@ -443,7 +532,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param rhs  right hand side integer
      * @param name optional name for the instruction
      */
-    public fun buildLogicalOr(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
+    public fun buildLogicalOr(lhs: Value, rhs: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildOr(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a logical xor instruction
@@ -454,7 +547,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param rhs  right hand side integer
      * @param name optional name for the instruction
      */
-    public fun buildLogicalXor(lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
+    public fun buildLogicalXor(lhs: Value, rhs: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildXor(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an extract element instruction
