@@ -205,7 +205,7 @@ class IRBuilderTest {
             builder.positionAfter(udivBlock)
             val udivLhs = udivFunction.getParameter(0).unwrap()
             val udivRhs = udivFunction.getParameter(1).unwrap()
-            val udivRes = builder.buildSignedDiv(udivLhs, udivRhs, exact, None)
+            val udivRes = builder.buildUnsignedDiv(udivLhs, udivRhs, exact, None)
             builder.buildReturn(Some(udivRes))
             udivFunction.addBasicBlock(udivBlock)
             assertTrue { isa<BinaryOperatorInstruction>(udivRes) }
@@ -291,7 +291,7 @@ class IRBuilderTest {
         xorFunction.addBasicBlock(xorBlock)
         assertTrue { isa<BinaryOperatorInstruction>(xorRes) }
     }
-    
+
     @Test fun `Test float binary operator instructions`() {
         val ctx = Context()
         val mod = ctx.newModule("test")

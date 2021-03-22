@@ -256,8 +256,8 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      */
     public fun buildIntAdd(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value {
         val res = when (semantics) {
-            WrapSemantics.NoUnsigned  -> LLVM.LLVMBuildNUWAdd(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
-            WrapSemantics.NoSigned    -> LLVM.LLVMBuildNSWAdd(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.NoUnsigned -> LLVM.LLVMBuildNUWAdd(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.NoSigned -> LLVM.LLVMBuildNSWAdd(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
             WrapSemantics.Unspecified -> LLVM.LLVMBuildAdd(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
         }
 
@@ -294,8 +294,8 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      */
     public fun buildIntSub(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value {
         val res = when (semantics) {
-            WrapSemantics.NoUnsigned  -> LLVM.LLVMBuildNUWSub(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
-            WrapSemantics.NoSigned    -> LLVM.LLVMBuildNSWSub(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.NoUnsigned -> LLVM.LLVMBuildNUWSub(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.NoSigned -> LLVM.LLVMBuildNSWSub(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
             WrapSemantics.Unspecified -> LLVM.LLVMBuildSub(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
         }
 
@@ -332,8 +332,8 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      */
     public fun buildIntMul(lhs: Value, rhs: Value, semantics: WrapSemantics, name: Option<String>): Value {
         val res = when (semantics) {
-            WrapSemantics.NoUnsigned  -> LLVM.LLVMBuildNUWMul(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
-            WrapSemantics.NoSigned    -> LLVM.LLVMBuildNSWMul(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.NoUnsigned -> LLVM.LLVMBuildNUWMul(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
+            WrapSemantics.NoSigned -> LLVM.LLVMBuildNSWMul(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
             WrapSemantics.Unspecified -> LLVM.LLVMBuildMul(ref, lhs.ref, rhs.ref, name.toNullable() ?: "")
         }
 

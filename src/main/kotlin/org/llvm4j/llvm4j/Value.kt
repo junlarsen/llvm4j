@@ -1890,6 +1890,11 @@ public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.
         }
     }
 
+    public fun getOpcode(): Opcode {
+        val opcode = LLVM.LLVMGetInstructionOpcode(ref)
+        return Opcode.from(opcode).unwrap()
+    }
+
     public fun hasMetadata(): Boolean {
         return LLVM.LLVMHasMetadata(ref).toBoolean()
     }

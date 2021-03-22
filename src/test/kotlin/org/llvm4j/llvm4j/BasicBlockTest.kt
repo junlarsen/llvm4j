@@ -1,9 +1,7 @@
 package org.llvm4j.llvm4j
 
 import org.junit.jupiter.api.Test
-import org.llvm4j.llvm4j.testing.assertIsErr
 import org.llvm4j.llvm4j.testing.assertIsNone
-import org.llvm4j.llvm4j.testing.assertIsOk
 import kotlin.test.assertEquals
 
 class BasicBlockTest {
