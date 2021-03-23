@@ -168,7 +168,7 @@ public object TypeCasting {
         // MemMoveInst
         // MemSetInst
         conversion(::ComparisonInstruction) { LLVM.LLVMIsACmpInst(it) },
-        conversion(::FPComparisonInstruction) { LLVM.LLVMIsAFCmpInst(it) },
+        conversion(::FloatComparisonInstruction) { LLVM.LLVMIsAFCmpInst(it) },
         conversion(::IntComparisonInstruction) { LLVM.LLVMIsAICmpInst(it) },
         conversion(::ExtractElementInstruction) { LLVM.LLVMIsAExtractElementInst(it) },
         conversion(::GetElementPtrInstruction) { LLVM.LLVMIsAGetElementPtrInst(it) },

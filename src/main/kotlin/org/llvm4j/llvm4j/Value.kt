@@ -1835,8 +1835,25 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
  */
 @CorrespondsTo("llvm::Instruction")
 public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
-    public interface AtomicInstructionImpl : Owner<LLVMValueRef>
     public interface CallBaseInstructionImpl : Owner<LLVMValueRef>
+
+    /**
+     * Common shared implementation for any LLVM instruction which is atomic
+     *
+     * @see AtomicRMWInstruction
+     * @see AtomicCmpXchgInstruction
+     *
+     * @author Mats Larsen
+     */
+    public interface AtomicInstructionImpl : Owner<LLVMValueRef> {
+        public fun isSingleThread(): Boolean {
+            return LLVM.LLVMIsAtomicSingleThread(ref).toBoolean()
+        }
+
+        public fun setSingleThread(singleThread: Boolean) {
+            LLVM.LLVMSetAtomicSingleThread(ref, singleThread.toInt())
+        }
+    }
 
     /**
      * Common shared implementation for any LLVM instruction which accesses memory
@@ -1982,10 +1999,20 @@ public class BinaryOperatorInstruction public constructor(ptr: LLVMValueRef) : I
 public open class ComparisonInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
 @CorrespondsTo("llvm::ICmpInst")
-public class IntComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr)
+public class IntComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr) {
+    public fun getPredicate(): IntPredicate {
+        val predicate = LLVM.LLVMGetICmpPredicate(ref)
+        return IntPredicate.from(predicate).unwrap()
+    }
+}
 
 @CorrespondsTo("llvm::FCmpInst")
-public class FPComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr)
+public class FloatComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr) {
+    public fun getPredicate(): FloatPredicate {
+        val predicate = LLVM.LLVMGetFCmpPredicate(ref)
+        return FloatPredicate.from(predicate).unwrap()
+    }
+}
 
 @CorrespondsTo("llvm::FuncletPadInst")
 public open class FuncletPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
@@ -2072,7 +2099,8 @@ public class ZeroExtInstruction public constructor(ptr: LLVMValueRef) : CastInst
 @CorrespondsTo("llvm::AtomicCmpXchgInst")
 public class AtomicCmpXchgInstruction public constructor(ptr: LLVMValueRef) :
     Instruction(ptr),
-    Instruction.MemoryAccessorInstructionImpl {
+    Instruction.MemoryAccessorInstructionImpl,
+    Instruction.AtomicInstructionImpl {
     public fun isWeak(): Boolean {
         return LLVM.LLVMGetWeak(ref).toBoolean()
     }
@@ -2080,12 +2108,31 @@ public class AtomicCmpXchgInstruction public constructor(ptr: LLVMValueRef) :
     public fun setWeak(weak: Boolean) {
         LLVM.LLVMSetWeak(ref, weak.toInt())
     }
+
+    public fun getFailureOrdering(): AtomicOrdering {
+        val ordering = LLVM.LLVMGetCmpXchgFailureOrdering(ref)
+        return AtomicOrdering.from(ordering).unwrap()
+    }
+
+    public fun setFailureOrdering(ordering: AtomicOrdering) {
+        LLVM.LLVMSetCmpXchgFailureOrdering(ref, ordering.value)
+    }
+
+    public fun getSuccessOrdering(): AtomicOrdering {
+        val ordering = LLVM.LLVMGetCmpXchgSuccessOrdering(ref)
+        return AtomicOrdering.from(ordering).unwrap()
+    }
+
+    public fun setSuccessOrdering(ordering: AtomicOrdering) {
+        LLVM.LLVMSetCmpXchgSuccessOrdering(ref, ordering.value)
+    }
 }
 
 @CorrespondsTo("llvm::AtmocRMWInst")
 public class AtomicRMWInstruction public constructor(ptr: LLVMValueRef) :
     Instruction(ptr),
-    Instruction.MemoryAccessorInstructionImpl {
+    Instruction.MemoryAccessorInstructionImpl,
+    Instruction.AtomicInstructionImpl {
     public fun getBinaryOperation(): AtomicRMWBinaryOperation {
         val binOp = LLVM.LLVMGetAtomicRMWBinOp(ref)
         return AtomicRMWBinaryOperation.from(binOp).unwrap()

@@ -943,7 +943,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param rhs       right hand side of comparison
      * @param name      optional name for the instruction
      */
-    public fun buildIntCompare(predicate: IntPredicate, lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
+    public fun buildIntCompare(predicate: IntPredicate, lhs: Value, rhs: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildICmp(ref, predicate.value, lhs.ref, rhs.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a floating-point comparison instruction
@@ -956,7 +960,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param rhs       right hand side of comparison
      * @param name      optional name for the instruction
      */
-    public fun buildFloatCompare(predicate: FloatPredicate, lhs: Value, rhs: Value, name: Option<String>): Value = TODO()
+    public fun buildFloatCompare(predicate: FloatPredicate, lhs: Value, rhs: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFCmp(ref, predicate.value, lhs.ref, rhs.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a phi instruction

@@ -473,4 +473,38 @@ class IRBuilderTest {
         gep1Inst.setInBounds(true)
         assertTrue { gep1Inst.isInBounds() }
     }
+
+    @Test fun `Test comparison instructions`() {
+        val ctx = Context()
+        val mod = ctx.newModule("test")
+        val float = ctx.getFloatType()
+        val void = ctx.getVoidType()
+        val i32 = ctx.getInt32Type()
+        val bb = ctx.newBasicBlock("bb1")
+        val builder = ctx.newIRBuilder()
+        val func = mod.addFunction("test", ctx.getFunctionType(void, i32, i32, float, float))
+
+        val intLhs = func.getParameter(0).unwrap()
+        val intRhs = func.getParameter(1).unwrap()
+        val floatLhs = func.getParameter(2).unwrap()
+        val floatRhs = func.getParameter(3).unwrap()
+        builder.positionAfter(bb)
+
+        for (predicate in IntPredicate.values()) {
+            val icmp = builder.buildIntCompare(predicate, intLhs, intRhs, None)
+            val icmpInst = cast<IntComparisonInstruction>(icmp)
+            assertEquals(Opcode.ICmp, icmpInst.getOpcode())
+            assertEquals(predicate, icmpInst.getPredicate())
+        }
+
+        for (predicate in FloatPredicate.values()) {
+            val fcmp = builder.buildFloatCompare(predicate, floatLhs, floatRhs, None)
+            val fcmpInst = cast<FloatComparisonInstruction>(fcmp)
+            assertEquals(Opcode.FCmp, fcmpInst.getOpcode())
+            assertEquals(predicate, fcmpInst.getPredicate())
+        }
+
+        builder.buildReturn(None)
+        func.addBasicBlock(bb)
+    }
 }
