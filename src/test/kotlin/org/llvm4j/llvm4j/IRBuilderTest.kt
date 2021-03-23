@@ -405,4 +405,72 @@ class IRBuilderTest {
         assertEquals(0, extractInst.getIndices().first())
         assertEquals(0, insertInst.getIndices().first())
     }
+
+    @Test fun `Test memory accessor instructions`() {
+        val ctx = Context()
+        val i32 = ctx.getInt32Type()
+        val void = ctx.getVoidType()
+        val mod = ctx.newModule("test")
+        val func = mod.addFunction("test", ctx.getFunctionType(void))
+        val bb = ctx.newBasicBlock("bb1")
+        val builder = ctx.newIRBuilder()
+        func.addBasicBlock(bb)
+
+        builder.positionAfter(bb)
+        val alloca = builder.buildAlloca(i32, None)
+        val allocaInst = cast<AllocaInstruction>(alloca)
+        assertEquals(Opcode.Alloca, allocaInst.getOpcode())
+        assertEquals(i32.ref, allocaInst.getAllocatedType().ref)
+
+        val load = builder.buildLoad(alloca, None)
+        val loadInst = cast<LoadInstruction>(load)
+        assertEquals(Opcode.Load, loadInst.getOpcode())
+        assertEquals(AtomicOrdering.NotAtomic, loadInst.getOrdering())
+        assertFalse { loadInst.isVolatile() }
+        loadInst.setVolatile(true)
+        loadInst.setOrdering(AtomicOrdering.Acquire)
+        assertTrue { loadInst.isVolatile() }
+        assertEquals(AtomicOrdering.Acquire, loadInst.getOrdering())
+
+        val value = i32.getConstant(100)
+        val store = builder.buildStore(alloca, value)
+        val storeInst = cast<StoreInstruction>(store)
+        assertEquals(Opcode.Store, storeInst.getOpcode())
+        assertEquals(AtomicOrdering.NotAtomic, storeInst.getOrdering())
+        assertFalse { storeInst.isVolatile() }
+        storeInst.setVolatile(true)
+        storeInst.setOrdering(AtomicOrdering.Acquire)
+        assertTrue { storeInst.isVolatile() }
+        assertEquals(AtomicOrdering.Acquire, storeInst.getOrdering())
+    }
+
+    @Test fun `Test getelementptr instruction`() {
+        val ctx = Context()
+        val i32 = ctx.getInt32Type()
+        val void = ctx.getVoidType()
+        val struct = ctx.getStructType(i32, i32)
+        val structPtr = ctx.getPointerType(struct).unwrap()
+        val functionType = ctx.getFunctionType(void, structPtr)
+        val mod = ctx.newModule("test")
+        val bb = ctx.newBasicBlock("bb1")
+        val builder = ctx.newIRBuilder()
+        val function = mod.addFunction("test", functionType)
+        function.addBasicBlock(bb)
+
+        builder.positionAfter(bb)
+        val param = function.getParameter(0).unwrap()
+        val zero = i32.getConstant(0)
+        val one = i32.getConstant(1)
+        // getelementptr i32 0, 1
+        val gep1 = builder.buildGetElementPtr(param, zero, one, name = None, inBounds = false)
+        val gep1Inst = cast<GetElementPtrInstruction>(gep1)
+        val gep2 = builder.buildGetElementPtr(param, zero, one, name = None, inBounds = true)
+        val gep2Inst = cast<GetElementPtrInstruction>(gep2)
+        assertEquals(Opcode.GetElementPtr, gep1Inst.getOpcode())
+        assertEquals(Opcode.GetElementPtr, gep2Inst.getOpcode())
+        assertFalse { gep1Inst.isInBounds() }
+        assertTrue { gep2Inst.isInBounds() }
+        gep1Inst.setInBounds(true)
+        assertTrue { gep1Inst.isInBounds() }
+    }
 }

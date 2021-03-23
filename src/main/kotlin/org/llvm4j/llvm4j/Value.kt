@@ -15,6 +15,7 @@ import org.llvm4j.llvm4j.util.InternalApi
 import org.llvm4j.llvm4j.util.Owner
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
+import org.llvm4j.llvm4j.util.toPointerPointer
 import org.llvm4j.optional.Err
 import org.llvm4j.optional.None
 import org.llvm4j.optional.Ok
@@ -1553,7 +1554,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
          */
         @JvmStatic
         public fun getGetElementPtr(aggregate: Constant, vararg indices: Constant, inBounds: Boolean): Constant {
-            val indexPtr = PointerPointer(*indices.map { it.ref }.toTypedArray())
+            val indexPtr = indices.map { it.ref }.toPointerPointer()
             val res = if (inBounds) {
                 LLVM.LLVMConstInBoundsGEP(aggregate.ref, indexPtr, indices.size)
             } else {
@@ -1836,7 +1837,35 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
 public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
     public interface AtomicInstructionImpl : Owner<LLVMValueRef>
     public interface CallBaseInstructionImpl : Owner<LLVMValueRef>
-    public interface MemoryAccessorInstructionImpl : Owner<LLVMValueRef>
+
+    /**
+     * Common shared implementation for any LLVM instruction which accesses memory
+     *
+     * @see LoadInstruction
+     * @see StoreInstruction
+     * @see AtomicRMWInstruction
+     * @see AtomicCmpXchgInstruction
+     *
+     * @author Mats Larsen
+     */
+    public interface MemoryAccessorInstructionImpl : Owner<LLVMValueRef> {
+        public fun isVolatile(): Boolean {
+            return LLVM.LLVMGetVolatile(ref).toBoolean()
+        }
+
+        public fun setVolatile(volatile: Boolean) {
+            LLVM.LLVMSetVolatile(ref, volatile.toInt())
+        }
+
+        public fun getOrdering(): AtomicOrdering {
+            val order = LLVM.LLVMGetOrdering(ref)
+            return AtomicOrdering.from(order).unwrap()
+        }
+
+        public fun setOrdering(order: AtomicOrdering) {
+            LLVM.LLVMSetOrdering(ref, order.value)
+        }
+    }
 
     /**
      * Common shared implementation for any LLVM instruction which modifies aggregate values
@@ -1971,9 +2000,15 @@ public class CleanupPadInstruction public constructor(ptr: LLVMValueRef) : Funcl
 public open class UnaryInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
 @CorrespondsTo("llvm::AllocaInst")
-public class AllocaInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+public class AllocaInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr) {
+    public fun getAllocatedType(): Type {
+        val allocated = LLVM.LLVMGetAllocatedType(ref)
 
-@CorrespondsTo("llvm::CastIsnt")
+        return Type(allocated)
+    }
+}
+
+@CorrespondsTo("llvm::CastInst")
 public open class CastInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
 
 @CorrespondsTo("llvm::ExtractValueInst")
@@ -1982,7 +2017,9 @@ public class ExtractValueInstruction public constructor(ptr: LLVMValueRef) :
     Instruction.ValueUpdatingInstructionImpl
 
 @CorrespondsTo("llvm::LoadInst")
-public class LoadInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+public class LoadInstruction public constructor(ptr: LLVMValueRef) :
+    UnaryInstruction(ptr),
+    Instruction.MemoryAccessorInstructionImpl
 
 @CorrespondsTo("llvm::VAArgInst")
 public class VAArgInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
@@ -2033,10 +2070,31 @@ public class UnsignedToFloatInstruction public constructor(ptr: LLVMValueRef) : 
 public class ZeroExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
 
 @CorrespondsTo("llvm::AtomicCmpXchgInst")
-public class AtomicCmpXchgInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class AtomicCmpXchgInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.MemoryAccessorInstructionImpl {
+    public fun isWeak(): Boolean {
+        return LLVM.LLVMGetWeak(ref).toBoolean()
+    }
+
+    public fun setWeak(weak: Boolean) {
+        LLVM.LLVMSetWeak(ref, weak.toInt())
+    }
+}
 
 @CorrespondsTo("llvm::AtmocRMWInst")
-public class AtomicRMWInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class AtomicRMWInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.MemoryAccessorInstructionImpl {
+    public fun getBinaryOperation(): AtomicRMWBinaryOperation {
+        val binOp = LLVM.LLVMGetAtomicRMWBinOp(ref)
+        return AtomicRMWBinaryOperation.from(binOp).unwrap()
+    }
+
+    public fun setBinaryOperation(binOp: AtomicRMWBinaryOperation) {
+        LLVM.LLVMSetAtomicRMWBinOp(ref, binOp.value)
+    }
+}
 
 @CorrespondsTo("llvm::BranchInst")
 public class BranchInstruction public constructor(ptr: LLVMValueRef) :
@@ -2107,7 +2165,15 @@ public class ExtractElementInstruction public constructor(ptr: LLVMValueRef) : I
 public class FenceInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
 @CorrespondsTo("llvm::GetElementPtrInst")
-public class GetElementPtrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class GetElementPtrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr) {
+    public fun isInBounds(): Boolean {
+        return LLVM.LLVMIsInBounds(ref).toBoolean()
+    }
+
+    public fun setInBounds(inBounds: Boolean) {
+        LLVM.LLVMSetIsInBounds(ref, inBounds.toInt())
+    }
+}
 
 @CorrespondsTo("llvm::IndirectBrInst")
 public class IndirectBrInstruction public constructor(ptr: LLVMValueRef) :
@@ -2164,7 +2230,9 @@ public class ShuffleVectorInstruction public constructor(ptr: LLVMValueRef) : In
 }
 
 @CorrespondsTo("llvm::StoreInst")
-public class StoreInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class StoreInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.MemoryAccessorInstructionImpl
 
 @CorrespondsTo("llvm::SwitchInst")
 public class SwitchInstruction public constructor(ptr: LLVMValueRef) :

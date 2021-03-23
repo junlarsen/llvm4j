@@ -3,6 +3,8 @@ package org.llvm4j.llvm4j
 import org.bytedeco.llvm.LLVM.LLVMBuilderRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.toInt
+import org.llvm4j.llvm4j.util.toPointerPointer
 import org.llvm4j.optional.None
 import org.llvm4j.optional.Option
 import org.llvm4j.optional.Some
@@ -25,6 +27,7 @@ import org.llvm4j.optional.Some
  * TODO: APIs - Implement the remaining instructions
  * TODO: Testing - Test debug/fpmathtags once metadata is done
  * TODO: Testing - Execute IRBuilderTest functions once ExecutionEngine is done
+ * TODO: Testing - Test atomic instructions (fence, atomiccmpxchg, atomicrmw)
  *
  * @author Mats Larsen
  */
@@ -646,7 +649,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type type to allocate
      * @param name optional name for the instruction
      */
-    public fun buildAlloca(type: Type, name: Option<String>): AllocaInstruction = TODO()
+    public fun buildAlloca(type: Type, name: Option<String>): AllocaInstruction {
+        val res = LLVM.LLVMBuildAlloca(ref, type.ref, name.toNullable() ?: "")
+
+        return AllocaInstruction(res)
+    }
 
     /**
      * Build a load instruction
@@ -657,7 +664,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param ptr  pointer value to read from
      * @param name optional name for the instruction
      */
-    public fun buildLoad(ptr: Value, name: Option<String>): LoadInstruction = TODO()
+    public fun buildLoad(ptr: Value, name: Option<String>): LoadInstruction {
+        val res = LLVM.LLVMBuildLoad(ref, ptr.ref, name.toNullable() ?: "")
+
+        return LoadInstruction(res)
+    }
 
     /**
      * Build a store instruction
@@ -669,9 +680,12 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      *
      * @param ptr   pointer value to write to
      * @param value value to write to pointer
-     * @param name optional name for the instruction
      */
-    public fun buildStore(ptr: Value, value: Value, name: Option<String>): StoreInstruction = TODO()
+    public fun buildStore(ptr: Value, value: Value): StoreInstruction {
+        val res = LLVM.LLVMBuildStore(ref, value.ref, ptr.ref)
+
+        return StoreInstruction(res)
+    }
 
     /**
      * Build a fence instruction
@@ -680,7 +694,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      *
      * TODO: Research - Find out what fence instruction is used for
      */
-    public fun buildFence(ordering: AtomicOrdering, singleThread: Boolean, name: Option<String>): FenceInstruction = TODO()
+    public fun buildFence(ordering: AtomicOrdering, singleThread: Boolean, name: Option<String>): FenceInstruction {
+        val res = LLVM.LLVMBuildFence(ref, ordering.value, singleThread.toInt(), name.toNullable() ?: "")
+
+        return FenceInstruction(res)
+    }
 
     /**
      * Build a comparison exchange instruction
@@ -697,7 +715,14 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
         successOrdering: AtomicOrdering,
         failureOrdering: AtomicOrdering,
         singleThread: Boolean
-    ): AtomicCmpXchgInstruction = TODO()
+    ): AtomicCmpXchgInstruction {
+        val res = LLVM.LLVMBuildAtomicCmpXchg(
+            ref, ptr.ref, comparison.ref, new.ref,
+            successOrdering.value, failureOrdering.value, singleThread.toInt()
+        )
+
+        return AtomicCmpXchgInstruction(res)
+    }
 
     /**
      * Build an atomic rmw instruction
@@ -712,7 +737,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
         value: Value,
         ordering: AtomicOrdering,
         singleThread: Boolean
-    ): AtomicRMWInstruction = TODO()
+    ): AtomicRMWInstruction {
+        val res = LLVM.LLVMBuildAtomicRMW(ref, op.value, ptr.ref, value.ref, ordering.value, singleThread.toInt())
+
+        return AtomicRMWInstruction(res)
+    }
 
     /**
      * Build a get element pointer instruction
@@ -730,9 +759,19 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
     public fun buildGetElementPtr(
         aggregate: Value,
         vararg indices: Value,
+        name: Option<String>,
         inBounds: Boolean,
-        name: Option<String>
-    ): Value = TODO()
+    ): Value {
+        val indicesPtr = indices.map { it.ref }.toPointerPointer()
+        val res = if (inBounds) {
+            LLVM.LLVMBuildInBoundsGEP(ref, aggregate.ref, indicesPtr, indices.size, name.toNullable() ?: "")
+        } else {
+            LLVM.LLVMBuildGEP(ref, aggregate.ref, indicesPtr, indices.size, name.toNullable() ?: "")
+        }
+        indicesPtr.deallocate()
+
+        return Value(res)
+    }
 
     /**
      * Build an integer trunc instruction
