@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 import org.llvm4j.optional.None
 import org.llvm4j.optional.Some
 import org.llvm4j.optional.testing.assertNone
+import org.llvm4j.optional.testing.assertOk
 import org.llvm4j.optional.testing.assertSome
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -60,6 +61,8 @@ class IRBuilderTest {
         assertEquals(1, br1.getSuccessorCount())
         assertEquals(bb2.ref, br1.getSuccessor(0).unwrap().ref)
         assertFalse { br1.isConditional() }
+        assertOk(br1.setSuccessor(bb3, 0))
+        assertEquals(bb3.ref, br1.getSuccessor(0).unwrap().ref)
 
         val cond = i1.getConstant(0)
         val replace = i1.getConstant(1)
@@ -506,5 +509,38 @@ class IRBuilderTest {
 
         builder.buildReturn(None)
         func.addBasicBlock(bb)
+    }
+
+    @Test fun `Test phi instruction`() {
+        val ctx = Context()
+        val mod = ctx.newModule("test")
+        val void = ctx.getVoidType()
+        val i1 = ctx.getInt1Type()
+        val entry = ctx.newBasicBlock("entry")
+        val bb1 = ctx.newBasicBlock("bb1")
+        val bb2 = ctx.newBasicBlock("bb2")
+        val exit = ctx.newBasicBlock("exit")
+        val builder = ctx.newIRBuilder()
+        val function = mod.addFunction("test", ctx.getFunctionType(void, i1))
+
+        val condition = function.getParameter(0).unwrap()
+        builder.positionAfter(entry)
+        builder.buildConditionalBranch(condition, bb1, bb2)
+        builder.positionAfter(bb1)
+        builder.buildBranch(exit)
+        builder.positionAfter(bb2)
+        builder.buildBranch(exit)
+        builder.positionAfter(exit)
+        val phi = builder.buildPhi(i1, None)
+        val phiInst = cast<PhiInstruction>(phi)
+        assertEquals(Opcode.PHI, phiInst.getOpcode())
+        assertEquals(0, phiInst.getIncomingCount())
+        val bb1Value = i1.getConstant(1)
+        val bb2Value = i1.getConstant(0)
+        phiInst.addIncoming(bb1 to bb1Value, bb2 to bb2Value)
+        assertEquals(2, phiInst.getIncomingCount())
+        val (block, value) = phiInst.getIncoming(0).unwrap()
+        assertEquals(bb1.ref, block.ref)
+        assertEquals(bb1Value.ref, value.ref)
     }
 }

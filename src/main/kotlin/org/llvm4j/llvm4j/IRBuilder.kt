@@ -978,7 +978,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type the expected resolving type
      * @param name optional name for the instruction
      */
-    public fun buildPhi(type: Type, name: Option<String>): PhiInstruction = TODO()
+    public fun buildPhi(type: Type, name: Option<String>): PhiInstruction {
+        val res = LLVM.LLVMBuildPhi(ref, type.ref, name.toNullable() ?: "")
+
+        return PhiInstruction(res)
+    }
 
     /**
      * Build a select instruction

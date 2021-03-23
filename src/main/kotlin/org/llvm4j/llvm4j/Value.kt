@@ -2243,7 +2243,40 @@ public class InsertValueInstruction public constructor(ptr: LLVMValueRef) :
 public class LandingPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
 @CorrespondsTo("llvm::PHINode")
-public class PhiInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class PhiInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr) {
+    /**
+     * Add a set of pairs of blocks and values to a phi instruction
+     *
+     * For each basic block, there must be an associated value.
+     */
+    public fun addIncoming(vararg pairs: Pair<BasicBlock, Value>) {
+        val blocks = pairs.map { it.first.ref }.toPointerPointer()
+        val values = pairs.map { it.second.ref }.toPointerPointer()
+        LLVM.LLVMAddIncoming(ref, values, blocks, pairs.size)
+        values.deallocate()
+        blocks.deallocate()
+    }
+
+    public fun getIncomingCount(): Int {
+        return LLVM.LLVMCountIncoming(ref)
+    }
+
+    /**
+     * Get the incoming value and basic block pair at a given index
+     *
+     * Returns IndexOutOfBoundsException if the index exceeds size
+     */
+    public fun getIncoming(index: Int): Result<Pair<BasicBlock, Value>, IndexOutOfBoundsException> {
+        val size = getIncomingCount()
+        return if (index < size) {
+            val block = LLVM.LLVMGetIncomingBlock(ref, index)
+            val value = LLVM.LLVMGetIncomingValue(ref, index)
+            Ok(Pair(BasicBlock(block), Value(value)))
+        } else {
+            Err(IndexOutOfBoundsException("Index $index out of bounds for size $size"))
+        }
+    }
+}
 
 @CorrespondsTo("llvm::ResumeInstruction")
 public class ResumeInstruction public constructor(ptr: LLVMValueRef) :
@@ -2302,4 +2335,6 @@ public class SwitchInstruction public constructor(ptr: LLVMValueRef) :
 }
 
 @CorrespondsTo("llvm::UnreachableInst")
-public class UnreachableInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr), Instruction.TerminatorInstructionImpl
+public class UnreachableInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
