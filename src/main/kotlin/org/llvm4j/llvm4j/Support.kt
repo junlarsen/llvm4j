@@ -204,7 +204,7 @@ public object TypeCasting {
         conversion(::FloatTruncInstruction) { LLVM.LLVMIsAFPTruncInst(it) },
         conversion(::IntToPtrInstruction) { LLVM.LLVMIsAIntToPtrInst(it) },
         conversion(::PtrToIntInstruction) { LLVM.LLVMIsAPtrToIntInst(it) },
-        conversion(::SignedExtInstruction) { LLVM.LLVMIsASExtInst(it) },
+        conversion(::SignExtInstruction) { LLVM.LLVMIsASExtInst(it) },
         conversion(::SignedToFloatInstruction) { LLVM.LLVMIsASIToFPInst(it) },
         conversion(::IntTruncInstruction) { LLVM.LLVMIsATruncInst(it) },
         conversion(::UnsignedToFloatInstruction) { LLVM.LLVMIsAUIToFPInst(it) },

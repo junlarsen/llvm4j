@@ -785,7 +785,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type type to truncate down to
      * @param name optional name for the instruction
      */
-    public fun buildIntTrunc(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
+    public fun buildIntTrunc(op: Value, type: IntegerType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildTrunc(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a zero extension instruction
@@ -798,7 +802,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type type to zero extend to
      * @param name optional name for the instruction
      */
-    public fun buildZeroExt(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
+    public fun buildZeroExt(op: Value, type: IntegerType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildZExt(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a sign extension instruction
@@ -811,7 +819,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type type to sign extend to
      * @param name optional name for the instruction
      */
-    public fun buildSignExt(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
+    public fun buildSignExt(op: Value, type: IntegerType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildSExt(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a floating-point trunc instruction
@@ -824,7 +836,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type type to truncate down to
      * @param name optional name for the instruction
      */
-    public fun buildFloatTrunc(op: Value, type: FloatingPointType, name: Option<String>): Value = TODO()
+    public fun buildFloatTrunc(op: Value, type: FloatingPointType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFPTrunc(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a float extension instruction
@@ -837,7 +853,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type the type to extend to
      * @param name optional name for the instruction
      */
-    public fun buildFloatExt(op: Value, type: FloatingPointType, name: Option<String>): Value = TODO()
+    public fun buildFloatExt(op: Value, type: FloatingPointType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFPExt(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a float to unsigned int cast instruction
@@ -849,7 +869,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type integer type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildFloatToUnsigned(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
+    public fun buildFloatToUnsigned(op: Value, type: IntegerType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFPToUI(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a float to signed int cast instruction
@@ -861,7 +885,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type integer type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildFloatToSigned(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
+    public fun buildFloatToSigned(op: Value, type: IntegerType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFPToSI(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an unsigned int to float cast instruction
@@ -873,7 +901,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type floating-point type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildUnsignedToFloat(op: Value, type: FloatingPointType, name: Option<String>): Value = TODO()
+    public fun buildUnsignedToFloat(op: Value, type: FloatingPointType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildUIToFP(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a signed int to float cast instruction
@@ -885,7 +917,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type floating-point type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildSignedToFloat(op: Value, type: FloatingPointType, name: Option<String>): Value = TODO()
+    public fun buildSignedToFloat(op: Value, type: FloatingPointType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildSIToFP(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a pointer to int cast instruction
@@ -896,7 +932,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type integer type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildPointerToInt(op: Value, type: IntegerType, name: Option<String>): Value = TODO()
+    public fun buildPointerToInt(op: Value, type: IntegerType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildPtrToInt(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a int to pointer cast instruction
@@ -907,7 +947,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type pointer type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildIntToPointer(op: Value, type: PointerType, name: Option<String>): Value = TODO()
+    public fun buildIntToPointer(op: Value, type: PointerType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildIntToPtr(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a bit cast instruction
@@ -918,7 +962,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type type to cast to
      * @param name optional name for the instruction
      */
-    public fun buildBitCast(op: Value, type: Type, name: Option<String>): Value = TODO()
+    public fun buildBitCast(op: Value, type: Type, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildBitCast(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an address space cast instruction
@@ -930,7 +978,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param type pointer type to cast address space cast into
      * @param name optional name for the instruction
      */
-    public fun buildAddressSpaceCast(op: Value, type: PointerType, name: Option<String>): Value = TODO()
+    public fun buildAddressSpaceCast(op: Value, type: PointerType, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildAddrSpaceCast(ref, op.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build an integer comparison instruction

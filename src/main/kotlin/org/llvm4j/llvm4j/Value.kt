@@ -2172,7 +2172,7 @@ public class IntToPtrInstruction public constructor(ptr: LLVMValueRef) : CastIns
 public class PtrToIntInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
 
 @CorrespondsTo("llvm::SExtInst")
-public class SignedExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+public class SignExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
 
 @CorrespondsTo("llvm::SIToFPInst")
 public class SignedToFloatInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
