@@ -1091,6 +1091,11 @@ public class GlobalVariable public constructor(ptr: LLVMValueRef) :
     public fun setExternallyInitialized(isExternallyInitialized: Boolean) {
         LLVM.LLVMSetExternallyInitialized(ref, isExternallyInitialized.toInt())
     }
+
+    /** Get the preferred alignment of this variable in bytes */
+    public fun getPreferredAlignment(target: TargetData): Int {
+        return LLVM.LLVMPreferredAlignmentOfGlobal(target.ref, ref)
+    }
 }
 
 /**

@@ -335,7 +335,10 @@ public class PointerType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::StructType")
-public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.CompositeTypeImpl, Type.StructureTypeImpl {
+public class StructType public constructor(ptr: LLVMTypeRef) :
+    Type(ptr),
+    Type.CompositeTypeImpl,
+    Type.StructureTypeImpl {
     public override fun getElementCount(): Int {
         return LLVM.LLVMCountStructElementTypes(ref)
     }

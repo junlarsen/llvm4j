@@ -49,6 +49,36 @@ public object LLVMSystem {
         LLVM.LLVMInitializeNativeAsmPrinter()
     }
 
+    public fun getHostProcessorName(): String {
+        val ptr = LLVM.LLVMGetHostCPUName()
+        val copy = ptr.string
+        ptr.deallocate()
+        return copy
+    }
+
+    public fun getHostProcessorFeatures(): String {
+        val ptr = LLVM.LLVMGetHostCPUFeatures()
+        val copy = ptr.string
+        ptr.deallocate()
+        return copy
+    }
+
+    public fun getHostTargetTriple(): String {
+        val ptr = LLVM.LLVMGetDefaultTargetTriple()
+        val copy = ptr.string
+        ptr.deallocate()
+        return copy
+    }
+
+    public fun getNormalizedTriple(triple: String): String {
+        val triplePtr = BytePointer(triple)
+        val ptr = LLVM.LLVMNormalizeTargetTriple(triplePtr)
+        val copy = ptr.string
+        ptr.deallocate()
+        triplePtr.deallocate()
+        return copy
+    }
+
     public class FatalErrorHandler(private val closure: (Payload) -> Unit) :
         LLVMFatalErrorHandler(),
         Callback<Unit, FatalErrorHandler.Payload> {

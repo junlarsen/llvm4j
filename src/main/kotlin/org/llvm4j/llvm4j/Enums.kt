@@ -314,42 +314,6 @@ public enum class VerifierFailureAction(public override val value: Int) : Enumer
     public companion object : Enumeration<VerifierFailureAction>(values())
 }
 
-public enum class CodeGenFileType(public override val value: Int) : Enumeration.EnumVariant {
-    AssemblyFile(LLVM.LLVMAssemblyFile),
-    ObjectFile(LLVM.LLVMObjectFile);
-    public companion object : Enumeration<CodeGenFileType>(values())
-}
-
-public enum class CodeGenOptimizationLevel(public override val value: Int) : Enumeration.EnumVariant {
-    None(LLVM.LLVMCodeGenLevelNone),
-    Less(LLVM.LLVMCodeGenLevelLess),
-    Default(LLVM.LLVMCodeGenLevelDefault),
-    Aggressive(LLVM.LLVMCodeGenLevelAggressive);
-    public companion object : Enumeration<CodeGenOptimizationLevel>(values())
-}
-
-public enum class CodeModel(public override val value: Int) : Enumeration.EnumVariant {
-    Default(LLVM.LLVMCodeModelDefault),
-    JITDefault(LLVM.LLVMCodeModelJITDefault),
-    Tiny(LLVM.LLVMCodeModelTiny),
-    Small(LLVM.LLVMCodeModelSmall),
-    Kernel(LLVM.LLVMCodeModelKernel),
-    Medium(LLVM.LLVMCodeModelMedium),
-    Large(LLVM.LLVMCodeModelLarge);
-    public companion object : Enumeration<CodeModel>(values())
-}
-
-public enum class RelocMode(public override val value: Int) : Enumeration.EnumVariant {
-    Default(LLVM.LLVMRelocDefault),
-    Static(LLVM.LLVMRelocStatic),
-    PositionIndependentCode(LLVM.LLVMRelocPIC),
-    DynamicNoPositionIndependentCode(LLVM.LLVMRelocDynamicNoPic),
-    ROPI(LLVM.LLVMRelocROPI),
-    RWPI(LLVM.LLVMRelocRWPI),
-    ROPIRWPI(LLVM.LLVMRelocROPI_RWPI);
-    public companion object : Enumeration<RelocMode>(values())
-}
-
 /**
  * Enumeration of LLVM Linkage types
  *
