@@ -16,7 +16,6 @@ import org.llvm4j.optional.Ok
 import org.llvm4j.optional.Option
 import org.llvm4j.optional.Result
 import org.llvm4j.optional.Some
-import java.nio.ByteOrder
 
 /**
  * A listing of the different target architectures the LLVM distribution was built with.
@@ -138,7 +137,7 @@ public class TargetData public constructor(ptr: LLVMTargetDataRef) : Owner<LLVMT
         }
     }
 
-    /** Get the size of a type in bytes */
+    /** Get the size of a type in bits */
     public fun getBitSize(type: Type): Long {
         return LLVM.LLVMSizeOfTypeInBits(ref,type.ref)
     }
@@ -179,7 +178,6 @@ public class TargetData public constructor(ptr: LLVMTargetDataRef) : Owner<LLVMT
 public class TargetLibraryInfo public constructor(ptr: LLVMTargetLibraryInfoRef) : Owner<LLVMTargetLibraryInfoRef> {
     public override val ref: LLVMTargetLibraryInfoRef = ptr
 }
-
 
 public enum class CodeGenFileType(public override val value: Int) : Enumeration.EnumVariant {
     AssemblyFile(LLVM.LLVMAssemblyFile),
