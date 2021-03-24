@@ -717,8 +717,13 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
         singleThread: Boolean
     ): AtomicCmpXchgInstruction {
         val res = LLVM.LLVMBuildAtomicCmpXchg(
-            ref, ptr.ref, comparison.ref, new.ref,
-            successOrdering.value, failureOrdering.value, singleThread.toInt()
+            ref,
+            ptr.ref,
+            comparison.ref,
+            new.ref,
+            successOrdering.value,
+            failureOrdering.value,
+            singleThread.toInt()
         )
 
         return AtomicCmpXchgInstruction(res)
