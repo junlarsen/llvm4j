@@ -155,7 +155,7 @@ public object TypeCasting {
         conversion(::GlobalVariable) { LLVM.LLVMIsAGlobalVariable(it) },
         conversion(::UndefValue) { LLVM.LLVMIsAUndefValue(it) },
         conversion(::Instruction) { LLVM.LLVMIsAInstruction(it) },
-        conversion(::UnaryOperator) { LLVM.LLVMIsAUnaryOperator(it) },
+        conversion(::UnaryOperatorInstruction) { LLVM.LLVMIsAUnaryOperator(it) },
         conversion(::BinaryOperatorInstruction) { LLVM.LLVMIsABinaryOperator(it) },
         conversion(::CallInstruction) { LLVM.LLVMIsACallInst(it) },
         // IntrinsicInst
@@ -168,7 +168,7 @@ public object TypeCasting {
         // MemMoveInst
         // MemSetInst
         conversion(::ComparisonInstruction) { LLVM.LLVMIsACmpInst(it) },
-        conversion(::FPComparisonInstruction) { LLVM.LLVMIsAFCmpInst(it) },
+        conversion(::FloatComparisonInstruction) { LLVM.LLVMIsAFCmpInst(it) },
         conversion(::IntComparisonInstruction) { LLVM.LLVMIsAICmpInst(it) },
         conversion(::ExtractElementInstruction) { LLVM.LLVMIsAExtractElementInst(it) },
         conversion(::GetElementPtrInstruction) { LLVM.LLVMIsAGetElementPtrInst(it) },
@@ -204,12 +204,12 @@ public object TypeCasting {
         conversion(::FloatTruncInstruction) { LLVM.LLVMIsAFPTruncInst(it) },
         conversion(::IntToPtrInstruction) { LLVM.LLVMIsAIntToPtrInst(it) },
         conversion(::PtrToIntInstruction) { LLVM.LLVMIsAPtrToIntInst(it) },
-        conversion(::SignedExtInstruction) { LLVM.LLVMIsASExtInst(it) },
+        conversion(::SignExtInstruction) { LLVM.LLVMIsASExtInst(it) },
         conversion(::SignedToFloatInstruction) { LLVM.LLVMIsASIToFPInst(it) },
         conversion(::IntTruncInstruction) { LLVM.LLVMIsATruncInst(it) },
         conversion(::UnsignedToFloatInstruction) { LLVM.LLVMIsAUIToFPInst(it) },
         conversion(::ZeroExtInstruction) { LLVM.LLVMIsAZExtInst(it) },
-        conversion(::ExtractValueInstruction) { LLVM.LLVMIsAExtractElementInst(it) },
+        conversion(::ExtractValueInstruction) { LLVM.LLVMIsAExtractValueInst(it) },
         conversion(::LoadInstruction) { LLVM.LLVMIsALoadInst(it) },
         conversion(::VAArgInstruction) { LLVM.LLVMIsAVAArgInst(it) },
         conversion(::FreezeInstruction) { LLVM.LLVMIsAFreezeInst(it) },

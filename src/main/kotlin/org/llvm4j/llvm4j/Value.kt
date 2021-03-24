@@ -14,7 +14,10 @@ import org.llvm4j.llvm4j.util.InternalApi
 import org.llvm4j.llvm4j.util.Owner
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
+import org.llvm4j.llvm4j.util.toPointerPointer
+import org.llvm4j.optional.Err
 import org.llvm4j.optional.None
+import org.llvm4j.optional.Ok
 import org.llvm4j.optional.Option
 import org.llvm4j.optional.Result
 import org.llvm4j.optional.Some
@@ -92,12 +95,18 @@ public open class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
         return Option.of(use).map { Use(it) }
     }
 
+    /**
+     * TODO: Research - What is legal in this cast?
+     */
     public fun asBasicBlock(): BasicBlock {
         val bb = LLVM.LLVMValueAsBasicBlock(ref)
 
         return BasicBlock(bb)
     }
 
+    /**
+     * TODO: Research - What is legal in this cast?
+     */
     public fun asMetadata(): ValueAsMetadata {
         val md = LLVM.LLVMValueAsMetadata(ref)
 
@@ -218,8 +227,7 @@ public open class User constructor(ptr: LLVMValueRef) : Value(ptr) {
     public fun setOperand(index: Int, value: Value): Result<Unit, AssertionError> = result {
         assert(index < getOperandCount()) { "Index $index is out of bounds for size of ${getOperandCount()}" }
         assert(!isConstant()) { "Cannot mutate a constant with setOperand" }
-        // TODO: Api - Replace once isa<> is implemented
-        assert(LLVM.LLVMIsAGlobalValue(ref) == null) { "Cannot mutate a constant with setOperand" }
+        assert(isa<GlobalValue>(this)) { "Cannot mutate a constant with setOperand" }
 
         LLVM.LLVMSetOperand(ref, index, value.ref)
     }
@@ -672,6 +680,8 @@ public class ConstantArray public constructor(ptr: LLVMValueRef) : ConstantAggre
  *
  * @see ConstantAggregate
  *
+ * TODO: Research/ConstExpr - Find out where to place getPointerToInt overload
+ *
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::Vector")
@@ -724,12 +734,21 @@ public class ConstantFP public constructor(ptr: LLVMValueRef) : ConstantData(ptr
      *
      * @return pair of value and boolean indicating if conversion was lossy.
      */
-    public fun getValue(): Pair<Double, Boolean> {
+    public fun getValuePair(): Pair<Double, Boolean> {
         val ptr = IntPointer(1L)
         val double = LLVM.LLVMConstRealGetDouble(ref, ptr)
         val lossy = ptr.get()
 
         return Pair(double, lossy.toBoolean())
+    }
+
+    /**
+     * Retrieve the possibly lossy value as a Kotlin double
+     *
+     * If you need to know if the value was lossy, use [getValuePair]
+     */
+    public fun getLossyValue(): Double {
+        return getValuePair().first
     }
 }
 
@@ -928,6 +947,25 @@ public class Function public constructor(ptr: LLVMValueRef) :
     public fun addBasicBlock(block: BasicBlock) {
         LLVM.LLVMAppendExistingBasicBlock(ref, block.ref)
     }
+
+    /**
+     * Get the block address of a basic block in this function
+     *
+     * If the given block does not have an owner, or it is owned by someone else, an error is returned.
+     */
+    public fun getBlockAddress(block: BasicBlock): Result<BlockAddress, AssertionError> {
+        return when (val blockOwner = block.getFunction()) {
+            is Some -> {
+                if (ref == blockOwner.unwrap().ref) {
+                    val addr = LLVM.LLVMBlockAddress(ref, block.ref)
+                    Ok(addr).map { BlockAddress(it) }
+                } else {
+                    Err(AssertionError("This function does not own the provided block"))
+                }
+            }
+            is None -> Err(AssertionError("Provided block does not have owning function"))
+        }
+    }
 }
 
 /**
@@ -1060,6 +1098,9 @@ public class GlobalVariable public constructor(ptr: LLVMValueRef) :
  *
  * Constant expression types can be recognized using [ConstantExpression.getOpcode].
  *
+ * The [ConstantExpression.Companion] contains the constantexpr operations you may use on constants. Notice that none
+ * of these operations are checked so usage is "unsafe".
+ *
  * @author Mats Larsen
  */
 public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
@@ -1068,16 +1109,947 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
 
         return Opcode.from(opcode).unwrap()
     }
+
+    public companion object {
+        /**
+         * Create a integer negation constexpr
+         *
+         * The `fneg` instruction negates a floating-point or a vector-of-floating-point operand
+         *
+         * The produced value is a copy of its operand with the sign bit flipped.
+         *
+         * @param self floating-point or vector-of-floating-point to negate
+         */
+        @JvmStatic
+        public fun getIntNeg(self: Constant): Constant {
+            val res = LLVM.LLVMConstNeg(self.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating point negation constexpr
+         *
+         * The `fneg` instruction negates a floating-point or a vector-of-floating-point operand
+         *
+         * The produced value is a copy of its operand with the sign bit flipped.
+         *
+         * @param self floating-point or vector-of-floating-point to negate
+         */
+        @JvmStatic
+        public fun getFloatNeg(self: Constant): Constant {
+            val res = LLVM.LLVMConstFNeg(self.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an addition constexpr
+         *
+         * The `add` instruction adds two integer or vector-of-integer operands
+         *
+         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
+         * does overflow, a poison value is returned
+         *
+         * @param lhs       left hand side integer to add
+         * @param rhs       right hand side integer to add
+         * @param semantics wrapping semantics upon overflow
+         */
+        @JvmStatic
+        public fun getIntAdd(lhs: Constant, rhs: Constant, semantics: WrapSemantics): Constant {
+            val res = when (semantics) {
+                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWAdd(lhs.ref, rhs.ref)
+                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWAdd(lhs.ref, rhs.ref)
+                WrapSemantics.Unspecified -> LLVM.LLVMConstAdd(lhs.ref, rhs.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point addition constexpr
+         *
+         * The `fadd` instruction adds two floating-point or vector-of-floating-point operands
+         *
+         * @param lhs left hand side floating-point to add
+         * @param rhs right hand side floating-point to add
+         */
+        @JvmStatic
+        public fun getFloatAdd(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFAdd(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a subtraction constexpr
+         *
+         * The `sub` instruction subtracts to integer or vector-of-integer operands
+         *
+         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
+         * does overflow, a poison value is returned
+         *
+         * @param lhs       integer to subtract from
+         * @param rhs       how much to subtract from [lhs]
+         * @param semantics wrapping semantics upon overflow
+         */
+        @JvmStatic
+        public fun getIntSub(lhs: Constant, rhs: Constant, semantics: WrapSemantics): Constant {
+            val res = when (semantics) {
+                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWSub(lhs.ref, rhs.ref)
+                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWSub(lhs.ref, rhs.ref)
+                WrapSemantics.Unspecified -> LLVM.LLVMConstSub(lhs.ref, rhs.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point subtraction constexpr
+         *
+         * The `fsub` instruction subtracts two floating-point or vector-of-floating-point operands
+         *
+         * @param lhs  floating-point to subtract from
+         * @param rhs  how much to subtract from [lhs]
+         */
+        public fun getFloatSub(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFSub(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a multiplication constexpr
+         *
+         * The `mul` instruction multiplies two integer or vector-of-integer operands
+         *
+         * The [semantics] decide how LLVM should handle integer overflow. If a semantic rule is specified and the value
+         * does overflow, a poison value is returned
+         *
+         * @param lhs       left hand side integer to multiply
+         * @param rhs       right hand side integer to multiply
+         * @param semantics wrapping semantics upon overflow
+         */
+        @JvmStatic
+        public fun getIntMul(lhs: Constant, rhs: Constant, semantics: WrapSemantics): Constant {
+            val res = when (semantics) {
+                WrapSemantics.NoUnsigned -> LLVM.LLVMConstNUWMul(lhs.ref, rhs.ref)
+                WrapSemantics.NoSigned -> LLVM.LLVMConstNSWMul(lhs.ref, rhs.ref)
+                WrapSemantics.Unspecified -> LLVM.LLVMConstMul(lhs.ref, rhs.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point multiplication constexpr
+         *
+         * The `fmul` instruction multiplies two floating-point or vector-of-floating-point operands
+         *
+         * @param lhs left hand side floating-point to multiply
+         * @param rhs right hand side floating-point to multiply
+         */
+        public fun getFloatMul(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFMul(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an unsigned integer division constexpr
+         *
+         * The `udiv` instruction divides two integer or vector-of-integer operands. The `udiv` instruction yields the
+         * unsigned quotient of the two operands. Signed division is done with [getSignedDiv]
+         *
+         * @param dividend dividend integer value (value being divided)
+         * @param divisor  divisor integer value (the number dividend is being divided by)
+         * @param exact    use llvm "exact" division (see language reference)
+         */
+        @JvmStatic
+        public fun getUnsignedDiv(dividend: Constant, divisor: Constant, exact: Boolean): Constant {
+            val res = if (exact) {
+                LLVM.LLVMConstExactUDiv(dividend.ref, divisor.ref)
+            } else {
+                LLVM.LLVMConstUDiv(dividend.ref, divisor.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a signed integer division constexpr
+         *
+         * The `sdiv` instruction divides the two integer or vector-of-integer operands. The `sdiv` instruction yields
+         * the signed quotient of the two operands. Unsigned division is done with [getUnsignedDiv]
+         *
+         * @param dividend dividend integer value (value being divided)
+         * @param divisor divisor integer value (the number dividend is being divided by)
+         * @param exact   use llvm "exact" division (see language reference)
+         */
+        @JvmStatic
+        public fun getSignedDiv(dividend: Constant, divisor: Constant, exact: Boolean): Constant {
+            val res = if (exact) {
+                LLVM.LLVMConstExactSDiv(dividend.ref, divisor.ref)
+            } else {
+                LLVM.LLVMConstSDiv(dividend.ref, divisor.ref)
+            }
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point division constexpr
+         *
+         * The `fdiv` instruction divides the two floating-point or vector-of-floating-point operands.
+         *
+         * @param dividend dividend floating-point value (value being divided)
+         * @param divisor divisor floating-point value (the number divided is being divided by)
+         */
+        public fun getFloatDiv(dividend: Constant, divisor: Constant): Constant {
+            val res = LLVM.LLVMConstFDiv(dividend.ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an unsigned integer remainder constexpr
+         *
+         * The `urem` instruction returns the remainder from the unsigned division of its two integer or
+         * vector-of-integer operands.
+         *
+         * @param dividend dividend integer value (value being divided)
+         * @param divisor  divisor integer value (the number dividend is being divided by)
+         */
+        @JvmStatic
+        public fun getUnsignedRem(dividend: Constant, divisor: Constant): Constant {
+            val res = LLVM.LLVMConstURem(dividend.ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a signed integer remainder constexpr
+         *
+         * The `srem` instruction returns the remainder from the signed division of its two integer or vector-of-integer
+         * operands.
+         *
+         * @param dividend dividend integer value (value being divided)
+         * @param divisor  divisor integer value (the number dividend is being divided by)
+         */
+        @JvmStatic
+        public fun getSignedRem(dividend: Constant, divisor: Constant): Constant {
+            val res = LLVM.LLVMConstSRem(dividend.ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point remainder constexpr
+         *
+         * The `frem` instruction returns the remainder from the division of its floating-point or
+         * vector-of-floating-point operands.
+         *
+         * @param dividend dividend floating-point value (value being divided)
+         * @param divisor  divisor floating-point value (the number dividend is being divided by)
+         */
+        public fun getFloatRem(dividend: Constant, divisor: Constant): Constant {
+            val res = LLVM.LLVMConstFRem(dividend.ref, divisor.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a left shift constexpr
+         *
+         * The `shl` instruction shifts its first integer or vector-of-integer operand to the left a specified number of
+         * bits
+         *
+         * @param lhs integer value to shift left
+         * @param rhs number of bits to shift [lhs] to the left
+         */
+        @JvmStatic
+        public fun getLeftShift(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstShl(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical shift right constexpr
+         *
+         * The `lshr` instruction logically shifts its first integer or vector-of-integer operand to the right a
+         * specified number of bits with zero fill.
+         *
+         * @param lhs integer value to logically shift right
+         * @param rhs number of bits to shift [lhs] to the right
+         */
+        @JvmStatic
+        public fun getLogicalShiftRight(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstLShr(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an arithmetic shift right constexpr
+         *
+         * The `ashr` instruction arithmetically shifts its first integer or vector-of-integer operand to the right a
+         * specified number of bits with sign extension.
+         *
+         * @param lhs integer value to arithmetically shift right
+         * @param rhs number of bits to shift [lhs] to the right
+         */
+        @JvmStatic
+        public fun getArithmeticShiftRight(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstAShr(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical and constexpr
+         *
+         * The `and` instruction returns the bitwise logical and of its two integer or vector-of-integer operands.
+         *
+         * @param lhs left hand side integer
+         * @param rhs right hand side integer
+         */
+        @JvmStatic
+        public fun getLogicalAnd(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstAnd(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical or constexpr
+         *
+         * The `or` instruction returns the bitwise logical or of its two integer or vector-of-integer operands.
+         *
+         * @param lhs left hand side integer
+         * @param rhs right hand side integer
+         */
+        @JvmStatic
+        public fun getLogicalOr(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstOr(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a logical xor constexpr
+         *
+         * The `xor` instruction returns the bitwise logical xor of its two integer or vector-of-integer operands.
+         *
+         * @param lhs left hand side integer
+         * @param rhs right hand side integer
+         */
+        @JvmStatic
+        public fun getLogicalXor(lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstXor(lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an extract element constexpr
+         *
+         * The `extractelement` instruction extracts a single element from a vector at a specified index.
+         *
+         * @param vector value to extract an element from
+         * @param index  index of element to extract
+         */
+        @JvmStatic
+        public fun getExtractElement(vector: Constant, index: Constant): Constant {
+            val res = LLVM.LLVMConstExtractElement(vector.ref, index.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an insert element constexpr
+         *
+         * The `insertelement` instruction inserts a single element into a vector at a specified index.
+         *
+         * @param vector value to insert an element into
+         * @param value  the item to insert into the vector
+         * @param index  the index to store the element
+         */
+        @JvmStatic
+        public fun getInsertElement(vector: Constant, value: Constant, index: Constant): Constant {
+            val res = LLVM.LLVMConstInsertElement(vector.ref, value.ref, index.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a shuffle vector constexpr
+         *
+         * The `shufflevector` instruction constructs a permutation of elements from two input vectors, returning a
+         * vector with the same element type as the input and length that is the same as the shuffle mask.
+         *
+         * @param op1  first vector operand
+         * @param op2  second vector operand
+         * @param mask the shuffle mask
+         */
+        @JvmStatic
+        public fun getShuffleVector(vec1: Constant, vec2: Constant, mask: Constant): Constant {
+            val res = LLVM.LLVMConstShuffleVector(vec1.ref, vec2.ref, mask.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * CReate an extract value constexpr
+         *
+         * The `extractvalue` instruction extracts the value of a member field from an aggregate value.
+         *
+         * The LLVM C API only allows for a single index to be used.
+         *
+         * @param aggregate struct or array value to extract value from
+         * @param indices   indices in [aggregate] to retrieve
+         */
+        @JvmStatic
+        public fun getExtractValue(aggregate: Constant, vararg indices: Int): Constant {
+            val indexPtr = IntPointer(*indices)
+            val res = LLVM.LLVMConstExtractValue(aggregate.ref, indexPtr, indices.size)
+            indexPtr.deallocate()
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an insert value constexpr
+         *
+         * The `insertvalue` instruction sets the value of a member field of an aggregate value.
+         *
+         * The LLVM C API only allows for a single index to be used.
+         *
+         * @param aggregate struct or array value to extract value from
+         * @param value     value to insert at index
+         * @param indices   indices in this to insert element into
+         */
+        @JvmStatic
+        public fun getInsertValue(aggregate: Constant, value: Constant, vararg indices: Int): Constant {
+            val indexPtr = IntPointer(*indices)
+            val res = LLVM.LLVMConstInsertValue(aggregate.ref, value.ref, indexPtr, indices.size)
+            indexPtr.deallocate()
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a get element pointer constexpr
+         *
+         * The `getelementptr` instruction is used to calculate the address of a sub-element of an aggregate data
+         * structure. This is just a calculation and it does not access memory.
+         *
+         * If [inBounds] is true, the instruction will yield a poison value if one of the following rules are violated:
+         * See semantics for instruction: https://llvm.org/docs/LangRef.html#id233
+         *
+         * @param aggregate struct or array value to extract value from
+         * @param indices   directions/indices in the aggregate value to navigate through to find wanted element
+         * @param inBounds  whether the getelementptr is in bounds
+         */
+        @JvmStatic
+        public fun getGetElementPtr(aggregate: Constant, vararg indices: Constant, inBounds: Boolean): Constant {
+            val indexPtr = indices.map { it.ref }.toPointerPointer()
+            val res = if (inBounds) {
+                LLVM.LLVMConstInBoundsGEP(aggregate.ref, indexPtr, indices.size)
+            } else {
+                LLVM.LLVMConstGEP(aggregate.ref, indexPtr, indices.size)
+            }
+            indexPtr.deallocate()
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an integer trunc constexpr
+         *
+         * The `trunc` instruction truncates its integer or vector-of-integer operand to the provided type.
+         *
+         * The bit size of the operand's type must be larger than the bit size of the destination type. Equal sized types
+         * are not allowed.
+         *
+         * @param value integer value to truncate
+         * @param type  type to truncate down to
+         */
+        @JvmStatic
+        public fun getIntTrunc(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstTrunc(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a zero extension constexpr
+         *
+         * The `zext` instruction zero extends its integer or vector-of-integer operand to the provided type.
+         *
+         * The bit size of the operand's type must be smaller than the bit size of the destination type.
+         *
+         * @param value integer value to zero extend
+         * @param type  type to zero extend to
+         */
+        @JvmStatic
+        public fun getZeroExt(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstZExt(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a sign extension constexpr
+         *
+         * The `sext` instruction sign extends its integer or vector-of-integer operand to the provided type.
+         *
+         * The bit size of the operand's type must be smaller than the bit size of the destination type.
+         *
+         * @param value integer value to sign extend
+         * @param type  type to sign extend to
+         */
+        @JvmStatic
+        public fun getSignExt(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstSExt(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point trunc constexpr
+         *
+         * The `fptrunc` instruction truncates its floating-point or vector-of-floating-point operand to the provided type.
+         *
+         * The size of the operand's type must be larger than the destination type. Equal sized types are not allowed.
+         *
+         * @param value floating-point value to truncate
+         * @param type  type to truncate down to
+         */
+        @JvmStatic
+        public fun getFloatTrunc(value: Constant, type: FloatingPointType): Constant {
+            val res = LLVM.LLVMConstFPTrunc(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a float extension constexpr
+         *
+         * The `fpext` instruction casts a floating-point or vector-of-floating-point operand to the provided type.
+         *
+         * The size of the operand's type must be smaller than the destination type.
+         *
+         * @param value floating-point value to extend
+         * @param type  the type to extend to
+         */
+        @JvmStatic
+        public fun getFloatExt(value: Constant, type: FloatingPointType): Constant {
+            val res = LLVM.LLVMConstFPExt(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a float to unsigned int cast constexpr
+         *
+         * The `fptoui` instruction converts a floating-point or a vector-of-floating-point operand to its unsigned
+         * integer equivalent.
+         *
+         * @param value floating-point value to cast
+         * @param type  integer type to cast to
+         */
+        @JvmStatic
+        public fun getFloatToUnsigned(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstFPToUI(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a float to signed int cast constexpr
+         *
+         * The `fptosi` instruction converts a floating-point or a vector-of-floating-point operand to its signed integer
+         * equivalent.
+         *
+         * @param value floating-point value to cast
+         * @param type  integer type to cast to
+         */
+        @JvmStatic
+        public fun getFloatToSigned(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstFPToSI(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an unsigned int to float cast constexpr
+         *
+         * The `uitofp` instruction converts an unsigned integer or vector-of-integer operand to the floating-point type
+         * equivalent.
+         *
+         * @param value integer value to cast
+         * @param type  floating-point type to cast to
+         */
+        @JvmStatic
+        public fun getUnsignedToFloat(value: Constant, type: FloatingPointType): Constant {
+            val res = LLVM.LLVMConstSIToFP(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a signed int to float cast constexpr
+         *
+         * The `sitofp` instruction converts a signed integer or vector-of-integer operand to the floating-point type
+         * equivalent.
+         *
+         * @param value integer value to cast
+         * @param type  floating-point type to cast to
+         */
+        @JvmStatic
+        public fun getSignedToFloat(value: Constant, type: FloatingPointType): Constant {
+            val res = LLVM.LLVMConstSIToFP(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a pointer to int cast constexpr
+         *
+         * The `ptrtoint` instruction converts a pointer or vector-of-pointer operand to the provided integer type.
+         *
+         * @param value pointer to cast
+         * @param type  integer type to cast to
+         */
+        @JvmStatic
+        public fun getPointerToInt(value: Constant, type: IntegerType): Constant {
+            val res = LLVM.LLVMConstPtrToInt(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a int to pointer cast constexpr
+         *
+         * The `inttoptr` instruction converts an integer operand and casts it to the provided pointer type.
+         *
+         * @param value integer to cast
+         * @param type  pointer type to cast to
+         */
+        @JvmStatic
+        public fun getIntToPointer(value: Constant, type: PointerType): Constant {
+            val res = LLVM.LLVMConstIntToPtr(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a bit cast constexpr
+         *
+         * The `bitcast` instruction converts its operand to the provided type without changing any bits.
+         *
+         * @param value value to cast
+         * @param type  type to cast to
+         */
+        @JvmStatic
+        public fun getBitCast(value: Constant, type: Type): Constant {
+            val res = LLVM.LLVMConstBitCast(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an address space cast constexpr
+         *
+         * The `addrspacecast` instruction converts a pointer value with a type in address space A to a pointer type in
+         * address space B which must have a different address space.
+         *
+         * @param value pointer value to cast
+         * @param type  pointer type to cast address space cast into
+         */
+        @JvmStatic
+        public fun getAddrSpaceCast(value: Constant, type: PointerType): Constant {
+            val res = LLVM.LLVMConstAddrSpaceCast(value.ref, type.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create an integer comparison constexpr
+         *
+         * The `icmp` instruction returns a boolean (i1) value based on comparison of two integer, vector-of-integer,
+         * pointer or vector-of-pointer operands.
+         *
+         * @param predicate comparison operator to use
+         * @param lhs       left hand side of comparison
+         * @param rhs       right hand side of comparison
+         */
+        @JvmStatic
+        public fun getIntCompare(predicate: IntPredicate, lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstICmp(predicate.value, lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a floating-point comparison constexpr
+         *
+         * The `fcmp` instruction returns a boolean (i1) value based on comparison of two floating-point or
+         * vector-of-floating-point operands.
+         *
+         * @param predicate comparison operator to use
+         * @param lhs       left hand side of comparison
+         * @param rhs       right hand side of comparison
+         */
+        @JvmStatic
+        public fun getFloatCompare(predicate: FloatPredicate, lhs: Constant, rhs: Constant): Constant {
+            val res = LLVM.LLVMConstFCmp(predicate.value, lhs.ref, rhs.ref)
+
+            return Constant(res)
+        }
+
+        /**
+         * Create a select constexpr
+         *
+         * The `select` instruction is used to pick a value based on a boolean condition. It is analogous to the ternary
+         * operator in C. The condition is either a 1-bit integer or a vector of 1-bit integers
+         *
+         * @param condition boolean (i1) condition
+         * @param isTrue    value to select if [condition] is true
+         * @param isFalse   value to select if [condition] is false
+         * @param name      optional name for the instruction
+         */
+        @JvmStatic
+        public fun getSelect(condition: Constant, isTrue: Constant, isFalse: Constant): Constant {
+            val res = LLVM.LLVMConstSelect(condition.ref, isTrue.ref, isFalse.ref)
+
+            return Constant(res)
+        }
+    }
 }
 
 /**
  * TODO: Research - LLVMSetAlignment and GetAlignment on Alloca, Load and Store
  */
+@CorrespondsTo("llvm::Instruction")
 public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
-    public interface Atomic : Owner<LLVMValueRef>
-    public interface CallBase : Owner<LLVMValueRef>
-    public interface MemoryAccessor : Owner<LLVMValueRef>
-    public interface Terminator : Owner<LLVMValueRef>
+    /**
+     * Common shared implementation for any LLVM instruction which is a call
+     *
+     * @see CallInstruction
+     * @see CallBrInstruction
+     * @see InvokeInstruction
+     *
+     * TODO: Testing - Test attributes
+     *
+     * @author Mats Larsen
+     */
+    public interface CallBaseInstructionImpl : Owner<LLVMValueRef> {
+        public fun getArgumentCount(): Int {
+            return LLVM.LLVMGetNumArgOperands(ref)
+        }
+
+        public fun getCallConvention(): CallConvention {
+            val convention = LLVM.LLVMGetInstructionCallConv(ref)
+            return CallConvention.from(convention).unwrap()
+        }
+
+        public fun setCallConvention(convention: CallConvention) {
+            LLVM.LLVMSetInstructionCallConv(ref, convention.value)
+        }
+
+        /**
+         * Sets the parameter at [index]'s alignment to [alignment]
+         *
+         * Returns [IndexOutOfBoundsException] if index exceeds argument size
+         *
+         * TODO: Testing - Find out how to test this
+         */
+        public fun setParameterAlignment(index: Int, alignment: Int): Result<Unit, IndexOutOfBoundsException> {
+            val size = getArgumentCount()
+            return if (index < size) {
+                LLVM.LLVMSetInstrParamAlignment(ref, index, alignment)
+                Ok(Unit)
+            } else {
+                Err(IndexOutOfBoundsException("Index $index out of bounds for size $size"))
+            }
+        }
+
+        public fun getCalledFunctionType(): FunctionType {
+            val fnTy = LLVM.LLVMGetCalledFunctionType(ref)
+
+            return FunctionType(fnTy)
+        }
+
+        public fun getCallSiteAttributeCount(index: AttributeIndex): Int {
+            return LLVM.LLVMGetCallSiteAttributeCount(ref, index.value)
+        }
+
+        public fun getCallSiteAttributes(index: AttributeIndex): Array<Attribute> {
+            val size = getCallSiteAttributeCount(index)
+            val pointer = PointerPointer<LLVMAttributeRef>(size.toLong())
+            LLVM.LLVMGetCallSiteAttributes(ref, index.value, pointer)
+
+            return List(size) {
+                LLVMAttributeRef(pointer.get(it.toLong()))
+            }.map(::Attribute).toTypedArray().also {
+                pointer.deallocate()
+            }
+        }
+
+        public fun addCallSiteAttribute(index: AttributeIndex, attribute: Attribute) {
+            LLVM.LLVMAddCallSiteAttribute(ref, index.value, attribute.ref)
+        }
+
+        public fun getCallSiteEnumAttribute(index: AttributeIndex, kind: Int): Option<Attribute> {
+            val attr = LLVM.LLVMGetCallSiteEnumAttribute(ref, index.value, kind)
+
+            return Option.of(attr).map { Attribute(it) }
+        }
+
+        public fun getCallSiteStringAttribute(index: AttributeIndex, kind: String): Option<Attribute> {
+            val attr = LLVM.LLVMGetCallSiteStringAttribute(ref, index.value, kind, kind.length)
+
+            return Option.of(attr).map { Attribute(it) }
+        }
+
+        public fun removeCallSiteEnumAttribute(index: AttributeIndex, kind: Int) {
+            LLVM.LLVMRemoveCallSiteEnumAttribute(ref, index.value, kind)
+        }
+
+        public fun removeCallSiteStringAttribute(index: AttributeIndex, kind: String) {
+            LLVM.LLVMRemoveCallSiteStringAttribute(ref, index.value, kind, kind.length)
+        }
+    }
+
+    /**
+     * Common shared implementation for any LLVM instruction which is atomic
+     *
+     * @see AtomicRMWInstruction
+     * @see AtomicCmpXchgInstruction
+     *
+     * @author Mats Larsen
+     */
+    public interface AtomicInstructionImpl : Owner<LLVMValueRef> {
+        public fun isSingleThread(): Boolean {
+            return LLVM.LLVMIsAtomicSingleThread(ref).toBoolean()
+        }
+
+        public fun setSingleThread(singleThread: Boolean) {
+            LLVM.LLVMSetAtomicSingleThread(ref, singleThread.toInt())
+        }
+    }
+
+    /**
+     * Common shared implementation for any LLVM instruction which accesses memory
+     *
+     * @see LoadInstruction
+     * @see StoreInstruction
+     * @see AtomicRMWInstruction
+     * @see AtomicCmpXchgInstruction
+     *
+     * @author Mats Larsen
+     */
+    public interface MemoryAccessorInstructionImpl : Owner<LLVMValueRef> {
+        public fun isVolatile(): Boolean {
+            return LLVM.LLVMGetVolatile(ref).toBoolean()
+        }
+
+        public fun setVolatile(volatile: Boolean) {
+            LLVM.LLVMSetVolatile(ref, volatile.toInt())
+        }
+
+        public fun getOrdering(): AtomicOrdering {
+            val order = LLVM.LLVMGetOrdering(ref)
+            return AtomicOrdering.from(order).unwrap()
+        }
+
+        public fun setOrdering(order: AtomicOrdering) {
+            LLVM.LLVMSetOrdering(ref, order.value)
+        }
+    }
+
+    /**
+     * Common shared implementation for any LLVM instruction which modifies aggregate values
+     *
+     * @see ExtractValueInstruction
+     * @see InsertValueInstruction
+     *
+     * @author Mats Larsen
+     */
+    public interface ValueUpdatingInstructionImpl : Owner<LLVMValueRef> {
+        public fun getIndexCount(): Int {
+            return LLVM.LLVMGetNumIndices(ref)
+        }
+
+        public fun getIndices(): Array<Int> {
+            val indices = LLVM.LLVMGetIndices(ref)
+            val size = getIndexCount()
+
+            return List(size) {
+                indices.get(it.toLong())
+            }.toTypedArray()
+        }
+    }
+
+    /**
+     * Common shared implementation for any LLVM instruction which is a terminator
+     *
+     * @see ReturnInstruction
+     * @see BranchInstruction
+     * @see SwitchInstruction
+     * @see IndirectBrInstruction
+     * @see InvokeInstruction
+     * @see CallBrInstruction
+     * @see ResumeInstruction
+     * @see CatchSwitchInstruction
+     * @see CatchReturnInstruction
+     * @see CleanupReturnInstruction
+     * @see UnreachableInstruction
+     *
+     * @author Mats Larsen
+     */
+    public interface TerminatorInstructionImpl : Owner<LLVMValueRef> {
+        public fun getSuccessorCount(): Int {
+            return LLVM.LLVMGetNumSuccessors(ref)
+        }
+
+        /**
+         * Get the successor at [index] in the successors list
+         *
+         * @return block if it exists, [IndexOutOfBoundsException] if index is larger or equal to size.
+         */
+        public fun getSuccessor(index: Int): Result<BasicBlock, IndexOutOfBoundsException> {
+            val size = getSuccessorCount()
+            return if (index < size) {
+                val block = LLVM.LLVMGetSuccessor(ref, index)
+                Ok(block).map { BasicBlock(it) }
+            } else {
+                Err(IndexOutOfBoundsException("Index $index out of bounds for size $size"))
+            }
+        }
+
+        /**
+         * Set the successor at [index] in the successors list
+         *
+         * @return block if it exists, [IndexOutOfBoundsException] if index is larger or equal to size.
+         */
+        public fun setSuccessor(block: BasicBlock, index: Int): Result<Unit, IndexOutOfBoundsException> {
+            val size = getSuccessorCount()
+            return if (index < size) {
+                LLVM.LLVMSetSuccessor(ref, index, block.ref)
+                Ok(Unit)
+            } else {
+                Err(IndexOutOfBoundsException("Index $index out of bounds for size $size"))
+            }
+        }
+    }
+
+    public fun getOpcode(): Opcode {
+        val opcode = LLVM.LLVMGetInstructionOpcode(ref)
+        return Opcode.from(opcode).unwrap()
+    }
 
     public fun hasMetadata(): Boolean {
         return LLVM.LLVMHasMetadata(ref).toBoolean()
@@ -1092,66 +2064,421 @@ public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.
     public fun setMetadata(kindId: Int, node: MetadataAsValue) {
         LLVM.LLVMSetMetadata(ref, kindId, node.ref)
     }
+
+    /**
+     * Insert the instruction at the given [builder]'s insertion point.
+     *
+     * The instruction may optionally receive a [name]
+     */
+    public fun insert(builder: IRBuilder, name: Option<String>) {
+        when (name) {
+            is Some -> LLVM.LLVMInsertIntoBuilderWithName(builder.ref, ref, name.unwrap())
+            is None -> LLVM.LLVMInsertIntoBuilder(builder.ref, ref)
+        }
+    }
 }
 
+@CorrespondsTo("llvm::BinaryOperator")
 public class BinaryOperatorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
+@CorrespondsTo("llvm::CmpInst")
 public open class ComparisonInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class IntComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr)
-public class FPComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr)
 
-public open class FuncletPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+@CorrespondsTo("llvm::ICmpInst")
+public class IntComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr) {
+    public fun getPredicate(): IntPredicate {
+        val predicate = LLVM.LLVMGetICmpPredicate(ref)
+        return IntPredicate.from(predicate).unwrap()
+    }
+}
+
+@CorrespondsTo("llvm::FCmpInst")
+public class FloatComparisonInstruction public constructor(ptr: LLVMValueRef) : ComparisonInstruction(ptr) {
+    public fun getPredicate(): FloatPredicate {
+        val predicate = LLVM.LLVMGetFCmpPredicate(ref)
+        return FloatPredicate.from(predicate).unwrap()
+    }
+}
+
+@CorrespondsTo("llvm::FuncletPadInst")
+public open class FuncletPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr) {
+    public fun getArgumentCount(): Int {
+        return LLVM.LLVMGetNumArgOperands(ref)
+    }
+}
+
+@CorrespondsTo("llvm::CatchPadInst")
 public class CatchPadInstruction public constructor(ptr: LLVMValueRef) : FuncletPadInstruction(ptr)
+
+@CorrespondsTo("llvm::CleanupPadInst")
 public class CleanupPadInstruction public constructor(ptr: LLVMValueRef) : FuncletPadInstruction(ptr)
 
+@CorrespondsTo("llvm::UnaryInstruction")
 public open class UnaryInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class AllocaInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
-public open class CastInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
-public class ExtractValueInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
-public class LoadInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
-public class VAArgInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
-public class FreezeInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
-public class UnaryOperator public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
 
+@CorrespondsTo("llvm::AllocaInst")
+public class AllocaInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr) {
+    public fun getAllocatedType(): Type {
+        val allocated = LLVM.LLVMGetAllocatedType(ref)
+
+        return Type(allocated)
+    }
+}
+
+@CorrespondsTo("llvm::CastInst")
+public open class CastInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+
+@CorrespondsTo("llvm::ExtractValueInst")
+public class ExtractValueInstruction public constructor(ptr: LLVMValueRef) :
+    UnaryInstruction(ptr),
+    Instruction.ValueUpdatingInstructionImpl
+
+@CorrespondsTo("llvm::LoadInst")
+public class LoadInstruction public constructor(ptr: LLVMValueRef) :
+    UnaryInstruction(ptr),
+    Instruction.MemoryAccessorInstructionImpl
+
+@CorrespondsTo("llvm::VAArgInst")
+public class VAArgInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+
+@CorrespondsTo("llvm::FreezeInst")
+public class FreezeInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+
+@CorrespondsTo("llvm::UnaryOperator")
+public class UnaryOperatorInstruction public constructor(ptr: LLVMValueRef) : UnaryInstruction(ptr)
+
+@CorrespondsTo("llvm::AddrSpaceCastInst")
 public class AddrSpaceCastInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::BitCastInst")
 public class BitCastInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::FPExtInst")
 public class FloatExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::FPToSIIsnt")
 public class FloatToSignedInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::FPToUIInst")
 public class FloatToUnsignedInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::FPTruncInst")
 public class FloatTruncInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::IntToPtrInst")
 public class IntToPtrInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::PtrToIntInst")
 public class PtrToIntInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
-public class SignedExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::SExtInst")
+public class SignExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::SIToFPInst")
 public class SignedToFloatInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::TruncInst")
 public class IntTruncInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::UIToFPInst")
 public class UnsignedToFloatInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
+
+@CorrespondsTo("llvm::ZExtInst")
 public class ZeroExtInstruction public constructor(ptr: LLVMValueRef) : CastInstruction(ptr)
 
-public class AtomicCmpXchgInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class AtomicRMWInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+@CorrespondsTo("llvm::AtomicCmpXchgInst")
+public class AtomicCmpXchgInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.MemoryAccessorInstructionImpl,
+    Instruction.AtomicInstructionImpl {
+    public fun isWeak(): Boolean {
+        return LLVM.LLVMGetWeak(ref).toBoolean()
+    }
 
-public open class BranchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class InvokeInstruction public constructor(ptr: LLVMValueRef) : BranchInstruction(ptr)
-public class CallBrInstruction public constructor(ptr: LLVMValueRef) : BranchInstruction(ptr)
-public class CallInstruction public constructor(ptr: LLVMValueRef) : BranchInstruction(ptr)
+    public fun setWeak(weak: Boolean) {
+        LLVM.LLVMSetWeak(ref, weak.toInt())
+    }
 
-public class CatchReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class CatchSwitchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class CleanupReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+    public fun getFailureOrdering(): AtomicOrdering {
+        val ordering = LLVM.LLVMGetCmpXchgFailureOrdering(ref)
+        return AtomicOrdering.from(ordering).unwrap()
+    }
 
+    public fun setFailureOrdering(ordering: AtomicOrdering) {
+        LLVM.LLVMSetCmpXchgFailureOrdering(ref, ordering.value)
+    }
+
+    public fun getSuccessOrdering(): AtomicOrdering {
+        val ordering = LLVM.LLVMGetCmpXchgSuccessOrdering(ref)
+        return AtomicOrdering.from(ordering).unwrap()
+    }
+
+    public fun setSuccessOrdering(ordering: AtomicOrdering) {
+        LLVM.LLVMSetCmpXchgSuccessOrdering(ref, ordering.value)
+    }
+}
+
+@CorrespondsTo("llvm::AtmocRMWInst")
+public class AtomicRMWInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.MemoryAccessorInstructionImpl,
+    Instruction.AtomicInstructionImpl {
+    public fun getBinaryOperation(): AtomicRMWBinaryOperation {
+        val binOp = LLVM.LLVMGetAtomicRMWBinOp(ref)
+        return AtomicRMWBinaryOperation.from(binOp).unwrap()
+    }
+
+    public fun setBinaryOperation(binOp: AtomicRMWBinaryOperation) {
+        LLVM.LLVMSetAtomicRMWBinOp(ref, binOp.value)
+    }
+}
+
+@CorrespondsTo("llvm::BranchInst")
+public class BranchInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl {
+    public fun isConditional(): Boolean {
+        return LLVM.LLVMIsConditional(ref).toBoolean()
+    }
+
+    /**
+     * Get the condition of this branching instruction
+     *
+     * @return the condition if the instruction is conditional, [None] otherwise
+     */
+    public fun getCondition(): Option<Value> {
+        return if (isConditional()) {
+            val res = LLVM.LLVMGetCondition(ref)
+            Some(res).map { Value(it) }
+        } else {
+            None
+        }
+    }
+
+    /**
+     * Set the condition of this branching instruction
+     *
+     * If the branch isn't conditional, this is a no-op
+     */
+    public fun setCondition(condition: Value) {
+        if (isConditional()) {
+            LLVM.LLVMSetCondition(ref, condition.ref)
+        }
+    }
+}
+
+@CorrespondsTo("llvm::InvokeInst")
+public class InvokeInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl,
+    Instruction.CallBaseInstructionImpl {
+    /**
+     * Get the pointer to the function this instruction invokes
+     *
+     * TODO: Research - Can we use a more precise type here?
+     */
+    public fun getCalledFunction(): Value {
+        val fn = LLVM.LLVMGetCalledValue(ref)
+
+        return Value(fn)
+    }
+
+    public fun getNormalDestination(): BasicBlock {
+        val dest = LLVM.LLVMGetNormalDest(ref)
+
+        return BasicBlock(dest)
+    }
+
+    public fun getUnwindDestination(): BasicBlock {
+        val dest = LLVM.LLVMGetUnwindDest(ref)
+
+        return BasicBlock(dest)
+    }
+
+    public fun setNormalDestination(destination: BasicBlock) {
+        LLVM.LLVMSetNormalDest(ref, destination.ref)
+    }
+
+    public fun setUnwindDestination(destination: BasicBlock) {
+        LLVM.LLVMSetUnwindDest(ref, destination.ref)
+    }
+}
+
+@CorrespondsTo("llvm::CallBrInst")
+public class CallBrInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl,
+    Instruction.CallBaseInstructionImpl
+
+@CorrespondsTo("llvm::CallInst")
+public class CallInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.CallBaseInstructionImpl {
+    /**
+     * Get the pointer to the function this instruction invokes
+     *
+     * TODO: Research - Can we use a more precise type here?
+     */
+    public fun getCalledFunction(): Value {
+        val fn = LLVM.LLVMGetCalledValue(ref)
+
+        return Value(fn)
+    }
+
+    public fun isTailCall(): Boolean {
+        return LLVM.LLVMIsTailCall(ref).toBoolean()
+    }
+
+    public fun setTailCall(tailCall: Boolean) {
+        LLVM.LLVMSetTailCall(ref, tailCall.toInt())
+    }
+}
+
+@CorrespondsTo("llvm::CatchRetInst")
+public class CatchReturnInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::CatchSwitchInst")
+public class CatchSwitchInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::CleanupReturnInst")
+public class CleanupReturnInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::ExtractElementInst")
 public class ExtractElementInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::FenceInst")
 public class FenceInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
 
-public class GetElementPtrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class IndirectBrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+@CorrespondsTo("llvm::GetElementPtrInst")
+public class GetElementPtrInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr) {
+    public fun isInBounds(): Boolean {
+        return LLVM.LLVMIsInBounds(ref).toBoolean()
+    }
+
+    public fun setInBounds(inBounds: Boolean) {
+        LLVM.LLVMSetIsInBounds(ref, inBounds.toInt())
+    }
+}
+
+@CorrespondsTo("llvm::IndirectBrInst")
+public class IndirectBrInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl {
+    public fun addCase(block: BasicBlock) {
+        LLVM.LLVMAddDestination(ref, block.ref)
+    }
+}
+
+@CorrespondsTo("llvm::InsertElementInst")
 public class InsertElementInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class InsertValueInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::InsertValueInst")
+public class InsertValueInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.ValueUpdatingInstructionImpl
+
+@CorrespondsTo("llvm::LandingPadInst")
 public class LandingPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class PhiInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class ResumeInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class ReturnInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::PHINode")
+public class PhiInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr) {
+    /**
+     * Add a set of pairs of blocks and values to a phi instruction
+     *
+     * For each basic block, there must be an associated value.
+     */
+    public fun addIncoming(vararg pairs: Pair<BasicBlock, Value>) {
+        val blocks = pairs.map { it.first.ref }.toPointerPointer()
+        val values = pairs.map { it.second.ref }.toPointerPointer()
+        LLVM.LLVMAddIncoming(ref, values, blocks, pairs.size)
+        values.deallocate()
+        blocks.deallocate()
+    }
+
+    public fun getIncomingCount(): Int {
+        return LLVM.LLVMCountIncoming(ref)
+    }
+
+    /**
+     * Get the incoming value and basic block pair at a given index
+     *
+     * Returns IndexOutOfBoundsException if the index exceeds size
+     */
+    public fun getIncoming(index: Int): Result<Pair<BasicBlock, Value>, IndexOutOfBoundsException> {
+        val size = getIncomingCount()
+        return if (index < size) {
+            val block = LLVM.LLVMGetIncomingBlock(ref, index)
+            val value = LLVM.LLVMGetIncomingValue(ref, index)
+            Ok(Pair(BasicBlock(block), Value(value)))
+        } else {
+            Err(IndexOutOfBoundsException("Index $index out of bounds for size $size"))
+        }
+    }
+}
+
+@CorrespondsTo("llvm::ResumeInstruction")
+public class ResumeInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::ReturnInst")
+public class ReturnInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl
+
+@CorrespondsTo("llvm::SelectInst")
 public class SelectInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class ShuffleVectorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class StoreInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class SwitchInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
-public class UnreachableInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+
+@CorrespondsTo("llvm::ShuffleVectorInst")
+public class ShuffleVectorInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr) {
+    public fun getMaskElementCount(): Int {
+        return LLVM.LLVMGetNumMaskElements(ref)
+    }
+
+    public fun getMaskElement(index: Int): Int {
+        return LLVM.LLVMGetMaskValue(ref, index)
+    }
+
+    public companion object {
+        @JvmStatic
+        public fun getUndefMaskElement(): Int {
+            return LLVM.LLVMGetUndefMaskElem()
+        }
+    }
+}
+
+@CorrespondsTo("llvm::StoreInst")
+public class StoreInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.MemoryAccessorInstructionImpl
+
+@CorrespondsTo("llvm::SwitchInst")
+public class SwitchInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl {
+    /**
+     * Get the default destination block for this switch
+     *
+     * This is the block which control flow transfers to if none of the added cases match
+     */
+    public fun getDefaultDestination(): BasicBlock {
+        val block = LLVM.LLVMGetSwitchDefaultDest(ref)
+
+        return BasicBlock(block)
+    }
+
+    public fun addCase(case: ConstantInt, block: BasicBlock) {
+        LLVM.LLVMAddCase(ref, case.ref, block.ref)
+    }
+}
+
+@CorrespondsTo("llvm::UnreachableInst")
+public class UnreachableInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.TerminatorInstructionImpl

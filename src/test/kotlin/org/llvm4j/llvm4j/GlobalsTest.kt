@@ -131,6 +131,26 @@ class FunctionTest {
 
         assertEquals(2, subject.getBasicBlockCount())
     }
+
+    @Test fun `Retrieving block address of basic block`() {
+        val ctx = Context()
+        val void = ctx.getVoidType()
+        val mod = ctx.newModule("test")
+        val func = mod.addFunction("test", ctx.getFunctionType(void))
+        val otherFunc = mod.addFunction("test2", ctx.getFunctionType(void))
+        val entry = ctx.newBasicBlock("entry")
+        val bb1 = ctx.newBasicBlock("bb1")
+        val unowned = ctx.newBasicBlock("unowned")
+        val other = ctx.newBasicBlock("other")
+
+        func.addBasicBlock(entry)
+        func.addBasicBlock(bb1)
+        otherFunc.addBasicBlock(other)
+
+        assertIsErr(func.getBlockAddress(unowned))
+        assertIsErr(func.getBlockAddress(other))
+        assertIsOk(func.getBlockAddress(bb1))
+    }
 }
 
 class GlobalAliasTest {

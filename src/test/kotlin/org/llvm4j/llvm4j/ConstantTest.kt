@@ -8,7 +8,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ConstantIntTest {
-    @Test fun `Test ConstantInt properties`() {
+    @Test
+    fun `Test ConstantInt properties`() {
         val ctx = Context()
         val i32 = ctx.getInt32Type()
         val subject1 = i32.getConstant(100)
@@ -33,7 +34,8 @@ class ConstantIntTest {
         assertEquals(-100, subject5.getSignExtendedValue())
     }
 
-    @Test fun `Test get all ones`() {
+    @Test
+    fun `Test get all ones`() {
         val ctx = Context()
         val i1 = ctx.getInt1Type()
         val i8 = ctx.getInt8Type()
@@ -44,14 +46,14 @@ class ConstantIntTest {
 
         for (type in listOf(i1, i8, i16, i32, i64, i128)) {
             val subject = type.getAllOnes()
-
             assertEquals(-1, subject.getSignExtendedValue())
         }
     }
 }
 
 class ConstantFPTest {
-    @Test fun `Test ConstantFloat properties`() {
+    @Test
+    fun `Test ConstantFloat properties`() {
         val ctx = Context()
         val float = ctx.getFloatType()
         val subject1 = float.getConstant(100.0)
@@ -62,7 +64,7 @@ class ConstantFPTest {
         assertEquals(float.ref, subject1.getType().ref)
         assertEquals(ValueKind.ConstantFP, subject1.getValueKind())
         assertEquals("float 1.000000e+02", subject1.getAsString())
-        assertEquals(Pair(100.0, false), subject1.getValue())
+        assertEquals(Pair(100.0, false), subject1.getValuePair())
         assertTrue { subject1.isConstant() }
         assertFalse { subject1.isUndef() }
         assertFalse { subject1.isNull() }
@@ -72,7 +74,8 @@ class ConstantFPTest {
         assertTrue { subject4.isUndef() }
     }
 
-    @Test fun `Test get all ones`() {
+    @Test
+    fun `Test get all ones`() {
         val ctx = Context()
         val float = ctx.getFloatType()
         val bfloat = ctx.getBFloatType()
@@ -91,7 +94,7 @@ class ConstantFPTest {
 
         for ((type, result) in expected) {
             val (value, lossy) = result
-            val subject = type.getAllOnes().getValue()
+            val subject = type.getAllOnes().getValuePair()
 
             assertEquals(value, subject.first)
             assertEquals(lossy, subject.second)
@@ -100,7 +103,8 @@ class ConstantFPTest {
 }
 
 class ConstantArrayTest {
-    @Test fun `Test ConstantArray properties`() {
+    @Test
+    fun `Test ConstantArray properties`() {
         val ctx = Context()
         val i8 = ctx.getInt8Type()
         val a4i8 = ctx.getArrayType(i8, 4).unwrap()
@@ -121,7 +125,8 @@ class ConstantArrayTest {
 }
 
 class ConstantVectorTest {
-    @Test fun `Test ConstantVector properties`() {
+    @Test
+    fun `Test ConstantVector properties`() {
         val ctx = Context()
         val i8 = ctx.getInt8Type()
         val v4i8 = ctx.getVectorType(i8, 4).unwrap()
@@ -142,7 +147,8 @@ class ConstantVectorTest {
 }
 
 class ConstantPointerNullTest {
-    @Test fun `Test ConstantPointerNull properties`() {
+    @Test
+    fun `Test ConstantPointerNull properties`() {
         val ctx = Context()
         val i32 = ctx.getInt32Type()
         val i32ptr = ctx.getPointerType(i32).unwrap()
@@ -159,7 +165,8 @@ class ConstantPointerNullTest {
 }
 
 class ConstantStructTest {
-    @Test fun `Test anonymous ConstantStruct properties`() {
+    @Test
+    fun `Test anonymous ConstantStruct properties`() {
         val ctx = Context()
         val i8 = ctx.getInt8Type()
         val f32 = ctx.getFloatType()
@@ -184,7 +191,8 @@ class ConstantStructTest {
         assertFalse { subject2.isUndef() }
     }
 
-    @Test fun `Test named ConstantStruct properties`() {
+    @Test
+    fun `Test named ConstantStruct properties`() {
         val ctx = Context()
         val i8 = ctx.getInt8Type()
         val f32 = ctx.getFloatType()
