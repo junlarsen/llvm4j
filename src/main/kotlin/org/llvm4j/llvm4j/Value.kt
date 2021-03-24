@@ -5,7 +5,6 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMAttributeRef
 import org.bytedeco.llvm.LLVM.LLVMBasicBlockRef
-import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.LLVM.LLVMValueMetadataEntry
 import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
@@ -1835,7 +1834,94 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
  */
 @CorrespondsTo("llvm::Instruction")
 public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
-    public interface CallBaseInstructionImpl : Owner<LLVMValueRef>
+    /**
+     * Common shared implementation for any LLVM instruction which is a call
+     *
+     * @see CallInstruction
+     * @see CallBrInstruction
+     * @see InvokeInstruction
+     *
+     * TODO: Testing - Test attributes
+     *
+     * @author Mats Larsen
+     */
+    public interface CallBaseInstructionImpl : Owner<LLVMValueRef> {
+        public fun getArgumentCount(): Int {
+            return LLVM.LLVMGetNumArgOperands(ref)
+        }
+
+        public fun getCallConvention(): CallConvention {
+            val convention = LLVM.LLVMGetInstructionCallConv(ref)
+            return CallConvention.from(convention).unwrap()
+        }
+
+        public fun setCallConvention(convention: CallConvention) {
+            LLVM.LLVMSetInstructionCallConv(ref, convention.value)
+        }
+
+        /**
+         * Sets the parameter at [index]'s alignment to [alignment]
+         *
+         * Returns [IndexOutOfBoundsException] if index exceeds argument size
+         *
+         * TODO: Testing - Find out how to test this
+         */
+        public fun setParameterAlignment(index: Int, alignment: Int): Result<Unit, IndexOutOfBoundsException> {
+            val size = getArgumentCount()
+            return if (index < size) {
+                LLVM.LLVMSetInstrParamAlignment(ref, index, alignment)
+                Ok(Unit)
+            } else {
+                Err(IndexOutOfBoundsException("Index $index out of bounds for size $size"))
+            }
+        }
+
+        public fun getCalledFunctionType(): FunctionType {
+            val fnTy = LLVM.LLVMGetCalledFunctionType(ref)
+
+            return FunctionType(fnTy)
+        }
+
+        public fun getCallSiteAttributeCount(index: AttributeIndex): Int {
+            return LLVM.LLVMGetCallSiteAttributeCount(ref, index.value)
+        }
+
+        public fun getCallSiteAttributes(index: AttributeIndex): Array<Attribute> {
+            val size = getCallSiteAttributeCount(index)
+            val pointer = PointerPointer<LLVMAttributeRef>(size.toLong())
+            LLVM.LLVMGetCallSiteAttributes(ref, index.value, pointer)
+
+            return List(size) {
+                LLVMAttributeRef(pointer.get(it.toLong()))
+            }.map(::Attribute).toTypedArray().also {
+                pointer.deallocate()
+            }
+        }
+
+        public fun addCallSiteAttribute(index: AttributeIndex, attribute: Attribute) {
+            LLVM.LLVMAddCallSiteAttribute(ref, index.value, attribute.ref)
+        }
+
+        public fun getCallSiteEnumAttribute(index: AttributeIndex, kind: Int): Option<Attribute> {
+            val attr = LLVM.LLVMGetCallSiteEnumAttribute(ref, index.value, kind)
+
+            return Option.of(attr).map { Attribute(it) }
+        }
+
+        public fun getCallSiteStringAttribute(index: AttributeIndex, kind: String): Option<Attribute> {
+            val attr = LLVM.LLVMGetCallSiteStringAttribute(ref, index.value, kind, kind.length)
+
+            return Option.of(attr).map { Attribute(it) }
+        }
+
+        public fun removeCallSiteEnumAttribute(index: AttributeIndex, kind: Int) {
+            LLVM.LLVMRemoveCallSiteEnumAttribute(ref, index.value, kind)
+        }
+
+        public fun removeCallSiteStringAttribute(index: AttributeIndex, kind: String) {
+            LLVM.LLVMRemoveCallSiteStringAttribute(ref, index.value, kind, kind.length)
+        }
+    }
 
     /**
      * Common shared implementation for any LLVM instruction which is atomic
@@ -2015,7 +2101,11 @@ public class FloatComparisonInstruction public constructor(ptr: LLVMValueRef) : 
 }
 
 @CorrespondsTo("llvm::FuncletPadInst")
-public open class FuncletPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public open class FuncletPadInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr) {
+    public fun getArgumentCount(): Int {
+        return LLVM.LLVMGetNumArgOperands(ref)
+    }
+}
 
 @CorrespondsTo("llvm::CatchPadInst")
 public class CatchPadInstruction public constructor(ptr: LLVMValueRef) : FuncletPadInstruction(ptr)
@@ -2180,15 +2270,69 @@ public class BranchInstruction public constructor(ptr: LLVMValueRef) :
 @CorrespondsTo("llvm::InvokeInst")
 public class InvokeInstruction public constructor(ptr: LLVMValueRef) :
     Instruction(ptr),
-    Instruction.TerminatorInstructionImpl
+    Instruction.TerminatorInstructionImpl,
+    Instruction.CallBaseInstructionImpl {
+    /**
+     * Get the pointer to the function this instruction invokes
+     *
+     * TODO: Research - Can we use a more precise type here?
+     */
+    public fun getCalledFunction(): Value {
+        val fn = LLVM.LLVMGetCalledValue(ref)
+
+        return Value(fn)
+    }
+
+    public fun getNormalDestination(): BasicBlock {
+        val dest = LLVM.LLVMGetNormalDest(ref)
+
+        return BasicBlock(dest)
+    }
+
+    public fun getUnwindDestination(): BasicBlock {
+        val dest = LLVM.LLVMGetUnwindDest(ref)
+
+        return BasicBlock(dest)
+    }
+
+    public fun setNormalDestination(destination: BasicBlock) {
+        LLVM.LLVMSetNormalDest(ref, destination.ref)
+    }
+
+    public fun setUnwindDestination(destination: BasicBlock) {
+        LLVM.LLVMSetUnwindDest(ref, destination.ref)
+    }
+}
 
 @CorrespondsTo("llvm::CallBrInst")
 public class CallBrInstruction public constructor(ptr: LLVMValueRef) :
     Instruction(ptr),
-    Instruction.TerminatorInstructionImpl
+    Instruction.TerminatorInstructionImpl,
+    Instruction.CallBaseInstructionImpl
 
 @CorrespondsTo("llvm::CallInst")
-public class CallInstruction public constructor(ptr: LLVMValueRef) : Instruction(ptr)
+public class CallInstruction public constructor(ptr: LLVMValueRef) :
+    Instruction(ptr),
+    Instruction.CallBaseInstructionImpl {
+    /**
+     * Get the pointer to the function this instruction invokes
+     *
+     * TODO: Research - Can we use a more precise type here?
+     */
+    public fun getCalledFunction(): Value {
+        val fn = LLVM.LLVMGetCalledValue(ref)
+
+        return Value(fn)
+    }
+
+    public fun isTailCall(): Boolean {
+        return LLVM.LLVMIsTailCall(ref).toBoolean()
+    }
+
+    public fun setTailCall(tailCall: Boolean) {
+        LLVM.LLVMSetTailCall(ref, tailCall.toInt())
+    }
+}
 
 @CorrespondsTo("llvm::CatchRetInst")
 public class CatchReturnInstruction public constructor(ptr: LLVMValueRef) :

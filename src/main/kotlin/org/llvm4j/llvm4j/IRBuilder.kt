@@ -692,7 +692,7 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      *
      * The `fence` instruction is used to introduce happens-before edges between operations.
      *
-     * TODO: Research - Find out what fence instruction is used for
+     * TODO: Testing - Test this
      */
     public fun buildFence(ordering: AtomicOrdering, singleThread: Boolean, name: Option<String>): FenceInstruction {
         val res = LLVM.LLVMBuildFence(ref, ordering.value, singleThread.toInt(), name.toNullable() ?: "")
@@ -706,7 +706,7 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * The `cmpxchg` instruction is used to atomically modify memory. It loads a value in memory and compares it to a
      * given value. If these values are equal, it tries to store a new value into the memory.
      *
-     * TODO: Research - Find out what cmpxchg is used for
+     * TODO: Testing - Test this
      */
     public fun buildCmpXchg(
         ptr: Value,
@@ -729,7 +729,7 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      *
      * The `atomicrmw` instruction is used to atomically modify memory?
      *
-     * TODO: Research - Find out what atomicrmw is used for
+     * TODO: Testing - Test this
      */
     public fun buildAtomicRMW(
         op: AtomicRMWBinaryOperation,
@@ -995,7 +995,11 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param isFalse   value to select if [condition] is false
      * @param name      optional name for the instruction
      */
-    public fun buildSelect(condition: Value, isTrue: Value, isFalse: Value, name: Option<String>): Value = TODO()
+    public fun buildSelect(condition: Value, isTrue: Value, isFalse: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildSelect(ref, condition.ref, isTrue.ref, isFalse.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a freeze instruction
@@ -1004,8 +1008,14 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      *
      * @param op   poison or undef value
      * @param name optional name for the instruction
+     *
+     * TODO: Testing - Test this
      */
-    public fun buildFreeze(op: Value, name: Option<String>): Value = TODO()
+    public fun buildFreeze(op: Value, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildFreeze(ref, op.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 
     /**
      * Build a call instruction
@@ -1016,7 +1026,13 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param arguments list of arguments to pass into function
      * @param name      optional name for the instruction
      */
-    public fun buildCall(function: Function, vararg arguments: Value, name: Option<String>): Value = TODO()
+    public fun buildCall(function: Function, vararg arguments: Value, name: Option<String>): Value {
+        val argsPtr = arguments.map { it.ref }.toPointerPointer()
+        val res = LLVM.LLVMBuildCall(ref, function.ref, argsPtr, arguments.size, name.toNullable() ?: "")
+        argsPtr.deallocate()
+
+        return Value(res)
+    }
 
     /**
      * Build a variadic arguments instruction
@@ -1029,6 +1045,12 @@ public class IRBuilder public constructor(ptr: LLVMBuilderRef) : Owner<LLVMBuild
      * @param list va_arg list to access
      * @param type expected type of the current element
      * @param name optional name for the instruction
+     *
+     * TODO: Testing - Test this
      */
-    public fun buildVAArg(list: Value, type: Type, name: Option<String>): Value = TODO()
+    public fun buildVAArg(list: Value, type: Type, name: Option<String>): Value {
+        val res = LLVM.LLVMBuildVAArg(ref, list.ref, type.ref, name.toNullable() ?: "")
+
+        return Value(res)
+    }
 }

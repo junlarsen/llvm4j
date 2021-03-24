@@ -543,4 +543,53 @@ class IRBuilderTest {
         assertEquals(bb1.ref, block.ref)
         assertEquals(bb1Value.ref, value.ref)
     }
+
+    @Test fun `Test select instruction`() {
+        val ctx = Context()
+        val i1 = ctx.getInt1Type()
+        val i32 = ctx.getInt32Type()
+        val void = ctx.getVoidType()
+        val mod = ctx.newModule("test")
+        val function = mod.addFunction("test", ctx.getFunctionType(void, i1, i32, i32))
+        val bb = ctx.newBasicBlock("bb")
+        val builder = ctx.newIRBuilder()
+        builder.positionAfter(bb)
+        val condition = function.getParameter(0).unwrap()
+        val lhs = function.getParameter(1).unwrap()
+        val rhs = function.getParameter(2).unwrap()
+        val select = builder.buildSelect(condition, lhs, rhs, None)
+        val selectInst = cast<SelectInstruction>(select)
+        assertEquals(Opcode.Select, selectInst.getOpcode())
+    }
+
+    @Test fun `Test call instruction`() {
+        val ctx = Context()
+        val i32 = ctx.getInt32Type()
+        val void = ctx.getVoidType()
+        val mod = ctx.newModule("test")
+        val callerTy = ctx.getFunctionType(void)
+        val calleeTy = ctx.getFunctionType(void, i32)
+        val builder = ctx.newIRBuilder()
+        val bb = ctx.newBasicBlock("entry")
+        val callee = mod.addFunction("callee", calleeTy)
+        val caller = mod.addFunction("caller", callerTy)
+        builder.positionAfter(bb)
+        caller.addBasicBlock(bb)
+        val call = builder.buildCall(callee, i32.getConstant(1), name = None)
+        val callInst = cast<CallInstruction>(call)
+        assertEquals(Opcode.Call, callInst.getOpcode())
+        assertFalse { callInst.isTailCall() }
+        callInst.setTailCall(true)
+        assertTrue { callInst.isTailCall() }
+        val called = cast<Function>(callInst.getCalledFunction())
+        assertEquals(callee.ref, called.ref)
+        assertEquals(1, callInst.getArgumentCount())
+        assertEquals(CallConvention.C, callInst.getCallConvention())
+        for (value in CallConvention.values()) {
+            callInst.setCallConvention(value)
+            assertEquals(value, callInst.getCallConvention())
+        }
+        val calledType = callInst.getCalledFunctionType()
+        assertEquals(calledType.ref, calleeTy.ref)
+    }
 }
