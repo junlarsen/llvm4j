@@ -167,7 +167,7 @@ public open class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
      * global values and function arguments.
      *
      * @see Instruction
-     * @see BasicBlock
+     * @see BasicBlockAsValue
      * @see Function
      * @see GlobalValue
      * @see Argument
@@ -250,7 +250,8 @@ public open class User constructor(ptr: LLVMValueRef) : Value(ptr) {
  *
  * @author Mats Larsen
  */
-public class BasicBlock public constructor(ptr: LLVMBasicBlockRef) : Owner<LLVMBasicBlockRef> {
+public class BasicBlock public constructor(ptr: LLVMBasicBlockRef) :
+    Owner<LLVMBasicBlockRef> {
     public override val ref: LLVMBasicBlockRef = ptr
 
     public fun asValue(): BasicBlockAsValue {
@@ -313,7 +314,9 @@ public enum class MoveOrder(public override val value: Int) : Enumeration.EnumVa
  *
  * @author Mats Larsen
  */
-public class BasicBlockAsValue public constructor(ptr: LLVMValueRef) : Value(ptr) {
+public class BasicBlockAsValue public constructor(ptr: LLVMValueRef) :
+    Value(ptr),
+    Value.NamedValueImpl {
     public fun getBlock(): BasicBlock {
         val bb = LLVM.LLVMValueAsBasicBlock(ref)
 
@@ -493,7 +496,6 @@ public class ConstantDataVector public constructor(ptr: LLVMValueRef) : Constant
 @CorrespondsTo("llvm::GlobalValue")
 public open class GlobalValue constructor(ptr: LLVMValueRef) :
     Constant(ptr),
-    Owner<LLVMValueRef>,
     Value.NamedValueImpl {
     public fun getModule(): Module {
         val module = LLVM.LLVMGetGlobalParent(ref)
@@ -775,7 +777,9 @@ public class BlockAddress public constructor(ptr: LLVMValueRef) : Constant(ptr)
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::Argument")
-public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr), Value.NamedValueImpl {
+public class Argument public constructor(ptr: LLVMValueRef) :
+    Value(ptr),
+    Value.NamedValueImpl {
     public fun getParent(): Function {
         val fn = LLVM.LLVMGetParamParent(ref)
 
@@ -1832,7 +1836,10 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
  * TODO: Research - LLVMSetAlignment and GetAlignment on Alloca, Load and Store
  */
 @CorrespondsTo("llvm::Instruction")
-public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.DebugLocationValueImpl {
+public open class Instruction constructor(ptr: LLVMValueRef) :
+    User(ptr),
+    Value.DebugLocationValueImpl,
+    Value.NamedValueImpl {
     /**
      * Common shared implementation for any LLVM instruction which is a call
      *
@@ -2062,6 +2069,20 @@ public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.
 
     public fun setMetadata(kindId: Int, node: MetadataAsValue) {
         LLVM.LLVMSetMetadata(ref, kindId, node.ref)
+    }
+
+    /** Create a clone of this instruction, except it doesn't have a parent or a name */
+    public fun clone(): Instruction {
+        val duplicate = LLVM.LLVMInstructionClone(ref)
+
+        return Instruction(duplicate)
+    }
+
+    /** Get the basic block this instruction belongs to */
+    public fun getBasicBlock(): Option<BasicBlock> {
+        val bb = LLVM.LLVMGetInstructionParent(ref)
+
+        return Option.of(bb).map { BasicBlock(it) }
     }
 
     /**
