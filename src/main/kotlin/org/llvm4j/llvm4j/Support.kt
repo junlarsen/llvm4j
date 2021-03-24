@@ -85,7 +85,7 @@ public class MemoryBuffer public constructor(ptr: LLVMMemoryBufferRef) : Owner<L
             assert(file.exists()) { "File '$file' does not exist" }
 
             val fp = BytePointer(file.absolutePath)
-            val err = BytePointer(256)
+            val err = BytePointer(1L)
             val buf = LLVMMemoryBufferRef()
             val code = LLVM.LLVMCreateMemoryBufferWithContentsOfFile(fp, buf, err)
 

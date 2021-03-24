@@ -6,6 +6,7 @@ import org.llvm4j.llvm4j.testing.assertIsOk
 import org.llvm4j.llvm4j.testing.assertIsSome
 import org.llvm4j.optional.None
 import org.llvm4j.optional.Some
+import org.llvm4j.optional.testing.assertOk
 import java.io.File
 import java.nio.file.Files
 import kotlin.test.assertEquals
@@ -214,5 +215,37 @@ class ModuleTest {
 
         assertIsSome(mod.getGlobalVariable("var"))
         assertEquals(subject1.ref, mod.getGlobalVariable("var").unwrap().ref)
+    }
+
+    @Test fun `Test loading modules from memory buffers`() {
+        val ctx = Context()
+        val module1 = ctx.newModule("test")
+        val module2 = ctx.newModule("test2")
+        module1.setSourceFileName("hello_world.c")
+        module2.setSourceFileName("goodbye_world.c")
+
+        val buf1 = module1.toMemoryBuffer()
+        val buf2 = module2.toMemoryBuffer()
+        val newModule1 = ctx.getBitCodeModule(buf1).unwrap()
+        val newModule2 = ctx.getLazyBitCodeModule(buf2).unwrap()
+        assertEquals(ctx.ref, newModule1.getContext().ref)
+        assertEquals(ctx.ref, newModule2.getContext().ref)
+        assertEquals("hello_world.c", newModule1.getSourceFileName())
+        assertEquals("goodbye_world.c", newModule2.getSourceFileName())
+    }
+
+    @Test fun `Test exporting module bitcode to files`() {
+        val ctx = Context()
+        val module = ctx.newModule("test")
+        module.setSourceFileName("hello_world.c")
+
+        val file = File.createTempFile("test-module-export", "bc")
+        file.deleteOnExit()
+        module.writeBitCode(file)
+
+        val buffer = MemoryBuffer.of(file)
+        assertOk(buffer)
+        val newModule = ctx.getLazyBitCodeModule(buffer.unwrap())
+        assertEquals("hello_world.c", newModule.unwrap().getSourceFileName())
     }
 }

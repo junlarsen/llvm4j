@@ -1,9 +1,11 @@
 package org.llvm4j.llvm4j
 
+import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.javacpp.Pointer
 import org.bytedeco.llvm.LLVM.LLVMContextRef
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticHandler
 import org.bytedeco.llvm.LLVM.LLVMDiagnosticInfoRef
+import org.bytedeco.llvm.LLVM.LLVMModuleRef
 import org.bytedeco.llvm.LLVM.LLVMYieldCallback
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.Callback
@@ -12,6 +14,8 @@ import org.llvm4j.llvm4j.util.Owner
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
 import org.llvm4j.llvm4j.util.toPointerPointer
+import org.llvm4j.optional.Err
+import org.llvm4j.optional.Ok
 import org.llvm4j.optional.Option
 import org.llvm4j.optional.Result
 import org.llvm4j.optional.result
@@ -295,6 +299,49 @@ public open class Context public constructor(
         val ir = LLVM.LLVMCreateBuilderInContext(ref)
 
         return IRBuilder(ir)
+    }
+
+    /**
+     * Parse the provided [buffer] into a LLVM module whose objects live inside this context
+     *
+     * If there was an issue with parsing the buffer, a [RuntimeException] is returned.
+     *
+     * @see getLazyBitCodeModule
+     */
+    public fun getBitCodeModule(buffer: MemoryBuffer): Result<Module, RuntimeException> {
+        val error = BytePointer(1L)
+        val outModule = LLVMModuleRef()
+
+        return if (LLVM.LLVMParseBitcodeInContext2(ref, buffer.ref, outModule).toBoolean()) {
+            val copy = error.string
+            error.deallocate()
+            Err(RuntimeException(copy))
+        } else {
+            error.deallocate()
+            Ok(Module(outModule))
+        }
+    }
+
+    /**
+     * Parse the provided [buffer] into a LLVM module whose objects live inside this context
+     *
+     * This version differs from [getBitCodeModule] because it performs lazy deserialization and is often a better
+     * candidate performance wise for large modules.
+     *
+     * If there was an issue with parsing the buffer, a [RuntimeException] is returned.
+     */
+    public fun getLazyBitCodeModule(buffer: MemoryBuffer): Result<Module, RuntimeException> {
+        val error = BytePointer(1L)
+        val outModule = LLVMModuleRef()
+
+        return if (LLVM.LLVMGetBitcodeModuleInContext2(ref, buffer.ref, outModule).toBoolean()) {
+            val copy = error.string
+            error.deallocate()
+            Err(RuntimeException(copy))
+        } else {
+            error.deallocate()
+            Ok(Module(outModule))
+        }
     }
 
     public class DiagnosticHandler(private val closure: (Payload) -> Unit) :

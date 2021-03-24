@@ -139,7 +139,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
                 assert(fd.createNewFile()) { "Failed to create new file '$file'" }
             }
 
-            val err = BytePointer(256)
+            val err = BytePointer(1L)
             val code = LLVM.LLVMPrintModuleToFile(ref, fd.absolutePath, err)
 
             assert(code == 0) {
@@ -150,6 +150,18 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
         } else {
             LLVM.LLVMDumpModule(ref)
         }
+    }
+
+    /** Export the module bitcode to a memory buffer */
+    public fun toMemoryBuffer(): MemoryBuffer {
+        val buf = LLVM.LLVMWriteBitcodeToMemoryBuffer(ref)
+
+        return MemoryBuffer(buf)
+    }
+
+    /** Export the module bitcode to a file */
+    public fun writeBitCode(target: File) {
+        LLVM.LLVMWriteBitcodeToFile(ref, target.absolutePath)
     }
 
     public fun getInlineAsm(): String {
