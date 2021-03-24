@@ -4,7 +4,6 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
-import org.llvm4j.llvm4j.util.InternalApi
 import org.llvm4j.llvm4j.util.Owner
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
@@ -133,26 +132,31 @@ public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
     )
 
     /**
-     * Shared code among all composite types.
+     * Common shared implementation for any LLVM type which is composite
      *
-     * Composite types are [ArrayType], [VectorType], [ScalableVectorType], [PointerType] and [StructType]
+     * @see StructType
+     * @see VectorType
+     * @see ScalableVectorType
+     * @see ArrayType
+     * @see PointerType
      *
      * @author Mats Larsen
      */
-    @InternalApi
-    public interface IsComposite : Owner<LLVMTypeRef> {
+    public interface CompositeTypeImpl : Owner<LLVMTypeRef> {
         public fun getElementCount(): Int
     }
 
     /**
-     * Shared code among all sequential types.
+     * Common shared implementation for any LLVM type which is sequential
      *
-     * Composite types are [ArrayType], [VectorType], [ScalableVectorType] and [PointerType]
+     * @see VectorType
+     * @see ScalableVectorType
+     * @see ArrayType
+     * @see PointerType
      *
      * @author Mats Larsen
      */
-    @InternalApi
-    public interface IsSequential : IsComposite {
+    public interface SequentialTypeImpl : CompositeTypeImpl {
         public fun getSubtypes(): Array<Type> {
             val size = getElementCount()
             val buffer = PointerPointer<LLVMTypeRef>(size.toLong())
@@ -174,12 +178,14 @@ public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
     }
 
     /**
-     * Shared code among both struct types
+     * Common shared implementation for any LLVM type which is a structure
+     *
+     * @see NamedStructType
+     * @see StructType
      *
      * @author Mats Larsen
      */
-    @InternalApi
-    public interface IsStructure : Owner<LLVMTypeRef> {
+    public interface StructureTypeImpl : Owner<LLVMTypeRef> {
         public fun isPacked(): Boolean {
             return LLVM.LLVMIsPackedStruct(ref).toBoolean()
         }
@@ -239,7 +245,7 @@ public class IntegerType public constructor(ptr: LLVMTypeRef) : Type(ptr) {
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ArrayType")
-public class ArrayType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsSequential {
+public class ArrayType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.SequentialTypeImpl {
     public override fun getElementCount(): Int {
         return LLVM.LLVMGetArrayLength(ref)
     }
@@ -259,7 +265,7 @@ public class ArrayType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.Is
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::FixedVectorType", "llvm::VectorType")
-public class VectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsSequential {
+public class VectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.SequentialTypeImpl {
     public override fun getElementCount(): Int {
         return LLVM.LLVMGetVectorSize(ref)
     }
@@ -280,7 +286,7 @@ public class VectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.I
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::ScalableVectorType", "llvm::VectorType")
-public class ScalableVectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsSequential {
+public class ScalableVectorType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.SequentialTypeImpl {
     public fun getConstantNull(): ConstantVector {
         val ptr = LLVM.LLVMConstNull(ref)
 
@@ -300,7 +306,7 @@ public class ScalableVectorType public constructor(ptr: LLVMTypeRef) : Type(ptr)
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::PointerType")
-public class PointerType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsSequential {
+public class PointerType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.SequentialTypeImpl {
     public fun getAddressSpace(): AddressSpace {
         val space = LLVM.LLVMGetPointerAddressSpace(ref)
 
@@ -329,7 +335,7 @@ public class PointerType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::StructType")
-public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsComposite, Type.IsStructure {
+public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.CompositeTypeImpl, Type.StructureTypeImpl {
     public override fun getElementCount(): Int {
         return LLVM.LLVMCountStructElementTypes(ref)
     }
@@ -376,7 +382,7 @@ public class StructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.I
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::StructType")
-public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.IsStructure {
+public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), Type.StructureTypeImpl {
     public fun getElementCount(): Option<Int> {
         return if (isOpaque()) {
             None

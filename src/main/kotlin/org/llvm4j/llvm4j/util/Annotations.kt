@@ -23,14 +23,3 @@ public annotation class CorrespondsTo(vararg val names: String)
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.SOURCE)
 public annotation class CustomApi
-
-/**
- * Suggests that this interface exists only to share code between multiple modules
- *
- * This means that consumers should never expect this type as a parameter or return type
- *
- * @author Mats Larsen
- */
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
-@Retention(AnnotationRetention.SOURCE)
-public annotation class InternalApi

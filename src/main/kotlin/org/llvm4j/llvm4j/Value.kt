@@ -10,7 +10,6 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Enumeration
-import org.llvm4j.llvm4j.util.InternalApi
 import org.llvm4j.llvm4j.util.Owner
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
@@ -114,10 +113,14 @@ public open class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
     }
 
     /**
-     * Common implementation for any value which has a retrievable debug location at compile time.
+     * Common shared implementation for any LLVM value which may have a debug location
      *
      * In the C++ API there are 3 different implementations for this, but the C API has thrown all of these under
      * umbrella functions which delegate to the C++ implementations.
+     *
+     * @see Instruction
+     * @see GlobalVariable
+     * @see Function
      *
      * Known inheritors are [Instruction], [GlobalVariable] and [Function]
      *
@@ -125,8 +128,7 @@ public open class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
      *
      * @author Mats Larsen
      */
-    @InternalApi
-    public interface HasDebugLocation : Owner<LLVMValueRef> {
+    public interface DebugLocationValueImpl : Owner<LLVMValueRef> {
         public fun getDebugLine(): Int {
             return LLVM.LLVMGetDebugLocLine(ref)
         }
@@ -159,12 +161,10 @@ public open class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
     }
 
     /**
-     * Common implementation for any value which may have a name.
+     * Common shared implementation for any LLVM value which may have a debug location
      *
      * Only a few value kinds in LLVM IR may have a name. These are limited to instructions, basic blocks, functions,
      * global values and function arguments.
-     *
-     * Inheritors in the LLVM hierarchy are:
      *
      * @see Instruction
      * @see BasicBlock
@@ -174,8 +174,7 @@ public open class Value constructor(ptr: LLVMValueRef) : Owner<LLVMValueRef> {
      *
      * @author Mats Larsen
      */
-    @InternalApi
-    public interface HasName : Owner<LLVMValueRef> {
+    public interface NamedValueImpl : Owner<LLVMValueRef> {
         public fun getName(): String {
             val size = SizeTPointer(1L)
             val ptr = LLVM.LLVMGetValueName2(ref, size)
@@ -495,7 +494,7 @@ public class ConstantDataVector public constructor(ptr: LLVMValueRef) : Constant
 public open class GlobalValue constructor(ptr: LLVMValueRef) :
     Constant(ptr),
     Owner<LLVMValueRef>,
-    Value.HasName {
+    Value.NamedValueImpl {
     public fun getModule(): Module {
         val module = LLVM.LLVMGetGlobalParent(ref)
 
@@ -776,7 +775,7 @@ public class BlockAddress public constructor(ptr: LLVMValueRef) : Constant(ptr)
  * @author Mats Larsen
  */
 @CorrespondsTo("llvm::Argument")
-public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr), Value.HasName {
+public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr), Value.NamedValueImpl {
     public fun getParent(): Function {
         val fn = LLVM.LLVMGetParamParent(ref)
 
@@ -807,8 +806,8 @@ public class Argument public constructor(ptr: LLVMValueRef) : Value(ptr), Value.
 @CorrespondsTo("llvm::Function")
 public class Function public constructor(ptr: LLVMValueRef) :
     GlobalObject(ptr),
-    Value.HasDebugLocation,
-    Value.HasName {
+    Value.DebugLocationValueImpl,
+    Value.NamedValueImpl {
     public fun delete() {
         LLVM.LLVMDeleteFunction(ref)
     }
@@ -1040,7 +1039,7 @@ public class GlobalAlias public constructor(ptr: LLVMValueRef) : GlobalIndirectS
 @CorrespondsTo("llvm::GlobalVariable")
 public class GlobalVariable public constructor(ptr: LLVMValueRef) :
     GlobalObject(ptr),
-    Value.HasDebugLocation {
+    Value.DebugLocationValueImpl {
     public fun delete() {
         LLVM.LLVMDeleteGlobal(ref)
     }
@@ -1833,7 +1832,7 @@ public class ConstantExpression constructor(ptr: LLVMValueRef) : Constant(ptr) {
  * TODO: Research - LLVMSetAlignment and GetAlignment on Alloca, Load and Store
  */
 @CorrespondsTo("llvm::Instruction")
-public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.HasDebugLocation {
+public open class Instruction constructor(ptr: LLVMValueRef) : User(ptr), Value.DebugLocationValueImpl {
     /**
      * Common shared implementation for any LLVM instruction which is a call
      *
