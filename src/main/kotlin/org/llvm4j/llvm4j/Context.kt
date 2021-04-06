@@ -11,6 +11,7 @@ import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.Callback
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.take
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
 import org.llvm4j.llvm4j.util.toPointerPointer
@@ -313,9 +314,7 @@ public open class Context public constructor(
         val outModule = LLVMModuleRef()
 
         return if (LLVM.LLVMParseBitcodeInContext2(ref, buffer.ref, outModule).toBoolean()) {
-            val copy = error.string
-            error.deallocate()
-            Err(RuntimeException(copy))
+            Err(RuntimeException(error.take()))
         } else {
             error.deallocate()
             Ok(Module(outModule))
@@ -335,9 +334,7 @@ public open class Context public constructor(
         val outModule = LLVMModuleRef()
 
         return if (LLVM.LLVMGetBitcodeModuleInContext2(ref, buffer.ref, outModule).toBoolean()) {
-            val copy = error.string
-            error.deallocate()
-            Err(RuntimeException(copy))
+            Err(RuntimeException(error.take()))
         } else {
             error.deallocate()
             Ok(Module(outModule))
@@ -403,12 +400,7 @@ public class DiagnosticInfo public constructor(ptr: LLVMDiagnosticInfoRef) : Own
     public override val ref: LLVMDiagnosticInfoRef = ptr
 
     public fun getDescription(): String {
-        val ptr = LLVM.LLVMGetDiagInfoDescription(ref)
-        val copy = ptr.string
-
-        ptr.deallocate()
-
-        return copy
+        return LLVM.LLVMGetDiagInfoDescription(ref).take()
     }
 
     public fun getSeverity(): DiagnosticSeverity {

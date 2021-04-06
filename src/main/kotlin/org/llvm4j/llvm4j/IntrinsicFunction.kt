@@ -4,6 +4,7 @@ import org.bytedeco.javacpp.PointerPointer
 import org.bytedeco.javacpp.SizeTPointer
 import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
+import org.llvm4j.llvm4j.util.take
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toPointerPointer
 import org.llvm4j.optional.None
@@ -29,12 +30,7 @@ public class IntrinsicFunction constructor(intrinsic: Int) {
     public fun getName(): String {
         val size = SizeTPointer(1L)
         val ptr = LLVM.LLVMIntrinsicGetName(id, size)
-        val copy = ptr.string
-
-        ptr.deallocate()
-        size.deallocate()
-
-        return copy
+        return ptr.take().also { size.deallocate() }
     }
 
     public fun getDeclaration(target: Module): Result<Function, AssertionError> = result {

@@ -9,6 +9,7 @@ import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.CustomApi
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.take
 
 /**
  * Metadata is program metadata which can be attached to instructions or functions in the IR which convey extra
@@ -72,12 +73,7 @@ public class NamedMetadataNode public constructor(ptr: LLVMNamedMDNodeRef) : Own
     public fun getName(): String {
         val size = SizeTPointer(1L)
         val ptr = LLVM.LLVMGetNamedMetadataName(ref, size)
-        val copy = ptr.string
-
-        size.deallocate()
-        ptr.deallocate()
-
-        return copy
+        return ptr.take().also { size.deallocate() }
     }
 
     @CustomApi

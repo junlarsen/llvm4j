@@ -8,6 +8,7 @@ import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Enumeration
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.take
 import org.llvm4j.optional.None
 import org.llvm4j.optional.Option
 import org.llvm4j.optional.Result
@@ -44,12 +45,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
     public fun getModuleIdentifier(): String {
         val size = SizeTPointer(1L)
         val ptr = LLVM.LLVMGetModuleIdentifier(ref, size)
-        val copy = ptr.string
-
-        ptr.deallocate()
-        size.deallocate()
-
-        return copy
+        return ptr.take().also { size.deallocate() }
     }
 
     public fun setModuleIdentifier(name: String) {
@@ -59,12 +55,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
     public fun getSourceFileName(): String {
         val size = SizeTPointer(1L)
         val ptr = LLVM.LLVMGetSourceFileName(ref, size)
-        val copy = ptr.string
-
-        ptr.deallocate()
-        size.deallocate()
-
-        return copy
+        return ptr.take()
     }
 
     public fun setSourceFileName(name: String) {
@@ -73,20 +64,12 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
 
     public fun getDataLayout(): String {
         val ptr = LLVM.LLVMGetDataLayoutStr(ref)
-        val copy = ptr.string
-
-        ptr.deallocate()
-
-        return copy
+        return ptr.take()
     }
 
     public fun getTarget(): String {
         val ptr = LLVM.LLVMGetTarget(ref)
-        val copy = ptr.string
-
-        ptr.deallocate()
-
-        return copy
+        return ptr.take()
     }
 
     public fun setTarget(target: String) {
@@ -118,11 +101,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
 
     public fun getAsString(): String {
         val ptr = LLVM.LLVMPrintModuleToString(ref)
-        val copy = ptr.string
-
-        ptr.deallocate()
-
-        return copy
+        return ptr.take()
     }
 
     /**
@@ -167,12 +146,7 @@ public class Module public constructor(ptr: LLVMModuleRef) : Owner<LLVMModuleRef
     public fun getInlineAsm(): String {
         val size = SizeTPointer(1L)
         val ptr = LLVM.LLVMGetModuleInlineAsm(ref, size)
-        val copy = ptr.string
-
-        ptr.deallocate()
-        size.deallocate()
-
-        return copy
+        return ptr.take().also { size.deallocate() }
     }
 
     public fun setInlineAsm(asm: String) {

@@ -5,6 +5,7 @@ import org.bytedeco.llvm.LLVM.LLVMTypeRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.take
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.llvm4j.util.toInt
 import org.llvm4j.llvm4j.util.toPointerPointer
@@ -62,11 +63,7 @@ public open class Type constructor(ptr: LLVMTypeRef) : Owner<LLVMTypeRef> {
 
     public fun getAsString(): String {
         val ptr = LLVM.LLVMPrintTypeToString(ref)
-        val copy = ptr.string
-
-        ptr.deallocate()
-
-        return copy
+        return ptr.take()
     }
 
     public fun getConstantUndef(): UndefValue {
@@ -393,11 +390,7 @@ public class NamedStructType public constructor(ptr: LLVMTypeRef) : Type(ptr), T
 
     public fun getName(): String {
         val ptr = LLVM.LLVMGetStructName(ref)
-        val copy = ptr.string
-
-        ptr.deallocate()
-
-        return copy
+        return ptr.take()
     }
 
     public fun setElementTypes(vararg elements: Type, isPacked: Boolean = false): Result<Unit, AssertionError> = result {

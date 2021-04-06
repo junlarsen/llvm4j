@@ -6,6 +6,7 @@ import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Enumeration
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.take
 import org.llvm4j.llvm4j.util.toBoolean
 import org.llvm4j.optional.None
 import org.llvm4j.optional.Option
@@ -55,12 +56,7 @@ public open class Attribute constructor(ptr: LLVMAttributeRef) : Owner<LLVMAttri
 
         val size = IntPointer(1L)
         val ptr = LLVM.LLVMGetStringAttributeKind(ref, size)
-        val copy = ptr.string
-
-        size.deallocate()
-        ptr.deallocate()
-
-        copy
+        ptr.take().also { size.deallocate() }
     }
 
     public fun getStringValue(): Result<String, AssertionError> = result {
@@ -68,12 +64,7 @@ public open class Attribute constructor(ptr: LLVMAttributeRef) : Owner<LLVMAttri
 
         val size = IntPointer(1L)
         val ptr = LLVM.LLVMGetStringAttributeValue(ref, size)
-        val copy = ptr.string
-
-        size.deallocate()
-        ptr.deallocate()
-
-        copy
+        ptr.take().also { size.deallocate() }
     }
 
     public companion object {

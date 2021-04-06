@@ -6,6 +6,7 @@ import org.bytedeco.llvm.LLVM.LLVMValueRef
 import org.bytedeco.llvm.global.LLVM
 import org.llvm4j.llvm4j.util.CorrespondsTo
 import org.llvm4j.llvm4j.util.Owner
+import org.llvm4j.llvm4j.util.take
 import org.llvm4j.optional.None
 import org.llvm4j.optional.Option
 import org.llvm4j.optional.Result
@@ -24,10 +25,11 @@ import java.io.File
 public class LLVMString public constructor(ptr: BytePointer) : Owner<BytePointer> {
     public override val ref: BytePointer = ptr
 
-    /**
-     * Copies the content of the string.
-     */
+    /** Copies the content of the string */
     public fun getString(): String = ref.string
+
+    /** Copies the content of the string and discards the pointer afterwards */
+    public fun drop(): String = getString().also { deallocate() }
 
     public override fun deallocate() {
         LLVM.LLVMDisposeMessage(ref)
@@ -91,12 +93,7 @@ public class MemoryBuffer public constructor(ptr: LLVMMemoryBufferRef) : Owner<L
 
             fp.deallocate()
 
-            assert(code == 0) {
-                val c = err.string
-                err.deallocate()
-                buf.deallocate()
-                c
-            }
+            assert(code == 0) { err.take().also { buf.deallocate() } }
 
             MemoryBuffer(buf)
         }
